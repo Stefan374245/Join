@@ -1,5 +1,32 @@
-<nav class="sidebar">
-  <a routerLink="/summary" routerLinkActive="active">Summary</a>
-  <a routerLink="/board" routerLinkActive="active">Board</a>
-  <a routerLink="/contacts" routerLinkActive="active">Contacts</a>
-</nav>
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <img src="assets/images/joinlogowhite.svg" alt="Join Logo" />
+  </div>
+
+  <nav class="sidebar-nav">
+    <a
+      *ngFor="let link of navLinks"
+      [routerLink]="link.path"
+      routerLinkActive="active"
+      class="nav-link">
+      <img 
+        [src]="link.iconGray" 
+        [alt]="link.label" 
+        class="icon-gray" />
+      <img 
+        [src]="link.iconWhite" 
+        [alt]="link.label" 
+        class="icon-white" />
+      <span>{{ link.label }}</span>
+    </a>
+  </nav>
+
+  <div class="sidebar-legal">
+    <a
+      *ngFor="let link of legalLinks"
+      [routerLink]="link.path"
+      class="legal-link">
+      {{ link.label }}
+    </a>
+  </div>
+</aside>

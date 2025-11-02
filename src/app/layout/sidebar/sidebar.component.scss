@@ -2,73 +2,175 @@
 @import '../../../styles/mixins';
 
 .sidebar {
-  width: 250px;
-  background-color: $white;
-  box-shadow: $shadow;
   height: 100vh;
-  padding: $spacing-lg 0;
-  @include flex(column);
-  gap: $spacing-md;
+  width: 200px;
+  background-color: $primary-color;
+  @include flex(column, space-between, stretch);
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 200;
+  overflow-y: auto;
+  box-shadow: $shadow-lg;
+}
 
-  .logo {
-    padding: 0 $spacing-lg;
-    margin-bottom: $spacing-lg;
-    
-    img {
-      width: 100px;
-      height: auto;
-    }
-  }
+.sidebar-logo {
+  @include flex(row, center, center);
+  padding: $spacing-xl 0;
+  margin-top: $spacing-md;
 
-  a {
-    @include flex(row, flex-start, center);
-    gap: $spacing-md;
-    padding: $spacing-sm $spacing-lg;
-    color: $gray-700;
-    text-decoration: none;
-    transition: all 0.3s ease;
-    
+  img {
+    width: 80px;
+    height: auto;
+    transition: transform 0.3s ease;
+
     &:hover {
-      background-color: rgba($primary-color, 0.1);
-      color: $primary-color;
-      text-decoration: none;
-    }
-    
-    &.active {
-      background-color: $primary-color;
-      color: $white;
-      
-      &:hover {
-        background-color: $primary-dark;
-      }
-    }
-    
-    .nav-icon {
-      width: 24px;
-      height: 24px;
-      @include flex(row, center, center);
+      transform: scale(1.05);
     }
   }
+}
 
-  .sidebar-footer {
-    margin-top: auto;
-    padding: $spacing-lg;
-    border-top: 1px solid $gray-200;
-    
-    .legal-links {
-      @include flex(column);
-      gap: $spacing-sm;
-      
-      a {
-        font-size: $font-size-sm;
-        color: $gray-600;
-        padding: $spacing-xs 0;
-        
-        &:hover {
-          color: $primary-color;
-          background-color: transparent;
-        }
+.sidebar-nav {
+  @include flex(column, flex-start, stretch);
+  flex: 1;
+  padding: $spacing-md 0;
+}
+
+.nav-link {
+  @include flex(row, flex-start, center);
+  padding: $spacing-sm $spacing-lg;
+  padding-left: 45px;
+  text-decoration: none;
+  color: $font-color;
+  font-size: $font-size-base;
+  transition: all 0.2s ease;
+  position: relative;
+  white-space: nowrap;
+  gap: $spacing-sm;
+
+  .icon-gray {
+    display: block;
+    width: 24px;
+    height: 24px;
+  }
+
+  .icon-white {
+    display: none;
+    width: 24px;
+    height: 24px;
+  }
+
+  &:hover {
+    background-color: #2A3D59;
+    color: $white;
+  }
+
+  &.active {
+    background-color: $primary-dark;
+    color: $white;
+    cursor: default;
+
+    .icon-gray {
+      display: none;
+    }
+
+    .icon-white {
+      display: block;
+    }
+
+    &:hover {
+      background-color: $primary-dark;
+    }
+  }
+}
+
+.sidebar-legal {
+  @include flex(column, center, center);
+  padding: $spacing-lg 0;
+  gap: $spacing-md;
+  border-top: 1px solid rgba($white, 0.1);
+}
+
+.legal-link {
+  color: #A8A8A8;
+  font-size: 12px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+
+  &:hover {
+    color: $secondary-color;
+    font-weight: bold;
+  }
+}
+
+// Responsive design
+@media (max-width: $breakpoint-md) {
+  .sidebar {
+    width: 80px;
+
+    .sidebar-logo img {
+      width: 60px;
+    }
+
+    .nav-link {
+      padding-left: $spacing-md;
+      justify-content: center;
+
+      span {
+        display: none;
       }
+
+      .icon-gray,
+      .icon-white {
+        margin: 0;
+      }
+    }
+
+    .sidebar-legal {
+      flex-direction: row;
+      gap: $spacing-sm;
+
+      .legal-link {
+        font-size: 10px;
+        writing-mode: vertical-rl;
+        text-orientation: mixed;
+      }
+    }
+  }
+}
+
+@media (max-width: $breakpoint-sm) {
+  .sidebar {
+    width: 100%;
+    height: 60px;
+    flex-direction: row;
+    bottom: 0;
+    top: auto;
+
+    .sidebar-logo {
+      display: none;
+    }
+
+    .sidebar-nav {
+      flex-direction: row;
+      flex: 1;
+      padding: 0;
+      justify-content: space-around;
+    }
+
+    .nav-link {
+      flex-direction: column;
+      padding: $spacing-xs;
+      gap: 2px;
+
+      span {
+        font-size: 10px;
+      }
+    }
+
+    .sidebar-legal {
+      display: none;
     }
   }
 }

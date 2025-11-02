@@ -29,6 +29,8 @@ export class SignupComponent implements OnInit {
   showConfirmPassword = false;
   showSuccessMessage = false;
   logoAnimationComplete = false;
+  passwordFocused = false;
+  confirmPasswordFocused = false;
 
   constructor(
     private authService: AuthService,
@@ -55,11 +57,21 @@ export class SignupComponent implements OnInit {
   onPasswordFocus(): void {
     this.passwordError = false;
     this.signupFailError = false;
+    this.passwordFocused = true;
+  }
+
+  onPasswordBlur(): void {
+    this.passwordFocused = false;
   }
 
   onConfirmPasswordFocus(): void {
     this.confirmPasswordError = false;
     this.signupFailError = false;
+    this.confirmPasswordFocused = true;
+  }
+
+  onConfirmPasswordBlur(): void {
+    this.confirmPasswordFocused = false;
   }
 
   togglePasswordVisibility(): void {
@@ -68,6 +80,20 @@ export class SignupComponent implements OnInit {
 
   toggleConfirmPasswordVisibility(): void {
     this.showConfirmPassword = !this.showConfirmPassword;
+  }
+
+  getPasswordIcon(): string {
+    if (!this.passwordFocused && !this.password) {
+      return 'assets/images/lock.svg';
+    }
+    return this.showPassword ? 'assets/images/visibilityon.svg' : 'assets/images/visibilityoff.svg';
+  }
+
+  getConfirmPasswordIcon(): string {
+    if (!this.confirmPasswordFocused && !this.confirmPassword) {
+      return 'assets/images/lock.svg';
+    }
+    return this.showConfirmPassword ? 'assets/images/visibilityon.svg' : 'assets/images/visibilityoff.svg';
   }
 
   validateForm(): boolean {
@@ -113,9 +139,35 @@ export class SignupComponent implements OnInit {
       return;
     }
 
-    // TODO: Implement actual signup logic with AuthService
-    // Simulated signup for now
-    this.showSignupSuccess();
+    // Firebase signup
+    const signupData = {
+      name: this.name,
+      email: this.email,
+      password: this.password
+    };
+
+    this.authService.signup(signupData).subscribe({
+      next: (userCredential) => {
+        console.log('Signup successful:', userCredential.user);
+        this.showSignupSuccess();
+      },
+      error: (error) => {
+        console.error('Signup error:', error);
+        this.signupFailError = true;
+        
+        // Handle specific Firebase error codes
+        if (error.code === 'auth/email-already-in-use') {
+          this.emailError = true;
+          this.signupFailError = false;
+        } else if (error.code === 'auth/invalid-email') {
+          this.emailError = true;
+          this.signupFailError = false;
+        } else if (error.code === 'auth/weak-password') {
+          this.passwordError = true;
+          this.signupFailError = false;
+        }
+      }
+    });
   }
 
   showSignupSuccess(): void {

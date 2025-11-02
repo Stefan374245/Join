@@ -95,6 +95,25 @@
   margin: 0px;
   padding: 0px;
   cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  opacity: 0.5;
+
+  &.clickable {
+    cursor: pointer;
+    
+    &:hover {
+      opacity: 1;
+      transform: scale(1.1);
+    }
+
+    &.active {
+      opacity: 0.8;
+    }
+  }
+
+  &:not(.clickable) {
+    cursor: default;
+  }
 }
 
 .checkbox-div {

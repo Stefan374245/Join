@@ -4,13 +4,34 @@ import { SignupComponent } from './components/auth/signup/signup.component';
 import { BoardViewComponent } from './components/board/board-view/board-view.component';
 import { ContactsListComponent } from './components/contacts/contacts-list/contacts-list.component';
 import { SummaryViewComponent } from './components/summary/summary-view/summary-view.component';
+import { authGuard, guestGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
-  { path: 'login', component: LoginComponent },
-  { path: 'signup', component: SignupComponent },
-  { path: 'board', component: BoardViewComponent },
-  { path: 'contacts', component: ContactsListComponent },
-  { path: 'summary', component: SummaryViewComponent },
-  { path: '**', redirectTo: '/login' }
+  { 
+    path: 'login', 
+    component: LoginComponent,
+    canActivate: [guestGuard]
+  },
+  { 
+    path: 'signup', 
+    component: SignupComponent,
+    canActivate: [guestGuard]
+  },
+  { 
+    path: 'board', 
+    component: BoardViewComponent,
+    canActivate: [authGuard]
+  },
+  { 
+    path: 'contacts', 
+    component: ContactsListComponent,
+    canActivate: [authGuard]
+  },
+  { 
+    path: 'summary', 
+    component: SummaryViewComponent,
+    canActivate: [authGuard]
+  },
+  { path: '**', redirectTo: '/summary' }
 ];

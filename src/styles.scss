@@ -9,18 +9,20 @@
   box-sizing: border-box;
 }
 
+html, body {
+  height: 100%;
+  width: 100%;
+  overflow-x: hidden;
+}
+
 body {
   font-family: $font-family-base;
   font-size: $font-size-base;
   line-height: 1.5;
-  color: $gray-900;
+  color: $text-color;
   background-color: $background-color;
-  overflow-x: hidden;
-}
-
-html, body {
-  height: 100%;
-  width: 100%;
+  min-height: 100vh;
+  position: relative;
 }
 
 // Typography

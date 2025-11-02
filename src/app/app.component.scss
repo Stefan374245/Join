@@ -1,15 +1,27 @@
 @import '../styles/variables';
 @import '../styles/mixins';
 
-.app-container {
-  display: flex;
+:host {
+  display: block;
   height: 100vh;
+  overflow: hidden;
+}
+
+.app-container {
+  @include flex(row, flex-start, stretch);
+  height: 100vh;
+  background-color: $background-color;
 }
 
 .main-content {
   flex: 1;
-  padding: $spacing-lg;
+  margin-left: 200px; // Sidebar width
+  margin-top: 90px; // Header height
+  padding: $spacing-xl;
   overflow-y: auto;
+  overflow-x: hidden;
+  min-height: calc(100vh - 90px);
+  width: calc(100% - 200px);
 }
 
 .auth-content {
@@ -18,4 +30,22 @@
   @include flex(column, center, center);
   background-color: $background-color;
   padding: $spacing-lg;
+}
+
+// Responsive design
+@media (max-width: $breakpoint-md) {
+  .main-content {
+    margin-left: 80px;
+    width: calc(100% - 80px);
+  }
+}
+
+@media (max-width: $breakpoint-sm) {
+  .main-content {
+    margin-left: 0;
+    margin-bottom: 60px;
+    margin-top: 70px;
+    width: 100%;
+    min-height: calc(100vh - 130px);
+  }
 }

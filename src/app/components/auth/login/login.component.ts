@@ -20,6 +20,7 @@ export class LoginComponent implements OnInit {
   showPassword = false;
   showSuccessMessage = false;
   logoAnimationComplete = false;
+  passwordFocused = false;
 
   constructor(
     private authService: AuthService,
@@ -36,6 +37,11 @@ export class LoginComponent implements OnInit {
   onPasswordFocus(): void {
     this.passwordError = false;
     this.loginFailError = false;
+    this.passwordFocused = true;
+  }
+
+  onPasswordBlur(): void {
+    this.passwordFocused = false;
   }
 
   onEmailFocus(): void {
@@ -45,6 +51,13 @@ export class LoginComponent implements OnInit {
 
   togglePasswordVisibility(): void {
     this.showPassword = !this.showPassword;
+  }
+
+  getPasswordIcon(): string {
+    if (!this.passwordFocused && !this.password) {
+      return 'assets/images/lock.svg';
+    }
+    return this.showPassword ? 'assets/images/visibilityon.svg' : 'assets/images/visibilityoff.svg';
   }
 
   validateForm(): boolean {
@@ -72,18 +85,59 @@ export class LoginComponent implements OnInit {
       return;
     }
 
-    // TODO: Implement actual login logic with AuthService
-    // Simulated login for now
-    if (this.email === 'test@test.com' && this.password === 'password') {
-      this.showLoginSuccess();
-    } else {
-      this.loginFailError = true;
-    }
+    // Firebase login
+    this.authService.login(this.email, this.password).subscribe({
+      next: (userCredential) => {
+        console.log('Login successful:', userCredential.user);
+        this.showLoginSuccess();
+      },
+      error: (error) => {
+        console.error('Login error:', error);
+        this.loginFailError = true;
+        
+        // Handle specific Firebase error codes
+        if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+          this.loginFailError = true;
+        } else if (error.code === 'auth/invalid-email') {
+          this.emailError = true;
+        } else if (error.code === 'auth/too-many-requests') {
+          this.loginFailError = true;
+        }
+      }
+    });
   }
 
   guestLogin(): void {
-    // TODO: Implement guest login
-    this.showLoginSuccess();
+    this.authService.guestLogin().subscribe({
+      next: (userCredential) => {
+        console.log('Guest login successful:', userCredential.user);
+        this.showLoginSuccess();
+      },
+      error: (error) => {
+        console.error('Guest login error:', error);
+        this.loginFailError = true;
+      }
+    });
+  }
+
+  signInWithGoogle(): void {
+    this.loginFailError = false;
+    
+    this.authService.signInWithGoogle().subscribe({
+      next: (userCredential) => {
+        console.log('Google login successful:', userCredential.user);
+        this.showLoginSuccess();
+      },
+      error: (error) => {
+        console.error('Google login error:', error);
+        this.loginFailError = true;
+        
+        // Handle popup closed error gracefully
+        if (error.code === 'auth/popup-closed-by-user') {
+          this.loginFailError = false;
+        }
+      }
+    });
   }
 
   showLoginSuccess(): void {
