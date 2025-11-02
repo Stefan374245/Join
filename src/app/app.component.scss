@@ -1,0 +1,21 @@
+@import '../styles/variables';
+@import '../styles/mixins';
+
+.app-container {
+  display: flex;
+  height: 100vh;
+}
+
+.main-content {
+  flex: 1;
+  padding: $spacing-lg;
+  overflow-y: auto;
+}
+
+.auth-content {
+  width: 100%;
+  min-height: 100vh;
+  @include flex(column, center, center);
+  background-color: $background-color;
+  padding: $spacing-lg;
+}

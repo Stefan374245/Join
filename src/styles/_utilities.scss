@@ -1,0 +1,75 @@
+@import './variables';
+
+// Generate all user color classes
+@each $name, $color in $user-colors {
+  .userColor-#{$name} {
+    background-color: $color;
+  }
+}
+
+// User avatar component classes
+.user-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: $white;
+  font-weight: bold;
+  
+  &.size-sm {
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
+  }
+  
+  &.size-md {
+    width: 48px;
+    height: 48px;
+    font-size: 18px;
+  }
+  
+  &.size-lg {
+    width: 64px;
+    height: 64px;
+    font-size: 24px;
+  }
+}
+
+// Priority badge classes
+.priority-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: bold;
+  color: $white;
+  
+  &.priority-low {
+    background-color: $priority-color-low;
+  }
+  
+  &.priority-medium {
+    background-color: $priority-color-medium;
+  }
+  
+  &.priority-urgent {
+    background-color: $priority-color-urgent;
+  }
+}
+
+// Utility classes for quick access
+.bg-primary { background-color: $primary-color; }
+.bg-secondary { background-color: $secondary-color; }
+.bg-accent { background-color: $accent-color; }
+
+.text-primary { color: $primary-color; }
+.text-secondary { color: $secondary-color; }
+.text-accent { color: $accent-color; }
+.text-link { color: $link-color; }
+.text-error { color: $error-color; }
+
+.border-primary { border-color: $border-color; }
+.border-focus { border-color: $border-color-focus-filled; }
+.border-required { border-color: $border-color-required; }

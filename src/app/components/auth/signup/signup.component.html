@@ -1,0 +1,115 @@
+<main class="main-div" [class.show]="logoAnimationComplete">
+  <div class="main-content">
+    <div class="signup-div">
+      <h1 class="account-header">Sign up</h1>
+      
+      <div class="signup-input-div">
+        <div class="input-div">
+          <input 
+            type="text" 
+            id="nameInput" 
+            name="name"
+            [(ngModel)]="name"
+            placeholder="Name" 
+            class="signup-input"
+            [class.red-border]="nameError"
+            (focus)="onNameFocus()"
+            autocomplete="name">
+          <img src="assets/images/person.svg" alt="" class="input-img">
+        </div>
+        <span class="error-span" [class.visible]="nameError">Please enter your name</span>
+        
+        <div class="input-div">
+          <input 
+            type="email" 
+            id="emailInput" 
+            name="email"
+            [(ngModel)]="email"
+            placeholder="Email" 
+            class="signup-input"
+            [class.red-border]="emailError"
+            (focus)="onEmailFocus()"
+            autocomplete="email">
+          <img src="assets/images/mail.svg" alt="" class="input-img">
+        </div>
+        <span class="error-span" [class.visible]="emailError">Please enter a valid email address</span>
+        
+        <div class="input-div">
+          <input 
+            [type]="showPassword ? 'text' : 'password'" 
+            id="passwordInput" 
+            name="password"
+            [(ngModel)]="password"
+            placeholder="Password" 
+            class="signup-input"
+            [class.red-border]="passwordError"
+            (focus)="onPasswordFocus()"
+            autocomplete="new-password">
+          <img 
+            id="passwordImg" 
+            [src]="showPassword ? 'assets/images/visibility_off.svg' : 'assets/images/lock.svg'" 
+            alt="" 
+            class="input-img"
+            (click)="togglePasswordVisibility()">
+        </div>
+        <span class="error-span" [class.visible]="passwordError">Password must be at least 6 characters</span>
+        
+        <div class="input-div">
+          <input 
+            [type]="showConfirmPassword ? 'text' : 'password'" 
+            id="confirmPasswordInput" 
+            name="confirmPassword"
+            [(ngModel)]="confirmPassword"
+            placeholder="Confirm Password" 
+            class="signup-input"
+            [class.red-border]="confirmPasswordError"
+            (focus)="onConfirmPasswordFocus()"
+            autocomplete="new-password">
+          <img 
+            id="confirmPasswordImg" 
+            [src]="showConfirmPassword ? 'assets/images/visibility_off.svg' : 'assets/images/lock.svg'" 
+            alt="" 
+            class="input-img"
+            (click)="toggleConfirmPasswordVisibility()">
+        </div>
+        <span class="error-span" [class.visible]="confirmPasswordError">Passwords do not match</span>
+        
+        <div class="checkbox-div">
+          <input 
+            type="checkbox" 
+            id="privacyCheckbox" 
+            name="acceptPrivacy"
+            [(ngModel)]="acceptPrivacy"
+            class="privacy-checkbox">
+          <label for="privacyCheckbox" class="privacy-label">
+            I accept the <a routerLink="/privacy-policy" class="privacy-link">Privacy Policy</a>
+          </label>
+        </div>
+        <span class="error-span" [class.visible]="privacyError">You must accept the Privacy Policy</span>
+      </div>
+      
+      <div class="signup-button-div">
+        <div class="button-row">
+          <button type="button" (click)="signup()" class="blue-btn">Sign up</button>
+        </div>
+        <span class="error-span text-center" [class.visible]="signupFailError">
+          Signup failed. Please try again.
+        </span>
+      </div>
+    </div>
+  </div>
+  
+  <div class="login-redirect-div">
+    <span class="redirect-span">Already have an account?</span>
+    <a routerLink="/login" class="redirect-link">Log in</a>
+  </div>
+  
+  <div class="legal">
+    <a routerLink="/privacy-policy" class="legal-text">Privacy Policy</a>
+    <a routerLink="/legal-notice" class="legal-text">Legal Notice</a>
+  </div>
+  
+  <span class="signup-success animation" [class.display-none]="!showSuccessMessage">
+    Account created successfully!
+  </span>
+</main>

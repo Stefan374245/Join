@@ -1,0 +1,124 @@
+@import '../../../../styles/variables';
+@import '../../../../styles/mixins';
+
+.summary-container {
+  @include flex(column);
+  gap: $spacing-xl;
+  padding: $spacing-xl;
+
+  .greeting {
+    @include flex(column);
+    gap: $spacing-sm;
+
+    .time {
+      font-size: $font-size-lg;
+      color: $gray-600;
+    }
+
+    .name {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: $primary-color;
+    }
+  }
+
+  .stats-grid {
+    @include grid(3, $spacing-lg);
+
+    @include responsive(md) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @include responsive(sm) {
+      grid-template-columns: 1fr;
+    }
+
+    .stat-card {
+      background: $white;
+      border-radius: $border-radius;
+      padding: $spacing-lg;
+      box-shadow: $shadow;
+      @include flex(column);
+      gap: $spacing-md;
+
+      .stat-header {
+        @include flex(row, space-between, center);
+        
+        .stat-icon {
+          width: 40px;
+          height: 40px;
+          border-radius: $border-radius;
+          @include flex(row, center, center);
+          background-color: rgba($primary-color, 0.1);
+          color: $primary-color;
+        }
+
+        .stat-value {
+          font-size: 2rem;
+          font-weight: 700;
+        }
+      }
+
+      .stat-title {
+        font-size: $font-size-base;
+        color: $gray-600;
+      }
+
+      &.urgent {
+        border-left: 4px solid #ff4444;
+      }
+
+      &.deadline {
+        .deadline-date {
+          font-weight: 600;
+          color: $primary-color;
+        }
+      }
+    }
+  }
+
+  .tasks-overview {
+    @include flex(column);
+    gap: $spacing-lg;
+
+    h2 {
+      color: $gray-800;
+    }
+
+    .tasks-grid {
+      @include grid(2, $spacing-lg);
+
+      @include responsive(sm) {
+        grid-template-columns: 1fr;
+      }
+
+      .task-status {
+        background: $white;
+        border-radius: $border-radius;
+        padding: $spacing-lg;
+        @include flex(row, space-between, center);
+        box-shadow: $shadow-sm;
+        transition: transform 0.2s ease;
+
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow: $shadow;
+        }
+
+        .status-info {
+          @include flex(column);
+          gap: $spacing-xs;
+
+          .status-title {
+            color: $gray-600;
+          }
+
+          .status-count {
+            font-size: $font-size-lg;
+            font-weight: 600;
+          }
+        }
+      }
+    }
+  }
+}

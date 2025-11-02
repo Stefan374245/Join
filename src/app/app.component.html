@@ -1,0 +1,15 @@
+
+
+@if (isAuthPage) {
+  <main class="auth-content">
+    <router-outlet />
+  </main>
+} @else {
+  <app-header></app-header>
+  <div class="app-container">
+    <app-sidebar></app-sidebar>
+    <main class="main-content">
+      <router-outlet />
+    </main>
+  </div>
+}

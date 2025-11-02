@@ -1,0 +1,74 @@
+@import '../../../styles/variables';
+@import '../../../styles/mixins';
+
+.sidebar {
+  width: 250px;
+  background-color: $white;
+  box-shadow: $shadow;
+  height: 100vh;
+  padding: $spacing-lg 0;
+  @include flex(column);
+  gap: $spacing-md;
+
+  .logo {
+    padding: 0 $spacing-lg;
+    margin-bottom: $spacing-lg;
+    
+    img {
+      width: 100px;
+      height: auto;
+    }
+  }
+
+  a {
+    @include flex(row, flex-start, center);
+    gap: $spacing-md;
+    padding: $spacing-sm $spacing-lg;
+    color: $gray-700;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    
+    &:hover {
+      background-color: rgba($primary-color, 0.1);
+      color: $primary-color;
+      text-decoration: none;
+    }
+    
+    &.active {
+      background-color: $primary-color;
+      color: $white;
+      
+      &:hover {
+        background-color: $primary-dark;
+      }
+    }
+    
+    .nav-icon {
+      width: 24px;
+      height: 24px;
+      @include flex(row, center, center);
+    }
+  }
+
+  .sidebar-footer {
+    margin-top: auto;
+    padding: $spacing-lg;
+    border-top: 1px solid $gray-200;
+    
+    .legal-links {
+      @include flex(column);
+      gap: $spacing-sm;
+      
+      a {
+        font-size: $font-size-sm;
+        color: $gray-600;
+        padding: $spacing-xs 0;
+        
+        &:hover {
+          color: $primary-color;
+          background-color: transparent;
+        }
+      }
+    }
+  }
+}

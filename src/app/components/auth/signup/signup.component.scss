@@ -1,0 +1,289 @@
+@import '../../../../styles/variables';
+
+.main-div {
+  position: relative;
+  opacity: 0;
+  transition: opacity 0.5s;
+  width: 100vw;
+  height: 100vh;
+  min-height: 630px;
+  background-color: #F6F7F8;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  &.show {
+    opacity: 1;
+  }
+}
+
+.main-content {
+  margin: 50px;
+}
+
+.signup-div {
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
+  background-color: white;
+  width: fit-content;
+  border-radius: 30px;
+  padding: 30px 40px;
+  box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.05);
+}
+
+.account-header {
+  font-size: 55px;
+  font-weight: bold;
+  text-decoration: underline 3px #29ABE2;
+  text-underline-offset: 20px;
+  cursor: default;
+  margin: 0 0 20px 0;
+}
+
+.signup-input-div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  margin: 20px 0;
+}
+
+.input-div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: fit-content;
+  padding-left: 25px;
+  margin-top: 0px;
+  margin-bottom: 0px;
+}
+
+.signup-input {
+  border: solid 1px #D1D1D1;
+  border-radius: 10px;
+  height: 46px;
+  border-width: 1px;
+  width: 375px;
+  font-size: 20px;
+  background-repeat: no-repeat;
+  background-position: right 20px center;
+  padding-left: 20px;
+  padding-right: 50px;
+  margin: 10px 0px;
+  outline: none;
+  cursor: pointer;
+
+  &::placeholder {
+    color: #D1D1D1;
+  }
+
+  &:focus {
+    border-color: #29ABE2;
+  }
+
+  &.red-border {
+    border-color: red;
+  }
+}
+
+.input-img {
+  position: relative;
+  right: 45px;
+  margin: 0px;
+  padding: 0px;
+  cursor: pointer;
+}
+
+.checkbox-div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 15px 0;
+  width: 100%;
+  padding-left: 25px;
+}
+
+.privacy-checkbox {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: #29ABE2;
+}
+
+.privacy-label {
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.privacy-link {
+  color: #29ABE2;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.error-span {
+  height: auto;
+  min-height: 14px;
+  font-size: 10px;
+  color: red;
+  visibility: hidden;
+  width: 100%;
+
+  &.visible {
+    visibility: visible;
+  }
+
+  &.text-center {
+    text-align: center;
+  }
+}
+
+.signup-button-div {
+  width: 100%;
+  display: flex;
+  justify-content: space-evenly;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+}
+
+.button-row {
+  display: flex;
+  gap: 16px;
+}
+
+.blue-btn {
+  background-color: #2A3647;
+  color: white;
+  font-size: 21px;
+  font-weight: bold;
+  border: none;
+  border-radius: 10px;
+  height: 48px;
+  width: fit-content;
+  padding: 0px 30px;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #29ABE2;
+    box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.25);
+    transition: all 0.1s ease-in-out;
+  }
+}
+
+.login-redirect-div {
+  position: absolute;
+  top: 75px;
+  right: 100px;
+}
+
+.redirect-span {
+  margin-right: 20px;
+  font-size: 16px;
+  cursor: default;
+}
+
+.redirect-link {
+  background-color: #2A3647;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  border: none;
+  border-radius: 10px;
+  width: 110px;
+  text-decoration: none;
+  padding: 10px 20px;
+  text-align: center;
+
+  &:hover {
+    background-color: #29ABE2;
+    box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.25);
+    transition: all 0.1s ease-in-out;
+  }
+}
+
+.legal {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  bottom: 20px;
+  gap: 50px;
+}
+
+.legal-text {
+  font-size: 12px;
+  color: #A8A8A8;
+  text-decoration: none;
+
+  &:hover {
+    color: #29ABE2;
+    font-weight: bold;
+  }
+}
+
+.signup-success {
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  transform: translate(-50%, -150%);
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  background-color: #2A3647;
+  border-radius: 10px;
+  padding: 20px 20px;
+  text-align: center;
+  z-index: 2;
+
+  &.display-none {
+    display: none;
+  }
+}
+
+.animation {
+  transition: all 0.5s ease-in-out;
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .main-content {
+    margin: 20px;
+  }
+
+  .signup-div {
+    padding: 20px;
+    height: auto;
+  }
+
+  .account-header {
+    font-size: 40px;
+  }
+
+  .signup-input {
+    width: 300px;
+    font-size: 18px;
+  }
+
+  .login-redirect-div {
+    top: 30px;
+    right: 30px;
+  }
+
+  .blue-btn {
+    font-size: 18px;
+    height: 44px;
+    padding: 0px 25px;
+  }
+
+  .button-row {
+    width: 100%;
+  }
+}
