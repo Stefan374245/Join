@@ -32,25 +32,42 @@
 				<span>Add new contact</span>
 			</div>
 
-			<div id="allContacts" class="all-contacts">
-				<ng-container *ngIf="grouped$ | async as groups">
-					<ng-container *ngFor="let g of groups">
-						<div class="capital">
-							<span class="spanLetter">{{ g.letter }}</span>
-							<div class="separator"></div>
-						</div>
+			<!-- Debug Info -->
+			<!-- <div style="padding: 10px; background: #f0f0f0; margin: 10px 0;">
+				<small>Debug: Contacts count: {{ (contacts$ | async)?.length || 0 }} | Groups count: {{ (grouped$ | async)?.length || 0 }}</small>
+			</div> -->
 
-						<ng-container *ngFor="let user of g.items; index as i">
-							<nav class="singleUser" [class.singleUserChosen]="selected?.email === user.email" (click)="select(user)">
-								<span class="userInitials" [ngStyle]="{'background-color': user.color}">{{ user.initials }}</span>
-								<div class="userDetails">
-									<span class="userName">{{ user.firstName }} {{ user.lastName }}</span>
-									<a class="emailText" [href]="'mailto:' + user.email">{{ user.email }}</a>
-								</div>
-							</nav>
+			<div id="allContacts" class="all-contacts">
+				<ng-container *ngIf="grouped$ | async as groups; else loading">
+					<ng-container *ngIf="groups.length > 0; else noContacts">
+						<ng-container *ngFor="let g of groups">
+							<div class="capital">
+								<span class="spanLetter">{{ g.letter }}</span>
+								<div class="separator"></div>
+							</div>
+
+							<ng-container *ngFor="let user of g.items; index as i">
+								<nav class="singleUser" [class.singleUserChosen]="selected?.email === user.email" (click)="select(user)">
+									<span class="userInitials" [ngStyle]="{'background-color': user.color}">{{ user.initials }}</span>
+									<div class="userDetails">
+										<span class="userName">{{ user.firstName }} {{ user.lastName }}</span>
+										<a class="emailText" [href]="'mailto:' + user.email">{{ user.email }}</a>
+									</div>
+								</nav>
+							</ng-container>
 						</ng-container>
 					</ng-container>
+					<ng-template #noContacts>
+						<div class="empty-message">
+							<p>No contacts available. Register users to see them here.</p>
+						</div>
+					</ng-template>
 				</ng-container>
+				<ng-template #loading>
+					<div class="loading-message">
+						<p>Loading contacts...</p>
+					</div>
+				</ng-template>
 			</div>
 		</div>
 
@@ -70,10 +87,10 @@
 						<p id="contactDetailsName">{{ selected.firstName }} {{ selected.lastName }}</p>
 						<div id="basicManipulate">
 							<div class="manipulateBtnDiv">
-								<button class="btn-link">Edit</button>
+								<button class="btn-link" (click)="editContact(selected)">Edit</button>
 							</div>
 							<div class="manipulateBtnDiv">
-								<button class="btn-link">Delete</button>
+								<button class="btn-link" (click)="deleteContact(selected.email)">Delete</button>
 							</div>
 						</div>
 					</section>
@@ -95,4 +112,14 @@
 			</ng-template>
 		</div>
 	</main>
+
+	<!-- Contact Dialog -->
+	<app-contact-dialog 
+		*ngIf="showDialog"
+		[mode]="dialogMode"
+		[contact]="dialogContact"
+		(close)="closeDialog()"
+		(save)="saveContact($event)"
+		(delete)="deleteContact($event)">
+	</app-contact-dialog>
 </div>

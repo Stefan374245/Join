@@ -59,13 +59,50 @@ export class AuthService {
     const userDoc = doc(this.firestore, 'users', user.uid);
     const color = this.generateColorFromEmail(user.email || '');
     
+    // Parse displayName into firstName and lastName
+    const nameParts = displayName.split(' ');
+    const firstName = nameParts[0] || '';
+    const lastName = nameParts.slice(1).join(' ') || '';
+    
+    // Generate initials
+    const initials = displayName 
+      ? displayName.split(' ').map((s: string) => s[0]).slice(0, 2).join('').toUpperCase()
+      : (user.email?.substring(0, 2).toUpperCase() || 'U');
+    
     await setDoc(userDoc, {
+      firstName: firstName,
+      lastName: lastName,
       displayName: displayName,
       email: user.email,
+      phone: '',
       color: color,
+      initials: initials,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     });
+  }
+
+  /**
+   * Ensure user exists in Firestore (migration helper for existing Auth users)
+   * Checks if user document exists, if not creates it
+   */
+  private async ensureUserInFirestore(user: User): Promise<void> {
+    try {
+      const userDoc = doc(this.firestore, 'users', user.uid);
+      const userSnapshot = await getDoc(userDoc);
+      
+      if (!userSnapshot.exists()) {
+        console.log('🔄 User not found in Firestore, creating document for:', user.email);
+        const displayName = user.displayName || user.email?.split('@')[0] || 'User';
+        await this.saveUserToFirestore(user, displayName);
+        console.log('✅ User migrated to Firestore successfully');
+      } else {
+        console.log('✅ User already exists in Firestore');
+      }
+    } catch (error) {
+      console.error('❌ Error ensuring user in Firestore:', error);
+      // Don't throw error, just log it - login should still succeed
+    }
   }
 
   /**
@@ -101,7 +138,12 @@ export class AuthService {
    * @returns Observable of UserCredential
    */
   login(email: string, password: string): Observable<UserCredential> {
-    const promise = signInWithEmailAndPassword(this.auth, email, password);
+    const promise = signInWithEmailAndPassword(this.auth, email, password)
+      .then(async (userCredential) => {
+        // Ensure user exists in Firestore (migration for existing users)
+        await this.ensureUserInFirestore(userCredential.user);
+        return userCredential;
+      });
     return from(promise);
   }
 
@@ -129,17 +171,8 @@ export class AuthService {
     });
     
     const promise = signInWithPopup(this.auth, provider).then(async (userCredential) => {
-      // Check if user exists in Firestore, if not create entry
-      const userDoc = doc(this.firestore, 'users', userCredential.user.uid);
-      const docSnap = await getDoc(userDoc);
-      
-      if (!docSnap.exists()) {
-        await this.saveUserToFirestore(
-          userCredential.user, 
-          userCredential.user.displayName || 'User'
-        );
-      }
-      
+      // Ensure user exists in Firestore
+      await this.ensureUserInFirestore(userCredential.user);
       return userCredential;
     });
     
@@ -179,5 +212,29 @@ export class AuthService {
    */
   getUserEmail(): string | null {
     return this.currentUser?.email || null;
+  }
+
+  /**
+   * Update the display name of the current user
+   * Updates both the Firebase Auth profile
+   * @param displayName - The new display name
+   * @returns Promise<void>
+   */
+  async updateDisplayName(displayName: string): Promise<void> {
+    if (!this.currentUser) {
+      throw new Error('No user is currently logged in');
+    }
+
+    try {
+      // Update Firebase Auth profile
+      await updateProfile(this.currentUser, {
+        displayName: displayName
+      });
+
+      console.log('✅ Display name updated successfully in Auth');
+    } catch (error) {
+      console.error('❌ Error updating display name:', error);
+      throw error;
+    }
   }
 }

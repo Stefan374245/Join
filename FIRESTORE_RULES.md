@@ -6,12 +6,18 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Users collection - stores registered user profiles for contacts
+    // Users collection - stores both registered users and contacts
     match /users/{userId} {
       // Any authenticated user can read all users (for contacts list)
       allow read: if request.auth != null;
-      // Users can only write their own profile
-      allow write: if request.auth != null && request.auth.uid == userId;
+      
+      // Allow authenticated users to create new contacts (contacts-only, not auth users)
+      // Allow users to update their own profile (when userId matches auth UID)
+      allow create: if request.auth != null;
+      allow update: if request.auth != null && 
+                     (request.auth.uid == userId || request.auth.uid == resource.data.userId);
+      allow delete: if request.auth != null && 
+                     (request.auth.uid == userId || request.auth.uid == resource.data.userId);
     }
     
     // Tasks collection - for future task assignment feature
@@ -27,8 +33,14 @@ service cloud.firestore {
 
 ### `/users` collection:
 - ✅ **Read**: Any authenticated user can read all user profiles (needed for contacts list)
-- ⚠️ **Write**: Users can only create/update their own profile
-- 📝 **Purpose**: Stores registered user data for the contacts list and task assignment
+- ✅ **Create**: Any authenticated user can create new contacts (for contact management)
+- ✅ **Update**: Users can update their own profile OR contacts they created
+- ✅ **Delete**: Users can delete their own profile OR contacts they created
+- 📝 **Purpose**: Stores both registered user data AND non-auth contacts for the contacts list
+
+**Two types of users:**
+1. **Registered Users**: Created via Firebase Auth signup, userId = auth.uid
+2. **Contacts Only**: Created manually via "Add Contact", userId = sanitized email
 
 ### `/tasks` collection (future):
 - ✅ **Read**: Any authenticated user can read all tasks
@@ -38,10 +50,19 @@ service cloud.firestore {
 ## ⚠️ Important Notes:
 
 1. **These are DEVELOPMENT rules** - suitable for testing and development
-2. **Before going to production**, you should:
-   - Restrict contact writes to only the contact's owner
-   - Restrict login reads to only the user's own data
-   - Add data validation rules
+2. **The current rules allow any authenticated user to create contacts** - this is needed for the contact management feature
+3. **Before going to production**, you should:
+   - Add data validation rules (email format, required fields)
+   - Add rate limiting
+   - Consider adding a `createdBy` field to track who created each contact
+
+## How to Apply These Rules:
+
+1. Go to Firebase Console: https://console.firebase.google.com
+2. Select your project: `join-angular-based`
+3. Navigate to: **Firestore Database** → **Rules** tab
+4. Copy the rules from the section above
+5. Click **Publish**
 
 ## Production-Ready Rules (Future)
 

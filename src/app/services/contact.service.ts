@@ -28,16 +28,27 @@ export class ContactService {
 
         const result: Contact[] = snapshot.docs.map((doc) => {
           const data = doc.data();
-          const displayName = data['displayName'] || data['name'] || '';
           const email = data['email'] || '';
-          const nameParts = displayName.split(' ');
-          const firstName = nameParts[0] || '';
-          const lastName = nameParts.slice(1).join(' ') || '';
+          
+          // Support both formats:
+          // 1. New format: firstName + lastName (for contacts)
+          // 2. Old format: displayName only (for auth users)
+          let firstName = data['firstName'] || '';
+          let lastName = data['lastName'] || '';
+          
+          if (!firstName && !lastName && data['displayName']) {
+            // Parse displayName if firstName/lastName not available
+            const nameParts = data['displayName'].split(' ');
+            firstName = nameParts[0] || '';
+            lastName = nameParts.slice(1).join(' ') || '';
+          }
+          
+          const fullName = `${firstName} ${lastName}`.trim();
           
           // Generate initials from name
-          const initials = displayName 
-            ? displayName.split(' ').map((s: string) => s[0]).slice(0, 2).join('').toUpperCase()
-            : email.substring(0, 2).toUpperCase();
+          const initials = data['initials'] || (fullName 
+            ? fullName.split(' ').map((s: string) => s[0]).slice(0, 2).join('').toUpperCase()
+            : email.substring(0, 2).toUpperCase());
 
           // Assign color based on email hash or use stored color
           const color = data['color'] || this.generateColorFromEmail(email);
@@ -99,7 +110,7 @@ export class ContactService {
 
   /**
    * Save user profile to Firestore 'users' collection
-   * Called after user registration
+   * Called after user registration (Auth users)
    */
   saveUser(userId: string, userData: { displayName: string; email: string; color?: string }): Observable<void> {
     const userDoc = doc(this.firestore, 'users', userId);
@@ -116,11 +127,44 @@ export class ContactService {
   }
 
   /**
+   * Save a contact (non-auth user) to Firestore 'users' collection
+   * Used for adding contacts that are not registered users
+   */
+  saveContact(contact: Contact): Observable<void> {
+    const contactDoc = doc(this.firestore, 'users', contact.id);
+    const color = contact.color || this.generateColorFromEmail(contact.email);
+    
+    const promise = setDoc(contactDoc, {
+      firstName: contact.firstName,
+      lastName: contact.lastName,
+      displayName: `${contact.firstName} ${contact.lastName}`,
+      email: contact.email,
+      phone: contact.phone || '',
+      color: color,
+      initials: contact.initials,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    });
+
+    return from(promise);
+  }
+
+  /**
    * Update user profile
    */
   updateUser(userId: string, data: Partial<Contact>): Observable<void> {
     const userDoc = doc(this.firestore, 'users', userId);
-    const promise = setDoc(userDoc, data, { merge: true });
+    const updateData: any = {
+      ...data,
+      updatedAt: new Date().toISOString()
+    };
+    
+    // If firstName or lastName changed, update displayName too
+    if (data.firstName || data.lastName) {
+      updateData.displayName = `${data.firstName || ''} ${data.lastName || ''}`.trim();
+    }
+    
+    const promise = setDoc(userDoc, updateData, { merge: true });
     return from(promise);
   }
 
