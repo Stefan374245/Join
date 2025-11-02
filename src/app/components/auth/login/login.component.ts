@@ -34,6 +34,16 @@ export class LoginComponent implements OnInit {
     }, 500);
   }
 
+  /**
+   * Check if login button should be disabled
+   */
+  isLoginButtonDisabled(): boolean {
+    return !this.email || 
+           !this.password || 
+           !this.email.includes('@') ||
+           this.password.length < 6;
+  }
+
   onPasswordFocus(): void {
     this.passwordError = false;
     this.loginFailError = false;

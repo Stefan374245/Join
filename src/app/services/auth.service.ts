@@ -11,6 +11,7 @@ import {
   UserCredential,
   authState
 } from '@angular/fire/auth';
+import { Firestore, doc, setDoc, getDoc } from '@angular/fire/firestore';
 import { Observable, from } from 'rxjs';
 import { Router } from '@angular/router';
 
@@ -25,6 +26,7 @@ export interface SignupData {
 })
 export class AuthService {
   private auth = inject(Auth);
+  private firestore = inject(Firestore);
   private router = inject(Router);
   
   // Observable of the current user
@@ -33,6 +35,37 @@ export class AuthService {
   // Get current user synchronously
   get currentUser(): User | null {
     return this.auth.currentUser;
+  }
+
+  /**
+   * Generate a color for new user based on email
+   */
+  private generateColorFromEmail(email: string): string {
+    const colors = [
+      '#FF7A00', '#FF5EB3', '#6E52FF', '#9327FF', '#00BEE8',
+      '#1FD7C1', '#FF745E', '#FFA35E', '#FC71FF', '#FFC701',
+      '#0038FF', '#C3FF2B', '#FFE62B', '#FF4646', '#FFBB2B'
+    ];
+    
+    const hash = email.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    const colorIndex = hash % colors.length;
+    return colors[colorIndex];
+  }
+
+  /**
+   * Save user data to Firestore 'users' collection
+   */
+  private async saveUserToFirestore(user: User, displayName: string): Promise<void> {
+    const userDoc = doc(this.firestore, 'users', user.uid);
+    const color = this.generateColorFromEmail(user.email || '');
+    
+    await setDoc(userDoc, {
+      displayName: displayName,
+      email: user.email,
+      color: color,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    });
   }
 
   /**
@@ -45,12 +78,15 @@ export class AuthService {
       this.auth, 
       data.email, 
       data.password
-    ).then((userCredential) => {
+    ).then(async (userCredential) => {
       // Update user profile with display name
       if (userCredential.user) {
-        return updateProfile(userCredential.user, {
+        await updateProfile(userCredential.user, {
           displayName: data.name
-        }).then(() => userCredential);
+        });
+        
+        // Save user to Firestore for contacts list
+        await this.saveUserToFirestore(userCredential.user, data.name);
       }
       return userCredential;
     });
@@ -91,7 +127,22 @@ export class AuthService {
     provider.setCustomParameters({
       prompt: 'select_account'
     });
-    const promise = signInWithPopup(this.auth, provider);
+    
+    const promise = signInWithPopup(this.auth, provider).then(async (userCredential) => {
+      // Check if user exists in Firestore, if not create entry
+      const userDoc = doc(this.firestore, 'users', userCredential.user.uid);
+      const docSnap = await getDoc(userDoc);
+      
+      if (!docSnap.exists()) {
+        await this.saveUserToFirestore(
+          userCredential.user, 
+          userCredential.user.displayName || 'User'
+        );
+      }
+      
+      return userCredential;
+    });
+    
     return from(promise);
   }
 

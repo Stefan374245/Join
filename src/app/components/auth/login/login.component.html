@@ -44,7 +44,14 @@
       
       <div class="login-button-div">
         <div class="button-row">
-          <button type="button" (click)="login()" class="blue-btn">Log in</button>
+          <button 
+            type="button" 
+            (click)="login()" 
+            class="blue-btn"
+            [disabled]="isLoginButtonDisabled()"
+            [class.disabled]="isLoginButtonDisabled()">
+            Log in
+          </button>
           <button type="button" (click)="guestLogin()" class="white-btn">Guest Log in</button>
         </div>
         

@@ -94,7 +94,14 @@
       
       <div class="signup-button-div">
         <div class="button-row">
-          <button type="button" (click)="signup()" class="blue-btn">Sign up</button>
+          <button 
+            type="button" 
+            (click)="signup()" 
+            class="blue-btn"
+            [disabled]="isSignupButtonDisabled()"
+            [class.disabled]="isSignupButtonDisabled()">
+            Sign up
+          </button>
         </div>
         <span class="error-span text-center" [class.visible]="signupFailError">
           Signup failed. Please try again.

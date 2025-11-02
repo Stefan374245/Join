@@ -1,1 +1,98 @@
-<p>contacts-list works!</p>
+<div class="contacts-page">
+	<aside class="contacts-aside">
+		<div class="logo">
+			<img src="assets/images/joinlogowhite.svg" alt="Join" />
+		</div>
+
+		<nav class="side-nav">
+			<a routerLink="/summary">
+				<img src="assets/images/summarygray.svg" alt="Summary" />
+				<span>Summary</span>
+			</a>
+			<a routerLink="/board">
+				<img src="assets/images/boardgray.svg" alt="Board" />
+				<span>Board</span>
+			</a>
+			<a routerLink="/contacts" class="active">
+				<img src="assets/images/contactswhite.svg" alt="Contacts" />
+				<span>Contacts</span>
+			</a>
+		</nav>
+
+		<div id="legal" class="legal">
+			<a routerLink="/privacy">Privacy Policy</a>
+			<a routerLink="/legal">Legal Notice</a>
+		</div>
+	</aside>
+
+	<main class="contacts-main">
+		<div class="content-left">
+					<div class="add-btn" (click)="addContact()">
+				<img src="assets/images/person_add.svg" alt="add" />
+				<span>Add new contact</span>
+			</div>
+
+			<div id="allContacts" class="all-contacts">
+				<ng-container *ngIf="grouped$ | async as groups">
+					<ng-container *ngFor="let g of groups">
+						<div class="capital">
+							<span class="spanLetter">{{ g.letter }}</span>
+							<div class="separator"></div>
+						</div>
+
+						<ng-container *ngFor="let user of g.items; index as i">
+							<nav class="singleUser" [class.singleUserChosen]="selected?.email === user.email" (click)="select(user)">
+								<span class="userInitials" [ngStyle]="{'background-color': user.color}">{{ user.initials }}</span>
+								<div class="userDetails">
+									<span class="userName">{{ user.firstName }} {{ user.lastName }}</span>
+									<a class="emailText" [href]="'mailto:' + user.email">{{ user.email }}</a>
+								</div>
+							</nav>
+						</ng-container>
+					</ng-container>
+				</ng-container>
+			</div>
+		</div>
+
+		<div class="content-right" [class.hidden-xs]="!showRight">
+			<div class="frame-40">
+				<div class="contactsFrame">
+					<h1>Contacts</h1>
+					<div class="frame-40-vektor"></div>
+					<p>Better with a team</p>
+				</div>
+			</div>
+
+			<section class="contact-details" *ngIf="selected; else emptyState">
+				<div class="contactDetailsPerson">
+					<span class="userInitialsBig" [ngStyle]="{'background-color': selected.color}">{{ selected.initials }}</span>
+					<section>
+						<p id="contactDetailsName">{{ selected.firstName }} {{ selected.lastName }}</p>
+						<div id="basicManipulate">
+							<div class="manipulateBtnDiv">
+								<button class="btn-link">Edit</button>
+							</div>
+							<div class="manipulateBtnDiv">
+								<button class="btn-link">Delete</button>
+							</div>
+						</div>
+					</section>
+				</div>
+
+				<div class="contactInformations">
+					<p>Contact Information</p>
+					<strong>Email</strong>
+					<a id="contactDetailsMail" [href]="'mailto:' + selected.email">{{ selected.email }}</a>
+					<strong>Phone</strong>
+					<span id="contactDetailsPhone">{{ selected.phone || '-' }}</span>
+				</div>
+			</section>
+
+			<ng-template #emptyState>
+				<div class="empty-state">
+					<p>Select a contact to see details</p>
+				</div>
+			</ng-template>
+		</div>
+	</main>
+</div>

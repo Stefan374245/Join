@@ -44,6 +44,21 @@ export class SignupComponent implements OnInit {
     }, 500);
   }
 
+  /**
+   * Check if signup button should be disabled (User Story 1 requirement)
+   */
+  isSignupButtonDisabled(): boolean {
+    return !this.name || 
+           !this.email || 
+           !this.password || 
+           !this.confirmPassword || 
+           !this.acceptPrivacy ||
+           this.name.trim().length < 2 ||
+           !this.email.includes('@') ||
+           this.password.length < 6 ||
+           this.password !== this.confirmPassword;
+  }
+
   onNameFocus(): void {
     this.nameError = false;
     this.signupFailError = false;

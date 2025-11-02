@@ -1,135 +1,124 @@
-@import '../../../../styles/variables';
-@import '../../../../styles/mixins';
+@import '../../../../styles/_variables.scss';
+@import '../../../../styles/_mixins.scss';
+@import '../../../../styles/_utilities.scss';
 
-.contacts-container {
-  @include flex(row);
-  height: calc(100vh - 100px);
-  
-  .contacts-list {
-    width: 300px;
-    border-right: 1px solid $gray-300;
-    padding: $spacing-md;
-    overflow-y: auto;
-
-    .contacts-header {
-      @include flex(row, space-between, center);
-      margin-bottom: $spacing-lg;
-      
-      h2 {
-        margin-bottom: 0;
-      }
-
-      .add-contact {
-        @include button-primary;
-      }
-    }
-
-    .letter-group {
-      margin-bottom: $spacing-lg;
-
-      .letter-header {
-        font-size: $font-size-sm;
-        color: $gray-600;
-        padding: $spacing-xs 0;
-        border-bottom: 1px solid $gray-300;
-        margin-bottom: $spacing-sm;
-      }
-
-      .contact-item {
-        @include flex(row, flex-start, center);
-        gap: $spacing-md;
-        padding: $spacing-sm;
-        border-radius: $border-radius;
-        cursor: pointer;
-        transition: background-color 0.2s ease;
-
-        &:hover {
-          background-color: $gray-100;
-        }
-
-        &.active {
-          background-color: rgba($primary-color, 0.1);
-        }
-
-        .contact-avatar {
-          width: 40px;
-          height: 40px;
-          border-radius: 50%;
-          @include flex(row, center, center);
-          font-weight: 600;
-          color: $white;
-        }
-
-        .contact-info {
-          .contact-name {
-            font-weight: 500;
-          }
-
-          .contact-email {
-            font-size: $font-size-sm;
-            color: $gray-600;
-          }
-        }
-      }
-    }
-  }
-
-  .contact-details {
-    flex: 1;
-    padding: $spacing-xl;
-    overflow-y: auto;
-
-    .contact-header {
-      @include flex(row, flex-start, center);
-      gap: $spacing-lg;
-      margin-bottom: $spacing-xl;
-
-      .contact-avatar-large {
-        width: 80px;
-        height: 80px;
-        border-radius: 50%;
-        @include flex(row, center, center);
-        font-size: $font-size-lg;
-        font-weight: 600;
-        color: $white;
-      }
-
-      .contact-title {
-        h1 {
-          margin-bottom: $spacing-xs;
-        }
-
-        .edit-contact {
-          @include button-secondary;
-        }
-      }
-    }
-
-    .contact-info-section {
-      margin-bottom: $spacing-xl;
-
-      h3 {
-        color: $primary-color;
-        margin-bottom: $spacing-md;
-      }
-
-      .info-grid {
-        @include grid(2, $spacing-lg);
-
-        .info-item {
-          @include flex(column);
-          gap: $spacing-xs;
-
-          label {
-            font-size: $font-size-sm;
-            color: $gray-600;
-          }
-
-          .value {
-            font-size: $font-size-base;
-          }
-        }
-      }
-    }
-  }
+:host {
+  display: block;
+  height: calc(100vh - 0px);
 }
+
+.contacts-page {
+  display: flex;
+  height: 100vh;
+  background-color: $background-color;
+}
+
+.contacts-aside {
+  width: 200px;
+  background-color: $primary-color;
+  color: $white;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: $spacing-lg 0;
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 20;
+}
+
+.contacts-aside .logo {
+  display: flex;
+  justify-content: center;
+  padding: 24px 0;
+}
+
+.contacts-aside .logo img { width: 80px; }
+
+.side-nav {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+  padding: $spacing-md 0;
+}
+
+.side-nav a {
+  color: $white;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  padding: 12px 24px;
+}
+
+.side-nav a.active { background-color: $primary-dark; }
+
+.legal { padding: 24px; color: $gray-400; }
+
+.contacts-main {
+  margin-left: 200px;
+  display: flex;
+  width: calc(100% - 200px);
+  height: 100vh;
+}
+
+.content-left {
+  width: 340px;
+  background: $white;
+  box-shadow: 2px 2px 5px rgba($black, 0.06);
+  padding: $spacing-md;
+  overflow-y: auto;
+}
+
+.add-btn {
+  display: flex;
+  gap: $spacing-md;
+  align-items: center;
+  background-color: $primary-color;
+  color: $white;
+  border-radius: 10px;
+  padding: 12px 20px;
+  width: calc(100% - 2*$spacing-md);
+  cursor: pointer;
+  margin-bottom: $spacing-md;
+}
+
+.all-contacts { padding-bottom: 200px; }
+
+.capital { margin-top: $spacing-lg; }
+.spanLetter { font-weight: 700; margin-left: 6px; color: $gray-600; }
+.separator { height: 1px; background: $border-color; margin: 12px 0; }
+
+.singleUser {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.singleUser:hover { background: $gray-100; }
+.singleUserChosen { background: $primary-color; color: $white; }
+
+.userInitials { width: 35px; height: 35px; border-radius: 50%; display:flex; align-items:center; justify-content:center; color: $white; font-weight:700; }
+.userInitialsBig { width: 120px; height: 120px; border-radius: 50%; display:flex; align-items:center; justify-content:center; color: $white; font-weight:700; font-size: 48px; border: solid 3px $white; }
+
+.userDetails { display:flex; flex-direction:column; }
+.userName { font-weight: 600; }
+.emailText { color: $link-color; max-width: 210px; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; }
+
+.content-right { flex: 1; padding: $spacing-xl; overflow-y: auto; }
+.empty-state { color: $gray-600; padding: $spacing-lg; }
+
+.contactDetailsPerson { display:flex; align-items:center; gap: $spacing-lg; margin-top: $spacing-xl; }
+.contactInformations { margin-top: $spacing-lg; display:flex; flex-direction:column; gap: $spacing-md; }
+
+@media (max-width: 800px) {
+  .contacts-aside { width: 64px; }
+  .contacts-main { margin-left: 64px; width: calc(100% - 64px); }
+  .content-right { display: none; }
+  .content-right.show { display: block; }
+}
+
