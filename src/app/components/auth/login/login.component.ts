@@ -3,11 +3,12 @@ import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../services/auth.service';
+import { LogoAnimationComponent } from '../logo-animation/logo-animation.component';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [RouterLink, FormsModule, CommonModule],
+  imports: [RouterLink, FormsModule, CommonModule, LogoAnimationComponent],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'
 })
@@ -28,10 +29,11 @@ export class LoginComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Logo animation on load
-    setTimeout(() => {
-      this.logoAnimationComplete = true;
-    }, 500);
+    // Animation wird jetzt durch die LogoAnimationComponent gesteuert
+  }
+
+  onAnimationComplete(): void {
+    this.logoAnimationComplete = true;
   }
 
   /**
@@ -153,8 +155,8 @@ export class LoginComponent implements OnInit {
   showLoginSuccess(): void {
     this.showSuccessMessage = true;
     setTimeout(() => {
-      // TODO: Navigate to dashboard/summary
-      this.router.navigate(['/summary']);
+      // Navigate to board after successful login
+      this.router.navigate(['/board']);
     }, 2000);
   }
 }

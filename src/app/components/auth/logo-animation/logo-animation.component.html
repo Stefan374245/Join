@@ -1,0 +1,11 @@
+<div class="logo-animation-container" [class.background-hidden]="animationState === 'final'">
+  <img 
+    [src]="getLogoSrc()" 
+    alt="Join Logo" 
+    class="logo-img"
+    [class.hidden]="animationState === 'hidden'"
+    [class.center]="animationState === 'center'"
+    [class.expanding]="animationState === 'expanding'"
+    [class.shrinking]="animationState === 'shrinking'"
+    [class.final]="animationState === 'final'">
+</div>
