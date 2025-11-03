@@ -1,1 +1,92 @@
-<p>summary-view works!</p>
+<div class="summary-container" [class.guest-mode]="(isGuest$ | async)">
+  <div class="summary-content">
+    <!-- Stats Box (Frame 71, 64, 65, 69, 40, 3) -->
+    <div class="stats-box-wrapper">
+      <div class="stats-header">
+        <h1 class="main-title">Join 360</h1>
+        <span class="divider"></span>
+        <p class="subtitle">Key Metrics at a Glance</p>
+      </div>
+
+      <div class="stats-box">
+        <!-- Top Row: To-do (Frame 65) and Done (Frame 64) -->
+        <div class="top-row">
+          <div class="stat-item">
+            <div class="stat-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white">
+                <path d="M9 11L12 14L22 4" stroke-width="2.5" stroke-linecap="round"/>
+                <path d="M21 12V19C21 20.1 20.1 21 19 21H5C3.9 21 3 20.1 3 19V5C3 3.9 3.9 3 5 3H16" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="stat-content">
+              <div class="stat-number">{{ todoTasks$ | async }}</div>
+              <div class="stat-label">To-do</div>
+            </div>
+          </div>
+
+          <div class="stat-item">
+            <div class="stat-icon done">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white">
+                <path d="M5 13L9 17L19 7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="stat-content">
+              <div class="stat-number">{{ doneTasks$ | async }}</div>
+              <div class="stat-label">Done</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Middle Row: Urgent (Frame 69/407) and Email (Frame 40) -->
+        <div class="middle-row">
+          <div class="urgent-item">
+            <div class="urgent-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                <path d="M12 2L2 20H22L12 2Z"/>
+                <path d="M12 9V13" stroke="#FF3D00" stroke-width="2.5" stroke-linecap="round"/>
+                <circle cx="12" cy="17" r="1.2" fill="#FF3D00"/>
+              </svg>
+            </div>
+            <div class="urgent-content">
+              <div class="urgent-number">{{ urgentTasks$ | async }}</div>
+              <div class="urgent-label">Urgent</div>
+            </div>
+            <div class="deadline-info">
+              <div class="deadline-date">{{ formattedDeadline$ | async }}</div>
+              <div class="deadline-label">Upcoming Deadline</div>
+            </div>
+          </div>
+
+          <div class="email-item">
+            <div class="email-number">{{ awaitingFeedbackTasks$ | async }}</div>
+            <div class="email-label">Awaiting<br>Feedback</div>
+          </div>
+        </div>
+
+        <!-- Bottom Row: Task Stats (Frame 3) -->
+        <div class="bottom-row">
+          <div class="task-stat">
+            <div class="task-number">{{ totalTasks$ | async }}</div>
+            <div class="task-label">Tasks In<br>Board</div>
+          </div>
+
+          <div class="task-stat">
+            <div class="task-number">{{ inProgressTasks$ | async }}</div>
+            <div class="task-label">Tasks In<br>Progress</div>
+          </div>
+
+          <div class="task-stat">
+            <div class="task-number">{{ todoTasks$ | async }}</div>
+            <div class="task-label">Awaiting<br>Start</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Side: Greeting (only for logged-in users, not guests) -->
+    <div class="greeting-section" *ngIf="!(isGuest$ | async)">
+      <span class="greeting-text">{{ greeting }}</span>
+      <span class="greeting-name">{{ userName$ | async }}</span>
+    </div>
+  </div>
+</div>

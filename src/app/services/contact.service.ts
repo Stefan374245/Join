@@ -85,6 +85,13 @@ export class ContactService {
   }
 
   /**
+   * Alias for loadAll() - for compatibility
+   */
+  getContacts(): Observable<Contact[]> {
+    return this.loadAll();
+  }
+
+  /**
    * Generate a consistent color for a user based on their email
    */
   private generateColorFromEmail(email: string): string {

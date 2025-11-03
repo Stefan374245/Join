@@ -1,8 +1,8 @@
-// Colors - Join Project Theme
-$primary-color: #2A3647;
+// Colors - Join Project Theme (Updated from Figma)
+$primary-color: #2A3647;        // Main color - Dark blue
 $primary-dark: #091931;
-$secondary-color: #29ABE2;
-$accent-color: #0288d1;
+$secondary-color: #29ABE2;      // Light blue
+$accent-color: #29ABE2;         // Accent color - Light blue (consistent with secondary)
 
 // Background colors
 $background-color: #F6F7F8;
@@ -40,10 +40,10 @@ $shadow-color: #00000040;
 $error-color: #ff0000;
 $link-color: #007CEE;
 
-// Priority colors
-$priority-color-low: #7AE229;
-$priority-color-medium: #FFA800;
-$priority-color-urgent: #FF3D00;
+// Priority colors (From Figma Design System)
+$priority-color-low: #7AE229;      // Green - Low priority
+$priority-color-medium: #FFA800;   // Orange - Medium priority  
+$priority-color-urgent: #FF3D00;   // Red - Urgent priority
 
 // User avatar colors map
 $user-colors: (

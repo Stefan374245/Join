@@ -1,9 +1,346 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
+import { 
+  Firestore, 
+  collection, 
+  collectionData,
+  doc, 
+  setDoc, 
+  deleteDoc, 
+  updateDoc, 
+  query, 
+  where,
+  Timestamp,
+  orderBy
+} from '@angular/fire/firestore';
+import { Auth } from '@angular/fire/auth';
+import { Observable, from, BehaviorSubject, of } from 'rxjs';
+import { map, catchError, tap } from 'rxjs/operators';
+import { Task, Subtask } from '../models/task.interface';
 
 @Injectable({
   providedIn: 'root'
 })
 export class TaskService {
+  private firestore = inject(Firestore);
+  private auth = inject(Auth);
+  private tasksSubject = new BehaviorSubject<Task[]>([]);
+  public tasks$ = this.tasksSubject.asObservable();
 
-  constructor() { }
+  constructor() {
+    this.initializeTasksListener();
+  }
+
+  /**
+   * Initialize real-time listener for tasks
+   */
+  private initializeTasksListener(): void {
+    const tasksCol = collection(this.firestore, 'tasks');
+    const tasksQuery = query(tasksCol, orderBy('createdAt', 'desc'));
+    
+    collectionData(tasksQuery, { idField: 'id' }).pipe(
+      map((tasks: any[]) => {
+        return tasks.map((task) => this.mapFirestoreTask(task));
+      }),
+      tap((tasks) => {
+        console.log('📋 Tasks loaded from Firestore:', tasks.length);
+        this.tasksSubject.next(tasks);
+      }),
+      catchError((error) => {
+        console.error('❌ Error loading tasks:', error);
+        return of([]);
+      })
+    ).subscribe();
+  }
+
+  /**
+   * Map Firestore data to Task interface
+   */
+  private mapFirestoreTask(data: any): Task {
+    return {
+      id: data.id || data.taskId,
+      title: data.title || '',
+      description: data.description || '',
+      category: data.category || '',
+      assignedTo: Array.isArray(data.assignedTo) ? data.assignedTo : [],
+      dueDate: this.convertToDate(data.dueDate),
+      priority: data.priority || 'medium',
+      status: data.status || 'todo',
+      subtasks: this.mapSubtasks(data.subtasks)
+    } as Task;
+  }
+
+  /**
+   * Map Firestore subtasks data
+   */
+  private mapSubtasks(subtasks: any): Subtask[] {
+    if (!subtasks || !Array.isArray(subtasks)) {
+      return [];
+    }
+    
+    return subtasks.map((st: any) => ({
+      id: st.id || `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      title: st.title || '',
+      completed: st.completed || false
+    }));
+  }
+
+  /**
+   * Convert Firestore Timestamp to Date
+   */
+  private convertToDate(timestamp: any): Date {
+    if (!timestamp) {
+      return new Date();
+    }
+    
+    if (timestamp instanceof Date) {
+      return timestamp;
+    }
+    
+    if (timestamp.toDate && typeof timestamp.toDate === 'function') {
+      return timestamp.toDate();
+    }
+    
+    if (timestamp.seconds) {
+      return new Date(timestamp.seconds * 1000);
+    }
+    
+    return new Date(timestamp);
+  }
+
+  /**
+   * Convert Date to Firestore Timestamp
+   */
+  private convertToTimestamp(date: Date): Timestamp {
+    return Timestamp.fromDate(date);
+  }
+
+  /**
+   * Get all tasks
+   */
+  getTasks(): Observable<Task[]> {
+    return this.tasks$;
+  }
+
+  /**
+   * Get task by ID
+   */
+  getTaskById(taskId: string): Observable<Task | undefined> {
+    return this.tasks$.pipe(
+      map(tasks => tasks.find(task => task.id === taskId))
+    );
+  }
+
+  /**
+   * Get tasks by status
+   */
+  getTasksByStatus(status: 'todo' | 'in-progress' | 'done'): Observable<Task[]> {
+    return this.tasks$.pipe(
+      map(tasks => tasks.filter(task => task.status === status))
+    );
+  }
+
+  /**
+   * Get urgent tasks (priority = high)
+   */
+  getUrgentTasks(): Observable<Task[]> {
+    return this.tasks$.pipe(
+      map(tasks => tasks.filter(task => task.priority === 'high'))
+    );
+  }
+
+  /**
+   * Get task statistics
+   */
+  getTaskStats(): Observable<{
+    total: number;
+    todo: number;
+    inProgress: number;
+    done: number;
+    urgent: number;
+  }> {
+    return this.tasks$.pipe(
+      map(tasks => ({
+        total: tasks.length,
+        todo: tasks.filter(t => t.status === 'todo').length,
+        inProgress: tasks.filter(t => t.status === 'in-progress').length,
+        done: tasks.filter(t => t.status === 'done').length,
+        urgent: tasks.filter(t => t.priority === 'high').length
+      }))
+    );
+  }
+
+  /**
+   * Get next urgent deadline
+   */
+  getNextUrgentDeadline(): Observable<Date | null> {
+    return this.tasks$.pipe(
+      map(tasks => {
+        const urgentTasks = tasks
+          .filter(t => t.priority === 'high' && t.status !== 'done')
+          .sort((a, b) => a.dueDate.getTime() - b.dueDate.getTime());
+        
+        return urgentTasks.length > 0 ? urgentTasks[0].dueDate : null;
+      })
+    );
+  }
+
+  /**
+   * Add a new task
+   */
+  addTask(task: Task): Observable<void> {
+    const taskDoc = doc(this.firestore, 'tasks', task.id);
+    
+    // Prepare task data with proper Firestore types
+    const taskData = {
+      title: task.title,
+      description: task.description,
+      category: task.category,
+      assignedTo: task.assignedTo || [],
+      dueDate: this.convertToTimestamp(task.dueDate),
+      priority: task.priority,
+      status: task.status,
+      subtasks: this.prepareSubtasks(task.subtasks),
+      createdAt: Timestamp.now(),
+      updatedAt: Timestamp.now(),
+      createdBy: this.auth.currentUser?.uid || 'anonymous'
+    };
+
+    console.log('💾 Saving task to Firestore:', taskData);
+
+    const promise = setDoc(taskDoc, taskData).then(() => {
+      console.log('✅ Task saved successfully');
+    });
+
+    return from(promise);
+  }
+
+  /**
+   * Prepare subtasks for Firestore
+   */
+  private prepareSubtasks(subtasks: Subtask[]): any[] {
+    if (!subtasks || subtasks.length === 0) {
+      return [];
+    }
+    
+    return subtasks.map(st => ({
+      id: st.id,
+      title: st.title,
+      completed: st.completed || false
+    }));
+  }
+
+  /**
+   * Update an existing task
+   */
+  updateTask(taskId: string, updates: Partial<Task>): Observable<void> {
+    const taskDoc = doc(this.firestore, 'tasks', taskId);
+    
+    // Prepare update data
+    const updateData: any = {
+      ...updates,
+      updatedAt: Timestamp.now()
+    };
+
+    // Convert dueDate if present
+    if (updates.dueDate) {
+      updateData.dueDate = this.convertToTimestamp(updates.dueDate);
+    }
+
+    // Prepare subtasks if present
+    if (updates.subtasks) {
+      updateData.subtasks = this.prepareSubtasks(updates.subtasks);
+    }
+
+    const promise = updateDoc(taskDoc, updateData).then(() => {
+      console.log('✅ Task updated successfully');
+    });
+
+    return from(promise);
+  }
+
+  /**
+   * Delete a task
+   */
+  deleteTask(taskId: string): Observable<void> {
+    const taskDoc = doc(this.firestore, 'tasks', taskId);
+    const promise = deleteDoc(taskDoc).then(() => {
+      console.log('🗑️ Task deleted successfully');
+    });
+
+    return from(promise);
+  }
+
+  /**
+   * Update task status (for drag and drop on board)
+   */
+  updateTaskStatus(taskId: string, status: 'todo' | 'in-progress' | 'done'): Observable<void> {
+    return this.updateTask(taskId, { status });
+  }
+
+  /**
+   * Toggle subtask completion
+   */
+  toggleSubtask(taskId: string, subtaskId: string): Observable<void> {
+    return new Observable(observer => {
+      this.getTaskById(taskId).subscribe(task => {
+        if (task) {
+          const updatedSubtasks = task.subtasks.map(st => 
+            st.id === subtaskId ? { ...st, completed: !st.completed } : st
+          );
+          
+          this.updateTask(taskId, { subtasks: updatedSubtasks }).subscribe({
+            next: () => observer.next(),
+            error: (err) => observer.error(err),
+            complete: () => observer.complete()
+          });
+        } else {
+          observer.error(new Error('Task not found'));
+        }
+      });
+    });
+  }
+
+  /**
+   * Add subtask to existing task
+   */
+  addSubtaskToTask(taskId: string, subtask: Subtask): Observable<void> {
+    return new Observable(observer => {
+      this.getTaskById(taskId).subscribe(task => {
+        if (task) {
+          const updatedSubtasks = [...task.subtasks, subtask];
+          
+          this.updateTask(taskId, { subtasks: updatedSubtasks }).subscribe({
+            next: () => observer.next(),
+            error: (err) => observer.error(err),
+            complete: () => observer.complete()
+          });
+        } else {
+          observer.error(new Error('Task not found'));
+        }
+      });
+    });
+  }
+
+  /**
+   * Remove subtask from task
+   */
+  removeSubtaskFromTask(taskId: string, subtaskId: string): Observable<void> {
+    return new Observable(observer => {
+      this.getTaskById(taskId).subscribe(task => {
+        if (task) {
+          const updatedSubtasks = task.subtasks.filter(st => st.id !== subtaskId);
+          
+          this.updateTask(taskId, { subtasks: updatedSubtasks }).subscribe({
+            next: () => observer.next(),
+            error: (err) => observer.error(err),
+            complete: () => observer.complete()
+          });
+        } else {
+          observer.error(new Error('Task not found'));
+        }
+      });
+    });
+  }
 }
+
+

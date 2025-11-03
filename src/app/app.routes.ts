@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { LoginComponent } from './components/auth/login/login.component';
 import { SignupComponent } from './components/auth/signup/signup.component';
+import { AddTaskComponent } from './components/add-task/add-task.component';
 import { BoardViewComponent } from './components/board/board-view/board-view.component';
 import { ContactsListComponent } from './components/contacts/contacts-list/contacts-list.component';
 import { SummaryViewComponent } from './components/summary/summary-view/summary-view.component';
@@ -21,6 +22,11 @@ export const routes: Routes = [
   { 
     path: 'board', 
     component: BoardViewComponent,
+    canActivate: [authGuard]
+  },
+  {
+    path: 'add-task',
+    component: AddTaskComponent,
     canActivate: [authGuard]
   },
   { 

@@ -1,0 +1,249 @@
+<div class="add-task-container">
+  <!-- Header Section -->
+  <header class="add-task-header">
+    <h1 class="page-title">Add Task</h1>
+  </header>
+
+  <!-- Form Container -->
+  <div class="form-wrapper">
+    <form [formGroup]="taskForm" (ngSubmit)="onSubmit()" class="add-task-form">
+      <!-- Left Column -->
+      <div class="form-column form-column-left">
+        <!-- Title Input -->
+        <div class="form-group">
+          <label for="title" class="form-label">
+            Title<span class="required">*</span>
+          </label>
+          <input
+            type="text"
+            id="title"
+            formControlName="title"
+            class="form-input"
+            [class.error]="f['title'].touched && f['title'].errors"
+            placeholder="Enter a title"
+          />
+          <span class="error-message" *ngIf="f['title'].touched && f['title'].errors">
+            Title is required (min. 3 characters)
+          </span>
+        </div>
+
+        <!-- Description Textarea -->
+        <div class="form-group">
+          <label for="description" class="form-label">Description</label>
+          <textarea
+            id="description"
+            formControlName="description"
+            class="form-textarea"
+            rows="4"
+            placeholder="Enter a description"
+          ></textarea>
+        </div>
+
+        <!-- Assigned To Dropdown -->
+        <div class="form-group">
+          <label for="assignedTo" class="form-label">Assigned to</label>
+          <div class="input-wrapper" (click)="toggleContactDropdown()">
+            <input
+              type="text"
+              id="assignedTo"
+              class="form-input"
+              [placeholder]="selectedContacts.length > 0 ? selectedContacts.length + ' contact(s) selected' : 'Select contacts to assign'"
+              readonly
+            />
+            <img src="assets/images/arrow_drop_down.svg" alt="Dropdown" class="dropdown-icon" />
+          </div>
+          
+          <!-- Contact Dropdown -->
+          <div class="dropdown-menu" *ngIf="showContactDropdown">
+            <div 
+              *ngFor="let contact of availableContacts" 
+              class="dropdown-item"
+              [class.selected]="isContactSelected(contact)"
+              (click)="selectContact(contact)">
+              <div class="contact-info">
+                <div class="avatar" [style.background-color]="contact.color">
+                  {{ contact.initials }}
+                </div>
+                <span>{{ contact.firstName }} {{ contact.lastName }}</span>
+              </div>
+              <img 
+                *ngIf="isContactSelected(contact)" 
+                src="assets/images/check.svg" 
+                alt="Selected" 
+                class="check-icon" />
+            </div>
+          </div>
+
+          <!-- Selected Contacts Display -->
+          <div class="selected-contacts" *ngIf="selectedContacts.length > 0">
+            <div 
+              *ngFor="let contact of selectedContacts" 
+              class="contact-badge"
+              [style.background-color]="contact.color">
+              {{ contact.initials }}
+              <img 
+                src="assets/images/close.svg" 
+                alt="Remove" 
+                class="remove-icon"
+                (click)="removeContact(contact.id)" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column -->
+      <div class="form-column form-column-right">
+        <!-- Due Date Input -->
+        <div class="form-group">
+          <label for="dueDate" class="form-label">
+            Due date<span class="required">*</span>
+          </label>
+          <input
+            type="date"
+            id="dueDate"
+            formControlName="dueDate"
+            class="form-input"
+            [class.error]="f['dueDate'].touched && f['dueDate'].errors"
+          />
+          <span class="error-message" *ngIf="f['dueDate'].touched && f['dueDate'].errors">
+            Due date is required
+          </span>
+        </div>
+
+        <!-- Priority Selection -->
+        <div class="form-group">
+          <label class="form-label">Priority</label>
+          <div class="priority-buttons">
+            <button 
+              type="button" 
+              class="priority-btn"
+              [class.priority-btn-active]="selectedPriority === 'high'"
+              (click)="selectPriority('high')">
+              <span>Urgent</span>
+              <img 
+                [src]="selectedPriority === 'high' ? 'assets/images/urgentwhite.svg' : 'assets/images/urgent.svg'" 
+                alt="Urgent" />
+            </button>
+            <button 
+              type="button" 
+              class="priority-btn"
+              [class.priority-btn-active]="selectedPriority === 'medium'"
+              (click)="selectPriority('medium')">
+              <span>Medium</span>
+              <img 
+                [src]="selectedPriority === 'medium' ? 'assets/images/mediumwhite.svg' : 'assets/images/medium.svg'" 
+                alt="Medium" />
+            </button>
+            <button 
+              type="button" 
+              class="priority-btn"
+              [class.priority-btn-active]="selectedPriority === 'low'"
+              (click)="selectPriority('low')">
+              <span>Low</span>
+              <img 
+                [src]="selectedPriority === 'low' ? 'assets/images/lowwhite.svg' : 'assets/images/low.svg'" 
+                alt="Low" />
+            </button>
+          </div>
+        </div>
+
+        <!-- Category Dropdown -->
+        <div class="form-group">
+          <label for="category" class="form-label">
+            Category<span class="required">*</span>
+          </label>
+          <div class="input-wrapper" (click)="toggleCategoryDropdown()">
+            <input
+              type="text"
+              id="category"
+              class="form-input"
+              [class.error]="f['category'].touched && f['category'].errors"
+              [placeholder]="selectedCategory || 'Select task category'"
+              readonly
+            />
+            <img src="assets/images/arrow_drop_down.svg" alt="Dropdown" class="dropdown-icon" />
+          </div>
+          
+          <!-- Category Dropdown -->
+          <div class="dropdown-menu" *ngIf="showCategoryDropdown">
+            <div 
+              *ngFor="let category of categories" 
+              class="dropdown-item"
+              (click)="selectCategory(category)">
+              <span>{{ category }}</span>
+              <img 
+                *ngIf="selectedCategory === category" 
+                src="assets/images/check.svg" 
+                alt="Selected" 
+                class="check-icon" />
+            </div>
+          </div>
+          
+          <span class="error-message" *ngIf="f['category'].touched && f['category'].errors">
+            Category is required
+          </span>
+        </div>
+
+        <!-- Subtasks Section -->
+        <div class="form-group">
+          <label for="subtask" class="form-label">Subtasks</label>
+          <div class="input-wrapper">
+            <input
+              type="text"
+              id="subtask"
+              class="form-input"
+              [(ngModel)]="subtaskInput"
+              [ngModelOptions]="{standalone: true}"
+              placeholder="Add new subtask"
+              (keydown.enter)="editingSubtaskId ? updateSubtask() : addSubtask(); $event.preventDefault()"
+            />
+            <div class="subtask-actions" *ngIf="subtaskInput">
+              <img 
+                src="assets/images/close.svg" 
+                alt="Clear" 
+                class="subtask-icon subtask-clear"
+                (click)="clearSubtaskInput()" />
+              <div class="subtask-divider"></div>
+              <img 
+                src="assets/images/check.svg" 
+                alt="Add" 
+                class="subtask-icon subtask-add"
+                (click)="editingSubtaskId ? updateSubtask() : addSubtask()" />
+            </div>
+          </div>
+          
+          <!-- Subtasks List -->
+          <ul class="subtasks-list" *ngIf="subtasks.length > 0">
+            <li *ngFor="let subtask of subtasks" class="subtask-item">
+              <span class="subtask-text">• {{ subtask.title }}</span>
+              <div class="subtask-item-actions">
+                <img 
+                  src="assets/images/edit.svg" 
+                  alt="Edit" 
+                  class="subtask-action-icon"
+                  (click)="editSubtask(subtask)" />
+                <img 
+                  src="assets/images/delete.svg" 
+                  alt="Delete" 
+                  class="subtask-action-icon"
+                  (click)="deleteSubtask(subtask.id)" />
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </form>
+
+    <!-- Form Actions -->
+    <div class="form-actions">
+      <button type="button" class="btn btn-secondary" (click)="clearForm()">
+        <span>Clear</span>
+        <img src="assets/images/close.svg" alt="Clear" />
+      </button>
+      <button type="submit" class="btn btn-primary" (click)="onSubmit()">
+        <span>Create Task</span>
+        <img src="assets/images/check.svg" alt="Create" />
+      </button>
+    </div>
+  </div>
+</div>

@@ -2,123 +2,390 @@
 @import '../../../../styles/mixins';
 
 .summary-container {
-  @include flex(column);
-  gap: $spacing-xl;
-  padding: $spacing-xl;
+  padding: 40px 60px;
+  background-color: $background-color;
+  min-height: calc(100vh - 96px);
+  max-width: 100%;
+  box-sizing: border-box;
+  margin-left: 200px;
 
-  .greeting {
-    @include flex(column);
-    gap: $spacing-sm;
+  // Guest mode: Center the stats box
+  &.guest-mode {
+    .summary-content {
+      justify-content: center;
+      align-items: center;
+    }
+  }
 
-    .time {
-      font-size: $font-size-lg;
-      color: $gray-600;
+  @media (max-width: 768px) {
+    padding: 20px;
+  }
+}
+
+.summary-content {
+  @include flex(row, flex-start, center);
+  gap: 60px;
+  max-width: 1200px;
+
+  @media (max-width: 968px) {
+    flex-direction: column;
+    gap: 40px;
+  }
+}
+
+// Left Side: Stats Box Wrapper
+.stats-box-wrapper {
+  @include flex(column, flex-start, flex-start);
+  gap: 0;
+}
+
+.stats-header {
+  @include flex(row, flex-start, center);
+  gap: 20px;
+  margin-bottom: 25px;
+
+  .main-title {
+    font-size: 61px;
+    font-weight: 700;
+    color: $primary-color;
+    margin: 0;
+    font-family: $font-family-base;
+    line-height: 1;
+  }
+
+  .divider {
+    width: 3px;
+    height: 60px;
+    background-color: $secondary-color;
+  }
+
+  .subtitle {
+    font-size: 21px;
+    font-weight: 400;
+    color: $primary-color;
+    margin: 0;
+    font-family: $font-family-base;
+  }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+
+    .main-title {
+      font-size: 42px;
     }
 
-    .name {
-      font-size: 2.5rem;
+    .divider {
+      display: none;
+    }
+
+    .subtitle {
+      font-size: 18px;
+    }
+  }
+}
+
+// Stats Box with Blue Border
+.stats-box {
+  border: 3px solid $secondary-color;
+  border-radius: 30px;
+  padding: 35px;
+  background: transparent;
+  @include flex(column, flex-start, stretch);
+  gap: 25px;
+  width: 560px;
+  max-width: 100%;
+  box-sizing: border-box;
+
+  @media (max-width: 768px) {
+    width: 100%;
+    padding: 25px 20px;
+    gap: 20px;
+  }
+}
+
+// Top Row: To-do and Done
+.top-row {
+  @include flex(row, flex-start, stretch);
+  gap: 25px;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 15px;
+  }
+}
+
+.stat-item {
+  flex: 1;
+  background: $white;
+  border-radius: 10px;
+  padding: 25px 20px;
+  @include flex(row, flex-start, center);
+  gap: 15px;
+
+  .stat-icon {
+    width: 50px;
+    height: 50px;
+    min-width: 50px;
+    border-radius: 50%;
+    background-color: $primary-color;
+    @include flex(row, center, center);
+
+    &.done {
+      background-color: $primary-color;
+    }
+
+    svg {
+      width: 22px;
+      height: 22px;
+    }
+  }
+
+  .stat-content {
+    @include flex(column, center, flex-start);
+
+    .stat-number {
+      font-size: 47px;
+      font-weight: 600;
+      color: $primary-color;
+      line-height: 1;
+      font-family: $font-family-base;
+    }
+
+    .stat-label {
+      font-size: 16px;
+      font-weight: 400;
+      color: $primary-color;
+      font-family: $font-family-base;
+    }
+  }
+
+  @media (max-width: 768px) {
+    padding: 20px 15px;
+
+    .stat-icon {
+      width: 45px;
+      height: 45px;
+      min-width: 45px;
+    }
+
+    .stat-content {
+      .stat-number {
+        font-size: 36px;
+      }
+
+      .stat-label {
+        font-size: 14px;
+      }
+    }
+  }
+}
+
+// Middle Row: Urgent and Email
+.middle-row {
+  @include flex(row, flex-start, stretch);
+  gap: 25px;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 15px;
+  }
+}
+
+.urgent-item {
+  flex: 3;
+  background: $white;
+  border-radius: 10px;
+  padding: 25px 20px;
+  @include flex(row, space-between, center);
+  gap: 15px;
+
+  .urgent-icon {
+    width: 50px;
+    height: 50px;
+    min-width: 50px;
+    border-radius: 50%;
+    background-color: $priority-color-urgent;
+    @include flex(row, center, center);
+
+    svg {
+      width: 26px;
+      height: 26px;
+    }
+  }
+
+  .urgent-content {
+    @include flex(column, center, flex-start);
+
+    .urgent-number {
+      font-size: 47px;
+      font-weight: 600;
+      color: $primary-color;
+      line-height: 1;
+      font-family: $font-family-base;
+    }
+
+    .urgent-label {
+      font-size: 16px;
+      font-weight: 400;
+      color: $primary-color;
+      font-family: $font-family-base;
+    }
+  }
+
+  .deadline-info {
+    @include flex(column, center, flex-end);
+    text-align: right;
+
+    .deadline-date {
+      font-size: 14px;
       font-weight: 700;
       color: $primary-color;
+      margin-bottom: 3px;
+      font-family: $font-family-base;
+    }
+
+    .deadline-label {
+      font-size: 12px;
+      font-weight: 400;
+      color: $primary-color;
+      font-family: $font-family-base;
     }
   }
 
-  .stats-grid {
-    @include grid(3, $spacing-lg);
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 20px 15px;
 
-    @include responsive(md) {
-      grid-template-columns: repeat(2, 1fr);
-    }
-
-    @include responsive(sm) {
-      grid-template-columns: 1fr;
-    }
-
-    .stat-card {
-      background: $white;
-      border-radius: $border-radius;
-      padding: $spacing-lg;
-      box-shadow: $shadow;
-      @include flex(column);
-      gap: $spacing-md;
-
-      .stat-header {
-        @include flex(row, space-between, center);
-        
-        .stat-icon {
-          width: 40px;
-          height: 40px;
-          border-radius: $border-radius;
-          @include flex(row, center, center);
-          background-color: rgba($primary-color, 0.1);
-          color: $primary-color;
-        }
-
-        .stat-value {
-          font-size: 2rem;
-          font-weight: 700;
-        }
-      }
-
-      .stat-title {
-        font-size: $font-size-base;
-        color: $gray-600;
-      }
-
-      &.urgent {
-        border-left: 4px solid #ff4444;
-      }
-
-      &.deadline {
-        .deadline-date {
-          font-weight: 600;
-          color: $primary-color;
-        }
-      }
+    .deadline-info {
+      align-items: flex-start;
+      text-align: left;
     }
   }
+}
 
-  .tasks-overview {
-    @include flex(column);
-    gap: $spacing-lg;
+.email-item {
+  flex: 1;
+  background: $white;
+  border-radius: 10px;
+  padding: 25px 20px;
+  @include flex(column, center, center);
+  text-align: center;
 
-    h2 {
-      color: $gray-800;
+  .email-number {
+    font-size: 47px;
+    font-weight: 600;
+    color: $secondary-color;
+    line-height: 1;
+    margin-bottom: 5px;
+    font-family: $font-family-base;
+  }
+
+  .email-label {
+    font-size: 16px;
+    font-weight: 400;
+    color: $primary-color;
+    line-height: 1.2;
+    font-family: $font-family-base;
+  }
+
+  @media (max-width: 768px) {
+    padding: 20px 15px;
+
+    .email-number {
+      font-size: 36px;
     }
 
-    .tasks-grid {
-      @include grid(2, $spacing-lg);
+    .email-label {
+      font-size: 14px;
+    }
+  }
+}
 
-      @include responsive(sm) {
-        grid-template-columns: 1fr;
-      }
+// Bottom Row: Task Stats
+.bottom-row {
+  @include flex(row, flex-start, stretch);
+  gap: 25px;
 
-      .task-status {
-        background: $white;
-        border-radius: $border-radius;
-        padding: $spacing-lg;
-        @include flex(row, space-between, center);
-        box-shadow: $shadow-sm;
-        transition: transform 0.2s ease;
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 15px;
+  }
+}
 
-        &:hover {
-          transform: translateY(-2px);
-          box-shadow: $shadow;
-        }
+.task-stat {
+  flex: 1;
+  background: $white;
+  border-radius: 10px;
+  padding: 25px 20px;
+  @include flex(column, center, center);
+  text-align: center;
 
-        .status-info {
-          @include flex(column);
-          gap: $spacing-xs;
+  .task-number {
+    font-size: 47px;
+    font-weight: 600;
+    color: $primary-color;
+    line-height: 1;
+    margin-bottom: 5px;
+    font-family: $font-family-base;
+  }
 
-          .status-title {
-            color: $gray-600;
-          }
+  .task-label {
+    font-size: 16px;
+    font-weight: 400;
+    color: $primary-color;
+    line-height: 1.2;
+    font-family: $font-family-base;
+  }
 
-          .status-count {
-            font-size: $font-size-lg;
-            font-weight: 600;
-          }
-        }
-      }
+  @media (max-width: 768px) {
+    padding: 20px 15px;
+
+    .task-number {
+      font-size: 36px;
+    }
+
+    .task-label {
+      font-size: 14px;
+    }
+  }
+}
+
+// Right Side: Greeting
+.greeting-section {
+  @include flex(column, flex-start, flex-start);
+  gap: 8px;
+  padding-top: 120px;
+
+  .greeting-text {
+    font-size: 47px;
+    font-weight: 500;
+    color: $primary-color;
+    font-family: $font-family-base;
+  }
+
+  .greeting-name {
+    font-size: 64px;
+    font-weight: 700;
+    color: $secondary-color;
+    font-family: $font-family-base;
+  }
+
+  @media (max-width: 968px) {
+    padding-top: 0;
+  }
+
+  @media (max-width: 768px) {
+    gap: 5px;
+
+    .greeting-text {
+      font-size: 32px;
+    }
+
+    .greeting-name {
+      font-size: 42px;
     }
   }
 }

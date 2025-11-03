@@ -44,3 +44,6 @@ Thumbs.db
 # Environment variables
 .env
 .env.local
+
+# MCP Server Config (contains sensitive tokens)
+mcp.config.json

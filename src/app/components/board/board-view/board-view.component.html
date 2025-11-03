@@ -1,1 +1,280 @@
-<p>board-view works!</p>
+<div class="board-container">
+  <!-- Board Header -->
+  <header class="board-header">
+    <h1 class="board-title">Board</h1>
+    
+    <div class="board-actions">
+      <!-- Search Input -->
+      <div class="search-wrapper">
+        <input 
+          type="text" 
+          class="search-input" 
+          placeholder="Find Task"
+          [(ngModel)]="searchQuery"
+          (input)="onSearch()"
+        />
+        <img src="assets/images/search.svg" alt="Search" class="search-icon" />
+      </div>
+      
+      <!-- Add Task Button -->
+      <button class="btn-add-task" (click)="openAddTaskModal()">
+        <span>Add task</span>
+        <img src="assets/images/add.svg" alt="Add" class="add-icon" />
+      </button>
+    </div>
+  </header>
+
+  <!-- Board Columns -->
+  <div class="board-columns">
+    <!-- Triage Column -->
+    <div class="board-column">
+      <div class="column-header">
+        <h2 class="column-title">Triage</h2>
+        <button class="btn-add-column-task" (click)="openAddTaskModal('triage')" title="Add task to Triage">
+          <img src="assets/images/add.svg" alt="Add Task" />
+        </button>
+      </div>
+      
+      <div class="column-content" id="triage-column">
+        <div class="no-tasks" *ngIf="getTasksByStatus('triage').length === 0">
+          <p>No tasks in triage</p>
+        </div>
+        
+        <!-- Task Card Template -->
+        <div class="task-card" *ngFor="let task of getTasksByStatus('triage')" (click)="openTaskDetail(task)">
+          <div class="task-category" [ngClass]="getCategoryClass(task.category)">
+            {{ task.category }}
+          </div>
+          <h3 class="task-title">{{ task.title }}</h3>
+          <p class="task-description">{{ getShortDescription(task.description) }}</p>
+          
+          <div class="task-progress" *ngIf="task.subtasks && task.subtasks.length > 0">
+            <div class="progress-bar">
+              <div class="progress-fill" [style.width.%]="getSubtaskProgress(task)"></div>
+            </div>
+            <span class="progress-text">
+              {{ getCompletedSubtasks(task) }}/{{ task.subtasks.length }} Subtasks
+            </span>
+          </div>
+
+          <div class="task-footer">
+            <div class="task-assignees">
+              <div 
+                class="assignee-avatar" 
+                *ngFor="let userId of task.assignedTo.slice(0, 3)"
+                [style.background-color]="getContactColor(userId)">
+                {{ getContactInitials(userId) }}
+              </div>
+              <div class="assignee-avatar more" *ngIf="task.assignedTo.length > 3">
+                +{{ task.assignedTo.length - 3 }}
+              </div>
+            </div>
+            <div class="task-priority" [ngClass]="'priority-' + task.priority">
+              <img [src]="getPriorityIcon(task.priority)" [alt]="task.priority + ' priority'" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- To Do Column -->
+    <div class="board-column">
+      <div class="column-header">
+        <h2 class="column-title">To do</h2>
+        <button class="btn-add-column-task" (click)="openAddTaskModal('todo')" title="Add task to To do">
+          <img src="assets/images/add.svg" alt="Add Task" />
+        </button>
+      </div>
+      
+      <div class="column-content" id="todo-column">
+        <div class="no-tasks" *ngIf="getTasksByStatus('todo').length === 0">
+          <p>No tasks To do</p>
+        </div>
+        
+        <div class="task-card" *ngFor="let task of getTasksByStatus('todo')" (click)="openTaskDetail(task)">
+          <div class="task-category" [ngClass]="getCategoryClass(task.category)">
+            {{ task.category }}
+          </div>
+          <h3 class="task-title">{{ task.title }}</h3>
+          <p class="task-description">{{ getShortDescription(task.description) }}</p>
+          
+          <div class="task-progress" *ngIf="task.subtasks && task.subtasks.length > 0">
+            <div class="progress-bar">
+              <div class="progress-fill" [style.width.%]="getSubtaskProgress(task)"></div>
+            </div>
+            <span class="progress-text">
+              {{ getCompletedSubtasks(task) }}/{{ task.subtasks.length }} Subtasks
+            </span>
+          </div>
+
+          <div class="task-footer">
+            <div class="task-assignees">
+              <div 
+                class="assignee-avatar" 
+                *ngFor="let userId of task.assignedTo.slice(0, 3)"
+                [style.background-color]="getContactColor(userId)">
+                {{ getContactInitials(userId) }}
+              </div>
+              <div class="assignee-avatar more" *ngIf="task.assignedTo.length > 3">
+                +{{ task.assignedTo.length - 3 }}
+              </div>
+            </div>
+            <div class="task-priority" [ngClass]="'priority-' + task.priority">
+              <img [src]="getPriorityIcon(task.priority)" [alt]="task.priority + ' priority'" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- In Progress Column -->
+    <div class="board-column">
+      <div class="column-header">
+        <h2 class="column-title">In progress</h2>
+        <button class="btn-add-column-task" (click)="openAddTaskModal('in-progress')" title="Add task to In progress">
+          <img src="assets/images/add.svg" alt="Add Task" />
+        </button>
+      </div>
+      
+      <div class="column-content" id="in-progress-column">
+        <div class="no-tasks" *ngIf="getTasksByStatus('in-progress').length === 0">
+          <p>No tasks in progress</p>
+        </div>
+        
+        <div class="task-card" *ngFor="let task of getTasksByStatus('in-progress')" (click)="openTaskDetail(task)">
+          <div class="task-category" [ngClass]="getCategoryClass(task.category)">
+            {{ task.category }}
+          </div>
+          <h3 class="task-title">{{ task.title }}</h3>
+          <p class="task-description">{{ getShortDescription(task.description) }}</p>
+          
+          <div class="task-progress" *ngIf="task.subtasks && task.subtasks.length > 0">
+            <div class="progress-bar">
+              <div class="progress-fill" [style.width.%]="getSubtaskProgress(task)"></div>
+            </div>
+            <span class="progress-text">
+              {{ getCompletedSubtasks(task) }}/{{ task.subtasks.length }} Subtasks
+            </span>
+          </div>
+
+          <div class="task-footer">
+            <div class="task-assignees">
+              <div 
+                class="assignee-avatar" 
+                *ngFor="let userId of task.assignedTo.slice(0, 3)"
+                [style.background-color]="getContactColor(userId)">
+                {{ getContactInitials(userId) }}
+              </div>
+              <div class="assignee-avatar more" *ngIf="task.assignedTo.length > 3">
+                +{{ task.assignedTo.length - 3 }}
+              </div>
+            </div>
+            <div class="task-priority" [ngClass]="'priority-' + task.priority">
+              <img [src]="getPriorityIcon(task.priority)" [alt]="task.priority + ' priority'" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Await Feedback Column -->
+    <div class="board-column">
+      <div class="column-header">
+        <h2 class="column-title">Await feedback</h2>
+        <button class="btn-add-column-task" (click)="openAddTaskModal('await-feedback')" title="Add task to Await feedback">
+          <img src="assets/images/add.svg" alt="Add Task" />
+        </button>
+      </div>
+      
+      <div class="column-content" id="await-feedback-column">
+        <div class="no-tasks" *ngIf="getTasksByStatus('await-feedback').length === 0">
+          <p>No tasks awaiting feedback</p>
+        </div>
+        
+        <div class="task-card" *ngFor="let task of getTasksByStatus('await-feedback')" (click)="openTaskDetail(task)">
+          <div class="task-category" [ngClass]="getCategoryClass(task.category)">
+            {{ task.category }}
+          </div>
+          <h3 class="task-title">{{ task.title }}</h3>
+          <p class="task-description">{{ getShortDescription(task.description) }}</p>
+          
+          <div class="task-progress" *ngIf="task.subtasks && task.subtasks.length > 0">
+            <div class="progress-bar">
+              <div class="progress-fill" [style.width.%]="getSubtaskProgress(task)"></div>
+            </div>
+            <span class="progress-text">
+              {{ getCompletedSubtasks(task) }}/{{ task.subtasks.length }} Subtasks
+            </span>
+          </div>
+
+          <div class="task-footer">
+            <div class="task-assignees">
+              <div 
+                class="assignee-avatar" 
+                *ngFor="let userId of task.assignedTo.slice(0, 3)"
+                [style.background-color]="getContactColor(userId)">
+                {{ getContactInitials(userId) }}
+              </div>
+              <div class="assignee-avatar more" *ngIf="task.assignedTo.length > 3">
+                +{{ task.assignedTo.length - 3 }}
+              </div>
+            </div>
+            <div class="task-priority" [ngClass]="'priority-' + task.priority">
+              <img [src]="getPriorityIcon(task.priority)" [alt]="task.priority + ' priority'" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Done Column -->
+    <div class="board-column">
+      <div class="column-header">
+        <h2 class="column-title">Done</h2>
+        <button class="btn-add-column-task" (click)="openAddTaskModal('done')" title="Add task to Done">
+          <img src="assets/images/add.svg" alt="Add Task" />
+        </button>
+      </div>
+      
+      <div class="column-content" id="done-column">
+        <div class="no-tasks" *ngIf="getTasksByStatus('done').length === 0">
+          <p>No tasks done</p>
+        </div>
+        
+        <div class="task-card" *ngFor="let task of getTasksByStatus('done')" (click)="openTaskDetail(task)">
+          <div class="task-category" [ngClass]="getCategoryClass(task.category)">
+            {{ task.category }}
+          </div>
+          <h3 class="task-title">{{ task.title }}</h3>
+          <p class="task-description">{{ getShortDescription(task.description) }}</p>
+          
+          <div class="task-progress" *ngIf="task.subtasks && task.subtasks.length > 0">
+            <div class="progress-bar">
+              <div class="progress-fill" [style.width.%]="getSubtaskProgress(task)"></div>
+            </div>
+            <span class="progress-text">
+              {{ getCompletedSubtasks(task) }}/{{ task.subtasks.length }} Subtasks
+            </span>
+          </div>
+
+          <div class="task-footer">
+            <div class="task-assignees">
+              <div 
+                class="assignee-avatar" 
+                *ngFor="let userId of task.assignedTo.slice(0, 3)"
+                [style.background-color]="getContactColor(userId)">
+                {{ getContactInitials(userId) }}
+              </div>
+              <div class="assignee-avatar more" *ngIf="task.assignedTo.length > 3">
+                +{{ task.assignedTo.length - 3 }}
+              </div>
+            </div>
+            <div class="task-priority" [ngClass]="'priority-' + task.priority">
+              <img [src]="getPriorityIcon(task.priority)" [alt]="task.priority + ' priority'" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
