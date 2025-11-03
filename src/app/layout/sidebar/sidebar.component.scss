@@ -33,7 +33,7 @@
 .sidebar-nav {
   @include flex(column, flex-start, stretch);
   flex: 1;
-  padding: $spacing-md 0;
+  padding: 3rem 0;
 }
 
 .nav-link {

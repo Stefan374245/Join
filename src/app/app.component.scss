@@ -16,8 +16,6 @@
 .main-content {
   flex: 1;
   margin-left: 200px; // Sidebar width
-  margin-top: 90px; // Header height
-  padding: $spacing-xl;
   overflow-y: auto;
   overflow-x: hidden;
   min-height: calc(100vh - 90px);
