@@ -30,8 +30,12 @@
     <div class="board-column">
       <div class="column-header">
         <h2 class="column-title">Triage</h2>
-        <button class="btn-add-column-task" (click)="openAddTaskModal('triage')" title="Add task to Triage">
-          <img src="assets/images/add.svg" alt="Add Task" />
+        <button class="btn-add-column-task" 
+                (click)="openAddTaskModal('triage')" 
+                (mouseenter)="onAddButtonHover($event, true)"
+                (mouseleave)="onAddButtonHover($event, false)"
+                title="Add task to Triage">
+          <img src="assets/images/taskPlus.svg" alt="Add Task" />
         </button>
       </div>
       
@@ -48,7 +52,12 @@
           <h3 class="task-title">{{ task.title }}</h3>
           <p class="task-description">{{ getShortDescription(task.description) }}</p>
           
-          <div class="task-progress" *ngIf="task.subtasks && task.subtasks.length > 0">
+          <div class="task-progress" 
+               *ngIf="task.subtasks && task.subtasks.length > 0"
+               [ngClass]="{
+                 'all-completed': areAllSubtasksCompleted(task),
+                 'has-incomplete': hasIncompleteSubtasks(task)
+               }">
             <div class="progress-bar">
               <div class="progress-fill" [style.width.%]="getSubtaskProgress(task)"></div>
             </div>
@@ -81,8 +90,12 @@
     <div class="board-column">
       <div class="column-header">
         <h2 class="column-title">To do</h2>
-        <button class="btn-add-column-task" (click)="openAddTaskModal('todo')" title="Add task to To do">
-          <img src="assets/images/add.svg" alt="Add Task" />
+        <button class="btn-add-column-task" 
+                (click)="openAddTaskModal('todo')" 
+                (mouseenter)="onAddButtonHover($event, true)"
+                (mouseleave)="onAddButtonHover($event, false)"
+                title="Add task to To do">
+          <img src="assets/images/taskPlus.svg" alt="Add Task" />
         </button>
       </div>
       
@@ -98,7 +111,12 @@
           <h3 class="task-title">{{ task.title }}</h3>
           <p class="task-description">{{ getShortDescription(task.description) }}</p>
           
-          <div class="task-progress" *ngIf="task.subtasks && task.subtasks.length > 0">
+          <div class="task-progress" 
+               *ngIf="task.subtasks && task.subtasks.length > 0"
+               [ngClass]="{
+                 'all-completed': areAllSubtasksCompleted(task),
+                 'has-incomplete': hasIncompleteSubtasks(task)
+               }">
             <div class="progress-bar">
               <div class="progress-fill" [style.width.%]="getSubtaskProgress(task)"></div>
             </div>
@@ -131,8 +149,12 @@
     <div class="board-column">
       <div class="column-header">
         <h2 class="column-title">In progress</h2>
-        <button class="btn-add-column-task" (click)="openAddTaskModal('in-progress')" title="Add task to In progress">
-          <img src="assets/images/add.svg" alt="Add Task" />
+        <button class="btn-add-column-task" 
+                (click)="openAddTaskModal('in-progress')" 
+                (mouseenter)="onAddButtonHover($event, true)"
+                (mouseleave)="onAddButtonHover($event, false)"
+                title="Add task to In progress">
+          <img src="assets/images/taskPlus.svg" alt="Add Task" />
         </button>
       </div>
       
@@ -148,7 +170,12 @@
           <h3 class="task-title">{{ task.title }}</h3>
           <p class="task-description">{{ getShortDescription(task.description) }}</p>
           
-          <div class="task-progress" *ngIf="task.subtasks && task.subtasks.length > 0">
+          <div class="task-progress" 
+               *ngIf="task.subtasks && task.subtasks.length > 0"
+               [ngClass]="{
+                 'all-completed': areAllSubtasksCompleted(task),
+                 'has-incomplete': hasIncompleteSubtasks(task)
+               }">
             <div class="progress-bar">
               <div class="progress-fill" [style.width.%]="getSubtaskProgress(task)"></div>
             </div>
@@ -181,8 +208,12 @@
     <div class="board-column">
       <div class="column-header">
         <h2 class="column-title">Await feedback</h2>
-        <button class="btn-add-column-task" (click)="openAddTaskModal('await-feedback')" title="Add task to Await feedback">
-          <img src="assets/images/add.svg" alt="Add Task" />
+        <button class="btn-add-column-task" 
+                (click)="openAddTaskModal('await-feedback')" 
+                (mouseenter)="onAddButtonHover($event, true)"
+                (mouseleave)="onAddButtonHover($event, false)"
+                title="Add task to Await feedback">
+          <img src="assets/images/taskPlus.svg" alt="Add Task" />
         </button>
       </div>
       
@@ -198,7 +229,12 @@
           <h3 class="task-title">{{ task.title }}</h3>
           <p class="task-description">{{ getShortDescription(task.description) }}</p>
           
-          <div class="task-progress" *ngIf="task.subtasks && task.subtasks.length > 0">
+          <div class="task-progress" 
+               *ngIf="task.subtasks && task.subtasks.length > 0"
+               [ngClass]="{
+                 'all-completed': areAllSubtasksCompleted(task),
+                 'has-incomplete': hasIncompleteSubtasks(task)
+               }">
             <div class="progress-bar">
               <div class="progress-fill" [style.width.%]="getSubtaskProgress(task)"></div>
             </div>
@@ -231,8 +267,12 @@
     <div class="board-column">
       <div class="column-header">
         <h2 class="column-title">Done</h2>
-        <button class="btn-add-column-task" (click)="openAddTaskModal('done')" title="Add task to Done">
-          <img src="assets/images/add.svg" alt="Add Task" />
+        <button class="btn-add-column-task" 
+                (click)="openAddTaskModal('done')" 
+                (mouseenter)="onAddButtonHover($event, true)"
+                (mouseleave)="onAddButtonHover($event, false)"
+                title="Add task to Done">
+          <img src="assets/images/taskPlus.svg" alt="Add Task" />
         </button>
       </div>
       
@@ -248,7 +288,12 @@
           <h3 class="task-title">{{ task.title }}</h3>
           <p class="task-description">{{ getShortDescription(task.description) }}</p>
           
-          <div class="task-progress" *ngIf="task.subtasks && task.subtasks.length > 0">
+          <div class="task-progress" 
+               *ngIf="task.subtasks && task.subtasks.length > 0"
+               [ngClass]="{
+                 'all-completed': areAllSubtasksCompleted(task),
+                 'has-incomplete': hasIncompleteSubtasks(task)
+               }">
             <div class="progress-bar">
               <div class="progress-fill" [style.width.%]="getSubtaskProgress(task)"></div>
             </div>

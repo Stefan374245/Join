@@ -24,6 +24,7 @@ export class TaskDetailComponent implements OnInit {
 
   contacts: Contact[] = [];
   showDeleteConfirm: boolean = false;
+  private lastToggleTime: number = 0;
 
   ngOnInit(): void {
     this.loadContacts();
@@ -90,15 +91,46 @@ export class TaskDetailComponent implements OnInit {
   }
 
   /**
-   * Toggle subtask completion
+   * Toggle subtask completion - Update UI immediately, then sync with service
    */
   toggleSubtask(subtaskId: string): void {
-    this.taskService.toggleSubtask(this.task.id, subtaskId).subscribe({
+    // Debounce: Ignore clicks within 300ms of last toggle
+    const now = Date.now();
+    if (now - this.lastToggleTime < 300) {
+      console.log('⏸️ Click ignored (debounce)');
+      return;
+    }
+    this.lastToggleTime = now;
+
+    if (!this.task.subtasks) {
+      console.error('❌ Component: No subtasks found');
+      return;
+    }
+
+    const subtask = this.task.subtasks.find(st => st.id === subtaskId);
+    if (!subtask) {
+      console.error('❌ Component: Subtask not found:', subtaskId);
+      return;
+    }
+
+    const currentState = subtask.completed;
+    const newState = !currentState;
+    console.log('🎯 Component: Toggling subtask:', subtaskId, 'Current:', currentState, '→ New:', newState);
+
+    // 1. IMMEDIATE UI UPDATE: Toggle locally first for instant feedback
+    subtask.completed = newState;
+    console.log('🖼️ Component: UI updated immediately to:', subtask.completed);
+
+    // 2. THEN sync with Firestore using the NEW method that sets the value instead of toggling
+    this.taskService.updateSubtaskCompletion(this.task.id, subtaskId, newState).subscribe({
       next: () => {
-        console.log('✅ Subtask toggled successfully');
+        console.log('✅ Component: Firestore sync completed with state:', newState);
       },
       error: (error) => {
-        console.error('Error toggling subtask:', error);
+        console.error('❌ Component: Error syncing with Firestore:', error);
+        // Revert on error
+        subtask.completed = currentState;
+        console.log('⏮️ Component: Reverted to:', currentState);
       }
     });
   }
@@ -157,4 +189,3 @@ export class TaskDetailComponent implements OnInit {
     return `assets/images/${priority.toLowerCase()}.svg`;
   }
 }
-

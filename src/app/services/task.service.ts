@@ -127,8 +127,8 @@ export class TaskService {
     
     return subtasks.map((st: any) => ({
       id: st.id || `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      title: st.title || '',
-      completed: st.completed || false
+      title: st.title || st.name || '',
+      completed: st.completed === true // Explicit boolean check
     }));
   }
 
@@ -273,7 +273,7 @@ export class TaskService {
     return subtasks.map(st => ({
       id: st.id,
       title: st.title,
-      completed: st.completed || false
+      completed: st.completed === true // Explicit boolean
     }));
   }
 
@@ -326,26 +326,73 @@ export class TaskService {
   }
 
   /**
-   * Toggle subtask completion
+   * Update subtask completion state
+   * @param taskId - The task ID
+   * @param subtaskId - The subtask ID
+   * @param completed - The new completed state (true or false)
+   */
+  updateSubtaskCompletion(taskId: string, subtaskId: string, completed: boolean): Observable<void> {
+    console.log('🔧 Service: updateSubtaskCompletion called for:', subtaskId, 'new state:', completed);
+    
+    // Get current task from the BehaviorSubject
+    const tasks = this.tasksSubject.value;
+    const task = tasks.find(t => t.id === taskId);
+    
+    if (!task || !task.subtasks) {
+      console.error('❌ Service: Task or subtasks not found');
+      return new Observable(observer => {
+        observer.error(new Error('Task or subtasks not found'));
+        observer.complete();
+      });
+    }
+
+    // Find the subtask
+    const subtask = task.subtasks.find(st => st.id === subtaskId);
+    if (!subtask) {
+      console.error('❌ Service: Subtask not found:', subtaskId);
+      return new Observable(observer => {
+        observer.error(new Error('Subtask not found'));
+        observer.complete();
+      });
+    }
+
+    console.log('🔧 Service: Setting state to:', completed);
+
+    // Create updated subtasks array with new state
+    const updatedSubtasks = task.subtasks.map(st => 
+      st.id === subtaskId ? { ...st, completed: completed } : st
+    );
+    
+    // Update in Firestore
+    return this.updateTask(taskId, { subtasks: updatedSubtasks });
+  }
+
+  /**
+   * Toggle subtask completion (DEPRECATED - use updateSubtaskCompletion instead)
    */
   toggleSubtask(taskId: string, subtaskId: string): Observable<void> {
-    return new Observable(observer => {
-      this.getTaskById(taskId).subscribe(task => {
-        if (task) {
-          const updatedSubtasks = task.subtasks.map(st => 
-            st.id === subtaskId ? { ...st, completed: !st.completed } : st
-          );
-          
-          this.updateTask(taskId, { subtasks: updatedSubtasks }).subscribe({
-            next: () => observer.next(),
-            error: (err) => observer.error(err),
-            complete: () => observer.complete()
-          });
-        } else {
-          observer.error(new Error('Task not found'));
-        }
+    console.log('⚠️ Service: toggleSubtask is deprecated, use updateSubtaskCompletion instead');
+    
+    const tasks = this.tasksSubject.value;
+    const task = tasks.find(t => t.id === taskId);
+    
+    if (!task || !task.subtasks) {
+      return new Observable(observer => {
+        observer.error(new Error('Task or subtasks not found'));
+        observer.complete();
       });
-    });
+    }
+
+    const subtask = task.subtasks.find(st => st.id === subtaskId);
+    if (!subtask) {
+      return new Observable(observer => {
+        observer.error(new Error('Subtask not found'));
+        observer.complete();
+      });
+    }
+
+    // Use the new method
+    return this.updateSubtaskCompletion(taskId, subtaskId, !subtask.completed);
   }
 
   /**

@@ -1,6 +1,16 @@
 @import '../../../../styles/variables';
 @import '../../../../styles/mixins';
 
+// ========== Keyframe Animations ==========
+@keyframes shine {
+  0% {
+    left: -100%;
+  }
+  50%, 100% {
+    left: 100%;
+  }
+}
+
 // ========== Variables ==========
 $board-padding: 60px;
 $board-gap: 26px;
@@ -167,24 +177,22 @@ $header-height: 54px;
       background: transparent;
       border: none;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.3s ease;
       display: flex;
       align-items: center;
       justify-content: center;
       border-radius: 50%;
+      padding: 0;
 
       img {
         width: 24px;
         height: 24px;
-        transition: transform 0.2s ease;
+        transition: transform 0.3s ease;
+        display: block;
       }
 
       &:hover {
-        background-color: rgba($accent-color, 0.1);
-        
-        img {
-          transform: scale(1.1);
-        }
+        transform: scale(1.1);
       }
     }
   }
@@ -249,7 +257,6 @@ $header-height: 54px;
 .task-card {
   display: flex;
   flex-direction: column;
-  width: calc(100% - 32px);
   background: white;
   border-radius: 24px;
   padding: 18px;
@@ -334,11 +341,75 @@ $header-height: 54px;
     gap: 8px;
     width: 100%;
     align-items: center;
-    transition: transform 0.2s ease-in-out;
+    transition: all 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
 
     &:hover .subtask-count {
       transform: scale(1.15);
-      transition: transform 0.2s ease-in-out;
+      transition: transform 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
+    }
+
+    // Hover effect when all subtasks are completed - GREEN
+    &.all-completed {
+      .progress-bar {
+        transition: box-shadow 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
+        
+        .progress-fill {
+          transition: background 0.5s cubic-bezier(0.4, 0.0, 0.2, 1), 
+                      box-shadow 0.5s cubic-bezier(0.4, 0.0, 0.2, 1),
+                      width 0.8s cubic-bezier(0.4, 0.0, 0.2, 1);
+        }
+      }
+      
+      .progress-text {
+        transition: color 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
+      }
+
+      &:hover {
+        .progress-bar {
+          box-shadow: 0 0 12px rgba(13, 144, 35, 0.5);
+          
+          .progress-fill {
+            background: linear-gradient(90deg, #0d9023 0%, lighten(#0d9023, 10%) 100%);
+            box-shadow: 0 0 12px rgba(13, 144, 35, 0.6);
+          }
+        }
+        
+        .progress-text {
+          color: #0d9023;
+        }
+      }
+    }
+
+    // Hover effect when subtasks are incomplete - RED
+    &.has-incomplete {
+      .progress-bar {
+        transition: box-shadow 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
+        
+        .progress-fill {
+          transition: background 0.5s cubic-bezier(0.4, 0.0, 0.2, 1), 
+                      box-shadow 0.5s cubic-bezier(0.4, 0.0, 0.2, 1),
+                      width 0.8s cubic-bezier(0.4, 0.0, 0.2, 1);
+        }
+      }
+      
+      .progress-text {
+        transition: color 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
+      }
+
+      &:hover {
+        .progress-bar {
+          box-shadow: 0 0 12px rgba(255, 61, 0, 0.5);
+          
+          .progress-fill {
+            background: linear-gradient(90deg, #ff3d00 0%, lighten(#ff3d00, 10%) 100%);
+            box-shadow: 0 0 12px rgba(255, 61, 0, 0.6);
+          }
+        }
+        
+        .progress-text {
+          color: #ff3d00;
+        }
+      }
     }
 
     .subtask-progress-container {
@@ -347,13 +418,36 @@ $header-height: 54px;
       background: #f4f4f4;
       border-radius: 4px;
       overflow: hidden;
+      position: relative;
     }
 
     .subtask-progress-bar {
       height: 100%;
-      background: $accent-color;
+      background: linear-gradient(90deg, $accent-color 0%, lighten($accent-color, 10%) 100%);
       border-radius: 4px;
-      transition: width 0.2s ease;
+      transition: width 0.8s cubic-bezier(0.4, 0.0, 0.2, 1);
+      box-shadow: 0 0 8px rgba($accent-color, 0.3);
+      position: relative;
+      
+      // Smooth animation when width changes
+      will-change: width;
+      
+      // Animated shine effect
+      &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.4),
+          transparent
+        );
+        animation: shine 2s ease-in-out infinite;
+      }
     }
 
     // Old class names for compatibility
@@ -367,9 +461,28 @@ $header-height: 54px;
 
       .progress-fill {
         height: 100%;
-        background: $accent-color;
+        background: linear-gradient(90deg, $accent-color 0%, lighten($accent-color, 10%) 100%);
         border-radius: 4px;
-        transition: width 0.3s ease-in-out;
+        transition: width 0.8s cubic-bezier(0.4, 0.0, 0.2, 1);
+        box-shadow: 0 0 8px rgba($accent-color, 0.3);
+        will-change: width;
+        position: relative;
+
+        &::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(255, 255, 255, 0.4),
+            transparent
+          );
+          animation: shine 2s ease-in-out infinite;
+        }
       }
     }
 
@@ -398,8 +511,8 @@ $header-height: 54px;
   // ========== Task Footer ==========
   .task-footer {
     display: flex;
-    flex-direction: column;
-    gap: 20px;
+    flex-direction: row;
+    justify-content: space-between;
     margin-top: auto;
   }
 

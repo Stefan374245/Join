@@ -123,6 +123,19 @@ export class BoardViewComponent implements OnInit {
   }
 
   /**
+   * Handle hover effect for add task button - switch SVG
+   */
+  onAddButtonHover(event: MouseEvent, isHover: boolean): void {
+    const button = event.currentTarget as HTMLButtonElement;
+    const img = button.querySelector('img');
+    if (img) {
+      img.src = isHover 
+        ? 'assets/images/taskPlusHover.svg' 
+        : 'assets/images/taskPlus.svg';
+    }
+  }
+
+  /**
    * Open task detail view
    */
   openTaskDetail(task: Task): void {
@@ -195,6 +208,22 @@ export class BoardViewComponent implements OnInit {
   getCompletedSubtasks(task: Task): number {
     if (!task.subtasks) return 0;
     return task.subtasks.filter(st => st.completed).length;
+  }
+
+  /**
+   * Check if all subtasks are completed
+   */
+  areAllSubtasksCompleted(task: Task): boolean {
+    if (!task.subtasks || task.subtasks.length === 0) return false;
+    return task.subtasks.every(st => st.completed);
+  }
+
+  /**
+   * Check if task has incomplete subtasks
+   */
+  hasIncompleteSubtasks(task: Task): boolean {
+    if (!task.subtasks || task.subtasks.length === 0) return false;
+    return task.subtasks.some(st => !st.completed);
   }
 
   /**

@@ -225,37 +225,83 @@
     display: flex;
     flex-direction: column;
     gap: 0;
+  }
 
-    .subtask-item {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      margin-bottom: 8px;
-      padding: 10px;
-      border-radius: 10px;
-      transition: background-color 0.2s;
+  .subtask-checkbox-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 8px;
+    border-radius: 16px;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: background-color 0.2s ease;
+
+    &:hover {
+      background-color: #d1d1d1;
+    }
+
+    .subtask-checkbox-icon {
+      width: 24px;
+      height: 24px;
+      transition: transform 0.2s ease, opacity 0.2s ease;
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      flex-shrink: 0;
+      
+      &.checkbox-unchecked {
+        background-image: url('/assets/images/checkboxfalseblue.svg');
+      }
+      
+      &.checkbox-checked {
+        background-image: url('/assets/images/checkboxtrueblack.svg');
+      }
+    }
+
+    &:hover .subtask-checkbox-icon {
+      transform: scale(1.1);
+    }
+
+    .subtask-title {
+      margin: 0;
+      color: #2a3647;
+      font-size: 16px;
       cursor: pointer;
+      flex: 1;
+    }
+  }
 
-      &:hover {
-        background-color: #f7f7f7;
-      }
+  // Old styles for backward compatibility - can be removed later
+  .subtask-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 8px;
+    padding: 10px;
+    border-radius: 10px;
+    transition: background-color 0.2s;
+    cursor: pointer;
 
-      .subtask-checkbox {
-        width: 24px;
-        height: 24px;
-        border: 2px solid #2a3647;
-        border-radius: 3px;
-        cursor: pointer;
-        accent-color: $accent-color;
-      }
+    &:hover {
+      background-color: #f7f7f7;
+    }
 
-      .subtask-title {
-        color: #2a3647;
-        font-size: 16px;
-        cursor: pointer;
-        flex: 1;
-        margin: 0;
-      }
+    .subtask-checkbox {
+      width: 24px;
+      height: 24px;
+      border: 2px solid #2a3647;
+      border-radius: 3px;
+      cursor: pointer;
+      accent-color: $accent-color;
+    }
+
+    label.subtask-title {
+      color: #2a3647;
+      font-size: 16px;
+      cursor: pointer;
+      flex: 1;
+      margin: 0;
     }
   }
 }

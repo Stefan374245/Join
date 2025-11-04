@@ -59,18 +59,15 @@
       <div class="subtasks-section" *ngIf="task.subtasks && task.subtasks.length > 0">
         <span class="detail-label">Subtasks</span>
         <div class="subtask-list">
-          <div class="subtask-item" *ngFor="let subtask of task.subtasks" (click)="toggleSubtask(subtask.id)">
-            <input 
-              type="checkbox" 
-              [checked]="subtask.completed" 
-              [id]="'subtask-' + subtask.id"
-              class="subtask-checkbox"
-              (click)="$event.stopPropagation()"
-              (change)="toggleSubtask(subtask.id)"
-            />
-            <label [for]="'subtask-' + subtask.id" class="subtask-title">
-              {{ subtask.title }}
-            </label>
+          <div class="subtask-checkbox-container" 
+               *ngFor="let subtask of task.subtasks; let i = index" 
+               (click)="toggleSubtask(subtask.id)">
+            <div 
+              class="subtask-checkbox-icon"
+              [ngClass]="subtask.completed ? 'checkbox-checked' : 'checkbox-unchecked'"
+              [title]="subtask.completed ? 'Mark as incomplete' : 'Mark as complete'"
+            ></div>
+            <p class="subtask-title">{{ subtask.title }}</p>
           </div>
         </div>
       </div>
