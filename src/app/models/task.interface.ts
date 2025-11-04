@@ -6,7 +6,7 @@ export interface Task {
   assignedTo: string[];
   dueDate: Date;
   priority: 'low' | 'medium' | 'high';
-  status: 'todo' | 'in-progress' | 'done';
+  status: 'triage' | 'todo' | 'in-progress' | 'await-feedback' | 'done';
   subtasks: Subtask[];
 }
 

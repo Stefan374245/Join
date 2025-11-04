@@ -10,7 +10,9 @@ import {
   query, 
   where,
   Timestamp,
-  orderBy
+  orderBy,
+  getDocs,
+  onSnapshot
 } from '@angular/fire/firestore';
 import { Auth } from '@angular/fire/auth';
 import { Observable, from, BehaviorSubject, of } from 'rxjs';
@@ -34,28 +36,74 @@ export class TaskService {
    * Initialize real-time listener for tasks
    */
   private initializeTasksListener(): void {
-    const tasksCol = collection(this.firestore, 'tasks');
-    const tasksQuery = query(tasksCol, orderBy('createdAt', 'desc'));
-    
-    collectionData(tasksQuery, { idField: 'id' }).pipe(
-      map((tasks: any[]) => {
-        return tasks.map((task) => this.mapFirestoreTask(task));
-      }),
-      tap((tasks) => {
-        console.log('📋 Tasks loaded from Firestore:', tasks.length);
-        this.tasksSubject.next(tasks);
-      }),
-      catchError((error) => {
-        console.error('❌ Error loading tasks:', error);
-        return of([]);
-      })
-    ).subscribe();
+    try {
+      const tasksCol = collection(this.firestore, 'tasks');
+      const tasksQuery = query(tasksCol, orderBy('createdAt', 'desc'));
+      
+      // Use onSnapshot for real-time updates
+      onSnapshot(tasksQuery, 
+        (snapshot) => {
+          console.log('🔍 Raw snapshot from Firestore:', snapshot.docs.length, 'documents');
+          
+          const tasks = snapshot.docs.map((doc) => {
+            const data = doc.data();
+            console.log('📄 Document data:', { id: doc.id, ...data });
+            return this.mapFirestoreTask({ id: doc.id, ...data });
+          });
+          
+          console.log('📋 Tasks loaded from Firestore:', tasks.length);
+          console.log('✅ Mapped tasks:', tasks);
+          this.tasksSubject.next(tasks);
+        },
+        (error) => {
+          console.error('❌ Error in onSnapshot:', error);
+          console.error('Error details:', error.message, error.code);
+          this.tasksSubject.next([]);
+        }
+      );
+    } catch (error) {
+      console.error('❌ Critical error initializing tasks listener:', error);
+      this.tasksSubject.next([]);
+    }
   }
 
   /**
    * Map Firestore data to Task interface
    */
   private mapFirestoreTask(data: any): Task {
+    // Map old status values to new ones if needed
+    let status: 'triage' | 'todo' | 'in-progress' | 'await-feedback' | 'done' = 'todo';
+    if (data.status) {
+      // Handle old status values
+      switch (data.status.toLowerCase()) {
+        case 'triage':
+          status = 'triage';
+          break;
+        case 'todo':
+        case 'to-do':
+          status = 'todo';
+          break;
+        case 'in-progress':
+        case 'inprogress':
+        case 'in progress':
+          status = 'in-progress';
+          break;
+        case 'await-feedback':
+        case 'awaiting-feedback':
+        case 'awaiting feedback':
+        case 'awaitfeedback':
+          status = 'await-feedback';
+          break;
+        case 'done':
+        case 'completed':
+          status = 'done';
+          break;
+        default:
+          console.warn(`Unknown status: ${data.status}, defaulting to 'todo'`);
+          status = 'todo';
+      }
+    }
+
     return {
       id: data.id || data.taskId,
       title: data.title || '',
@@ -64,7 +112,7 @@ export class TaskService {
       assignedTo: Array.isArray(data.assignedTo) ? data.assignedTo : [],
       dueDate: this.convertToDate(data.dueDate),
       priority: data.priority || 'medium',
-      status: data.status || 'todo',
+      status: status,
       subtasks: this.mapSubtasks(data.subtasks)
     } as Task;
   }
@@ -273,7 +321,7 @@ export class TaskService {
   /**
    * Update task status (for drag and drop on board)
    */
-  updateTaskStatus(taskId: string, status: 'todo' | 'in-progress' | 'done'): Observable<void> {
+  updateTaskStatus(taskId: string, status: 'triage' | 'todo' | 'in-progress' | 'await-feedback' | 'done'): Observable<void> {
     return this.updateTask(taskId, { status });
   }
 

@@ -278,3 +278,13 @@
     </div>
   </div>
 </div>
+
+<!-- Task Detail Overlay -->
+<app-task-detail
+  *ngIf="selectedTask"
+  [task]="selectedTask"
+  [isVisible]="showTaskDetail"
+  (close)="closeTaskDetail()"
+  (edit)="onEditTask($event)"
+  (delete)="onDeleteTask($event)">
+</app-task-detail>

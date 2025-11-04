@@ -7,11 +7,12 @@ import { ContactService } from '../../../services/contact.service';
 import { Task } from '../../../models/task.interface';
 import { Contact } from '../../../models/contact.interface';
 import { Observable, map } from 'rxjs';
+import { TaskDetailComponent } from '../task-detail/task-detail.component';
 
 @Component({
   selector: 'app-board-view',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TaskDetailComponent],
   templateUrl: './board-view.component.html',
   styleUrl: './board-view.component.scss'
 })
@@ -24,6 +25,10 @@ export class BoardViewComponent implements OnInit {
   allTasks: Task[] = [];
   filteredTasks: Task[] = [];
   contacts: Contact[] = [];
+  
+  // Task Detail Overlay
+  selectedTask: Task | null = null;
+  showTaskDetail: boolean = false;
 
   ngOnInit(): void {
     this.loadTasks();
@@ -65,23 +70,27 @@ export class BoardViewComponent implements OnInit {
    * Get tasks by status
    */
   getTasksByStatus(status: string): Task[] {
-    // Map status to match our Task interface
-    let taskStatus: 'todo' | 'in-progress' | 'done' = 'todo';
+    // Map column names to task status
+    let taskStatus: 'triage' | 'todo' | 'in-progress' | 'await-feedback' | 'done';
     
     switch(status) {
-      case 'todo':
       case 'triage':
+        taskStatus = 'triage';
+        break;
+      case 'todo':
         taskStatus = 'todo';
         break;
       case 'in-progress':
         taskStatus = 'in-progress';
         break;
       case 'await-feedback':
-        // For now, we don't have this status, so return empty
-        return [];
+        taskStatus = 'await-feedback';
+        break;
       case 'done':
         taskStatus = 'done';
         break;
+      default:
+        return [];
     }
 
     return this.filteredTasks.filter(task => task.status === taskStatus);
@@ -117,8 +126,40 @@ export class BoardViewComponent implements OnInit {
    * Open task detail view
    */
   openTaskDetail(task: Task): void {
-    // TODO: Open task detail modal or navigate to detail page
-    console.log('Opening task detail:', task);
+    this.selectedTask = task;
+    this.showTaskDetail = true;
+  }
+
+  /**
+   * Close task detail view
+   */
+  closeTaskDetail(): void {
+    this.showTaskDetail = false;
+    this.selectedTask = null;
+  }
+
+  /**
+   * Handle task edit
+   */
+  onEditTask(task: Task): void {
+    // Navigate to add-task page with task ID for editing
+    this.router.navigate(['/add-task'], { queryParams: { id: task.id } });
+    this.closeTaskDetail();
+  }
+
+  /**
+   * Handle task delete
+   */
+  onDeleteTask(taskId: string): void {
+    this.taskService.deleteTask(taskId).subscribe({
+      next: () => {
+        console.log('✅ Task deleted successfully');
+        this.closeTaskDetail();
+      },
+      error: (error) => {
+        console.error('Error deleting task:', error);
+      }
+    });
   }
 
   /**

@@ -1,0 +1,105 @@
+<!-- Task Overlay Container -->
+<div class="task-overlay" 
+     *ngIf="isVisible && task" 
+     (click)="onOverlayClick($event)">
+  
+  <!-- Task Detail Card (525px width, 30px border-radius, shadow from Figma) -->
+  <div class="task-card-overlay" (click)="$event.stopPropagation()">
+    
+    <!-- Header with Category and Close Button -->
+    <div class="task-header">
+      <div class="task-category" [ngClass]="getCategoryClass(task.category)">
+        <span>{{ task.category }}</span>
+      </div>
+      <button class="close-btn" (click)="onClose()" aria-label="Close">
+        <img src="assets/images/close.svg" alt="Close" />
+      </button>
+    </div>
+
+    <!-- Task Content -->
+    <div class="task-content">
+      <!-- Title -->
+      <h2 class="task-title">{{ task.title }}</h2>
+      
+      <!-- Description -->
+      <p class="task-description">{{ task.description }}</p>
+      
+      <!-- Task Details -->
+      <div class="task-details">
+        <!-- Due Date -->
+        <div class="detail-row">
+          <span class="detail-label">Due date:</span>
+          <span class="detail-value">{{ formatDate(task.dueDate) }}</span>
+        </div>
+        
+        <!-- Priority -->
+        <div class="detail-row">
+          <span class="detail-label">Priority:</span>
+          <div class="task-priority" [ngClass]="'priority-' + task.priority">
+            <span>{{ task.priority | titlecase }}</span>
+            <img [src]="getPriorityIcon(task.priority)" [alt]="task.priority + ' priority'" />
+          </div>
+        </div>
+        
+        <!-- Assigned To -->
+        <div class="detail-row assigned-to">
+          <span class="detail-label">Assigned To:</span>
+          <div class="assignee-list">
+            <div class="assignee-item" *ngFor="let userId of task.assignedTo">
+              <div class="assignee-avatar" [style.background-color]="getContactColor(userId)">
+                {{ getContactInitials(userId) }}
+              </div>
+              <span class="assignee-name">{{ getContactFullName(userId) }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Subtasks Section -->
+      <div class="subtasks-section" *ngIf="task.subtasks && task.subtasks.length > 0">
+        <span class="detail-label">Subtasks</span>
+        <div class="subtask-list">
+          <div class="subtask-item" *ngFor="let subtask of task.subtasks" (click)="toggleSubtask(subtask.id)">
+            <input 
+              type="checkbox" 
+              [checked]="subtask.completed" 
+              [id]="'subtask-' + subtask.id"
+              class="subtask-checkbox"
+              (click)="$event.stopPropagation()"
+              (change)="toggleSubtask(subtask.id)"
+            />
+            <label [for]="'subtask-' + subtask.id" class="subtask-title">
+              {{ subtask.title }}
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="task-actions">
+      <button class="action-btn delete-btn" (click)="showDeleteConfirmation()">
+        <img src="assets/images/subtaskBin.svg" alt="Delete" />
+        <span>Delete</span>
+      </button>
+      <div class="action-separator"></div>
+      <button class="action-btn edit-btn" (click)="onEdit()">
+        <img src="assets/images/edit-2.svg" alt="Edit" />
+        <span>Edit</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirmation Dialog -->
+<div class="confirm-dialog-overlay" 
+     *ngIf="showDeleteConfirm" 
+     (click)="cancelDelete()">
+  <div class="confirm-dialog" (click)="$event.stopPropagation()">
+    <h3>Delete permanently?</h3>
+    <div class="confirm-buttons">
+      <button class="btn-cancel" (click)="cancelDelete()">Cancel</button>
+      <button class="btn-delete" (click)="confirmDelete()">Delete</button>
+    </div>
+  </div>
+</div>
