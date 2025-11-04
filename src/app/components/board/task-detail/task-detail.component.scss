@@ -194,12 +194,25 @@
             font-size: 16px;
             border: 2px solid white;
             flex-shrink: 0;
+            
+            &.more-avatar {
+              background-color: $primary-color;
+              font-size: 14px;
+              font-weight: 600;
+            }
           }
 
           .assignee-name {
             font-size: 19px;
             font-weight: 400;
             color: $primary-color;
+          }
+          
+          &.more-users {
+            .assignee-name {
+              color: #666;
+              font-style: italic;
+            }
           }
         }
       }

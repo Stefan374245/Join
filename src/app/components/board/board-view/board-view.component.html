@@ -333,3 +333,12 @@
   (edit)="onEditTask($event)"
   (delete)="onDeleteTask($event)">
 </app-task-detail>
+
+<!-- Task Edit Overlay -->
+<app-add-task
+  *ngIf="showEditOverlay && taskToEdit"
+  [isOverlay]="true"
+  [taskToEdit]="taskToEdit"
+  (close)="closeEditOverlay()"
+  (taskSaved)="onTaskSaved($event)">
+</app-add-task>

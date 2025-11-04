@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -15,6 +15,11 @@ import { ContactService } from '../../services/contact.service';
   styleUrl: './add-task.component.scss'
 })
 export class AddTaskComponent implements OnInit {
+  @Input() isOverlay: boolean = false; // Overlay-Modus aktivieren
+  @Input() taskToEdit: Task | null = null; // Task zum Bearbeiten
+  @Output() close = new EventEmitter<void>(); // Overlay schließen
+  @Output() taskSaved = new EventEmitter<Task>(); // Task gespeichert
+  
   taskForm!: FormGroup;
   subtaskInput: string = '';
   subtasks: Subtask[] = [];
@@ -29,6 +34,8 @@ export class AddTaskComponent implements OnInit {
   
   showContactDropdown: boolean = false;
   showCategoryDropdown: boolean = false;
+  
+  isEditMode: boolean = false; // Edit-Modus Flag
 
   constructor(
     private fb: FormBuilder,
@@ -39,7 +46,75 @@ export class AddTaskComponent implements OnInit {
 
   ngOnInit(): void {
     this.initForm();
-    this.loadContacts();
+    
+    // Contacts laden und dann Form befüllen wenn Edit-Modus
+    if (this.taskToEdit) {
+      this.isEditMode = true;
+      this.loadContactsAndPopulateForm(this.taskToEdit);
+    } else {
+      this.loadContacts();
+    }
+  }
+
+  /**
+   * Contacts laden und dann Form befüllen (für Edit-Modus)
+   */
+  private loadContactsAndPopulateForm(task: Task): void {
+    this.contactService.getContacts().subscribe({
+      next: (contacts: Contact[]) => {
+        this.availableContacts = contacts;
+        console.log('📋 Contacts loaded:', contacts.length);
+        // JETZT Form befüllen, nachdem Contacts geladen sind
+        this.populateFormWithTask(task);
+      },
+      error: (error: any) => {
+        console.error('❌ Error loading contacts:', error);
+      }
+    });
+  }
+
+  /**
+   * Formular mit Task-Daten befüllen (Edit-Modus)
+   */
+  private populateFormWithTask(task: Task): void {
+    console.log('📝 Populating form with task:', task);
+    console.log('👥 Available contacts:', this.availableContacts.length);
+    console.log('🎯 Task assignedTo:', task.assignedTo);
+    
+    // Form-Werte setzen
+    this.taskForm.patchValue({
+      title: task.title,
+      description: task.description,
+      dueDate: this.formatDateForInput(task.dueDate),
+      category: task.category
+    });
+    
+    // Priority setzen
+    this.selectedPriority = task.priority;
+    
+    // Category setzen
+    this.selectedCategory = task.category;
+    
+    // Subtasks setzen
+    this.subtasks = task.subtasks ? [...task.subtasks] : [];
+    
+    // Selected Contacts setzen (Contacts sind jetzt garantiert geladen)
+    this.selectedContacts = this.availableContacts.filter(c => 
+      task.assignedTo.includes(c.id)
+    );
+    
+    console.log('✅ Selected contacts:', this.selectedContacts.length, this.selectedContacts.map(c => c.firstName));
+  }
+
+  /**
+   * Datum für Input-Feld formatieren (YYYY-MM-DD)
+   */
+  private formatDateForInput(date: Date): string {
+    const d = new Date(date);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   }
 
   private initForm(): void {
@@ -146,29 +221,96 @@ export class AddTaskComponent implements OnInit {
   // Form Actions
   onSubmit(): void {
     if (this.taskForm.valid) {
-      const newTask: Task = {
-        id: this.generateId(),
-        title: this.taskForm.value.title,
-        description: this.taskForm.value.description || '',
-        category: this.selectedCategory,
-        assignedTo: this.selectedContacts.map(c => c.id),
-        dueDate: new Date(this.taskForm.value.dueDate),
-        priority: this.selectedPriority,
-        status: 'todo',
-        subtasks: this.subtasks
-      };
-
-      this.taskService.addTask(newTask).subscribe({
-        next: () => {
-          console.log('Task created successfully');
-          this.router.navigate(['/board']);
-        },
-        error: (error: any) => {
-          console.error('Error creating task:', error);
-        }
-      });
+      if (this.isEditMode && this.taskToEdit) {
+        // UPDATE existierenden Task
+        this.updateTask();
+      } else {
+        // CREATE neuen Task
+        this.createTask();
+      }
     } else {
       this.markFormAsTouched();
+    }
+  }
+
+  /**
+   * Neuen Task erstellen
+   */
+  private createTask(): void {
+    const newTask: Task = {
+      id: this.generateId(),
+      title: this.taskForm.value.title,
+      description: this.taskForm.value.description || '',
+      category: this.selectedCategory,
+      assignedTo: this.selectedContacts.map(c => c.id),
+      dueDate: new Date(this.taskForm.value.dueDate),
+      priority: this.selectedPriority,
+      status: 'todo',
+      subtasks: this.subtasks
+    };
+
+    this.taskService.addTask(newTask).subscribe({
+      next: () => {
+        console.log('✅ Task created successfully');
+        if (this.isOverlay) {
+          this.taskSaved.emit(newTask);
+          this.onClose();
+        } else {
+          this.router.navigate(['/board']);
+        }
+      },
+      error: (error: any) => {
+        console.error('❌ Error creating task:', error);
+      }
+    });
+  }
+
+  /**
+   * Existierenden Task aktualisieren
+   */
+  private updateTask(): void {
+    if (!this.taskToEdit) return;
+
+    const updatedTask: Partial<Task> = {
+      title: this.taskForm.value.title,
+      description: this.taskForm.value.description || '',
+      category: this.selectedCategory,
+      assignedTo: this.selectedContacts.map(c => c.id),
+      dueDate: new Date(this.taskForm.value.dueDate),
+      priority: this.selectedPriority,
+      subtasks: this.subtasks
+    };
+
+    this.taskService.updateTask(this.taskToEdit.id, updatedTask).subscribe({
+      next: () => {
+        console.log('✅ Task updated successfully');
+        const fullTask: Task = { ...this.taskToEdit!, ...updatedTask };
+        if (this.isOverlay) {
+          this.taskSaved.emit(fullTask);
+          this.onClose();
+        } else {
+          this.router.navigate(['/board']);
+        }
+      },
+      error: (error: any) => {
+        console.error('❌ Error updating task:', error);
+      }
+    });
+  }
+
+  /**
+   * Overlay schließen
+   */
+  onClose(): void {
+    this.close.emit();
+  }
+
+  /**
+   * Overlay-Hintergrund-Click
+   */
+  onOverlayClick(event: MouseEvent): void {
+    if ((event.target as HTMLElement).classList.contains('task-overlay')) {
+      this.onClose();
     }
   }
 

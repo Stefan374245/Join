@@ -1,12 +1,27 @@
-<div class="add-task-container">
-  <!-- Header Section -->
-  <header class="add-task-header">
-    <h1 class="page-title">Add Task</h1>
-  </header>
+<!-- Wrapper with conditional classes -->
+<div [class.task-edit-overlay]="isOverlay" 
+     [class.add-task-container]="!isOverlay"
+     (click)="isOverlay ? onOverlayClick($event) : null">
+  
+  <!-- Content Card (only for overlay) -->
+  <div [class.task-edit-card]="isOverlay" 
+       (click)="isOverlay ? $event.stopPropagation() : null">
+    
+    <!-- Close Button (only for overlay) -->
+    <button *ngIf="isOverlay" class="close-btn" (click)="onClose()" aria-label="Close">
+      <img src="assets/images/close.svg" alt="Close" />
+    </button>
 
-  <!-- Form Container -->
-  <div class="form-wrapper">
-    <form [formGroup]="taskForm" (ngSubmit)="onSubmit()" class="add-task-form">
+    <!-- Header Section -->
+    <header [class.edit-header]="isOverlay" [class.add-task-header]="!isOverlay">
+      <h1 [class.edit-title]="isOverlay" [class.page-title]="!isOverlay">
+        {{ isEditMode ? 'Edit Task' : 'Add Task' }}
+      </h1>
+    </header>
+
+    <!-- Form Container -->
+    <div class="form-wrapper">
+      <form [formGroup]="taskForm" (ngSubmit)="onSubmit()" class="add-task-form">
       <!-- Left Column -->
       <div class="form-column form-column-left">
         <!-- Title Input -->
@@ -232,18 +247,19 @@
           </ul>
         </div>
       </div>
-    </form>
 
-    <!-- Form Actions -->
-    <div class="form-actions">
-      <button type="button" class="btn btn-secondary" (click)="clearForm()">
-        <span>Clear</span>
-        <img src="assets/images/close.svg" alt="Clear" />
-      </button>
-      <button type="submit" class="btn btn-primary" (click)="onSubmit()">
-        <span>Create Task</span>
-        <img src="assets/images/check.svg" alt="Create" />
-      </button>
-    </div>
+      <!-- Form Actions -->
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" (click)="clearForm()">
+          <span>Clear</span>
+          <img src="assets/images/close.svg" alt="Clear" />
+        </button>
+        <button type="submit" class="btn btn-primary" [disabled]="taskForm.invalid">
+          <span>{{ isEditMode ? 'Save' : 'Create Task' }}</span>
+          <img src="assets/images/check.svg" alt="Save" />
+        </button>
+      </div>
+    </form>
+  </div>
   </div>
 </div>

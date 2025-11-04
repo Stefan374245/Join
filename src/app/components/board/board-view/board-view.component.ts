@@ -8,11 +8,12 @@ import { Task } from '../../../models/task.interface';
 import { Contact } from '../../../models/contact.interface';
 import { Observable, map } from 'rxjs';
 import { TaskDetailComponent } from '../task-detail/task-detail.component';
+import { AddTaskComponent } from '../../add-task/add-task.component';
 
 @Component({
   selector: 'app-board-view',
   standalone: true,
-  imports: [CommonModule, FormsModule, TaskDetailComponent],
+  imports: [CommonModule, FormsModule, TaskDetailComponent, AddTaskComponent],
   templateUrl: './board-view.component.html',
   styleUrl: './board-view.component.scss'
 })
@@ -29,6 +30,10 @@ export class BoardViewComponent implements OnInit {
   // Task Detail Overlay
   selectedTask: Task | null = null;
   showTaskDetail: boolean = false;
+  
+  // Task Edit Overlay
+  taskToEdit: Task | null = null;
+  showEditOverlay: boolean = false;
 
   ngOnInit(): void {
     this.loadTasks();
@@ -155,9 +160,27 @@ export class BoardViewComponent implements OnInit {
    * Handle task edit
    */
   onEditTask(task: Task): void {
-    // Navigate to add-task page with task ID for editing
-    this.router.navigate(['/add-task'], { queryParams: { id: task.id } });
-    this.closeTaskDetail();
+    // Öffne Edit-Overlay statt Navigation
+    this.taskToEdit = task;
+    this.showEditOverlay = true;
+    this.closeTaskDetail(); // Schließe Detail-Ansicht
+  }
+
+  /**
+   * Close edit overlay
+   */
+  closeEditOverlay(): void {
+    this.showEditOverlay = false;
+    this.taskToEdit = null;
+  }
+
+  /**
+   * Handle task saved from edit overlay
+   */
+  onTaskSaved(task: Task): void {
+    console.log('✅ Task saved:', task);
+    this.closeEditOverlay();
+    // Tasks werden automatisch durch onSnapshot aktualisiert
   }
 
   /**
