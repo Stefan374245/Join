@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, ViewChild, ElementRef, AfterViewChecked } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -14,16 +14,19 @@ import { ContactService } from '../../services/contact.service';
   templateUrl: './add-task.component.html',
   styleUrl: './add-task.component.scss'
 })
-export class AddTaskComponent implements OnInit {
+export class AddTaskComponent implements OnInit, AfterViewChecked {
   @Input() isOverlay: boolean = false; // Overlay-Modus aktivieren
   @Input() taskToEdit: Task | null = null; // Task zum Bearbeiten
   @Output() close = new EventEmitter<void>(); // Overlay schließen
   @Output() taskSaved = new EventEmitter<Task>(); // Task gespeichert
+  @ViewChild('editInput') editInput?: ElementRef<HTMLInputElement>;
   
   taskForm!: FormGroup;
   subtaskInput: string = '';
+  subtaskEditInput: string = ''; // Separates Input für Inline-Editing
   subtasks: Subtask[] = [];
   editingSubtaskId: string | null = null;
+  subtaskInputFocused: boolean = false; // Neues Property für Focus-State
   
   selectedPriority: 'low' | 'medium' | 'high' = 'medium';
   selectedContacts: Contact[] = [];
@@ -53,6 +56,13 @@ export class AddTaskComponent implements OnInit {
       this.loadContactsAndPopulateForm(this.taskToEdit);
     } else {
       this.loadContacts();
+    }
+  }
+
+  ngAfterViewChecked(): void {
+    // Auto-Focus auf Edit-Input wenn im Edit-Modus
+    if (this.editingSubtaskId && this.editInput) {
+      this.editInput.nativeElement.focus();
     }
   }
 
@@ -191,27 +201,48 @@ export class AddTaskComponent implements OnInit {
       };
       this.subtasks.push(newSubtask);
       this.subtaskInput = '';
+      this.subtaskInputFocused = false;
     }
   }
 
   clearSubtaskInput(): void {
     this.subtaskInput = '';
+    this.editingSubtaskId = null;
+  }
+
+  onSubtaskInputFocus(): void {
+    this.subtaskInputFocused = true;
+  }
+
+  onSubtaskInputBlur(): void {
+    // Verzögerung, damit Click-Events auf Icons noch funktionieren
+    setTimeout(() => {
+      if (!this.subtaskInput.trim() && !this.editingSubtaskId) {
+        this.subtaskInputFocused = false;
+      }
+    }, 200);
   }
 
   editSubtask(subtask: Subtask): void {
     this.editingSubtaskId = subtask.id;
-    this.subtaskInput = subtask.title;
+    this.subtaskEditInput = subtask.title; // Separates Input für Inline-Editing
+    // Focus wird automatisch durch #editInput gesetzt
   }
 
   updateSubtask(): void {
-    if (this.editingSubtaskId && this.subtaskInput.trim()) {
+    if (this.editingSubtaskId && this.subtaskEditInput.trim()) {
       const subtask = this.subtasks.find(s => s.id === this.editingSubtaskId);
       if (subtask) {
-        subtask.title = this.subtaskInput.trim();
+        subtask.title = this.subtaskEditInput.trim();
       }
       this.editingSubtaskId = null;
-      this.subtaskInput = '';
+      this.subtaskEditInput = '';
     }
+  }
+
+  cancelEditSubtask(): void {
+    this.editingSubtaskId = null;
+    this.subtaskEditInput = '';
   }
 
   deleteSubtask(subtaskId: string): void {
