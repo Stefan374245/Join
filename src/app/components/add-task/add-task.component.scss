@@ -1,7 +1,6 @@
 @import '../../../styles/variables';
 @import '../../../styles/mixins';
 
-// ========== Overlay Mode ==========
 .task-edit-overlay {
   display: flex;
   justify-content: center;
@@ -32,7 +31,6 @@
   flex-direction: column;
   gap: 24px;
 
-  // Hide scrollbar
   scrollbar-width: none;
   &::-webkit-scrollbar {
     display: none;
@@ -101,14 +99,12 @@
   }
 }
 
-// ========== Page Mode ==========
 .add-task-container {
   display: flex;
   align-items: center;
   flex-direction: column;
 }
 
-// Header Section
 .add-task-header {
   margin-bottom: 2rem;
   padding-left: 0;
@@ -121,14 +117,12 @@
   }
 }
 
-// Form Wrapper
 .form-wrapper {
   display: flex;
   flex-direction: column;
   width: 850px;
 }
 
-// Form Layout
 .add-task-form {
   display: flex;
   gap: 20px;
@@ -143,7 +137,6 @@
   gap: 8px;
 }
 
-// Form Groups
 .form-group {
   display: flex;
   flex-direction: column;
@@ -165,7 +158,6 @@
   }
 }
 
-// Input Styles
 .form-input,
 .form-textarea {
   width: 100%;
@@ -205,7 +197,6 @@
   }
 }
 
-// Error Messages
 .error-message {
   font-size: 12px;
   color: #ff3d00;
@@ -213,14 +204,12 @@
   display: block;
 }
 
-// Separator between columns
 .separator {
   width: 1px;
   background-color: #d1d1d1;
   align-self: stretch;
 }
 
-// Input Wrapper with Icon
 .input-wrapper {
   position: relative;
   display: flex;
@@ -237,7 +226,6 @@
   }
 }
 
-// Dropdown Menu
 .dropdown-menu {
   position: absolute;
   top: 100%;
@@ -294,7 +282,6 @@
   font-size: 12px;
 }
 
-// Selected Contacts
 .selected-contacts {
   display: flex;
   flex-wrap: wrap;
@@ -328,7 +315,6 @@
   }
 }
 
-// Priority Buttons
 .priority-buttons {
   display: flex;
   flex-direction: row;
@@ -374,7 +360,6 @@
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.15);
   }
 
-  // Active state für Urgent
   &.priority-btn-urgent.priority-btn-active {
     background: #FF3D00;
     color: #ffffff;
@@ -385,7 +370,6 @@
     }
   }
 
-  // Active state für Medium
   &.priority-btn-medium.priority-btn-active {
     background: #FFA800;
     color: #ffffff;
@@ -397,7 +381,6 @@
     }
   }
 
-  // Active state für Low
   &.priority-btn-low.priority-btn-active {
     background: #7AE229;
     color: #ffffff;
@@ -409,7 +392,6 @@
   }
 }
 
-// Selected Contacts
 .selected-contacts {
   display: flex;
   flex-wrap: wrap;
@@ -443,7 +425,6 @@
   }
 }
 
-// Subtasks Section
 .subtask-actions {
   position: absolute;
   right: 16px;
@@ -519,7 +500,6 @@
   }
 }
 
-// Inline Edit Wrapper
 .subtask-edit-wrapper {
   display: flex;
   align-items: center;
@@ -601,7 +581,6 @@
   margin: 0 8px;
 }
 
-// Form Actions
 .form-actions {
   display: flex;
   justify-content: flex-end;
@@ -667,7 +646,6 @@
   }
 }
 
-// Required Label
 .required-label {
   position: relative;
   width: fit-content;
@@ -681,7 +659,6 @@
   }
 }
 
-// Responsive Design
 @media (max-width: 768px) {
   .add-task-container {
     padding: 20px;
@@ -715,7 +692,6 @@
   }
 }
 
-// Date input styling
 input[type="date"] {
   position: relative;
   padding-right: 50px;
