@@ -1,0 +1,95 @@
+@import '../../../../styles/variables';
+
+.logo-animation-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: $background-color;
+  z-index: 9999;
+  pointer-events: none;
+  transition: background-color 0.5s ease-in-out;
+
+  @media (max-width: 800px) {
+    background-color: $primary-color;
+  }
+
+  // Nach Animation: Hintergrund ausblenden
+  &.background-hidden {
+    background-color: transparent;
+  }
+}
+
+.logo-img {
+  position: fixed;
+  transition: all 0.5s ease-in-out;
+  z-index: 10000;
+
+  // Phase 1: Hidden (initial state)
+  &.hidden {
+    display: none;
+    width: 0;
+    height: 0;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+  }
+
+  // Phase 2: Center (appear)
+  &.center {
+    display: block;
+    width: 0;
+    height: 0;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 1;
+  }
+
+  // Phase 3: Expanding (grow in center)
+  &.expanding {
+    display: block;
+    width: 200px;
+    height: 200px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 1;
+  }
+
+  // Phase 4: Shrinking (move to top-left and shrink)
+  &.shrinking {
+    width: 80px;
+    height: 80px;
+    left: 80px;
+    top: 80px;
+    transform: translate(0, 0);
+    opacity: 1;
+
+    @media (max-width: 800px) {
+      width: 60px;
+      height: 60px;
+      left: 30px;
+      top: 30px;
+    }
+  }
+
+  // Phase 5: Final (static position top-left)
+  &.final {
+    width: 80px;
+    height: 80px;
+    left: 80px;
+    top: 80px;
+    transform: translate(0, 0);
+    opacity: 1;
+
+    @media (max-width: 800px) {
+      width: 60px;
+      height: 60px;
+      left: 30px;
+      top: 30px;
+    }
+  }
+}

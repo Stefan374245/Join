@@ -1,54 +1,69 @@
-<div class="board-container">
+<main class="board-container">
   <!-- Board Header -->
   <header class="board-header">
     <h1 class="board-title">Board</h1>
     
-    <div class="board-actions">
+    <nav class="board-actions" aria-label="Board actions">
       <!-- Search Input -->
-      <div class="search-wrapper">
+      <div class="search-wrapper" role="search">
         <input 
           type="text" 
           class="search-input" 
           placeholder="Find Task"
           [(ngModel)]="searchQuery"
           (input)="onSearch()"
+          aria-label="Search tasks"
         />
         <img src="assets/images/search.svg" alt="Search" class="search-icon" />
       </div>
       
       <!-- Add Task Button -->
-      <button class="btn-add-task" (click)="openAddTaskModal()">
+      <button class="btn-add-task" (click)="openAddTaskModal()" aria-label="Add new task">
         <span>Add task</span>
         <img src="assets/images/add.svg" alt="Add" class="add-icon" />
       </button>
-    </div>
+    </nav>
   </header>
 
   <!-- Board Columns -->
-  <div class="board-columns">
+  <section class="board-columns" aria-label="Task board columns">
     <!-- Triage Column -->
-    <div class="board-column">
-      <div class="column-header">
-        <h2 class="column-title">Triage</h2>
-        <button class="btn-add-column-task" (click)="openAddTaskModal('triage')" title="Add task to Triage">
-          <img src="assets/images/add.svg" alt="Add Task" />
+    <section class="board-column" aria-labelledby="triage-heading">
+      <header class="column-header">
+        <h2 class="column-title" id="triage-heading">Triage</h2>
+        <button class="btn-add-column-task" 
+                (click)="openAddTaskModal('triage')" 
+                (mouseenter)="onAddButtonHover($event, true)"
+                (mouseleave)="onAddButtonHover($event, false)"
+                aria-label="Add task to Triage">
+          <img src="assets/images/taskPlus.svg" alt="" role="presentation" />
         </button>
-      </div>
+      </header>
       
-      <div class="column-content" id="triage-column">
-        <div class="no-tasks" *ngIf="getTasksByStatus('triage').length === 0">
+      <div class="column-content" id="triage-column" role="list">
+        <div class="no-tasks" *ngIf="getTasksByStatus('triage').length === 0" role="status">
           <p>No tasks in triage</p>
         </div>
         
         <!-- Task Card Template -->
-        <div class="task-card" *ngFor="let task of getTasksByStatus('triage')" (click)="openTaskDetail(task)">
-          <div class="task-category" [ngClass]="getCategoryClass(task.category)">
+        <article class="task-card" *ngFor="let task of getTasksByStatus('triage')" (click)="openTaskDetail(task)" role="listitem">
+          <span class="task-category" [ngClass]="getCategoryClass(task.category)">
             {{ task.category }}
-          </div>
+          </span>
           <h3 class="task-title">{{ task.title }}</h3>
           <p class="task-description">{{ getShortDescription(task.description) }}</p>
           
-          <div class="task-progress" *ngIf="task.subtasks && task.subtasks.length > 0">
+          <div class="task-progress" 
+               *ngIf="task.subtasks && task.subtasks.length > 0"
+               [ngClass]="{
+                 'all-completed': areAllSubtasksCompleted(task),
+                 'has-incomplete': hasIncompleteSubtasks(task)
+               }"
+               role="progressbar"
+               [attr.aria-valuenow]="getSubtaskProgress(task)"
+               aria-valuemin="0"
+               aria-valuemax="100"
+               [attr.aria-label]="getCompletedSubtasks(task) + ' of ' + task.subtasks.length + ' subtasks completed'">
             <div class="progress-bar">
               <div class="progress-fill" [style.width.%]="getSubtaskProgress(task)"></div>
             </div>
@@ -57,48 +72,64 @@
             </span>
           </div>
 
-          <div class="task-footer">
-            <div class="task-assignees">
+          <footer class="task-footer">
+            <div class="task-assignees" role="list" aria-label="Assigned contacts">
               <div 
                 class="assignee-avatar" 
                 *ngFor="let userId of task.assignedTo.slice(0, 3)"
-                [style.background-color]="getContactColor(userId)">
+                [style.background-color]="getContactColor(userId)"
+                role="listitem"
+                [attr.aria-label]="getContactInitials(userId)">
                 {{ getContactInitials(userId) }}
               </div>
-              <div class="assignee-avatar more" *ngIf="task.assignedTo.length > 3">
+              <div class="assignee-avatar more" *ngIf="task.assignedTo.length > 3" role="listitem">
                 +{{ task.assignedTo.length - 3 }}
               </div>
             </div>
-            <div class="task-priority" [ngClass]="'priority-' + task.priority">
+            <div class="task-priority" [ngClass]="'priority-' + task.priority" [attr.aria-label]="task.priority + ' priority'">
               <img [src]="getPriorityIcon(task.priority)" [alt]="task.priority + ' priority'" />
             </div>
-          </div>
-        </div>
+          </footer>
+        </article>
       </div>
-    </div>
+    </section>
 
     <!-- To Do Column -->
-    <div class="board-column">
-      <div class="column-header">
-        <h2 class="column-title">To do</h2>
-        <button class="btn-add-column-task" (click)="openAddTaskModal('todo')" title="Add task to To do">
-          <img src="assets/images/add.svg" alt="Add Task" />
+    <section class="board-column" aria-labelledby="todo-heading">
+      <header class="column-header">
+        <h2 class="column-title" id="todo-heading">To do</h2>
+        <button class="btn-add-column-task" 
+                (click)="openAddTaskModal('todo')" 
+                (mouseenter)="onAddButtonHover($event, true)"
+                (mouseleave)="onAddButtonHover($event, false)"
+                aria-label="Add task to To do">
+          <img src="assets/images/taskPlus.svg" alt="" role="presentation" />
         </button>
-      </div>
+      </header>
       
-      <div class="column-content" id="todo-column">
-        <div class="no-tasks" *ngIf="getTasksByStatus('todo').length === 0">
+      <div class="column-content" id="todo-column" role="list">
+        <div class="no-tasks" *ngIf="getTasksByStatus('todo').length === 0" role="status">
           <p>No tasks To do</p>
         </div>
         
-        <div class="task-card" *ngFor="let task of getTasksByStatus('todo')" (click)="openTaskDetail(task)">
-          <div class="task-category" [ngClass]="getCategoryClass(task.category)">
+        <article class="task-card" *ngFor="let task of getTasksByStatus('todo')" (click)="openTaskDetail(task)" role="listitem">
+          <span class="task-category" [ngClass]="getCategoryClass(task.category)">
             {{ task.category }}
-          </div>
+          </span>
           <h3 class="task-title">{{ task.title }}</h3>
           <p class="task-description">{{ getShortDescription(task.description) }}</p>
           
-          <div class="task-progress" *ngIf="task.subtasks && task.subtasks.length > 0">
+          <div class="task-progress" 
+               *ngIf="task.subtasks && task.subtasks.length > 0"
+               [ngClass]="{
+                 'all-completed': areAllSubtasksCompleted(task),
+                 'has-incomplete': hasIncompleteSubtasks(task)
+               }"
+               role="progressbar"
+               [attr.aria-valuenow]="getSubtaskProgress(task)"
+               aria-valuemin="0"
+               aria-valuemax="100"
+               [attr.aria-label]="getCompletedSubtasks(task) + ' of ' + task.subtasks.length + ' subtasks completed'">
             <div class="progress-bar">
               <div class="progress-fill" [style.width.%]="getSubtaskProgress(task)"></div>
             </div>
@@ -107,48 +138,64 @@
             </span>
           </div>
 
-          <div class="task-footer">
-            <div class="task-assignees">
+          <footer class="task-footer">
+            <div class="task-assignees" role="list" aria-label="Assigned contacts">
               <div 
                 class="assignee-avatar" 
                 *ngFor="let userId of task.assignedTo.slice(0, 3)"
-                [style.background-color]="getContactColor(userId)">
+                [style.background-color]="getContactColor(userId)"
+                role="listitem"
+                [attr.aria-label]="getContactInitials(userId)">
                 {{ getContactInitials(userId) }}
               </div>
-              <div class="assignee-avatar more" *ngIf="task.assignedTo.length > 3">
+              <div class="assignee-avatar more" *ngIf="task.assignedTo.length > 3" role="listitem">
                 +{{ task.assignedTo.length - 3 }}
               </div>
             </div>
-            <div class="task-priority" [ngClass]="'priority-' + task.priority">
+            <div class="task-priority" [ngClass]="'priority-' + task.priority" [attr.aria-label]="task.priority + ' priority'">
               <img [src]="getPriorityIcon(task.priority)" [alt]="task.priority + ' priority'" />
             </div>
-          </div>
-        </div>
+          </footer>
+        </article>
       </div>
-    </div>
+    </section>
 
     <!-- In Progress Column -->
-    <div class="board-column">
-      <div class="column-header">
-        <h2 class="column-title">In progress</h2>
-        <button class="btn-add-column-task" (click)="openAddTaskModal('in-progress')" title="Add task to In progress">
-          <img src="assets/images/add.svg" alt="Add Task" />
+    <section class="board-column" aria-labelledby="in-progress-heading">
+      <header class="column-header">
+        <h2 class="column-title" id="in-progress-heading">In progress</h2>
+        <button class="btn-add-column-task" 
+                (click)="openAddTaskModal('in-progress')" 
+                (mouseenter)="onAddButtonHover($event, true)"
+                (mouseleave)="onAddButtonHover($event, false)"
+                aria-label="Add task to In progress">
+          <img src="assets/images/taskPlus.svg" alt="" role="presentation" />
         </button>
-      </div>
+      </header>
       
-      <div class="column-content" id="in-progress-column">
-        <div class="no-tasks" *ngIf="getTasksByStatus('in-progress').length === 0">
+      <div class="column-content" id="in-progress-column" role="list">
+        <div class="no-tasks" *ngIf="getTasksByStatus('in-progress').length === 0" role="status">
           <p>No tasks in progress</p>
         </div>
         
-        <div class="task-card" *ngFor="let task of getTasksByStatus('in-progress')" (click)="openTaskDetail(task)">
-          <div class="task-category" [ngClass]="getCategoryClass(task.category)">
+        <article class="task-card" *ngFor="let task of getTasksByStatus('in-progress')" (click)="openTaskDetail(task)" role="listitem">
+          <span class="task-category" [ngClass]="getCategoryClass(task.category)">
             {{ task.category }}
-          </div>
+          </span>
           <h3 class="task-title">{{ task.title }}</h3>
           <p class="task-description">{{ getShortDescription(task.description) }}</p>
           
-          <div class="task-progress" *ngIf="task.subtasks && task.subtasks.length > 0">
+          <div class="task-progress" 
+               *ngIf="task.subtasks && task.subtasks.length > 0"
+               [ngClass]="{
+                 'all-completed': areAllSubtasksCompleted(task),
+                 'has-incomplete': hasIncompleteSubtasks(task)
+               }"
+               role="progressbar"
+               [attr.aria-valuenow]="getSubtaskProgress(task)"
+               aria-valuemin="0"
+               aria-valuemax="100"
+               [attr.aria-label]="getCompletedSubtasks(task) + ' of ' + task.subtasks.length + ' subtasks completed'">
             <div class="progress-bar">
               <div class="progress-fill" [style.width.%]="getSubtaskProgress(task)"></div>
             </div>
@@ -157,48 +204,64 @@
             </span>
           </div>
 
-          <div class="task-footer">
-            <div class="task-assignees">
+          <footer class="task-footer">
+            <div class="task-assignees" role="list" aria-label="Assigned contacts">
               <div 
                 class="assignee-avatar" 
                 *ngFor="let userId of task.assignedTo.slice(0, 3)"
-                [style.background-color]="getContactColor(userId)">
+                [style.background-color]="getContactColor(userId)"
+                role="listitem"
+                [attr.aria-label]="getContactInitials(userId)">
                 {{ getContactInitials(userId) }}
               </div>
-              <div class="assignee-avatar more" *ngIf="task.assignedTo.length > 3">
+              <div class="assignee-avatar more" *ngIf="task.assignedTo.length > 3" role="listitem">
                 +{{ task.assignedTo.length - 3 }}
               </div>
             </div>
-            <div class="task-priority" [ngClass]="'priority-' + task.priority">
+            <div class="task-priority" [ngClass]="'priority-' + task.priority" [attr.aria-label]="task.priority + ' priority'">
               <img [src]="getPriorityIcon(task.priority)" [alt]="task.priority + ' priority'" />
             </div>
-          </div>
-        </div>
+          </footer>
+        </article>
       </div>
-    </div>
+    </section>
 
     <!-- Await Feedback Column -->
-    <div class="board-column">
-      <div class="column-header">
-        <h2 class="column-title">Await feedback</h2>
-        <button class="btn-add-column-task" (click)="openAddTaskModal('await-feedback')" title="Add task to Await feedback">
-          <img src="assets/images/add.svg" alt="Add Task" />
+    <section class="board-column" aria-labelledby="await-feedback-heading">
+      <header class="column-header">
+        <h2 class="column-title" id="await-feedback-heading">Await feedback</h2>
+        <button class="btn-add-column-task" 
+                (click)="openAddTaskModal('await-feedback')" 
+                (mouseenter)="onAddButtonHover($event, true)"
+                (mouseleave)="onAddButtonHover($event, false)"
+                aria-label="Add task to Await feedback">
+          <img src="assets/images/taskPlus.svg" alt="" role="presentation" />
         </button>
-      </div>
+      </header>
       
-      <div class="column-content" id="await-feedback-column">
-        <div class="no-tasks" *ngIf="getTasksByStatus('await-feedback').length === 0">
+      <div class="column-content" id="await-feedback-column" role="list">
+        <div class="no-tasks" *ngIf="getTasksByStatus('await-feedback').length === 0" role="status">
           <p>No tasks awaiting feedback</p>
         </div>
         
-        <div class="task-card" *ngFor="let task of getTasksByStatus('await-feedback')" (click)="openTaskDetail(task)">
-          <div class="task-category" [ngClass]="getCategoryClass(task.category)">
+        <article class="task-card" *ngFor="let task of getTasksByStatus('await-feedback')" (click)="openTaskDetail(task)" role="listitem">
+          <span class="task-category" [ngClass]="getCategoryClass(task.category)">
             {{ task.category }}
-          </div>
+          </span>
           <h3 class="task-title">{{ task.title }}</h3>
           <p class="task-description">{{ getShortDescription(task.description) }}</p>
           
-          <div class="task-progress" *ngIf="task.subtasks && task.subtasks.length > 0">
+          <div class="task-progress" 
+               *ngIf="task.subtasks && task.subtasks.length > 0"
+               [ngClass]="{
+                 'all-completed': areAllSubtasksCompleted(task),
+                 'has-incomplete': hasIncompleteSubtasks(task)
+               }"
+               role="progressbar"
+               [attr.aria-valuenow]="getSubtaskProgress(task)"
+               aria-valuemin="0"
+               aria-valuemax="100"
+               [attr.aria-label]="getCompletedSubtasks(task) + ' of ' + task.subtasks.length + ' subtasks completed'">
             <div class="progress-bar">
               <div class="progress-fill" [style.width.%]="getSubtaskProgress(task)"></div>
             </div>
@@ -207,48 +270,64 @@
             </span>
           </div>
 
-          <div class="task-footer">
-            <div class="task-assignees">
+          <footer class="task-footer">
+            <div class="task-assignees" role="list" aria-label="Assigned contacts">
               <div 
                 class="assignee-avatar" 
                 *ngFor="let userId of task.assignedTo.slice(0, 3)"
-                [style.background-color]="getContactColor(userId)">
+                [style.background-color]="getContactColor(userId)"
+                role="listitem"
+                [attr.aria-label]="getContactInitials(userId)">
                 {{ getContactInitials(userId) }}
               </div>
-              <div class="assignee-avatar more" *ngIf="task.assignedTo.length > 3">
+              <div class="assignee-avatar more" *ngIf="task.assignedTo.length > 3" role="listitem">
                 +{{ task.assignedTo.length - 3 }}
               </div>
             </div>
-            <div class="task-priority" [ngClass]="'priority-' + task.priority">
+            <div class="task-priority" [ngClass]="'priority-' + task.priority" [attr.aria-label]="task.priority + ' priority'">
               <img [src]="getPriorityIcon(task.priority)" [alt]="task.priority + ' priority'" />
             </div>
-          </div>
-        </div>
+          </footer>
+        </article>
       </div>
-    </div>
+    </section>
 
     <!-- Done Column -->
-    <div class="board-column">
-      <div class="column-header">
-        <h2 class="column-title">Done</h2>
-        <button class="btn-add-column-task" (click)="openAddTaskModal('done')" title="Add task to Done">
-          <img src="assets/images/add.svg" alt="Add Task" />
+    <section class="board-column" aria-labelledby="done-heading">
+      <header class="column-header">
+        <h2 class="column-title" id="done-heading">Done</h2>
+        <button class="btn-add-column-task" 
+                (click)="openAddTaskModal('done')" 
+                (mouseenter)="onAddButtonHover($event, true)"
+                (mouseleave)="onAddButtonHover($event, false)"
+                aria-label="Add task to Done">
+          <img src="assets/images/taskPlus.svg" alt="" role="presentation" />
         </button>
-      </div>
+      </header>
       
-      <div class="column-content" id="done-column">
-        <div class="no-tasks" *ngIf="getTasksByStatus('done').length === 0">
+      <div class="column-content" id="done-column" role="list">
+        <div class="no-tasks" *ngIf="getTasksByStatus('done').length === 0" role="status">
           <p>No tasks done</p>
         </div>
         
-        <div class="task-card" *ngFor="let task of getTasksByStatus('done')" (click)="openTaskDetail(task)">
-          <div class="task-category" [ngClass]="getCategoryClass(task.category)">
+        <article class="task-card" *ngFor="let task of getTasksByStatus('done')" (click)="openTaskDetail(task)" role="listitem">
+          <span class="task-category" [ngClass]="getCategoryClass(task.category)">
             {{ task.category }}
-          </div>
+          </span>
           <h3 class="task-title">{{ task.title }}</h3>
           <p class="task-description">{{ getShortDescription(task.description) }}</p>
           
-          <div class="task-progress" *ngIf="task.subtasks && task.subtasks.length > 0">
+          <div class="task-progress" 
+               *ngIf="task.subtasks && task.subtasks.length > 0"
+               [ngClass]="{
+                 'all-completed': areAllSubtasksCompleted(task),
+                 'has-incomplete': hasIncompleteSubtasks(task)
+               }"
+               role="progressbar"
+               [attr.aria-valuenow]="getSubtaskProgress(task)"
+               aria-valuemin="0"
+               aria-valuemax="100"
+               [attr.aria-label]="getCompletedSubtasks(task) + ' of ' + task.subtasks.length + ' subtasks completed'">
             <div class="progress-bar">
               <div class="progress-fill" [style.width.%]="getSubtaskProgress(task)"></div>
             </div>
@@ -257,24 +336,54 @@
             </span>
           </div>
 
-          <div class="task-footer">
-            <div class="task-assignees">
+          <footer class="task-footer">
+            <div class="task-assignees" role="list" aria-label="Assigned contacts">
               <div 
                 class="assignee-avatar" 
                 *ngFor="let userId of task.assignedTo.slice(0, 3)"
-                [style.background-color]="getContactColor(userId)">
+                [style.background-color]="getContactColor(userId)"
+                role="listitem"
+                [attr.aria-label]="getContactInitials(userId)">
                 {{ getContactInitials(userId) }}
               </div>
-              <div class="assignee-avatar more" *ngIf="task.assignedTo.length > 3">
+              <div class="assignee-avatar more" *ngIf="task.assignedTo.length > 3" role="listitem">
                 +{{ task.assignedTo.length - 3 }}
               </div>
             </div>
-            <div class="task-priority" [ngClass]="'priority-' + task.priority">
+            <div class="task-priority" [ngClass]="'priority-' + task.priority" [attr.aria-label]="task.priority + ' priority'">
               <img [src]="getPriorityIcon(task.priority)" [alt]="task.priority + ' priority'" />
             </div>
-          </div>
-        </div>
+          </footer>
+        </article>
       </div>
-    </div>
-  </div>
-</div>
+    </section>
+  </section>
+</main>
+
+<!-- Task Detail Overlay -->
+<app-task-detail
+  *ngIf="selectedTask"
+  [task]="selectedTask"
+  [isVisible]="showTaskDetail"
+  (close)="closeTaskDetail()"
+  (edit)="onEditTask($event)"
+  (delete)="onDeleteTask($event)">
+</app-task-detail>
+
+<!-- Task Edit Overlay -->
+<app-add-task
+  *ngIf="showEditOverlay && taskToEdit"
+  [isOverlay]="true"
+  [taskToEdit]="taskToEdit"
+  (close)="closeEditOverlay()"
+  (taskSaved)="onTaskSaved($event)">
+</app-add-task>
+
+<!-- Add Task Overlay -->
+<app-add-task
+  *ngIf="showAddTaskOverlay"
+  [isOverlay]="true"
+  [initialStatus]="addTaskStatus"
+  (close)="closeAddTaskOverlay()"
+  (taskSaved)="onTaskCreated($event)">
+</app-add-task>

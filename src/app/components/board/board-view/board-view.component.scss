@@ -1,6 +1,16 @@
 @import '../../../../styles/variables';
 @import '../../../../styles/mixins';
 
+// ========== Keyframe Animations ==========
+@keyframes shine {
+  0% {
+    left: -100%;
+  }
+  50%, 100% {
+    left: 100%;
+  }
+}
+
 // ========== Variables ==========
 $board-padding: 60px;
 $board-gap: 26px;
@@ -150,26 +160,39 @@ $header-height: 54px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: $card-spacing;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
 
     .column-title {
-      font-size: 1.25rem; // 20px
+      font-size: 20px;
       font-weight: 700;
       color: $primary-color;
       margin: 0;
+      letter-spacing: 0.02em;
     }
 
     .btn-add-column-task {
-      width: 24px;
-      height: 24px;
-      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%232a3647'%3E%3Cpath d='M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z'/%3E%3C/svg%3E") no-repeat center;
-      background-size: contain;
+      width: 30px;
+      height: 30px;
+      background: transparent;
       border: none;
       cursor: pointer;
-      transition: background-image 0.2s ease-in-out;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      padding: 0;
+
+      img {
+        width: 24px;
+        height: 24px;
+        transition: transform 0.3s ease;
+        display: block;
+      }
 
       &:hover {
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2329abe2'%3E%3Cpath d='M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z'/%3E%3C/svg%3E");
+        transform: scale(1.1);
       }
     }
   }
@@ -207,18 +230,24 @@ $header-height: 54px;
       display: flex;
       align-items: center;
       justify-content: center;
-      min-height: 100px;
-      padding: 14px 20px;
-      background-color: #f6f7f8;
-      border: 1px dashed $primary-color;
+      min-height: 120px;
+      padding: 20px;
+      background-color: transparent;
+      border: 2px dashed rgba($primary-color, 0.2);
       border-radius: 10px;
       color: #a8a8a8;
-      font-size: 1rem;
+      font-size: 14px;
       text-align: center;
-      min-width: 140px;
+      transition: all 0.2s ease;
+
+      &:hover {
+        border-color: rgba($primary-color, 0.4);
+        background-color: rgba($gray-100, 0.5);
+      }
 
       p {
         margin: 0;
+        font-weight: 400;
       }
     }
   }
@@ -226,19 +255,23 @@ $header-height: 54px;
 
 // ========== Task Card ==========
 .task-card {
+  display: flex;
+  flex-direction: column;
   background: white;
-  border: 1px solid #e8e8e8;
-  border-radius: $card-radius;
-  padding: $card-padding;
-  margin-bottom: $card-spacing;
+  border-radius: 24px;
+  padding: 18px;
+  margin-bottom: 20px;
   cursor: pointer;
-  box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
-  transition: all 0.15s ease-in-out;
-  will-change: transform, box-shadow;
+  box-shadow: 0 0 14px 3px rgba(0, 0, 0, 0.04);
+  transition: transform 0.2s ease-in-out;
+  height: auto;
+  min-height: 200px;
+  position: relative;
+  gap: 12px;
 
   &:hover {
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.16);
-    transform: translateY(-2px);
+    transform: scale(1.02);
+    cursor: grab;
   }
 
   &:last-child {
@@ -247,20 +280,29 @@ $header-height: 54px;
 
   // ========== Category Badge ==========
   .task-category {
-    display: inline-block;
-    padding: 4px 25px;
-    border-radius: 8px;
-    font-size: 16px;
-    font-weight: 400;
-    margin-bottom: $card-padding;
-    line-height: 1.2;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+
+    span {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 8px;
+      font-size: 16px;
+      max-width: 100%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      box-sizing: border-box;
+    }
     
-    &.user-story {
+    &.user-story span {
       background: #0038ff;
       color: white;
     }
 
-    &.technical-task {
+    &.technical-task span {
       background: #1fd7c1;
       color: white;
     }
@@ -270,91 +312,269 @@ $header-height: 54px;
   .task-title {
     font-size: 16px;
     font-weight: 700;
+    margin: 0 0 10px 0;
     color: $primary-color;
-    margin: 0 0 $card-padding 0;
-    line-height: 1.2;
+    line-height: 1.4;
     word-break: break-word;
+    min-height: 22px;
   }
 
   // ========== Task Description ==========
   .task-description {
-    font-size: 16px;
-    font-weight: 400;
     color: #a8a8a8;
-    margin: 0 0 $card-padding 0;
-    line-height: 1.2;
+    font-size: 16px;
+    margin: 0 0 20px 0;
+    line-height: 1.4;
     word-break: break-word;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   // ========== Progress Section ==========
   .task-progress {
-    margin-bottom: $card-padding;
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    width: 100%;
+    align-items: center;
+    transition: all 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
 
+    &:hover .subtask-count {
+      transform: scale(1.15);
+      transition: transform 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
+    }
+
+    // Hover effect when all subtasks are completed - GREEN
+    &.all-completed {
+      .progress-bar {
+        transition: box-shadow 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
+        
+        .progress-fill {
+          transition: background 0.5s cubic-bezier(0.4, 0.0, 0.2, 1), 
+                      box-shadow 0.5s cubic-bezier(0.4, 0.0, 0.2, 1),
+                      width 0.8s cubic-bezier(0.4, 0.0, 0.2, 1);
+        }
+      }
+      
+      .progress-text {
+        transition: color 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
+      }
+
+      &:hover {
+        .progress-bar {
+          box-shadow: 0 0 12px rgba(13, 144, 35, 0.5);
+          
+          .progress-fill {
+            background: linear-gradient(90deg, #0d9023 0%, lighten(#0d9023, 10%) 100%);
+            box-shadow: 0 0 12px rgba(13, 144, 35, 0.6);
+          }
+        }
+        
+        .progress-text {
+          color: #0d9023;
+        }
+      }
+    }
+
+    // Hover effect when subtasks are incomplete - RED
+    &.has-incomplete {
+      .progress-bar {
+        transition: box-shadow 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
+        
+        .progress-fill {
+          transition: background 0.5s cubic-bezier(0.4, 0.0, 0.2, 1), 
+                      box-shadow 0.5s cubic-bezier(0.4, 0.0, 0.2, 1),
+                      width 0.8s cubic-bezier(0.4, 0.0, 0.2, 1);
+        }
+      }
+      
+      .progress-text {
+        transition: color 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
+      }
+
+      &:hover {
+        .progress-bar {
+          box-shadow: 0 0 12px rgba(255, 61, 0, 0.5);
+          
+          .progress-fill {
+            background: linear-gradient(90deg, #ff3d00 0%, lighten(#ff3d00, 10%) 100%);
+            box-shadow: 0 0 12px rgba(255, 61, 0, 0.6);
+          }
+        }
+        
+        .progress-text {
+          color: #ff3d00;
+        }
+      }
+    }
+
+    .subtask-progress-container {
+      width: 100%;
+      height: 8px;
+      background: #f4f4f4;
+      border-radius: 4px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .subtask-progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, $accent-color 0%, lighten($accent-color, 10%) 100%);
+      border-radius: 4px;
+      transition: width 0.8s cubic-bezier(0.4, 0.0, 0.2, 1);
+      box-shadow: 0 0 8px rgba($accent-color, 0.3);
+      position: relative;
+      
+      // Smooth animation when width changes
+      will-change: width;
+      
+      // Animated shine effect
+      &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.4),
+          transparent
+        );
+        animation: shine 2s ease-in-out infinite;
+      }
+    }
+
+    // Old class names for compatibility
     .progress-bar {
       width: 100%;
       height: 8px;
       background: #f4f4f4;
       border-radius: 4px;
       overflow: hidden;
-      margin-bottom: 8px;
+      position: relative;
 
       .progress-fill {
         height: 100%;
-        background: $accent-color;
+        background: linear-gradient(90deg, $accent-color 0%, lighten($accent-color, 10%) 100%);
         border-radius: 4px;
-        transition: width 0.3s ease-in-out;
+        transition: width 0.8s cubic-bezier(0.4, 0.0, 0.2, 1);
+        box-shadow: 0 0 8px rgba($accent-color, 0.3);
+        will-change: width;
+        position: relative;
+
+        &::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(255, 255, 255, 0.4),
+            transparent
+          );
+          animation: shine 2s ease-in-out infinite;
+        }
+      }
+    }
+
+    .subtask-count {
+      color: #a8a8a8;
+      font-size: 12px;
+      white-space: nowrap;
+      transition: transform 0.2s ease-in-out;
+
+      &.all-done:hover {
+        color: #0d9023 !important;
+      }
+
+      &.not-done:hover {
+        color: #ff3d00 !important;
       }
     }
 
     .progress-text {
+      color: #a8a8a8;
       font-size: 12px;
-      font-weight: 400;
-      color: $primary-color;
+      white-space: nowrap;
     }
   }
 
   // ========== Task Footer ==========
   .task-footer {
     display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-top: auto;
+  }
+
+  .task-bottom-info {
+    display: flex;
     justify-content: space-between;
     align-items: center;
+    width: 100%;
+  }
 
-    .task-assignees {
-      display: flex;
+  .task-assignees {
+    display: flex;
+    margin-left: 8px;
+    min-width: 0;
+    gap: 4px;
+    flex-wrap: nowrap;
 
-      .assignee-avatar {
-        width: 35px;
-        height: 35px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-weight: 400;
-        font-size: 12px;
-        border: 2px solid white;
-        margin-left: -10px;
-
-        &:first-child {
-          margin-left: 0;
-        }
-
-        &.more {
-          background: $primary-color;
-          font-size: 12px;
-        }
-      }
-    }
-
-    .task-priority {
+    .assignee-avatar {
       display: flex;
       align-items: center;
       justify-content: center;
-      
-      img {
-        width: 20px;
-        height: 20px;
+      width: 35px;
+      height: 35px;
+      font-size: 12px;
+      border: 2px solid white;
+      margin-left: -8px;
+      min-width: 0;
+      border-radius: 50%;
+      transition: width 0.2s, height 0.2s, font-size 0.2s;
+      background: #0d9023;
+      color: white;
+
+      &:first-child {
+        margin-left: 0;
       }
+
+      &:hover {
+        transform: scale(1.1);
+        z-index: 10;
+      }
+
+      &.more {
+        background: $primary-color;
+        font-size: 12px;
+      }
+    }
+  }
+
+  .task-priority {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    
+    img {
+      width: 24px;
+      height: 24px;
+      transition: transform 0.2s ease;
+    }
+
+    &:hover img {
+      transform: scale(1.1);
     }
   }
 }

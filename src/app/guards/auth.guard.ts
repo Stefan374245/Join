@@ -37,7 +37,8 @@ export const guestGuard: CanActivateFn = (route, state) => {
       if (!user) {
         return true;
       } else {
-        router.navigate(['/summary']);
+        // Redirect to board instead of summary
+        router.navigate(['/board']);
         return false;
       }
     })

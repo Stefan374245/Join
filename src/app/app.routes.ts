@@ -11,13 +11,13 @@ export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
   { 
     path: 'login', 
-    component: LoginComponent,
-    canActivate: [guestGuard]
+    component: LoginComponent
+    // guestGuard entfernt - User können jederzeit zur Login-Seite
   },
   { 
     path: 'signup', 
-    component: SignupComponent,
-    canActivate: [guestGuard]
+    component: SignupComponent
+    // guestGuard entfernt
   },
   { 
     path: 'board', 
@@ -39,5 +39,5 @@ export const routes: Routes = [
     component: SummaryViewComponent,
     canActivate: [authGuard]
   },
-  { path: '**', redirectTo: '/summary' }
+  { path: '**', redirectTo: '/login' }
 ];

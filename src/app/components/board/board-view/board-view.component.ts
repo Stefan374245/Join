@@ -7,11 +7,13 @@ import { ContactService } from '../../../services/contact.service';
 import { Task } from '../../../models/task.interface';
 import { Contact } from '../../../models/contact.interface';
 import { Observable, map } from 'rxjs';
+import { TaskDetailComponent } from '../task-detail/task-detail.component';
+import { AddTaskComponent } from '../../add-task/add-task.component';
 
 @Component({
   selector: 'app-board-view',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TaskDetailComponent, AddTaskComponent],
   templateUrl: './board-view.component.html',
   styleUrl: './board-view.component.scss'
 })
@@ -24,6 +26,18 @@ export class BoardViewComponent implements OnInit {
   allTasks: Task[] = [];
   filteredTasks: Task[] = [];
   contacts: Contact[] = [];
+  
+  // Task Detail Overlay
+  selectedTask: Task | null = null;
+  showTaskDetail: boolean = false;
+  
+  // Task Edit Overlay
+  taskToEdit: Task | null = null;
+  showEditOverlay: boolean = false;
+  
+  // Add Task Overlay
+  showAddTaskOverlay: boolean = false;
+  addTaskStatus: 'triage' | 'todo' | 'in-progress' | 'await-feedback' | 'done' = 'todo';
 
   ngOnInit(): void {
     this.loadTasks();
@@ -65,23 +79,27 @@ export class BoardViewComponent implements OnInit {
    * Get tasks by status
    */
   getTasksByStatus(status: string): Task[] {
-    // Map status to match our Task interface
-    let taskStatus: 'todo' | 'in-progress' | 'done' = 'todo';
+    // Map column names to task status
+    let taskStatus: 'triage' | 'todo' | 'in-progress' | 'await-feedback' | 'done';
     
     switch(status) {
-      case 'todo':
       case 'triage':
+        taskStatus = 'triage';
+        break;
+      case 'todo':
         taskStatus = 'todo';
         break;
       case 'in-progress':
         taskStatus = 'in-progress';
         break;
       case 'await-feedback':
-        // For now, we don't have this status, so return empty
-        return [];
+        taskStatus = 'await-feedback';
+        break;
       case 'done':
         taskStatus = 'done';
         break;
+      default:
+        return [];
     }
 
     return this.filteredTasks.filter(task => task.status === taskStatus);
@@ -108,17 +126,102 @@ export class BoardViewComponent implements OnInit {
    * Open Add Task modal/page
    */
   openAddTaskModal(status?: string): void {
-    // Navigate to add-task page
-    // TODO: Later we can pass the status as query param
-    this.router.navigate(['/add-task']);
+    // Setze den Status basierend auf der Spalte
+    if (status) {
+      this.addTaskStatus = status as 'triage' | 'todo' | 'in-progress' | 'await-feedback' | 'done';
+    } else {
+      this.addTaskStatus = 'todo'; // Default wenn oben rechts geklickt wird
+    }
+    
+    this.showAddTaskOverlay = true;
+  }
+
+  /**
+   * Handle hover effect for add task button - switch SVG
+   */
+  onAddButtonHover(event: MouseEvent, isHover: boolean): void {
+    const button = event.currentTarget as HTMLButtonElement;
+    const img = button.querySelector('img');
+    if (img) {
+      img.src = isHover 
+        ? 'assets/images/taskPlusHover.svg' 
+        : 'assets/images/taskPlus.svg';
+    }
   }
 
   /**
    * Open task detail view
    */
   openTaskDetail(task: Task): void {
-    // TODO: Open task detail modal or navigate to detail page
-    console.log('Opening task detail:', task);
+    this.selectedTask = task;
+    this.showTaskDetail = true;
+  }
+
+  /**
+   * Close task detail view
+   */
+  closeTaskDetail(): void {
+    this.showTaskDetail = false;
+    this.selectedTask = null;
+  }
+
+  /**
+   * Handle task edit
+   */
+  onEditTask(task: Task): void {
+    // Öffne Edit-Overlay statt Navigation
+    this.taskToEdit = task;
+    this.showEditOverlay = true;
+    this.closeTaskDetail(); // Schließe Detail-Ansicht
+  }
+
+  /**
+   * Close edit overlay
+   */
+  closeEditOverlay(): void {
+    this.showEditOverlay = false;
+    this.taskToEdit = null;
+  }
+
+  /**
+   * Handle task saved from edit overlay
+   */
+  onTaskSaved(task: Task): void {
+    console.log('✅ Task saved:', task);
+    this.closeEditOverlay();
+    // Tasks werden automatisch durch onSnapshot aktualisiert
+  }
+  
+  /**
+   * Close add task overlay
+   */
+  closeAddTaskOverlay(): void {
+    this.showAddTaskOverlay = false;
+    this.addTaskStatus = 'todo';
+  }
+  
+  /**
+   * Handle new task created from add task overlay
+   */
+  onTaskCreated(task: Task): void {
+    console.log('✅ New task created:', task);
+    this.closeAddTaskOverlay();
+    // Tasks werden automatisch durch onSnapshot aktualisiert
+  }
+
+  /**
+   * Handle task delete
+   */
+  onDeleteTask(taskId: string): void {
+    this.taskService.deleteTask(taskId).subscribe({
+      next: () => {
+        console.log('✅ Task deleted successfully');
+        this.closeTaskDetail();
+      },
+      error: (error) => {
+        console.error('Error deleting task:', error);
+      }
+    });
   }
 
   /**
@@ -154,6 +257,22 @@ export class BoardViewComponent implements OnInit {
   getCompletedSubtasks(task: Task): number {
     if (!task.subtasks) return 0;
     return task.subtasks.filter(st => st.completed).length;
+  }
+
+  /**
+   * Check if all subtasks are completed
+   */
+  areAllSubtasksCompleted(task: Task): boolean {
+    if (!task.subtasks || task.subtasks.length === 0) return false;
+    return task.subtasks.every(st => st.completed);
+  }
+
+  /**
+   * Check if task has incomplete subtasks
+   */
+  hasIncompleteSubtasks(task: Task): boolean {
+    if (!task.subtasks || task.subtasks.length === 0) return false;
+    return task.subtasks.some(st => !st.completed);
   }
 
   /**

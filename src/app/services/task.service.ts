@@ -10,7 +10,9 @@ import {
   query, 
   where,
   Timestamp,
-  orderBy
+  orderBy,
+  getDocs,
+  onSnapshot
 } from '@angular/fire/firestore';
 import { Auth } from '@angular/fire/auth';
 import { Observable, from, BehaviorSubject, of } from 'rxjs';
@@ -34,28 +36,74 @@ export class TaskService {
    * Initialize real-time listener for tasks
    */
   private initializeTasksListener(): void {
-    const tasksCol = collection(this.firestore, 'tasks');
-    const tasksQuery = query(tasksCol, orderBy('createdAt', 'desc'));
-    
-    collectionData(tasksQuery, { idField: 'id' }).pipe(
-      map((tasks: any[]) => {
-        return tasks.map((task) => this.mapFirestoreTask(task));
-      }),
-      tap((tasks) => {
-        console.log('📋 Tasks loaded from Firestore:', tasks.length);
-        this.tasksSubject.next(tasks);
-      }),
-      catchError((error) => {
-        console.error('❌ Error loading tasks:', error);
-        return of([]);
-      })
-    ).subscribe();
+    try {
+      const tasksCol = collection(this.firestore, 'tasks');
+      const tasksQuery = query(tasksCol, orderBy('createdAt', 'desc'));
+      
+      // Use onSnapshot for real-time updates
+      onSnapshot(tasksQuery, 
+        (snapshot) => {
+          console.log('🔍 Raw snapshot from Firestore:', snapshot.docs.length, 'documents');
+          
+          const tasks = snapshot.docs.map((doc) => {
+            const data = doc.data();
+            console.log('📄 Document data:', { id: doc.id, ...data });
+            return this.mapFirestoreTask({ id: doc.id, ...data });
+          });
+          
+          console.log('📋 Tasks loaded from Firestore:', tasks.length);
+          console.log('✅ Mapped tasks:', tasks);
+          this.tasksSubject.next(tasks);
+        },
+        (error) => {
+          console.error('❌ Error in onSnapshot:', error);
+          console.error('Error details:', error.message, error.code);
+          this.tasksSubject.next([]);
+        }
+      );
+    } catch (error) {
+      console.error('❌ Critical error initializing tasks listener:', error);
+      this.tasksSubject.next([]);
+    }
   }
 
   /**
    * Map Firestore data to Task interface
    */
   private mapFirestoreTask(data: any): Task {
+    // Map old status values to new ones if needed
+    let status: 'triage' | 'todo' | 'in-progress' | 'await-feedback' | 'done' = 'todo';
+    if (data.status) {
+      // Handle old status values
+      switch (data.status.toLowerCase()) {
+        case 'triage':
+          status = 'triage';
+          break;
+        case 'todo':
+        case 'to-do':
+          status = 'todo';
+          break;
+        case 'in-progress':
+        case 'inprogress':
+        case 'in progress':
+          status = 'in-progress';
+          break;
+        case 'await-feedback':
+        case 'awaiting-feedback':
+        case 'awaiting feedback':
+        case 'awaitfeedback':
+          status = 'await-feedback';
+          break;
+        case 'done':
+        case 'completed':
+          status = 'done';
+          break;
+        default:
+          console.warn(`Unknown status: ${data.status}, defaulting to 'todo'`);
+          status = 'todo';
+      }
+    }
+
     return {
       id: data.id || data.taskId,
       title: data.title || '',
@@ -64,7 +112,7 @@ export class TaskService {
       assignedTo: Array.isArray(data.assignedTo) ? data.assignedTo : [],
       dueDate: this.convertToDate(data.dueDate),
       priority: data.priority || 'medium',
-      status: data.status || 'todo',
+      status: status,
       subtasks: this.mapSubtasks(data.subtasks)
     } as Task;
   }
@@ -79,8 +127,8 @@ export class TaskService {
     
     return subtasks.map((st: any) => ({
       id: st.id || `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      title: st.title || '',
-      completed: st.completed || false
+      title: st.title || st.name || '',
+      completed: st.completed === true // Explicit boolean check
     }));
   }
 
@@ -225,7 +273,7 @@ export class TaskService {
     return subtasks.map(st => ({
       id: st.id,
       title: st.title,
-      completed: st.completed || false
+      completed: st.completed === true // Explicit boolean
     }));
   }
 
@@ -273,31 +321,78 @@ export class TaskService {
   /**
    * Update task status (for drag and drop on board)
    */
-  updateTaskStatus(taskId: string, status: 'todo' | 'in-progress' | 'done'): Observable<void> {
+  updateTaskStatus(taskId: string, status: 'triage' | 'todo' | 'in-progress' | 'await-feedback' | 'done'): Observable<void> {
     return this.updateTask(taskId, { status });
   }
 
   /**
-   * Toggle subtask completion
+   * Update subtask completion state
+   * @param taskId - The task ID
+   * @param subtaskId - The subtask ID
+   * @param completed - The new completed state (true or false)
+   */
+  updateSubtaskCompletion(taskId: string, subtaskId: string, completed: boolean): Observable<void> {
+    console.log('🔧 Service: updateSubtaskCompletion called for:', subtaskId, 'new state:', completed);
+    
+    // Get current task from the BehaviorSubject
+    const tasks = this.tasksSubject.value;
+    const task = tasks.find(t => t.id === taskId);
+    
+    if (!task || !task.subtasks) {
+      console.error('❌ Service: Task or subtasks not found');
+      return new Observable(observer => {
+        observer.error(new Error('Task or subtasks not found'));
+        observer.complete();
+      });
+    }
+
+    // Find the subtask
+    const subtask = task.subtasks.find(st => st.id === subtaskId);
+    if (!subtask) {
+      console.error('❌ Service: Subtask not found:', subtaskId);
+      return new Observable(observer => {
+        observer.error(new Error('Subtask not found'));
+        observer.complete();
+      });
+    }
+
+    console.log('🔧 Service: Setting state to:', completed);
+
+    // Create updated subtasks array with new state
+    const updatedSubtasks = task.subtasks.map(st => 
+      st.id === subtaskId ? { ...st, completed: completed } : st
+    );
+    
+    // Update in Firestore
+    return this.updateTask(taskId, { subtasks: updatedSubtasks });
+  }
+
+  /**
+   * Toggle subtask completion (DEPRECATED - use updateSubtaskCompletion instead)
    */
   toggleSubtask(taskId: string, subtaskId: string): Observable<void> {
-    return new Observable(observer => {
-      this.getTaskById(taskId).subscribe(task => {
-        if (task) {
-          const updatedSubtasks = task.subtasks.map(st => 
-            st.id === subtaskId ? { ...st, completed: !st.completed } : st
-          );
-          
-          this.updateTask(taskId, { subtasks: updatedSubtasks }).subscribe({
-            next: () => observer.next(),
-            error: (err) => observer.error(err),
-            complete: () => observer.complete()
-          });
-        } else {
-          observer.error(new Error('Task not found'));
-        }
+    console.log('⚠️ Service: toggleSubtask is deprecated, use updateSubtaskCompletion instead');
+    
+    const tasks = this.tasksSubject.value;
+    const task = tasks.find(t => t.id === taskId);
+    
+    if (!task || !task.subtasks) {
+      return new Observable(observer => {
+        observer.error(new Error('Task or subtasks not found'));
+        observer.complete();
       });
-    });
+    }
+
+    const subtask = task.subtasks.find(st => st.id === subtaskId);
+    if (!subtask) {
+      return new Observable(observer => {
+        observer.error(new Error('Subtask not found'));
+        observer.complete();
+      });
+    }
+
+    // Use the new method
+    return this.updateSubtaskCompletion(taskId, subtaskId, !subtask.completed);
   }
 
   /**
