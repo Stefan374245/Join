@@ -34,6 +34,10 @@ export class BoardViewComponent implements OnInit {
   // Task Edit Overlay
   taskToEdit: Task | null = null;
   showEditOverlay: boolean = false;
+  
+  // Add Task Overlay
+  showAddTaskOverlay: boolean = false;
+  addTaskStatus: 'triage' | 'todo' | 'in-progress' | 'await-feedback' | 'done' = 'todo';
 
   ngOnInit(): void {
     this.loadTasks();
@@ -122,9 +126,14 @@ export class BoardViewComponent implements OnInit {
    * Open Add Task modal/page
    */
   openAddTaskModal(status?: string): void {
-    // Navigate to add-task page
-    // TODO: Later we can pass the status as query param
-    this.router.navigate(['/add-task']);
+    // Setze den Status basierend auf der Spalte
+    if (status) {
+      this.addTaskStatus = status as 'triage' | 'todo' | 'in-progress' | 'await-feedback' | 'done';
+    } else {
+      this.addTaskStatus = 'todo'; // Default wenn oben rechts geklickt wird
+    }
+    
+    this.showAddTaskOverlay = true;
   }
 
   /**
@@ -180,6 +189,23 @@ export class BoardViewComponent implements OnInit {
   onTaskSaved(task: Task): void {
     console.log('✅ Task saved:', task);
     this.closeEditOverlay();
+    // Tasks werden automatisch durch onSnapshot aktualisiert
+  }
+  
+  /**
+   * Close add task overlay
+   */
+  closeAddTaskOverlay(): void {
+    this.showAddTaskOverlay = false;
+    this.addTaskStatus = 'todo';
+  }
+  
+  /**
+   * Handle new task created from add task overlay
+   */
+  onTaskCreated(task: Task): void {
+    console.log('✅ New task created:', task);
+    this.closeAddTaskOverlay();
     // Tasks werden automatisch durch onSnapshot aktualisiert
   }
 

@@ -17,6 +17,7 @@ import { ContactService } from '../../services/contact.service';
 export class AddTaskComponent implements OnInit, AfterViewChecked {
   @Input() isOverlay: boolean = false; // Overlay-Modus aktivieren
   @Input() taskToEdit: Task | null = null; // Task zum Bearbeiten
+  @Input() initialStatus: 'triage' | 'todo' | 'in-progress' | 'await-feedback' | 'done' = 'todo'; // Initial Status für neue Tasks
   @Output() close = new EventEmitter<void>(); // Overlay schließen
   @Output() taskSaved = new EventEmitter<Task>(); // Task gespeichert
   @ViewChild('editInput') editInput?: ElementRef<HTMLInputElement>;
@@ -276,7 +277,7 @@ export class AddTaskComponent implements OnInit, AfterViewChecked {
       assignedTo: this.selectedContacts.map(c => c.id),
       dueDate: new Date(this.taskForm.value.dueDate),
       priority: this.selectedPriority,
-      status: 'todo',
+      status: this.initialStatus, // Verwende den initialStatus aus Input
       subtasks: this.subtasks
     };
 
