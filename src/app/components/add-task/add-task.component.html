@@ -1,33 +1,40 @@
-<!-- Wrapper with conditional classes -->
+<!-- Main Wrapper with conditional classes -->
 <div [class.task-edit-overlay]="isOverlay" 
      [class.add-task-container]="!isOverlay"
-     (click)="isOverlay ? onOverlayClick($event) : null">
+     (click)="isOverlay ? onOverlayClick($event) : null"
+     role="dialog"
+     [attr.aria-modal]="isOverlay"
+     [attr.aria-labelledby]="isEditMode ? 'edit-task-title' : 'add-task-title'">
   
   <!-- Content Card (only for overlay) -->
-  <div [class.task-edit-card]="isOverlay" 
+  <article [class.task-edit-card]="isOverlay" 
        (click)="isOverlay ? $event.stopPropagation() : null">
     
     <!-- Close Button (only for overlay) -->
-    <button *ngIf="isOverlay" class="close-btn" (click)="onClose()" aria-label="Close">
-      <img src="assets/images/close.svg" alt="Close" />
+    <button *ngIf="isOverlay" class="close-btn" (click)="onClose()" aria-label="Close dialog">
+      <img src="assets/images/close.svg" alt="" role="presentation" />
     </button>
 
     <!-- Header Section -->
     <header [class.edit-header]="isOverlay" [class.add-task-header]="!isOverlay">
-      <h1 [class.edit-title]="isOverlay" [class.page-title]="!isOverlay">
+      <h1 [class.edit-title]="isOverlay" 
+          [class.page-title]="!isOverlay"
+          [id]="isEditMode ? 'edit-task-title' : 'add-task-title'">
         {{ isEditMode ? 'Edit Task' : 'Add Task' }}
       </h1>
     </header>
 
     <!-- Form Container -->
-    <div class="form-wrapper">
-      <form [formGroup]="taskForm" (ngSubmit)="onSubmit()" class="add-task-form">
+    <main class="form-wrapper">
+      <form [formGroup]="taskForm" (ngSubmit)="onSubmit()" class="add-task-form" aria-label="Task form">
       <!-- Left Column -->
-      <div class="form-column form-column-left">
+      <section class="form-column form-column-left" aria-labelledby="basic-info-heading">
+        <h2 id="basic-info-heading" class="visually-hidden">Basic Task Information</h2>
+        
         <!-- Title Input -->
-        <div class="form-group">
+        <fieldset class="form-group">
           <label for="title" class="form-label">
-            Title<span class="required">*</span>
+            Title<span class="required" aria-label="required">*</span>
           </label>
           <input
             type="text"
@@ -36,14 +43,20 @@
             class="form-input"
             [class.error]="f['title'].touched && f['title'].errors"
             placeholder="Enter a title"
+            aria-required="true"
+            [attr.aria-invalid]="f['title'].touched && f['title'].errors"
+            [attr.aria-describedby]="f['title'].touched && f['title'].errors ? 'title-error' : null"
           />
-          <span class="error-message" *ngIf="f['title'].touched && f['title'].errors">
+          <span class="error-message" 
+                id="title-error" 
+                *ngIf="f['title'].touched && f['title'].errors"
+                role="alert">
             Title is required (min. 3 characters)
           </span>
-        </div>
+        </fieldset>
 
         <!-- Description Textarea -->
-        <div class="form-group">
+        <fieldset class="form-group">
           <label for="description" class="form-label">Description</label>
           <textarea
             id="description"
@@ -52,13 +65,14 @@
             rows="4"
             placeholder="Enter a Description"
             spellcheck="false"
+            aria-label="Task description"
           ></textarea>
-        </div>
+        </fieldset>
 
         <!-- Due Date Input -->
-        <div class="form-group">
+        <fieldset class="form-group">
           <label for="dueDate" class="form-label">
-            Due date<span class="required">*</span>
+            Due date<span class="required" aria-label="required">*</span>
           </label>
           <div class="input-wrapper">
             <input
@@ -68,23 +82,31 @@
               class="form-input"
               [class.error]="f['dueDate'].touched && f['dueDate'].errors"
               placeholder="dd/mm/yyyy"
+              aria-required="true"
+              [attr.aria-invalid]="f['dueDate'].touched && f['dueDate'].errors"
+              [attr.aria-describedby]="f['dueDate'].touched && f['dueDate'].errors ? 'dueDate-error' : null"
             />
           </div>
-          <span class="error-message" *ngIf="f['dueDate'].touched && f['dueDate'].errors">
+          <span class="error-message" 
+                id="dueDate-error"
+                *ngIf="f['dueDate'].touched && f['dueDate'].errors"
+                role="alert">
             Due date is required
           </span>
-        </div>
-      </div>
+        </fieldset>
+      </section>
 
       <!-- Separator -->
-      <div class="separator"></div>
+      <hr class="separator" aria-hidden="true" />
 
       <!-- Right Column -->
-      <div class="form-column form-column-right">
+      <section class="form-column form-column-right" aria-labelledby="task-details-heading">
+        <h2 id="task-details-heading" class="visually-hidden">Task Details</h2>
+        
         <!-- Priority Selection -->
-        <div class="form-group">
-          <label class="form-label">Priority</label>
-          <div class="priority-buttons">
+        <fieldset class="form-group">
+          <legend class="form-label">Priority</legend>
+          <div class="priority-buttons" role="group" aria-label="Priority selection">
             <button 
               type="button" 
               [ngClass]="{
@@ -92,11 +114,14 @@
                 'priority-btn-urgent': true,
                 'priority-btn-active': selectedPriority === 'high'
               }"
-              (click)="selectPriority('high')">
+              (click)="selectPriority('high')"
+              [attr.aria-pressed]="selectedPriority === 'high'"
+              aria-label="Set priority to urgent">
               <span>Urgent</span>
               <img 
                 [src]="selectedPriority === 'high' ? 'assets/images/urgentwhite.svg' : 'assets/images/urgent.svg'" 
-                alt="Urgent" />
+                alt="" 
+                role="presentation" />
             </button>
             <button 
               type="button" 
@@ -105,11 +130,14 @@
                 'priority-btn-medium': true,
                 'priority-btn-active': selectedPriority === 'medium'
               }"
-              (click)="selectPriority('medium')">
+              (click)="selectPriority('medium')"
+              [attr.aria-pressed]="selectedPriority === 'medium'"
+              aria-label="Set priority to medium">
               <span>Medium</span>
               <img 
                 [src]="selectedPriority === 'medium' ? 'assets/images/mediumwhite.svg' : 'assets/images/medium.svg'" 
-                alt="Medium" />
+                alt="" 
+                role="presentation" />
             </button>
             <button 
               type="button" 
@@ -118,18 +146,21 @@
                 'priority-btn-low': true,
                 'priority-btn-active': selectedPriority === 'low'
               }"
-              (click)="selectPriority('low')">
+              (click)="selectPriority('low')"
+              [attr.aria-pressed]="selectedPriority === 'low'"
+              aria-label="Set priority to low">
               <span>Low</span>
               <img 
                 [src]="selectedPriority === 'low' ? 'assets/images/lowwhite.svg' : 'assets/images/low.svg'" 
-                alt="Low" />
+                alt="" 
+                role="presentation" />
             </button>
           </div>
-        </div>
+        </fieldset>
 
         <!-- Assigned To Dropdown -->
-        <div class="form-group">
-          <label for="assignedTo" class="form-label">Assigned to</label>
+        <fieldset class="form-group">
+          <legend class="form-label">Assigned to</legend>
           <div class="input-wrapper" (click)="toggleContactDropdown()">
             <input
               type="text"
@@ -137,19 +168,30 @@
               class="form-input"
               [placeholder]="selectedContacts.length > 0 ? selectedContacts.length + ' contact(s) selected' : 'Select contacts to assign'"
               readonly
+              aria-haspopup="listbox"
+              [attr.aria-expanded]="showContactDropdown"
+              aria-label="Assigned contacts"
             />
-            <img src="assets/images/arrow_drop_down.svg" alt="Dropdown" class="dropdown-icon" />
+            <img src="assets/images/arrow_drop_down.svg" alt="" class="dropdown-icon" role="presentation" />
           </div>
           
           <!-- Contact Dropdown -->
-          <div class="dropdown-menu" *ngIf="showContactDropdown">
-            <div 
+          <ul class="dropdown-menu" 
+              *ngIf="showContactDropdown" 
+              role="listbox"
+              aria-label="Contact selection">
+            <li 
               *ngFor="let contact of availableContacts" 
               class="dropdown-item"
               [class.selected]="isContactSelected(contact)"
-              (click)="selectContact(contact)">
+              (click)="selectContact(contact)"
+              role="option"
+              [attr.aria-selected]="isContactSelected(contact)"
+              tabindex="0">
               <div class="contact-info">
-                <div class="avatar" [style.background-color]="contact.color">
+                <div class="avatar" 
+                     [style.background-color]="contact.color"
+                     [attr.aria-label]="contact.firstName + ' ' + contact.lastName">
                   {{ contact.initials }}
                 </div>
                 <span>{{ contact.firstName }} {{ contact.lastName }}</span>
@@ -157,32 +199,40 @@
               <img 
                 *ngIf="isContactSelected(contact)" 
                 src="assets/images/checkDark.svg" 
-                alt="Selected" 
-                class="check-icon" />
-            </div>
-          </div>
+                alt="" 
+                class="check-icon"
+                role="presentation" />
+            </li>
+          </ul>
 
           <!-- Selected Contacts Display -->
-          <div class="selected-contacts" *ngIf="selectedContacts.length > 0">
+          <div class="selected-contacts" 
+               *ngIf="selectedContacts.length > 0"
+               role="list"
+               aria-label="Selected contacts">
             <div 
               *ngFor="let contact of selectedContacts" 
               class="contact-badge"
-              [style.background-color]="contact.color">
+              [style.background-color]="contact.color"
+              role="listitem"
+              [attr.aria-label]="contact.firstName + ' ' + contact.lastName">
               {{ contact.initials }}
               <img 
                 src="assets/images/close.svg" 
-                alt="Remove" 
+                alt="Remove contact" 
                 class="remove-icon"
-                (click)="removeContact(contact.id)" />
+                (click)="removeContact(contact.id)"
+                role="button"
+                tabindex="0" />
             </div>
           </div>
-        </div>
+        </fieldset>
 
         <!-- Category Dropdown -->
-        <div class="form-group">
-          <label for="category" class="form-label">
-            Category<span class="required">*</span>
-          </label>
+        <fieldset class="form-group">
+          <legend class="form-label">
+            Category<span class="required" aria-label="required">*</span>
+          </legend>
           <div class="input-wrapper" (click)="toggleCategoryDropdown()">
             <input
               type="text"
@@ -191,29 +241,42 @@
               [class.error]="f['category'].touched && f['category'].errors"
               [placeholder]="selectedCategory || 'Select task category'"
               readonly
+              aria-required="true"
+              aria-haspopup="listbox"
+              [attr.aria-expanded]="showCategoryDropdown"
+              [attr.aria-invalid]="f['category'].touched && f['category'].errors"
+              [attr.aria-describedby]="f['category'].touched && f['category'].errors ? 'category-error' : null"
             />
-            <img src="assets/images/arrow_drop_down.svg" alt="Dropdown" class="dropdown-icon" />
+            <img src="assets/images/arrow_drop_down.svg" alt="" class="dropdown-icon" role="presentation" />
           </div>
           
           <!-- Category Dropdown -->
-          <div class="dropdown-menu" *ngIf="showCategoryDropdown">
-            <div 
+          <ul class="dropdown-menu" 
+              *ngIf="showCategoryDropdown"
+              role="listbox"
+              aria-label="Category selection">
+            <li 
               *ngFor="let category of categories" 
               class="dropdown-item"
-              (click)="selectCategory(category)">
+              (click)="selectCategory(category)"
+              role="option"
+              [attr.aria-selected]="selectedCategory === category"
+              tabindex="0">
               <span>{{ category }}</span>
-        
-            </div>
-          </div>
+            </li>
+          </ul>
           
-          <span class="error-message" *ngIf="f['category'].touched && f['category'].errors">
+          <span class="error-message" 
+                id="category-error"
+                *ngIf="f['category'].touched && f['category'].errors"
+                role="alert">
             Category is required
           </span>
-        </div>
+        </fieldset>
 
         <!-- Subtasks Section -->
-        <div class="form-group">
-          <label for="subtask" class="form-label">Subtasks</label>
+        <fieldset class="form-group">
+          <legend class="form-label">Subtasks</legend>
           <div class="input-wrapper">
             <input
               type="text"
@@ -226,30 +289,39 @@
               (blur)="onSubtaskInputBlur()"
               (keydown.enter)="editingSubtaskId ? updateSubtask() : addSubtask(); $event.preventDefault()"
               maxlength="35"
+              aria-label="Subtask input"
             />
             <div class="subtask-actions" *ngIf="subtaskInputFocused || subtaskInput">
               <img 
                 src="assets/images/close.svg" 
-                alt="Clear" 
+                alt="Clear subtask input" 
                 class="subtask-icon subtask-clear"
-                (click)="clearSubtaskInput()" />
-              <div class="subtask-divider"></div>
+                (click)="clearSubtaskInput()"
+                role="button"
+                tabindex="0" />
+              <div class="subtask-divider" aria-hidden="true"></div>
               <img 
                 src="assets/images/checkDark.svg" 
-                alt="Add" 
+                [attr.alt]="editingSubtaskId ? 'Update subtask' : 'Add subtask'"
                 class="subtask-icon subtask-add"
-                (click)="editingSubtaskId ? updateSubtask() : addSubtask()" />
+                (click)="editingSubtaskId ? updateSubtask() : addSubtask()"
+                role="button"
+                tabindex="0" />
             </div>
             <img 
               *ngIf="!subtaskInputFocused && !subtaskInput"
               src="assets/images/add.svg" 
-              alt="Add subtask" 
-              class="dropdown-icon" />
+              alt="" 
+              class="dropdown-icon"
+              role="presentation" />
           </div>
           
           <!-- Subtasks List -->
-          <ul class="subtasks-list" *ngIf="subtasks.length > 0">
-            <li *ngFor="let subtask of subtasks" class="subtask-item">
+          <ul class="subtasks-list" 
+              *ngIf="subtasks.length > 0"
+              role="list"
+              aria-label="Subtasks">
+            <li *ngFor="let subtask of subtasks" class="subtask-item" role="listitem">
               <!-- Normal View -->
               <span class="subtask-text" *ngIf="editingSubtaskId !== subtask.id">{{ subtask.title }}</span>
               
@@ -265,19 +337,24 @@
                   (keydown.escape)="cancelEditSubtask()"
                   maxlength="35"
                   #editInput
+                  aria-label="Edit subtask"
                 />
                 <div class="subtask-edit-actions">
                   <img 
                     src="assets/images/close.svg" 
-                    alt="Cancel" 
+                    alt="Cancel edit" 
                     class="subtask-edit-icon subtask-edit-clear"
-                    (click)="cancelEditSubtask()" />
-                  <div class="subtask-edit-divider"></div>
+                    (click)="cancelEditSubtask()"
+                    role="button"
+                    tabindex="0" />
+                  <div class="subtask-edit-divider" aria-hidden="true"></div>
                   <img 
                     src="assets/images/checkDark.svg" 
-                    alt="Save" 
+                    alt="Save subtask" 
                     class="subtask-edit-icon subtask-edit-add"
-                    (click)="updateSubtask()" />
+                    (click)="updateSubtask()"
+                    role="button"
+                    tabindex="0" />
                 </div>
               </div>
               
@@ -285,38 +362,46 @@
               <div class="subtask-item-actions" *ngIf="editingSubtaskId !== subtask.id">
                 <img 
                   src="assets/images/edit-2.svg" 
-                  alt="Edit" 
+                  alt="Edit subtask" 
                   class="subtask-action-icon"
-                  (click)="editSubtask(subtask)" />
-                <div class="vertical-line-subtask"></div>
+                  (click)="editSubtask(subtask)"
+                  role="button"
+                  tabindex="0" />
+                <div class="vertical-line-subtask" aria-hidden="true"></div>
                 <img 
                   src="assets/images/delete.svg" 
-                  alt="Delete" 
+                  alt="Delete subtask" 
                   class="subtask-action-icon"
-                  (click)="deleteSubtask(subtask.id)" />
+                  (click)="deleteSubtask(subtask.id)"
+                  role="button"
+                  tabindex="0" />
               </div>
             </li>
           </ul>
-        </div>
-      </div>
+        </fieldset>
+      </section>
     </form>
 
     <!-- Required Label -->
-    <label class="required-label">
-      <span>*</span>This field is required
-    </label>
+    <p class="required-label">
+      <span aria-hidden="true">*</span>This field is required
+    </p>
 
     <!-- Form Actions -->
-    <div class="form-actions">
-      <button type="button" class="btn btn-secondary" (click)="clearForm()">
+    <footer class="form-actions">
+      <button type="button" class="btn btn-secondary" (click)="clearForm()" aria-label="Clear form">
         Clear
-        <img src="assets/images/close.svg" alt="Clear" />
+        <img src="assets/images/close.svg" alt="" role="presentation" />
       </button>
-      <button type="submit" class="btn btn-primary" [disabled]="taskForm.invalid" (click)="onSubmit()">
-        Create Task
-        <img src="assets/images/check.svg" alt="Create" />
+      <button type="submit" 
+              class="btn btn-primary" 
+              [disabled]="taskForm.invalid" 
+              (click)="onSubmit()"
+              [attr.aria-label]="isEditMode ? 'Update task' : 'Create task'">
+        {{ isEditMode ? 'Update Task' : 'Create Task' }}
+        <img src="assets/images/check.svg" alt="" role="presentation" />
       </button>
-    </div>
-  </div>
-  </div>
+    </footer>
+  </main>
+  </article>
 </div>

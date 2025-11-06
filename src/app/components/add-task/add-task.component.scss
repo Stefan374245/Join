@@ -1,6 +1,19 @@
 @import '../../../styles/variables';
 @import '../../../styles/mixins';
 
+// Accessibility Helper Class
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
 .task-edit-overlay {
   display: flex;
   justify-content: center;
@@ -144,6 +157,16 @@
   margin-bottom: 8px;
 }
 
+// Fieldset styles (semantic replacement for .form-group)
+fieldset.form-group {
+  border: none;
+  padding: 0;
+  margin: 0 0 8px 0;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
 .form-label {
   display: flex;
   margin-bottom: 8px;
@@ -208,6 +231,8 @@
   width: 1px;
   background-color: #d1d1d1;
   align-self: stretch;
+  border: none;
+  margin: 0;
 }
 
 .input-wrapper {
@@ -239,6 +264,8 @@
   overflow-y: auto;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   z-index: 10;
+  list-style: none;
+  padding: 0;
 }
 
 .dropdown-item {
@@ -462,6 +489,20 @@
   gap: 0;
   max-height: 80px;
   overflow-y: auto;
+}
+
+.required-label {
+  position: relative;
+  width: fit-content;
+  font-size: 12px;
+  color: #2a3647;
+  margin-top: 24px;
+  margin-bottom: 0;
+  
+  span {
+    color: #ff3d00;
+    margin-right: 4px;
+  }
 }
 
 .subtask-item {
