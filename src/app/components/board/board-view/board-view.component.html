@@ -14,10 +14,9 @@
           (input)="onSearch()"
           aria-label="Search tasks"
         />
-        <img src="assets/images/search.svg" alt="Search" class="search-icon" />
+        <img src="assets/images/search.svg" alt="Search" class="search-icon"/>
       </div>
       
-      <!-- Add Task Button -->
       <button class="btn-add-task" (click)="openAddTaskModal()" aria-label="Add new task">
         <span>Add task</span>
         <img src="assets/images/add.svg" alt="Add" class="add-icon" />
@@ -25,9 +24,7 @@
     </nav>
   </header>
 
-  <!-- Board Columns -->
   <section class="board-columns" aria-label="Task board columns">
-    <!-- Triage Column -->
     <section class="board-column" aria-labelledby="triage-heading">
       <header class="column-header">
         <h2 class="column-title" id="triage-heading">Triage</h2>
@@ -40,13 +37,24 @@
         </button>
       </header>
       
-      <div class="column-content" id="triage-column" role="list">
-        <div class="no-tasks" *ngIf="getTasksByStatus('triage').length === 0" role="status">
+      <div class="column-content" 
+           cdkDropList
+           [cdkDropListData]="triageTasks"
+           cdkDropListId="triage-list"
+           (cdkDropListDropped)="onTaskDrop($event, 'triage')">
+        <div class="no-tasks" *ngIf="triageTasks.length === 0" role="status">
           <p>No tasks in triage</p>
         </div>
         
-        <!-- Task Card Template -->
-        <article class="task-card" *ngFor="let task of getTasksByStatus('triage')" (click)="openTaskDetail(task)" role="listitem">
+        <article class="task-card" 
+                 *ngFor="let task of triageTasks" 
+                 cdkDrag
+                 [cdkDragData]="task"
+                 [attr.data-task-id]="task.id"
+                 (click)="openTaskDetail(task)">
+          
+          <div class="drag-placeholder" *cdkDragPlaceholder></div>
+          
           <span class="task-category" [ngClass]="getCategoryClass(task.category)">
             {{ task.category }}
           </span>
@@ -94,7 +102,6 @@
       </div>
     </section>
 
-    <!-- To Do Column -->
     <section class="board-column" aria-labelledby="todo-heading">
       <header class="column-header">
         <h2 class="column-title" id="todo-heading">To do</h2>
@@ -107,12 +114,24 @@
         </button>
       </header>
       
-      <div class="column-content" id="todo-column" role="list">
-        <div class="no-tasks" *ngIf="getTasksByStatus('todo').length === 0" role="status">
+      <div class="column-content" 
+           cdkDropList
+           [cdkDropListData]="todoTasks"
+           cdkDropListId="todo-list"
+           (cdkDropListDropped)="onTaskDrop($event, 'todo')">
+        <div class="no-tasks" *ngIf="todoTasks.length === 0" role="status">
           <p>No tasks To do</p>
         </div>
         
-        <article class="task-card" *ngFor="let task of getTasksByStatus('todo')" (click)="openTaskDetail(task)" role="listitem">
+        <article class="task-card" 
+                 *ngFor="let task of todoTasks" 
+                 cdkDrag
+                 [cdkDragData]="task"
+                 [attr.data-task-id]="task.id"
+                 (click)="openTaskDetail(task)">
+          
+          <div class="drag-placeholder" *cdkDragPlaceholder></div>
+          
           <span class="task-category" [ngClass]="getCategoryClass(task.category)">
             {{ task.category }}
           </span>
@@ -160,8 +179,7 @@
       </div>
     </section>
 
-    <!-- In Progress Column -->
-    <section class="board-column" aria-labelledby="in-progress-heading">
+    <!-- In Progress Column --><section class="board-column" aria-labelledby="in-progress-heading">
       <header class="column-header">
         <h2 class="column-title" id="in-progress-heading">In progress</h2>
         <button class="btn-add-column-task" 
@@ -173,12 +191,24 @@
         </button>
       </header>
       
-      <div class="column-content" id="in-progress-column" role="list">
-        <div class="no-tasks" *ngIf="getTasksByStatus('in-progress').length === 0" role="status">
+      <div class="column-content" 
+           cdkDropList
+           [cdkDropListData]="inProgressTasks"
+           cdkDropListId="in-progress-list"
+           (cdkDropListDropped)="onTaskDrop($event, 'in-progress')">
+        <div class="no-tasks" *ngIf="inProgressTasks.length === 0" role="status">
           <p>No tasks in progress</p>
         </div>
         
-        <article class="task-card" *ngFor="let task of getTasksByStatus('in-progress')" (click)="openTaskDetail(task)" role="listitem">
+        <article class="task-card" 
+                 *ngFor="let task of inProgressTasks"
+                 cdkDrag
+                 [cdkDragData]="task"
+                 [attr.data-task-id]="task.id"
+                 (click)="openTaskDetail(task)">
+          
+          <div class="drag-placeholder" *cdkDragPlaceholder></div>
+          
           <span class="task-category" [ngClass]="getCategoryClass(task.category)">
             {{ task.category }}
           </span>
@@ -239,12 +269,24 @@
         </button>
       </header>
       
-      <div class="column-content" id="await-feedback-column" role="list">
-        <div class="no-tasks" *ngIf="getTasksByStatus('await-feedback').length === 0" role="status">
+      <div class="column-content" 
+           cdkDropList
+           [cdkDropListData]="awaitFeedbackTasks"
+           cdkDropListId="await-feedback-list"
+           (cdkDropListDropped)="onTaskDrop($event, 'await-feedback')">
+        <div class="no-tasks" *ngIf="awaitFeedbackTasks.length === 0" role="status">
           <p>No tasks awaiting feedback</p>
         </div>
         
-        <article class="task-card" *ngFor="let task of getTasksByStatus('await-feedback')" (click)="openTaskDetail(task)" role="listitem">
+        <article class="task-card" 
+                 *ngFor="let task of awaitFeedbackTasks"
+                 cdkDrag
+                 [cdkDragData]="task"
+                 [attr.data-task-id]="task.id"
+                 (click)="openTaskDetail(task)">
+          
+          <div class="drag-placeholder" *cdkDragPlaceholder></div>
+          
           <span class="task-category" [ngClass]="getCategoryClass(task.category)">
             {{ task.category }}
           </span>
@@ -305,12 +347,24 @@
         </button>
       </header>
       
-      <div class="column-content" id="done-column" role="list">
-        <div class="no-tasks" *ngIf="getTasksByStatus('done').length === 0" role="status">
+      <div class="column-content" 
+           cdkDropList
+           [cdkDropListData]="doneTasks"
+           cdkDropListId="done-list"
+           (cdkDropListDropped)="onTaskDrop($event, 'done')">
+        <div class="no-tasks" *ngIf="doneTasks.length === 0" role="status">
           <p>No tasks done</p>
         </div>
         
-        <article class="task-card" *ngFor="let task of getTasksByStatus('done')" (click)="openTaskDetail(task)" role="listitem">
+        <article class="task-card" 
+                 *ngFor="let task of doneTasks"
+                 cdkDrag
+                 [cdkDragData]="task"
+                 [attr.data-task-id]="task.id"
+                 (click)="openTaskDetail(task)">
+          
+          <div class="drag-placeholder" *cdkDragPlaceholder></div>
+          
           <span class="task-category" [ngClass]="getCategoryClass(task.category)">
             {{ task.category }}
           </span>

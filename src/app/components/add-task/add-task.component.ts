@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter, ViewChild, ElementRef, AfterViewChecked } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, ViewChild, ElementRef, AfterViewChecked, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -15,19 +15,19 @@ import { ContactService } from '../../services/contact.service';
   styleUrl: './add-task.component.scss'
 })
 export class AddTaskComponent implements OnInit, AfterViewChecked {
-  @Input() isOverlay: boolean = false; // Overlay-Modus aktivieren
-  @Input() taskToEdit: Task | null = null; // Task zum Bearbeiten
-  @Input() initialStatus: 'triage' | 'todo' | 'in-progress' | 'await-feedback' | 'done' = 'todo'; // Initial Status für neue Tasks
-  @Output() close = new EventEmitter<void>(); // Overlay schließen
-  @Output() taskSaved = new EventEmitter<Task>(); // Task gespeichert
+  @Input() isOverlay: boolean = false;
+  @Input() taskToEdit: Task | null = null;
+  @Input() initialStatus: 'triage' | 'todo' | 'in-progress' | 'await-feedback' | 'done' = 'todo';
+  @Output() close = new EventEmitter<void>();
+  @Output() taskSaved = new EventEmitter<Task>();
   @ViewChild('editInput') editInput?: ElementRef<HTMLInputElement>;
   
   taskForm!: FormGroup;
   subtaskInput: string = '';
-  subtaskEditInput: string = ''; // Separates Input für Inline-Editing
+  subtaskEditInput: string = '';
   subtasks: Subtask[] = [];
   editingSubtaskId: string | null = null;
-  subtaskInputFocused: boolean = false; // Neues Property für Focus-State
+  subtaskInputFocused: boolean = false;
   
   selectedPriority: 'low' | 'medium' | 'high' = 'medium';
   selectedContacts: Contact[] = [];
@@ -39,7 +39,7 @@ export class AddTaskComponent implements OnInit, AfterViewChecked {
   showContactDropdown: boolean = false;
   showCategoryDropdown: boolean = false;
   
-  isEditMode: boolean = false; // Edit-Modus Flag
+  isEditMode: boolean = false;
 
   constructor(
     private fb: FormBuilder,
@@ -51,7 +51,6 @@ export class AddTaskComponent implements OnInit, AfterViewChecked {
   ngOnInit(): void {
     this.initForm();
     
-    // Contacts laden und dann Form befüllen wenn Edit-Modus
     if (this.taskToEdit) {
       this.isEditMode = true;
       this.loadContactsAndPopulateForm(this.taskToEdit);
@@ -61,7 +60,6 @@ export class AddTaskComponent implements OnInit, AfterViewChecked {
   }
 
   ngAfterViewChecked(): void {
-    // Auto-Focus auf Edit-Input wenn im Edit-Modus
     if (this.editingSubtaskId && this.editInput) {
       this.editInput.nativeElement.focus();
     }
@@ -75,7 +73,6 @@ export class AddTaskComponent implements OnInit, AfterViewChecked {
       next: (contacts: Contact[]) => {
         this.availableContacts = contacts;
         console.log('📋 Contacts loaded:', contacts.length);
-        // JETZT Form befüllen, nachdem Contacts geladen sind
         this.populateFormWithTask(task);
       },
       error: (error: any) => {
@@ -88,33 +85,19 @@ export class AddTaskComponent implements OnInit, AfterViewChecked {
    * Formular mit Task-Daten befüllen (Edit-Modus)
    */
   private populateFormWithTask(task: Task): void {
-    console.log('📝 Populating form with task:', task);
-    console.log('👥 Available contacts:', this.availableContacts.length);
-    console.log('🎯 Task assignedTo:', task.assignedTo);
-    
-    // Form-Werte setzen
     this.taskForm.patchValue({
       title: task.title,
       description: task.description,
       dueDate: this.formatDateForInput(task.dueDate),
       category: task.category
     });
-    
-    // Priority setzen
+
     this.selectedPriority = task.priority;
-    
-    // Category setzen
     this.selectedCategory = task.category;
-    
-    // Subtasks setzen
     this.subtasks = task.subtasks ? [...task.subtasks] : [];
-    
-    // Selected Contacts setzen (Contacts sind jetzt garantiert geladen)
     this.selectedContacts = this.availableContacts.filter(c => 
       task.assignedTo.includes(c.id)
     );
-    
-    console.log('✅ Selected contacts:', this.selectedContacts.length, this.selectedContacts.map(c => c.firstName));
   }
 
   /**
@@ -148,12 +131,10 @@ export class AddTaskComponent implements OnInit, AfterViewChecked {
     });
   }
 
-  // Priority Methods
   selectPriority(priority: 'low' | 'medium' | 'high'): void {
     this.selectedPriority = priority;
   }
 
-  // Contact Methods
   toggleContactDropdown(): void {
     this.showContactDropdown = !this.showContactDropdown;
     if (this.showContactDropdown) {
@@ -178,7 +159,29 @@ export class AddTaskComponent implements OnInit, AfterViewChecked {
     this.selectedContacts = this.selectedContacts.filter(c => c.id !== contactId);
   }
 
-  // Category Methods
+  /**
+   * Schließt Dropdowns wenn außerhalb geklickt wird
+   */
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    
+    const isInsideContactDropdown = target.closest('#assignedTo')?.parentElement?.parentElement || 
+                                     target.closest('.dropdown-menu') ||
+                                     target.closest('.selected-contacts');
+    
+    if (!isInsideContactDropdown && this.showContactDropdown) {
+      this.showContactDropdown = false;
+    }
+
+    const isInsideCategoryDropdown = target.closest('#category')?.parentElement?.parentElement || 
+                                      target.closest('.dropdown-menu');
+    
+    if (!isInsideCategoryDropdown && this.showCategoryDropdown) {
+      this.showCategoryDropdown = false;
+    }
+  }
+
   toggleCategoryDropdown(): void {
     this.showCategoryDropdown = !this.showCategoryDropdown;
     if (this.showCategoryDropdown) {
@@ -192,7 +195,6 @@ export class AddTaskComponent implements OnInit, AfterViewChecked {
     this.showCategoryDropdown = false;
   }
 
-  // Subtask Methods
   addSubtask(): void {
     if (this.subtaskInput.trim()) {
       const newSubtask: Subtask = {
@@ -216,7 +218,6 @@ export class AddTaskComponent implements OnInit, AfterViewChecked {
   }
 
   onSubtaskInputBlur(): void {
-    // Verzögerung, damit Click-Events auf Icons noch funktionieren
     setTimeout(() => {
       if (!this.subtaskInput.trim() && !this.editingSubtaskId) {
         this.subtaskInputFocused = false;
@@ -226,8 +227,7 @@ export class AddTaskComponent implements OnInit, AfterViewChecked {
 
   editSubtask(subtask: Subtask): void {
     this.editingSubtaskId = subtask.id;
-    this.subtaskEditInput = subtask.title; // Separates Input für Inline-Editing
-    // Focus wird automatisch durch #editInput gesetzt
+    this.subtaskEditInput = subtask.title;
   }
 
   updateSubtask(): void {

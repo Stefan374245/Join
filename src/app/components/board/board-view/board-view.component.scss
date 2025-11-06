@@ -200,7 +200,7 @@ $header-height: 54px;
   // ========== Column Content Scrollable ==========
   .column-content {
     flex: 1;
-    overflow-y: auto;
+    overflow-y: hidden;
     padding: 5px;
     
     // Custom Scrollbar
@@ -719,3 +719,111 @@ $header-height: 54px;
     }
   }
 }
+
+// ========== CDK Drag & Drop Styling ==========
+// Drag preview (element being dragged)
+.cdk-drag-preview {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  opacity: 0.95;
+  cursor: grabbing;
+  transform: rotate(3deg);
+  transition: transform 0.2s ease;
+  z-index: 1000;
+}
+
+// Original task while dragging
+.cdk-drag-animating {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+// Drop list while dragging over it
+.column-content.cdk-drop-list-dragging {
+  .task-card:not(.cdk-drag-placeholder) {
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+  }
+}
+
+// Placeholder where item will be dropped
+.drag-placeholder {
+  min-height: 100px;
+  background: rgba(42, 54, 71, 0.05);
+  border: 2px dashed $secondary-color;
+  border-radius: $card-radius;
+  margin-bottom: $card-spacing;
+  transition: all 250ms cubic-bezier(0, 0, 0.2, 1);
+  
+  // Show "Drop here" message
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  &::before {
+    content: 'Drop here';
+    color: $secondary-color;
+    font-size: 0.875rem;
+    font-weight: 500;
+    opacity: 0.7;
+  }
+}
+
+// Highlight drop zone when dragging over different column
+.column-content.cdk-drop-list-receiving {
+  background-color: $background-dragging-color;
+  border-radius: 8px;
+  transition: background-color 250ms ease;
+  
+  .drag-placeholder {
+    background: rgba(42, 171, 226, 0.1);
+    border-color: $secondary-color;
+    border-width: 2px;
+    
+    &::before {
+      opacity: 1;
+    }
+  }
+}
+
+// Active drop zone (while item is hovering)
+.column-content:not(.cdk-drop-list-receiving).cdk-drop-list-dragging {
+  background-color: rgba($gray-200, 0.3);
+  transition: background-color 250ms ease;
+}
+
+// Make task cards grabbable
+.task-card {
+  cursor: grab;
+  -webkit-user-select: none;
+  user-select: none;
+  transition: transform 150ms ease, box-shadow 150ms ease;
+  
+  &:active {
+    cursor: grabbing;
+  }
+  
+  &.cdk-drag-disabled {
+    cursor: default;
+  }
+  
+  // Hover effect on task cards
+  &:hover:not(.cdk-drag-preview) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+}
+
+// Smooth transitions
+.column-content {
+  transition: background-color 250ms ease;
+  min-height: 200px;
+}
+
+// Column header during drag
+.board-column:has(.column-content.cdk-drop-list-receiving) {
+  .column-header {
+    .column-title {
+      color: $secondary-color;
+      transition: color 250ms ease;
+    }
+  }
+}
+

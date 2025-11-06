@@ -11,7 +11,7 @@
       <article class="stats-box" aria-label="Task statistics overview">
         <!-- Top Row: To-do (Frame 65) and Done (Frame 64) -->
         <div class="top-row">
-          <article class="stat-item" aria-labelledby="todo-label">
+          <article class="stat-item" aria-labelledby="todo-label" *ngIf="todoTasks$ | async as todoCount">
             <div class="stat-icon" aria-hidden="true">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" role="presentation">
                 <path d="M9 11L12 14L22 4" stroke-width="2.5" stroke-linecap="round"/>
@@ -19,19 +19,19 @@
               </svg>
             </div>
             <div class="stat-content">
-              <div class="stat-number" aria-label="{{ todoTasks$ | async }} tasks to do">{{ todoTasks$ | async }}</div>
+              <div class="stat-number" [attr.aria-label]="todoCount + ' tasks to do'">{{ todoCount }}</div>
               <div class="stat-label" id="todo-label">To-do</div>
             </div>
           </article>
 
-          <article class="stat-item" aria-labelledby="done-label">
+          <article class="stat-item" aria-labelledby="done-label" *ngIf="doneTasks$ | async as doneCount">
             <div class="stat-icon done" aria-hidden="true">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" role="presentation">
                 <path d="M5 13L9 17L19 7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
             </div>
             <div class="stat-content">
-              <div class="stat-number" aria-label="{{ doneTasks$ | async }} tasks done">{{ doneTasks$ | async }}</div>
+              <div class="stat-number" [attr.aria-label]="doneCount + ' tasks done'">{{ doneCount }}</div>
               <div class="stat-label" id="done-label">Done</div>
             </div>
           </article>
@@ -39,7 +39,7 @@
 
         <!-- Middle Row: Urgent (Frame 69/407) and Email (Frame 40) -->
         <div class="middle-row">
-          <article class="urgent-item" aria-labelledby="urgent-label">
+          <article class="urgent-item" aria-labelledby="urgent-label" *ngIf="urgentTasks$ | async as urgentCount">
             <div class="urgent-icon" aria-hidden="true">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="white" role="presentation">
                 <path d="M12 2L2 20H22L12 2Z"/>
@@ -48,35 +48,35 @@
               </svg>
             </div>
             <div class="urgent-content">
-              <div class="urgent-number" aria-label="{{ urgentTasks$ | async }} urgent tasks">{{ urgentTasks$ | async }}</div>
+              <div class="urgent-number" [attr.aria-label]="urgentCount + ' urgent tasks'">{{ urgentCount }}</div>
               <div class="urgent-label" id="urgent-label">Urgent</div>
             </div>
-            <div class="deadline-info">
-              <time class="deadline-date" [attr.datetime]="formattedDeadline$ | async">{{ formattedDeadline$ | async }}</time>
+            <div class="deadline-info" *ngIf="formattedDeadline$ | async as deadline">
+              <time class="deadline-date" [attr.datetime]="deadline">{{ deadline }}</time>
               <div class="deadline-label">Upcoming Deadline</div>
             </div>
           </article>
 
-          <article class="email-item" aria-labelledby="feedback-label">
-            <div class="email-number" aria-label="{{ awaitingFeedbackTasks$ | async }} tasks awaiting feedback">{{ awaitingFeedbackTasks$ | async }}</div>
+          <article class="email-item" aria-labelledby="feedback-label" *ngIf="awaitingFeedbackTasks$ | async as feedbackCount">
+            <div class="email-number" [attr.aria-label]="feedbackCount + ' tasks awaiting feedback'">{{ feedbackCount }}</div>
             <div class="email-label" id="feedback-label">Awaiting<br>Feedback</div>
           </article>
         </div>
 
         <!-- Bottom Row: Task Stats (Frame 3) -->
         <div class="bottom-row">
-          <article class="task-stat" aria-labelledby="total-tasks-label">
-            <div class="task-number" aria-label="{{ totalTasks$ | async }} total tasks">{{ totalTasks$ | async }}</div>
+          <article class="task-stat" aria-labelledby="total-tasks-label" *ngIf="totalTasks$ | async as totalCount">
+            <div class="task-number" [attr.aria-label]="totalCount + ' total tasks'">{{ totalCount }}</div>
             <div class="task-label" id="total-tasks-label">Tasks In<br>Board</div>
           </article>
 
-          <article class="task-stat" aria-labelledby="progress-tasks-label">
-            <div class="task-number" aria-label="{{ inProgressTasks$ | async }} tasks in progress">{{ inProgressTasks$ | async }}</div>
+          <article class="task-stat" aria-labelledby="progress-tasks-label" *ngIf="inProgressTasks$ | async as progressCount">
+            <div class="task-number" [attr.aria-label]="progressCount + ' tasks in progress'">{{ progressCount }}</div>
             <div class="task-label" id="progress-tasks-label">Tasks In<br>Progress</div>
           </article>
 
-          <article class="task-stat" aria-labelledby="awaiting-start-label">
-            <div class="task-number" aria-label="{{ todoTasks$ | async }} tasks awaiting start">{{ todoTasks$ | async }}</div>
+          <article class="task-stat" aria-labelledby="awaiting-start-label" *ngIf="todoTasks$ | async as awaitingCount">
+            <div class="task-number" [attr.aria-label]="awaitingCount + ' tasks awaiting start'">{{ awaitingCount }}</div>
             <div class="task-label" id="awaiting-start-label">Awaiting<br>Start</div>
           </article>
         </div>

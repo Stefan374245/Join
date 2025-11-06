@@ -37,9 +37,6 @@ export class AuthService {
     return this.auth.currentUser;
   }
 
-  /**
-   * Generate a color for new user based on email
-   */
   private generateColorFromEmail(email: string): string {
     const colors = [
       '#FF7A00', '#FF5EB3', '#6E52FF', '#9327FF', '#00BEE8',
@@ -52,19 +49,14 @@ export class AuthService {
     return colors[colorIndex];
   }
 
-  /**
-   * Save user data to Firestore 'users' collection
-   */
   private async saveUserToFirestore(user: User, displayName: string): Promise<void> {
     const userDoc = doc(this.firestore, 'users', user.uid);
     const color = this.generateColorFromEmail(user.email || '');
     
-    // Parse displayName into firstName and lastName
     const nameParts = displayName.split(' ');
     const firstName = nameParts[0] || '';
     const lastName = nameParts.slice(1).join(' ') || '';
     
-    // Generate initials
     const initials = displayName 
       ? displayName.split(' ').map((s: string) => s[0]).slice(0, 2).join('').toUpperCase()
       : (user.email?.substring(0, 2).toUpperCase() || 'U');
@@ -82,34 +74,19 @@ export class AuthService {
     });
   }
 
-  /**
-   * Ensure user exists in Firestore (migration helper for existing Auth users)
-   * Checks if user document exists, if not creates it
-   */
   private async ensureUserInFirestore(user: User): Promise<void> {
     try {
       const userDoc = doc(this.firestore, 'users', user.uid);
       const userSnapshot = await getDoc(userDoc);
       
       if (!userSnapshot.exists()) {
-        console.log('🔄 User not found in Firestore, creating document for:', user.email);
         const displayName = user.displayName || user.email?.split('@')[0] || 'User';
         await this.saveUserToFirestore(user, displayName);
-        console.log('✅ User migrated to Firestore successfully');
-      } else {
-        console.log('✅ User already exists in Firestore');
       }
     } catch (error) {
-      console.error('❌ Error ensuring user in Firestore:', error);
-      // Don't throw error, just log it - login should still succeed
     }
   }
 
-  /**
-   * Sign up a new user with email and password
-   * @param data - User signup data (name, email, password)
-   * @returns Observable of UserCredential
-   */
   signup(data: SignupData): Observable<UserCredential> {
     const promise = createUserWithEmailAndPassword(
       this.auth, 

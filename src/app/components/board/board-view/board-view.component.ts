@@ -1,7 +1,8 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ViewChildren, QueryList, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { CdkDragDrop, DragDropModule, CdkDropList } from '@angular/cdk/drag-drop';
 import { TaskService } from '../../../services/task.service';
 import { ContactService } from '../../../services/contact.service';
 import { Task } from '../../../models/task.interface';
@@ -13,11 +14,13 @@ import { AddTaskComponent } from '../../add-task/add-task.component';
 @Component({
   selector: 'app-board-view',
   standalone: true,
-  imports: [CommonModule, FormsModule, TaskDetailComponent, AddTaskComponent],
+  imports: [CommonModule, FormsModule, DragDropModule, TaskDetailComponent, AddTaskComponent],
   templateUrl: './board-view.component.html',
   styleUrl: './board-view.component.scss'
 })
-export class BoardViewComponent implements OnInit {
+export class BoardViewComponent implements OnInit, AfterViewInit {
+  @ViewChildren(CdkDropList) dropLists!: QueryList<CdkDropList>;
+  
   private taskService = inject(TaskService);
   private contactService = inject(ContactService);
   private router = inject(Router);
@@ -27,15 +30,19 @@ export class BoardViewComponent implements OnInit {
   filteredTasks: Task[] = [];
   contacts: Contact[] = [];
   
-  // Task Detail Overlay
+  // Separate arrays for each column (required for CDK Drag & Drop)
+  triageTasks: Task[] = [];
+  todoTasks: Task[] = [];
+  inProgressTasks: Task[] = [];
+  awaitFeedbackTasks: Task[] = [];
+  doneTasks: Task[] = [];
+  
   selectedTask: Task | null = null;
   showTaskDetail: boolean = false;
   
-  // Task Edit Overlay
   taskToEdit: Task | null = null;
   showEditOverlay: boolean = false;
   
-  // Add Task Overlay
   showAddTaskOverlay: boolean = false;
   addTaskStatus: 'triage' | 'todo' | 'in-progress' | 'await-feedback' | 'done' = 'todo';
 
@@ -52,12 +59,50 @@ export class BoardViewComponent implements OnInit {
       next: (tasks: Task[]) => {
         this.allTasks = tasks;
         this.filteredTasks = tasks;
+        this.updateColumnArrays();
         console.log('📋 Loaded tasks:', tasks.length);
       },
       error: (error: any) => {
         console.error('❌ Error loading tasks:', error);
       }
     });
+  }
+
+  /**
+   * Update separate arrays for each column
+   */
+  private updateColumnArrays(): void {
+    this.triageTasks = this.filteredTasks.filter(task => task.status === 'triage');
+    this.todoTasks = this.filteredTasks.filter(task => task.status === 'todo');
+    this.inProgressTasks = this.filteredTasks.filter(task => task.status === 'in-progress');
+    this.awaitFeedbackTasks = this.filteredTasks.filter(task => task.status === 'await-feedback');
+    this.doneTasks = this.filteredTasks.filter(task => task.status === 'done');
+    
+    console.log('📊 Column Arrays Updated:', {
+      triage: this.triageTasks.length,
+      todo: this.todoTasks.length,
+      inProgress: this.inProgressTasks.length,
+      awaitFeedback: this.awaitFeedbackTasks.length,
+      done: this.doneTasks.length
+    });
+  }
+
+  /**
+   * After view is initialized, connect all drop lists programmatically
+   */
+  ngAfterViewInit(): void {
+    // Wait for next tick to ensure all drop lists are registered
+    setTimeout(() => {
+      const allDropListIds = this.dropLists.map(list => list.id);
+      console.log('🎯 Connecting drop lists:', allDropListIds);
+      
+      // Connect each drop list to all others
+      this.dropLists.forEach(dropList => {
+        dropList.connectedTo = this.dropLists.filter(list => list.id !== dropList.id);
+      });
+      
+      console.log('✅ All drop lists connected');
+    }, 0);
   }
 
   /**
@@ -79,30 +124,20 @@ export class BoardViewComponent implements OnInit {
    * Get tasks by status
    */
   getTasksByStatus(status: string): Task[] {
-    // Map column names to task status
-    let taskStatus: 'triage' | 'todo' | 'in-progress' | 'await-feedback' | 'done';
-    
     switch(status) {
       case 'triage':
-        taskStatus = 'triage';
-        break;
+        return this.triageTasks;
       case 'todo':
-        taskStatus = 'todo';
-        break;
+        return this.todoTasks;
       case 'in-progress':
-        taskStatus = 'in-progress';
-        break;
+        return this.inProgressTasks;
       case 'await-feedback':
-        taskStatus = 'await-feedback';
-        break;
+        return this.awaitFeedbackTasks;
       case 'done':
-        taskStatus = 'done';
-        break;
+        return this.doneTasks;
       default:
         return [];
     }
-
-    return this.filteredTasks.filter(task => task.status === taskStatus);
   }
 
   /**
@@ -111,6 +146,7 @@ export class BoardViewComponent implements OnInit {
   onSearch(): void {
     if (!this.searchQuery.trim()) {
       this.filteredTasks = this.allTasks;
+      this.updateColumnArrays();
       return;
     }
 
@@ -120,6 +156,81 @@ export class BoardViewComponent implements OnInit {
       task.description.toLowerCase().includes(query) ||
       task.category.toLowerCase().includes(query)
     );
+    this.updateColumnArrays();
+  }
+
+  /**
+   * Handle drag & drop event - Kanban Board functionality
+   * @param event - CdkDragDrop event containing drag information
+   * @param targetStatus - Target column status
+   */
+  onTaskDrop(event: CdkDragDrop<Task[]>, targetStatus: 'triage' | 'todo' | 'in-progress' | 'await-feedback' | 'done'): void {
+    const task = event.item.data as Task;
+    
+    console.log('🔍 DROP EVENT:', {
+      task: task.title,
+      currentStatus: task.status,
+      targetStatus: targetStatus,
+      previousContainer: event.previousContainer.id,
+      currentContainer: event.container.id,
+      sameContainer: event.previousContainer === event.container
+    });
+    
+    // Only update if task is moved to a different column
+    if (task.status !== targetStatus) {
+      console.log(`📦 Moving task "${task.title}" from ${task.status} to ${targetStatus}`);
+      
+      // Save old status for potential rollback
+      const oldStatus = task.status;
+      
+      // ✅ OPTIMISTIC UPDATE: Update local data immediately
+      const taskIndex = this.allTasks.findIndex(t => t.id === task.id);
+      if (taskIndex !== -1) {
+        this.allTasks[taskIndex].status = targetStatus;
+        this.filteredTasks = [...this.allTasks];
+        this.updateColumnArrays(); // Update column arrays
+        console.log('✅ Local update done, column arrays updated');
+      }
+      
+      // Update task status in Firestore
+      this.taskService.updateTaskStatus(task.id, targetStatus).subscribe({
+        next: () => {
+          console.log('✅ Task status updated successfully in Firestore');
+          
+          // Visual feedback: scroll to task after animation
+          setTimeout(() => {
+            this.scrollToTask(task.id);
+          }, 400);
+        },
+        error: (error) => {
+          console.error('❌ Error updating task status:', error);
+          
+          // ROLLBACK: Revert local change on error
+          const taskIndex = this.allTasks.findIndex(t => t.id === task.id);
+          if (taskIndex !== -1) {
+            this.allTasks[taskIndex].status = oldStatus;
+            this.filteredTasks = [...this.allTasks];
+            this.updateColumnArrays();
+          }
+        }
+      });
+    } else {
+      console.log('ℹ️ Task dropped in same column - no update needed');
+    }
+  }
+
+  /**
+   * Scroll to task element with smooth animation
+   * @param taskId - ID of task to scroll to
+   */
+  private scrollToTask(taskId: string): void {
+    const taskElement = document.querySelector(`[data-task-id="${taskId}"]`);
+    if (taskElement) {
+      taskElement.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'center' 
+      });
+    }
   }
 
   /**
