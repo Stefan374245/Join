@@ -65,9 +65,10 @@
 }
 
 .contacts-main {
+  @include content-at-sidebar;
   display: flex;
-  width: calc(100% - 200px);
-  height: 100vh;
+  width: calc(100% - 136px);
+  padding: 0; // Remove default padding for this special layout
 }
 
 .content-left {

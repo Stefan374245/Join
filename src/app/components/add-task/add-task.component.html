@@ -81,6 +81,7 @@
               formControlName="dueDate"
               class="form-input"
               [class.error]="f['dueDate'].touched && f['dueDate'].errors"
+              [min]="minDate"
               placeholder="dd/mm/yyyy"
               aria-required="true"
               [attr.aria-invalid]="f['dueDate'].touched && f['dueDate'].errors"
@@ -197,8 +198,7 @@
                 <span>{{ contact.firstName }} {{ contact.lastName }}</span>
               </div>
               <img 
-                *ngIf="isContactSelected(contact)" 
-                src="assets/images/checkDark.svg" 
+                [src]="isContactSelected(contact) ? 'assets/images/checkboxtrueblack.svg' : 'assets/images/checkboxfalseblack.svg'" 
                 alt="" 
                 class="check-icon"
                 role="presentation" />

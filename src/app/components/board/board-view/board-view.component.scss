@@ -1,12 +1,13 @@
-@import '../../../../styles/variables';
-@import '../../../../styles/mixins';
+@import "../../../../styles/variables";
+@import "../../../../styles/mixins";
 
 // ========== Keyframe Animations ==========
 @keyframes shine {
   0% {
     left: -100%;
   }
-  50%, 100% {
+  50%,
+  100% {
     left: 100%;
   }
 }
@@ -22,15 +23,14 @@ $header-height: 54px;
 
 // ========== Main Container ==========
 .board-container {
+  @include main-content-layout;
   display: flex;
   flex-direction: column;
-  padding: $board-padding 0;
-  margin: 0 $board-padding;
-  max-width: 1440px;
+  max-width: 100%;
   height: calc(95vh - 210px);
   overflow: auto;
   gap: 40px;
-  
+
   // Hide scrollbar
   scrollbar-width: none;
   &::-webkit-scrollbar {
@@ -202,7 +202,7 @@ $header-height: 54px;
     flex: 1;
     overflow-y: hidden;
     padding: 5px;
-    
+
     // Custom Scrollbar
     scrollbar-width: thin;
     scrollbar-color: $primary-color #e7e7e7;
@@ -219,7 +219,7 @@ $header-height: 54px;
       background-color: $primary-color;
       border-radius: 10px;
       border: 2px solid #e7e7e7;
-      
+
       &:hover {
         background-color: $accent-color;
       }
@@ -296,7 +296,7 @@ $header-height: 54px;
       text-overflow: ellipsis;
       box-sizing: border-box;
     }
-    
+
     &.user-story span {
       background: #0038ff;
       color: white;
@@ -341,39 +341,43 @@ $header-height: 54px;
     gap: 8px;
     width: 100%;
     align-items: center;
-    transition: all 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 
     &:hover .subtask-count {
       transform: scale(1.15);
-      transition: transform 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     // Hover effect when all subtasks are completed - GREEN
     &.all-completed {
       .progress-bar {
-        transition: box-shadow 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
-        
+        transition: box-shadow 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+
         .progress-fill {
-          transition: background 0.5s cubic-bezier(0.4, 0.0, 0.2, 1), 
-                      box-shadow 0.5s cubic-bezier(0.4, 0.0, 0.2, 1),
-                      width 0.8s cubic-bezier(0.4, 0.0, 0.2, 1);
+          transition: background 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+            box-shadow 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+            width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
         }
       }
-      
+
       .progress-text {
-        transition: color 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
+        transition: color 0.5s cubic-bezier(0.4, 0, 0.2, 1);
       }
 
       &:hover {
         .progress-bar {
           box-shadow: 0 0 12px rgba(13, 144, 35, 0.5);
-          
+
           .progress-fill {
-            background: linear-gradient(90deg, #0d9023 0%, lighten(#0d9023, 10%) 100%);
+            background: linear-gradient(
+              90deg,
+              #0d9023 0%,
+              lighten(#0d9023, 10%) 100%
+            );
             box-shadow: 0 0 12px rgba(13, 144, 35, 0.6);
           }
         }
-        
+
         .progress-text {
           color: #0d9023;
         }
@@ -383,29 +387,33 @@ $header-height: 54px;
     // Hover effect when subtasks are incomplete - RED
     &.has-incomplete {
       .progress-bar {
-        transition: box-shadow 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
-        
+        transition: box-shadow 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+
         .progress-fill {
-          transition: background 0.5s cubic-bezier(0.4, 0.0, 0.2, 1), 
-                      box-shadow 0.5s cubic-bezier(0.4, 0.0, 0.2, 1),
-                      width 0.8s cubic-bezier(0.4, 0.0, 0.2, 1);
+          transition: background 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+            box-shadow 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+            width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
         }
       }
-      
+
       .progress-text {
-        transition: color 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
+        transition: color 0.5s cubic-bezier(0.4, 0, 0.2, 1);
       }
 
       &:hover {
         .progress-bar {
           box-shadow: 0 0 12px rgba(255, 61, 0, 0.5);
-          
+
           .progress-fill {
-            background: linear-gradient(90deg, #ff3d00 0%, lighten(#ff3d00, 10%) 100%);
+            background: linear-gradient(
+              90deg,
+              #ff3d00 0%,
+              lighten(#ff3d00, 10%) 100%
+            );
             box-shadow: 0 0 12px rgba(255, 61, 0, 0.6);
           }
         }
-        
+
         .progress-text {
           color: #ff3d00;
         }
@@ -423,18 +431,22 @@ $header-height: 54px;
 
     .subtask-progress-bar {
       height: 100%;
-      background: linear-gradient(90deg, $accent-color 0%, lighten($accent-color, 10%) 100%);
+      background: linear-gradient(
+        90deg,
+        $accent-color 0%,
+        lighten($accent-color, 10%) 100%
+      );
       border-radius: 4px;
-      transition: width 0.8s cubic-bezier(0.4, 0.0, 0.2, 1);
+      transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
       box-shadow: 0 0 8px rgba($accent-color, 0.3);
       position: relative;
-      
+
       // Smooth animation when width changes
       will-change: width;
-      
+
       // Animated shine effect
       &::before {
-        content: '';
+        content: "";
         position: absolute;
         top: 0;
         left: -100%;
@@ -461,15 +473,19 @@ $header-height: 54px;
 
       .progress-fill {
         height: 100%;
-        background: linear-gradient(90deg, $accent-color 0%, lighten($accent-color, 10%) 100%);
+        background: linear-gradient(
+          90deg,
+          $accent-color 0%,
+          lighten($accent-color, 10%) 100%
+        );
         border-radius: 4px;
-        transition: width 0.8s cubic-bezier(0.4, 0.0, 0.2, 1);
+        transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
         box-shadow: 0 0 8px rgba($accent-color, 0.3);
         will-change: width;
         position: relative;
 
         &::before {
-          content: '';
+          content: "";
           position: absolute;
           top: 0;
           left: -100%;
@@ -534,8 +550,8 @@ $header-height: 54px;
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 35px;
-      height: 35px;
+      width: 32px;
+      height: 32px;
       font-size: 12px;
       border: 2px solid white;
       margin-left: -8px;
@@ -566,7 +582,7 @@ $header-height: 54px;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    
+
     img {
       width: 24px;
       height: 24px;
@@ -637,11 +653,6 @@ $header-height: 54px;
 }
 
 // ========== Responsive Design ==========
-@media (max-width: 1400px) {
-  .board-columns {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
 
 @media (max-width: 1024px) {
   .board-container {
@@ -708,16 +719,6 @@ $header-height: 54px;
       max-height: 400px;
     }
   }
-
-  .task-card {
-    .task-assignees {
-      .assignee-avatar {
-        width: 32px;
-        height: 32px;
-        font-size: 11px;
-      }
-    }
-  }
 }
 
 // ========== CDK Drag & Drop Styling ==========
@@ -751,14 +752,14 @@ $header-height: 54px;
   border-radius: $card-radius;
   margin-bottom: $card-spacing;
   transition: all 250ms cubic-bezier(0, 0, 0.2, 1);
-  
+
   // Show "Drop here" message
   display: flex;
   align-items: center;
   justify-content: center;
-  
+
   &::before {
-    content: 'Drop here';
+    content: "Drop here";
     color: $secondary-color;
     font-size: 0.875rem;
     font-weight: 500;
@@ -771,12 +772,12 @@ $header-height: 54px;
   background-color: $background-dragging-color;
   border-radius: 8px;
   transition: background-color 250ms ease;
-  
+
   .drag-placeholder {
     background: rgba(42, 171, 226, 0.1);
     border-color: $secondary-color;
     border-width: 2px;
-    
+
     &::before {
       opacity: 1;
     }
@@ -795,15 +796,15 @@ $header-height: 54px;
   -webkit-user-select: none;
   user-select: none;
   transition: transform 150ms ease, box-shadow 150ms ease;
-  
+
   &:active {
     cursor: grabbing;
   }
-  
+
   &.cdk-drag-disabled {
     cursor: default;
   }
-  
+
   // Hover effect on task cards
   &:hover:not(.cdk-drag-preview) {
     transform: translateY(-2px);
@@ -826,4 +827,3 @@ $header-height: 54px;
     }
   }
 }
-

@@ -40,6 +40,7 @@ export class AddTaskComponent implements OnInit, AfterViewChecked {
   showCategoryDropdown: boolean = false;
   
   isEditMode: boolean = false;
+  minDate: string = ''; // Minimales Datum (heute)
 
   constructor(
     private fb: FormBuilder,
@@ -49,6 +50,7 @@ export class AddTaskComponent implements OnInit, AfterViewChecked {
   ) {}
 
   ngOnInit(): void {
+    this.setMinDate();
     this.initForm();
     
     if (this.taskToEdit) {
@@ -109,6 +111,13 @@ export class AddTaskComponent implements OnInit, AfterViewChecked {
     const month = String(d.getMonth() + 1).padStart(2, '0');
     const day = String(d.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
+  }
+
+  /**
+   * Setze das minimale Datum auf heute
+   */
+  private setMinDate(): void {
+    this.minDate = this.formatDateForInput(new Date());
   }
 
   private initForm(): void {
