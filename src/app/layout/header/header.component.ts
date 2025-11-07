@@ -49,9 +49,12 @@ export class HeaderComponent {
   /**
    * Get user initials for avatar
    */
-  getUserInitials(displayName: string | null): string {
+  getUserInitials(displayName: string | null, email?: string | null): string {
+    // If guest user, always return 'G'
+    if (email && email.toLowerCase() === 'guest@join.com') {
+      return 'G';
+    }
     if (!displayName) return 'U';
-    
     const names = displayName.split(' ');
     if (names.length >= 2) {
       return (names[0][0] + names[1][0]).toUpperCase();

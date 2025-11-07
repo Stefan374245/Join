@@ -19,7 +19,7 @@
 .header-left {
   @include flex(row, flex-start, center);
   gap: $spacing-md;
-  margin-left: calc($sidebar-width + $content-offset-left); // 296px - aligned with content
+  margin-left: calc($sidebar-width + $content-offset-left);
 
   .logo {
     height: 50px;
@@ -68,11 +68,11 @@
 }
 
 .user-avatar-btn {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  border: 3px solid $primary-color;
   @include flex(row, center, center);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid $primary-color;
   color: $white;
   font-weight: bold;
   font-size: 18px;
@@ -80,6 +80,7 @@
   transition: all 0.2s ease;
   background: none;
   padding: 0;
+  color: $secondary-color;
 
   &:hover {
     background-color: rgba($primary-color, 0.1);
@@ -96,7 +97,7 @@
   top: calc(100% + 15px);
   right: 0;
   background: $primary-color;
-  border-radius: $border-radius-lg;
+   border-radius: 20px 0px 20px 20px;
   box-shadow: $shadow-lg;
   min-width: 200px;
   z-index: 1000;
@@ -140,7 +141,7 @@ hr {
   text-align: left;
 
   &:hover {
-    background-color: rgba($white, 0.1);
+    color: $accent-color;
   }
 
   &.logout-btn {

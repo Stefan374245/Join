@@ -8,6 +8,7 @@ import { SummaryViewComponent } from './components/summary/summary-view/summary-
 import { LegalNoticeComponent } from './components/legal-notice/legal-notice.component';
 import { PrivacyPolicyComponent } from './components/privacy-policy/privacy-policy.component';
 import { authGuard, guestGuard } from './guards/auth.guard';
+import { HelpComponent } from './components/help/help.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -48,6 +49,10 @@ export const routes: Routes = [
   {
     path: 'privacy-policy',
     component: PrivacyPolicyComponent
+  },
+  {
+    path: 'help',
+    component: HelpComponent
   },
   { path: '**', redirectTo: '/login' }
 ];

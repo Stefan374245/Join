@@ -16,7 +16,7 @@
           [style.background-color]="getUserColor((user$ | async)?.email || null)"
           *ngIf="user$ | async as user"
           title="User Menu">
-          {{ getUserInitials(user.displayName) }}
+          {{ getUserInitials(user.displayName, user.email) }}
         </button>
         
         <div class="user-dropdown" *ngIf="showUserMenu" (click)="closeUserMenu()">

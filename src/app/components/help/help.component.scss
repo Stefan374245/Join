@@ -1,0 +1,119 @@
+@import '../../../styles/variables';
+@import '../../../styles/mixins';
+
+.help-main {
+  @include flex(column, flex-start, flex-start);
+  width: 100%;
+  min-height: 100vh;
+  background: $background-color;
+  padding: $spacing-xl;
+}
+
+.help-container {
+  @include flex(row, space-between, center);
+  width: 100%;
+  margin-bottom: $spacing-xl;
+
+  .help {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: $primary-color;
+    margin: 0;
+  }
+
+  .help-back-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: $spacing-sm;
+    margin-left: $spacing-lg;
+    img {
+      width: 32px;
+      height: 32px;
+    }
+  }
+}
+
+.text-container {
+  max-width: 900px;
+  margin: 0 auto;
+  background: $white;
+  border-radius: $border-radius-lg;
+  box-shadow: $shadow;
+  padding: $spacing-xl;
+  color: $text-color;
+
+  h2 {
+    font-size: 1.5rem;
+    color: $primary-color;
+    margin-top: $spacing-lg;
+    margin-bottom: $spacing-md;
+  }
+  h3 {
+    font-size: 1.1rem;
+    color: $primary-color;
+    margin-bottom: $spacing-xs;
+  }
+  p {
+    font-size: 1rem;
+    margin-bottom: $spacing-md;
+    line-height: 1.6;
+  }
+  .highlight-join {
+    color: $secondary-color;
+    font-weight: 600;
+  }
+}
+
+.number-text-container {
+  @include flex(column, flex-start, flex-start);
+  gap: $spacing-lg;
+  margin: $spacing-lg 0;
+}
+
+.number-text {
+  @include flex(row, flex-start, flex-start);
+  gap: $spacing-lg;
+  align-items: flex-start;
+
+  h2 {
+    font-size: 2rem;
+    color: $secondary-color;
+    margin: 0 $spacing-md 0 0;
+    min-width: 2.5rem;
+    text-align: right;
+  }
+  h3 {
+    margin: 0 0 $spacing-xs 0;
+  }
+  p {
+    margin: 0;
+  }
+}
+
+.the-end {
+  text-align: center;
+  color: $primary-color;
+  margin-top: $spacing-xl;
+}
+
+@media (max-width: $breakpoint-md) {
+  .help-main {
+    padding: $spacing-md;
+  }
+  .text-container {
+    padding: $spacing-lg;
+  }
+}
+
+@media (max-width: $breakpoint-sm) {
+  .help-main {
+    padding: $spacing-sm;
+  }
+  .text-container {
+    padding: $spacing-md;
+  }
+  .help-container .help {
+    font-size: 2rem;
+  }
+}
