@@ -104,10 +104,25 @@
 
 // Main content layout with sidebar and header offset
 @mixin main-content-layout {
-  margin-left: calc($sidebar-width + $content-offset-left); // 136px + 96px = 232px
+  margin-left: calc($sidebar-width + $content-offset-left); // 200px + 96px = 296px
   margin-top: calc($header-height + $content-offset-top); // 90px + 20px = 110px
   padding: $spacing-xl;
   min-height: calc(100vh - $header-height - $content-offset-top);
+}
+
+// Page content layout for components inside router-outlet
+@mixin page-content-layout {
+  padding: $spacing-xl;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+// Page with centered content
+@mixin page-content-centered {
+  @include page-content-layout;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 // Content that sits directly at sidebar (no left margin)

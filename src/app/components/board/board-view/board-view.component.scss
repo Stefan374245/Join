@@ -23,15 +23,18 @@ $header-height: 54px;
 
 // ========== Main Container ==========
 .board-container {
-  @include main-content-layout;
+  position: absolute;
+  left: calc($sidebar-width + 24px);
+  right: 20px;
+  top: calc($header-height + $content-offset-top);
   display: flex;
   flex-direction: column;
   max-width: 100%;
   height: calc(95vh - 210px);
   overflow: auto;
   gap: 40px;
+  margin-top: 110px;
 
-  // Hide scrollbar
   scrollbar-width: none;
   &::-webkit-scrollbar {
     display: none;
@@ -45,12 +48,14 @@ $header-height: 54px;
   align-items: center;
   width: 100%;
   margin-bottom: 40px;
+  padding-left: 72px;
 
   .board-title {
     font-size: 3.5rem; // 56px
     font-weight: 700;
     color: $primary-color;
     margin: 0;
+    line-height: 1.2;
   }
 
   .board-actions {
@@ -58,6 +63,18 @@ $header-height: 54px;
     align-items: center;
     gap: 30px;
   }
+}
+
+// ========== Board Columns Grid ==========
+.board-columns {
+  display: grid;
+  grid-template-columns: repeat($column-count, 1fr);
+  gap: $board-gap;
+  flex: 1;
+  overflow: visible;
+  height: 100%;
+  padding: 0;
+  margin: 0;
 }
 
 // ========== Search Input ==========

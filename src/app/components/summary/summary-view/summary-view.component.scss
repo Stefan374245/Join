@@ -2,9 +2,10 @@
 @import '../../../../styles/mixins';
 
 .summary-container {
-  @include page-content-layout;
+  @include main-content-layout;
   background-color: $background-color;
   max-width: 100%;
+  box-sizing: border-box;
 
   // Guest mode: Center the stats box
   &.guest-mode {
