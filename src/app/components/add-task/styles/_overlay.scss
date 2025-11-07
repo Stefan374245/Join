@@ -1,0 +1,114 @@
+// ========== Task Edit Overlay & Card Styles ==========
+
+.task-edit-overlay {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.1);
+  z-index: 15;
+  padding: 20px;
+  overflow: auto;
+}
+
+.task-edit-card {
+  position: relative;
+  width: 1116px;
+  max-width: 95%;
+  max-height: 90vh;
+  background: $white;
+  box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 30px;
+  padding: 48px 40px;
+  animation: slideInFromRight 0.3s ease-out;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  .close-btn {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    background: none;
+    border: none;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+    z-index: 10;
+
+    img {
+      width: 24px;
+      height: 24px;
+    }
+
+    &:hover {
+      background-color: rgba($primary-color, 0.1);
+    }
+  }
+
+  .edit-header {
+    margin-bottom: 1rem;
+
+    .edit-title {
+      font-size: 2rem;
+      font-weight: 700;
+      color: $primary-color;
+      margin: 0;
+    }
+  }
+
+  .form-wrapper {
+    flex: 1;
+    overflow: visible;
+    background: transparent;
+    padding: 0;
+    box-shadow: none;
+    border-radius: 0;
+  }
+
+  .add-task-form {
+    gap: 2rem;
+  }
+}
+
+@keyframes slideInFromRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.add-task-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.add-task-header {
+  margin-bottom: 2rem;
+  padding-left: 0;
+
+  .page-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: $primary-color;
+  }
+}

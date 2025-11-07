@@ -1,0 +1,91 @@
+// ========== Responsive Design ==========
+
+// Large tablets & smaller desktops (Sidebar wird schmaler)
+@media (max-width: $breakpoint-xxl) {
+  // No container margins needed - handled by main layout
+}
+
+// Tablets (Sidebar geht nach unten)
+@media (max-width: $breakpoint-lg) {
+  .form-wrapper {
+    max-width: 100%;
+  }
+}
+
+// Mobile & Small Tablets (Columns untereinander, Inhalte horizontal)
+@media (max-width: $breakpoint-md) {
+  .add-task-form {
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .form-column {
+    width: 100%;
+    
+    // Inhalte horizontal nebeneinander wenn möglich
+    .form-group,
+    fieldset.form-group {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 12px;
+      
+      &:has(.form-input),
+      &:has(.form-textarea) {
+        flex-direction: column; // Inputs bleiben vertikal
+      }
+    }
+  }
+
+  .separator {
+    display: none;
+  }
+
+  .form-actions {
+    flex-direction: column;
+    gap: 16px;
+
+    .btn {
+      width: 100%;
+    }
+  }
+
+  .priority-buttons {
+    width: 100%;
+    gap: 8px;
+    height: auto;
+    flex-wrap: wrap;
+    
+    .priority-btn {
+      flex: 1;
+      min-width: 100px;
+    }
+  }
+
+  .task-edit-card {
+    max-width: 100%;
+    padding: 32px 20px;
+    border-radius: 20px;
+  }
+}
+
+// Very small mobile screens
+@media (max-width: 480px) {
+  .add-task-header .page-title {
+    font-size: 28px;
+  }
+
+  .priority-buttons {
+    flex-direction: column;
+    
+    .priority-btn {
+      width: 100%;
+    }
+  }
+
+  .form-input,
+  .form-textarea {
+    font-size: 16px; // Verhindert Auto-Zoom auf iOS
+  }
+}
+

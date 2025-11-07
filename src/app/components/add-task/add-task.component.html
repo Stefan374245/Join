@@ -29,8 +29,6 @@
       <form [formGroup]="taskForm" (ngSubmit)="onSubmit()" class="add-task-form" aria-label="Task form">
       <!-- Left Column -->
       <section class="form-column form-column-left" aria-labelledby="basic-info-heading">
-        <h2 id="basic-info-heading" class="visually-hidden">Basic Task Information</h2>
-        
         <!-- Title Input -->
         <fieldset class="form-group">
           <label for="title" class="form-label">
@@ -102,7 +100,6 @@
 
       <!-- Right Column -->
       <section class="form-column form-column-right" aria-labelledby="task-details-heading">
-        <h2 id="task-details-heading" class="visually-hidden">Task Details</h2>
         
         <!-- Priority Selection -->
         <fieldset class="form-group">

@@ -20,7 +20,7 @@
   overflow-x: hidden;
   background-color: $background-color;
   width: calc(100% - $sidebar-width - $content-offset-left);
-  padding: 0; // Remove padding - components handle their own
+  padding: 0;
 
   @media (max-width: 768px) {
     margin-left: 0;

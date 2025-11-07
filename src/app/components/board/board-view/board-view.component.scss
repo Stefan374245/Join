@@ -24,15 +24,15 @@ $header-height: 54px;
 // ========== Main Container ==========
 .board-container {
   position: absolute;
-  left: calc($sidebar-width + 24px);
-  right: 20px;
-  top: calc($header-height + $content-offset-top);
   display: flex;
   flex-direction: column;
   max-width: 100%;
-  height: calc(95vh - 210px);
+  height: 100vh;
   overflow: auto;
   gap: 40px;
+  left: calc($sidebar-width + 24px);
+  right: 20px;
+  top: calc($header-height + $content-offset-top);
   margin-top: 110px;
 
   scrollbar-width: none;
@@ -281,7 +281,7 @@ $header-height: 54px;
   cursor: pointer;
   box-shadow: 0 0 14px 3px rgba(0, 0, 0, 0.04);
   transition: transform 0.2s ease-in-out;
-  height: auto;
+  height: 284px;
   min-height: 200px;
   position: relative;
   gap: 12px;
@@ -558,7 +558,6 @@ $header-height: 54px;
 
   .task-assignees {
     display: flex;
-    margin-left: 8px;
     min-width: 0;
     gap: 4px;
     flex-wrap: nowrap;
@@ -574,9 +573,18 @@ $header-height: 54px;
       margin-left: -8px;
       min-width: 0;
       border-radius: 50%;
-      transition: width 0.2s, height 0.2s, font-size 0.2s;
       background: #0d9023;
       color: white;
+      transition: margin-left 0.3s ease, transform 0.2s ease, width 0.2s ease, height 0.2s ease, font-size 0.2s ease;
+
+      @media (max-width: $breakpoint-xxl) {
+        margin-left: -14px;
+      }
+      @media (max-width: $breakpoint-xl) {
+        width: 28px;
+        height: 28px;
+        font-size: 10px;
+      }
 
       &:first-child {
         margin-left: 0;

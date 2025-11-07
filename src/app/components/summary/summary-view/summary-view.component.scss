@@ -2,7 +2,7 @@
 @import '../../../../styles/mixins';
 
 .summary-container {
-  @include main-content-layout;
+
   background-color: $background-color;
   max-width: 100%;
   box-sizing: border-box;

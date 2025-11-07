@@ -1,0 +1,78 @@
+// ========== Priority Button Group ==========
+
+.priority-buttons {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 0px;
+  gap: 12px;
+  width: 100%;
+  height: auto;
+  margin-bottom: 17px;
+}
+
+.priority-btn {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 12px 8px;
+  gap: 6px;
+  flex: 1;
+  min-width: 90px;
+  max-width: 136px;
+  height: 48px;
+  background: #ffffff;
+  box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  border: none;
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 120%;
+  color: #000000;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  img {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+  }
+
+
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  &.priority-btn-urgent.priority-btn-active {
+    background: #ff3d00;
+    color: white;
+
+    img {
+      filter: brightness(0) invert(1);
+    }
+  }
+
+  &.priority-btn-medium.priority-btn-active {
+    background: #ffa800;
+    color: white;
+
+    img {
+      filter: brightness(0) invert(1);
+    }
+  }
+
+  &.priority-btn-low.priority-btn-active {
+    background: #7ae229;
+    color: white;
+
+    img {
+      filter: brightness(0) invert(1);
+    }
+  }
+}
