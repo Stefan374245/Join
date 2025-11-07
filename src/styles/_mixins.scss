@@ -101,3 +101,27 @@
     background-color: $priority-color-urgent;
   }
 }
+
+// Main content layout with sidebar and header offset
+@mixin main-content-layout {
+  margin-left: calc($sidebar-width + $content-offset-left); // 136px + 96px = 232px
+  margin-top: calc($header-height + $content-offset-top); // 90px + 20px = 110px
+  padding: $spacing-xl;
+  min-height: calc(100vh - $header-height - $content-offset-top);
+}
+
+// Content that sits directly at sidebar (no left margin)
+@mixin content-at-sidebar {
+  margin-left: $sidebar-width; // Only sidebar width, no offset
+  margin-top: calc($header-height + $content-offset-top);
+  padding: $spacing-xl;
+  min-height: calc(100vh - $header-height - $content-offset-top);
+}
+
+// Page title spacing
+@mixin page-title {
+  font-size: 61px;
+  font-weight: 700;
+  color: $primary-color;
+  margin: 0 0 $spacing-xl 0;
+}

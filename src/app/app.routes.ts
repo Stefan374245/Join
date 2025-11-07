@@ -5,6 +5,8 @@ import { AddTaskComponent } from './components/add-task/add-task.component';
 import { BoardViewComponent } from './components/board/board-view/board-view.component';
 import { ContactsListComponent } from './components/contacts/contacts-list/contacts-list.component';
 import { SummaryViewComponent } from './components/summary/summary-view/summary-view.component';
+import { LegalNoticeComponent } from './components/legal-notice/legal-notice.component';
+import { PrivacyPolicyComponent } from './components/privacy-policy/privacy-policy.component';
 import { authGuard, guestGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
@@ -38,6 +40,14 @@ export const routes: Routes = [
     path: 'summary', 
     component: SummaryViewComponent,
     canActivate: [authGuard]
+  },
+  {
+    path: 'legal-notice',
+    component: LegalNoticeComponent
+  },
+  {
+    path: 'privacy-policy',
+    component: PrivacyPolicyComponent
   },
   { path: '**', redirectTo: '/login' }
 ];

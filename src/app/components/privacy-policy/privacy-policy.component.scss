@@ -1,0 +1,155 @@
+@import '../../../styles/variables';
+@import '../../../styles/mixins';
+
+.privacy-main {
+  @include main-content-layout;
+  @include flex(column, flex-start, flex-start);
+  max-width: 1200px;
+  gap: $spacing-xl;
+
+  h1 {
+    @include page-title;
+  }
+}
+
+.privacy-content {
+  @include flex(column, flex-start, flex-start);
+  gap: $spacing-xl;
+  width: 100%;
+  max-width: 950px;
+}
+
+.index-nav {
+  background: $background-color;
+  padding: $spacing-lg;
+  border-radius: $border-radius-lg;
+  width: 100%;
+
+  h2 {
+    font-size: 24px;
+    font-weight: 700;
+    color: $primary-color;
+    margin: 0 0 $spacing-md 0;
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    @include flex(column, flex-start, flex-start);
+    gap: $spacing-sm;
+
+    li a {
+      color: $link-color;
+      text-decoration: none;
+      transition: color 0.2s ease;
+
+      &:hover {
+        color: $secondary-color;
+        text-decoration: underline;
+      }
+    }
+  }
+}
+
+.privacy-section {
+  @include flex(column, flex-start, flex-start);
+  gap: $spacing-md;
+  width: 100%;
+  scroll-margin-top: 120px; // Für Anchor-Links
+
+  h2 {
+    font-size: 24px;
+    font-weight: 700;
+    color: $primary-color;
+    margin: 0;
+  }
+
+  h3 {
+    font-size: 20px;
+    font-weight: 600;
+    color: $primary-color;
+    margin: $spacing-md 0 $spacing-sm 0;
+  }
+
+  p {
+    font-size: $font-size-base;
+    color: $text-color;
+    line-height: 1.6;
+    margin: 0;
+    word-break: break-word;
+  }
+
+  ul {
+    padding-left: $spacing-lg;
+    margin: 0;
+    @include flex(column, flex-start, flex-start);
+    gap: $spacing-sm;
+
+    li {
+      line-height: 1.6;
+      color: $text-color;
+    }
+  }
+
+  a {
+    color: $link-color;
+    text-decoration: none;
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: $secondary-color;
+      text-decoration: underline;
+    }
+  }
+}
+
+.privacy-footer {
+  margin-top: $spacing-lg;
+  padding-top: $spacing-lg;
+  border-top: 1px solid $border-color;
+  width: 100%;
+
+  p {
+    font-size: $font-size-sm;
+    color: $gray-600;
+    margin: $spacing-sm 0;
+  }
+}
+
+// Responsive
+@media (max-width: $breakpoint-md) {
+  .privacy-main {
+    margin: 90px $spacing-md 0 $spacing-md;
+    padding: $spacing-lg;
+
+    h1 {
+      font-size: 48px;
+    }
+  }
+}
+
+@media (max-width: $breakpoint-sm) {
+  .privacy-main {
+    margin: 70px $spacing-sm 0 $spacing-sm;
+    padding: $spacing-md;
+
+    h1 {
+      font-size: 36px;
+    }
+  }
+
+  .privacy-section {
+    h2 {
+      font-size: 20px;
+    }
+
+    h3 {
+      font-size: 18px;
+    }
+  }
+
+  .index-nav {
+    padding: $spacing-md;
+  }
+}

@@ -1,7 +1,6 @@
 <header class="main-header">
   <div class="header-container">
     <div class="header-left">
-      <img src="assets/images/joinlogodark.svg" alt="Join Logo" class="logo" />
       <span class="header-title">Kanban Project Management Tool</span>
     </div>
     
@@ -22,14 +21,14 @@
         
         <div class="user-dropdown" *ngIf="showUserMenu" (click)="closeUserMenu()">
           <div class="dropdown-content">
-            <div class="user-info">
-              <p class="user-name">{{ (user$ | async)?.displayName || 'User' }}</p>
-              <p class="user-email">{{ (user$ | async)?.email }}</p>
-            </div>
-            <hr />
-            <button class="dropdown-item" (click)="logout()">
-              <img src="assets/images/logingray.svg" alt="Logout" />
-              <span>Logout</span>
+            <a routerLink="/legal-notice" class="dropdown-item">
+              Legal Notice
+            </a>
+            <a routerLink="/privacy-policy" class="dropdown-item">
+              Privacy Policy
+            </a>
+            <button class="dropdown-item logout-btn" (click)="logout()">
+              Log out
             </button>
           </div>
         </div>

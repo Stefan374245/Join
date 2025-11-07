@@ -32,10 +32,11 @@
   }
 
   .header-title {
-    font-size: $font-size-lg;
+    font-size: 20px;
     color: $text-color;
     font-weight: 400;
     white-space: nowrap;
+    line-height: 1.2;
   }
 }
 
@@ -92,14 +93,15 @@
 
 .user-dropdown {
   position: absolute;
-  top: calc(100% + 10px);
+  top: calc(100% + 15px);
   right: 0;
-  background: $white;
+  background: $primary-color;
   border-radius: $border-radius-lg;
   box-shadow: $shadow-lg;
-  min-width: 220px;
+  min-width: 200px;
   z-index: 1000;
   animation: slideDown 0.2s ease;
+  overflow: hidden;
 }
 
 @keyframes slideDown {
@@ -114,61 +116,42 @@
 }
 
 .dropdown-content {
-  padding: $spacing-md;
-}
-
-.user-info {
-  padding: $spacing-sm 0;
-  
-  .user-name {
-    font-weight: bold;
-    color: $text-color;
-    margin: 0 0 $spacing-xs 0;
-    font-size: $font-size-base;
-  }
-
-  .user-email {
-    color: $gray-600;
-    margin: 0;
-    font-size: $font-size-sm;
-    word-break: break-all;
-  }
+  padding: $spacing-md 0;
 }
 
 hr {
   border: none;
-  border-top: 1px solid $border-color;
-  margin: $spacing-sm 0;
+  border-top: 1px solid rgba($white, 0.2);
+  margin: $spacing-xs 0;
 }
 
 .dropdown-item {
   @include flex(row, flex-start, center);
   width: 100%;
   gap: $spacing-sm;
-  padding: $spacing-sm;
+  padding: $spacing-md $spacing-lg;
   background: none;
   border: none;
-  border-radius: $border-radius;
   cursor: pointer;
-  color: $text-color;
+  color: $white;
   font-size: $font-size-base;
+  text-decoration: none;
   transition: all 0.2s ease;
-
-  img {
-    width: 20px;
-    height: 20px;
-  }
+  text-align: left;
 
   &:hover {
-    background-color: $background-color;
-    color: $secondary-color;
+    background-color: rgba($white, 0.1);
+  }
+
+  &.logout-btn {
+    border-top: 1px solid rgba($white, 0.2);
   }
 }
 
 // Responsive design
 @media (max-width: $breakpoint-md) {
   .header-left {
-    margin-left: 0;
+    margin-left: 80px;
 
     .header-title {
       display: none;

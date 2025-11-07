@@ -2,12 +2,9 @@
 @import '../../../../styles/mixins';
 
 .summary-container {
-  padding: 40px 60px;
+  @include page-content-layout;
   background-color: $background-color;
-  min-height: calc(100vh - 96px);
   max-width: 100%;
-  box-sizing: border-box;
-  margin-left: 200px;
 
   // Guest mode: Center the stats box
   &.guest-mode {
@@ -42,7 +39,7 @@
 .stats-header {
   @include flex(row, flex-start, center);
   gap: 20px;
-  margin-bottom: 25px;
+  margin-bottom: 56px;
 
   .main-title {
     font-size: 61px;
@@ -88,10 +85,6 @@
 
 // Stats Box with Blue Border
 .stats-box {
-  border: 3px solid $secondary-color;
-  border-radius: 30px;
-  padding: 35px;
-  background: transparent;
   @include flex(column, flex-start, stretch);
   gap: 25px;
   width: 560px;

@@ -1,0 +1,105 @@
+@import '../../../styles/variables';
+@import '../../../styles/mixins';
+
+.legal-main {
+  @include main-content-layout;
+  @include flex(column, flex-start, flex-start);
+  max-width: 1200px;
+  gap: $spacing-xl;
+
+  h1 {
+    @include page-title;
+  }
+}
+
+.legal-content {
+  @include flex(column, flex-start, flex-start);
+  gap: $spacing-xl;
+  width: 100%;
+  max-width: 950px;
+}
+
+.legal-section {
+  @include flex(column, flex-start, flex-start);
+  gap: $spacing-md;
+  width: 100%;
+
+  h2 {
+    font-size: 24px;
+    font-weight: 700;
+    color: $primary-color;
+    margin: 0;
+  }
+
+  h3 {
+    font-size: 20px;
+    font-weight: 600;
+    color: $primary-color;
+    margin: $spacing-md 0 $spacing-sm 0;
+  }
+
+  p {
+    font-size: $font-size-base;
+    color: $text-color;
+    line-height: 1.6;
+    margin: 0;
+    word-break: break-word;
+  }
+
+  a {
+    color: $link-color;
+    text-decoration: none;
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: $secondary-color;
+      text-decoration: underline;
+    }
+  }
+}
+
+.legal-footer {
+  margin-top: $spacing-lg;
+  padding-top: $spacing-lg;
+  border-top: 1px solid $border-color;
+  width: 100%;
+
+  p {
+    font-size: $font-size-sm;
+    color: $gray-600;
+    margin: 0;
+  }
+}
+
+// Responsive
+@media (max-width: $breakpoint-md) {
+  .legal-main {
+    margin: 90px $spacing-md 0 $spacing-md;
+    padding: $spacing-lg;
+
+    h1 {
+      font-size: 48px;
+    }
+  }
+}
+
+@media (max-width: $breakpoint-sm) {
+  .legal-main {
+    margin: 70px $spacing-sm 0 $spacing-sm;
+    padding: $spacing-md;
+
+    h1 {
+      font-size: 36px;
+    }
+  }
+
+  .legal-section {
+    h2 {
+      font-size: 20px;
+    }
+
+    h3 {
+      font-size: 18px;
+    }
+  }
+}
