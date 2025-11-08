@@ -20,7 +20,7 @@ import { AddTaskComponent } from '../../add-task/add-task.component';
 })
 export class BoardViewComponent implements OnInit, AfterViewInit {
   @ViewChildren(CdkDropList) dropLists!: QueryList<CdkDropList>;
-  
+
   private taskService = inject(TaskService);
   private contactService = inject(ContactService);
   private router = inject(Router);
@@ -29,20 +29,19 @@ export class BoardViewComponent implements OnInit, AfterViewInit {
   allTasks: Task[] = [];
   filteredTasks: Task[] = [];
   contacts: Contact[] = [];
-  
-  // Separate arrays for each column (required for CDK Drag & Drop)
+
   triageTasks: Task[] = [];
   todoTasks: Task[] = [];
   inProgressTasks: Task[] = [];
   awaitFeedbackTasks: Task[] = [];
   doneTasks: Task[] = [];
-  
+
   selectedTask: Task | null = null;
   showTaskDetail: boolean = false;
-  
+
   taskToEdit: Task | null = null;
   showEditOverlay: boolean = false;
-  
+
   showAddTaskOverlay: boolean = false;
   addTaskStatus: 'triage' | 'todo' | 'in-progress' | 'await-feedback' | 'done' = 'todo';
 
@@ -77,7 +76,7 @@ export class BoardViewComponent implements OnInit, AfterViewInit {
     this.inProgressTasks = this.filteredTasks.filter(task => task.status === 'in-progress');
     this.awaitFeedbackTasks = this.filteredTasks.filter(task => task.status === 'await-feedback');
     this.doneTasks = this.filteredTasks.filter(task => task.status === 'done');
-    
+
     console.log('📊 Column Arrays Updated:', {
       triage: this.triageTasks.length,
       todo: this.todoTasks.length,
@@ -91,16 +90,15 @@ export class BoardViewComponent implements OnInit, AfterViewInit {
    * After view is initialized, connect all drop lists programmatically
    */
   ngAfterViewInit(): void {
-    // Wait for next tick to ensure all drop lists are registered
     setTimeout(() => {
       const allDropListIds = this.dropLists.map(list => list.id);
       console.log('🎯 Connecting drop lists:', allDropListIds);
-      
+
       // Connect each drop list to all others
       this.dropLists.forEach(dropList => {
         dropList.connectedTo = this.dropLists.filter(list => list.id !== dropList.id);
       });
-      
+
       console.log('✅ All drop lists connected');
     }, 0);
   }
@@ -151,7 +149,7 @@ export class BoardViewComponent implements OnInit, AfterViewInit {
     }
 
     const query = this.searchQuery.toLowerCase();
-    this.filteredTasks = this.allTasks.filter(task => 
+    this.filteredTasks = this.allTasks.filter(task =>
       task.title.toLowerCase().includes(query) ||
       task.description.toLowerCase().includes(query) ||
       task.category.toLowerCase().includes(query)
@@ -166,57 +164,40 @@ export class BoardViewComponent implements OnInit, AfterViewInit {
    */
   onTaskDrop(event: CdkDragDrop<Task[]>, targetStatus: 'triage' | 'todo' | 'in-progress' | 'await-feedback' | 'done'): void {
     const task = event.item.data as Task;
-    
+    this.logDropEvent(task, event, targetStatus);
+    if (task.status === targetStatus) return this.logNoUpdate();
+    const oldStatus = task.status;
+    this.updateLocalTaskStatus(task.id, targetStatus);
+    this.taskService.updateTaskStatus(task.id, targetStatus).subscribe({
+      next: () => setTimeout(() => this.scrollToTask(task.id), 400),
+      error: () => this.revertLocalTaskStatus(task.id, oldStatus)
+    });
+  }
+  private logDropEvent(task: Task, event: CdkDragDrop<Task[]>, targetStatus: Task['status']) {
     console.log('🔍 DROP EVENT:', {
-      task: task.title,
-      currentStatus: task.status,
-      targetStatus: targetStatus,
-      previousContainer: event.previousContainer.id,
-      currentContainer: event.container.id,
+      task: task.title, currentStatus: task.status, targetStatus,
+      previousContainer: event.previousContainer.id, currentContainer: event.container.id,
       sameContainer: event.previousContainer === event.container
     });
-    
-    // Only update if task is moved to a different column
-    if (task.status !== targetStatus) {
-      console.log(`📦 Moving task "${task.title}" from ${task.status} to ${targetStatus}`);
-      
-      // Save old status for potential rollback
-      const oldStatus = task.status;
-      
-      // ✅ OPTIMISTIC UPDATE: Update local data immediately
-      const taskIndex = this.allTasks.findIndex(t => t.id === task.id);
-      if (taskIndex !== -1) {
-        this.allTasks[taskIndex].status = targetStatus;
-        this.filteredTasks = [...this.allTasks];
-        this.updateColumnArrays(); // Update column arrays
-        console.log('✅ Local update done, column arrays updated');
-      }
-      
-      // Update task status in Firestore
-      this.taskService.updateTaskStatus(task.id, targetStatus).subscribe({
-        next: () => {
-          console.log('✅ Task status updated successfully in Firestore');
-          
-          // Visual feedback: scroll to task after animation
-          setTimeout(() => {
-            this.scrollToTask(task.id);
-          }, 400);
-        },
-        error: (error) => {
-          console.error('❌ Error updating task status:', error);
-          
-          // ROLLBACK: Revert local change on error
-          const taskIndex = this.allTasks.findIndex(t => t.id === task.id);
-          if (taskIndex !== -1) {
-            this.allTasks[taskIndex].status = oldStatus;
-            this.filteredTasks = [...this.allTasks];
-            this.updateColumnArrays();
-          }
-        }
-      });
-    } else {
-      console.log('ℹ️ Task dropped in same column - no update needed');
+  }
+
+  private logNoUpdate() {
+    console.log('ℹ️ Task dropped in same column - no update needed');
+  }
+
+  private updateLocalTaskStatus(id: string, status: Task['status']) {
+    const i = this.allTasks.findIndex(t => t.id === id);
+    if (i !== -1) {
+      this.allTasks[i].status = status;
+      this.filteredTasks = [...this.allTasks];
+      this.updateColumnArrays();
+      console.log('✅ Local update done, column arrays updated');
     }
+  }
+
+  private revertLocalTaskStatus(id: string, status: Task['status']) {
+    console.error('❌ Error updating task status');
+    this.updateLocalTaskStatus(id, status);
   }
 
   /**
@@ -226,9 +207,9 @@ export class BoardViewComponent implements OnInit, AfterViewInit {
   private scrollToTask(taskId: string): void {
     const taskElement = document.querySelector(`[data-task-id="${taskId}"]`);
     if (taskElement) {
-      taskElement.scrollIntoView({ 
-        behavior: 'smooth', 
-        block: 'center' 
+      taskElement.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center'
       });
     }
   }
@@ -243,7 +224,7 @@ export class BoardViewComponent implements OnInit, AfterViewInit {
     } else {
       this.addTaskStatus = 'todo'; // Default wenn oben rechts geklickt wird
     }
-    
+
     this.showAddTaskOverlay = true;
   }
 
@@ -254,8 +235,8 @@ export class BoardViewComponent implements OnInit, AfterViewInit {
     const button = event.currentTarget as HTMLButtonElement;
     const img = button.querySelector('img');
     if (img) {
-      img.src = isHover 
-        ? 'assets/images/taskPlusHover.svg' 
+      img.src = isHover
+        ? 'assets/images/taskPlusHover.svg'
         : 'assets/images/taskPlus.svg';
     }
   }
@@ -302,7 +283,7 @@ export class BoardViewComponent implements OnInit, AfterViewInit {
     this.closeEditOverlay();
     // Tasks werden automatisch durch onSnapshot aktualisiert
   }
-  
+
   /**
    * Close add task overlay
    */
@@ -310,7 +291,7 @@ export class BoardViewComponent implements OnInit, AfterViewInit {
     this.showAddTaskOverlay = false;
     this.addTaskStatus = 'todo';
   }
-  
+
   /**
    * Handle new task created from add task overlay
    */
@@ -348,8 +329,8 @@ export class BoardViewComponent implements OnInit, AfterViewInit {
   getShortDescription(description: string): string {
     if (!description) return '';
     const maxLength = 80;
-    return description.length > maxLength 
-      ? description.substring(0, maxLength) + '...' 
+    return description.length > maxLength
+      ? description.substring(0, maxLength) + '...'
       : description;
   }
 

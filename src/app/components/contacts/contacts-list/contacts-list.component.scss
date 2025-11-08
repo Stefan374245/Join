@@ -4,8 +4,9 @@
 
 :host {
   display: block;
-  height: calc(100vh - 0px);
+  height: 100vh;
 }
+
 
 .contacts-page {
   display: flex;
@@ -66,6 +67,7 @@
 
 .contacts-main {
   display: flex;
+  margin-left: 200px;
 }
 
 .content-left {

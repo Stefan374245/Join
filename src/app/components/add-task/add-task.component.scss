@@ -24,13 +24,12 @@
 .add-task-container {
   display: flex;
   flex-direction: column;
-  padding: $spacing-xl; // Gleichmäßiges Padding auf allen Seiten
   box-sizing: border-box;
-  
+
   @media (max-width: $breakpoint-lg) {
     padding: $spacing-lg;
   }
-  
+
   @media (max-width: $breakpoint-md) {
     padding: $spacing-md;
   }

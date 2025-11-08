@@ -22,6 +22,7 @@ body {
   background-color: $background-color;
   min-height: 100vh;
   position: relative;
+  overflow: hidden;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -50,11 +51,11 @@ a {
 
 .btn {
   @include button-base;
-  
+
   &-primary {
     @include button-primary;
   }
-  
+
   &-secondary {
     @include button-secondary;
   }
