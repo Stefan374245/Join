@@ -1,0 +1,58 @@
+<ul class="subtasks-list" *ngIf="subtasks.length > 0" role="list" aria-label="Subtasks">
+  <li *ngFor="let subtask of subtasks" class="subtask-item" role="listitem">
+    <!-- Normal View -->
+    <span class="subtask-text" *ngIf="editingSubtaskId !== subtask.id">{{ subtask.title }}</span>
+
+    <!-- Edit View -->
+    <div class="subtask-edit-wrapper" *ngIf="editingSubtaskId === subtask.id">
+      <input
+        type="text"
+        class="subtask-edit-input"
+        [(ngModel)]="subtaskEditInput"
+        [ngModelOptions]="{standalone: true}"
+        placeholder="Edit subtask"
+        (keydown.enter)="onUpdate(); $event.preventDefault()"
+        (keydown.escape)="onCancelEdit()"
+        maxlength="35"
+        #editInput
+        aria-label="Edit subtask"
+      />
+      <div class="subtask-edit-actions">
+        <img
+          src="assets/images/close.svg"
+          alt="Cancel edit"
+          class="subtask-edit-icon subtask-edit-clear"
+          (click)="onCancelEdit()"
+          role="button"
+          tabindex="0" />
+        <div class="subtask-edit-divider" aria-hidden="true"></div>
+        <img
+          src="assets/images/checkDark.svg"
+          alt="Save subtask"
+          class="subtask-edit-icon subtask-edit-add"
+          (click)="onUpdate()"
+          role="button"
+          tabindex="0" />
+      </div>
+    </div>
+
+    <!-- Normal Actions (Edit & Delete) -->
+    <div class="subtask-item-actions" *ngIf="editingSubtaskId !== subtask.id">
+      <img
+        src="assets/images/edit-2.svg"
+        alt="Edit subtask"
+        class="subtask-action-icon"
+        (click)="onEdit(subtask)"
+        role="button"
+        tabindex="0" />
+      <div class="vertical-line-subtask" aria-hidden="true"></div>
+      <img
+        src="assets/images/delete.svg"
+        alt="Delete subtask"
+        class="subtask-action-icon"
+        (click)="onDelete(subtask.id)"
+        role="button"
+        tabindex="0" />
+    </div>
+  </li>
+</ul>

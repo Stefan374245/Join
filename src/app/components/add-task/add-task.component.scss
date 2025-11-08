@@ -1,3 +1,20 @@
+// Subtask input wrapper for icon positioning
+.subtask-input-wrapper {
+  position: relative;
+}
+
+.subtask-input {
+  padding-right: 40px;
+}
+
+.subtask-add-icon-absolute {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  z-index: 2;
+}
 @import "../../../styles/variables";
 @import "../../../styles/mixins";
 @import "./styles/overlay";

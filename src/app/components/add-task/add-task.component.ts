@@ -1,5 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter, ViewChild, ElementRef, AfterViewChecked, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { SubtaskListComponent } from './subtask-list/subtask-list.component';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Task, Subtask } from '../../models/task.interface';
@@ -10,7 +11,7 @@ import { ContactService } from '../../services/contact.service';
 @Component({
   selector: 'app-add-task',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, SubtaskListComponent],
   templateUrl: './add-task.component.html',
   styleUrl: './add-task.component.scss'
 })
@@ -21,24 +22,24 @@ export class AddTaskComponent implements OnInit, AfterViewChecked {
   @Output() close = new EventEmitter<void>();
   @Output() taskSaved = new EventEmitter<Task>();
   @ViewChild('editInput') editInput?: ElementRef<HTMLInputElement>;
-  
+
   taskForm!: FormGroup;
   subtaskInput: string = '';
   subtaskEditInput: string = '';
   subtasks: Subtask[] = [];
   editingSubtaskId: string | null = null;
   subtaskInputFocused: boolean = false;
-  
+
   selectedPriority: 'low' | 'medium' | 'high' = 'medium';
   selectedContacts: Contact[] = [];
   selectedCategory: string = '';
-  
+
   availableContacts: Contact[] = [];
   categories: string[] = ['Technical Task', 'User Story'];
-  
+
   showContactDropdown: boolean = false;
   showCategoryDropdown: boolean = false;
-  
+
   isEditMode: boolean = false;
   minDate: string = ''; // Minimales Datum (heute)
 
@@ -52,7 +53,7 @@ export class AddTaskComponent implements OnInit, AfterViewChecked {
   ngOnInit(): void {
     this.setMinDate();
     this.initForm();
-    
+
     if (this.taskToEdit) {
       this.isEditMode = true;
       this.loadContactsAndPopulateForm(this.taskToEdit);
@@ -97,7 +98,7 @@ export class AddTaskComponent implements OnInit, AfterViewChecked {
     this.selectedPriority = task.priority;
     this.selectedCategory = task.category;
     this.subtasks = task.subtasks ? [...task.subtasks] : [];
-    this.selectedContacts = this.availableContacts.filter(c => 
+    this.selectedContacts = this.availableContacts.filter(c =>
       task.assignedTo.includes(c.id)
     );
   }
@@ -174,18 +175,18 @@ export class AddTaskComponent implements OnInit, AfterViewChecked {
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
     const target = event.target as HTMLElement;
-    
-    const isInsideContactDropdown = target.closest('#assignedTo')?.parentElement?.parentElement || 
+
+    const isInsideContactDropdown = target.closest('#assignedTo')?.parentElement?.parentElement ||
                                      target.closest('.dropdown-menu') ||
                                      target.closest('.selected-contacts');
-    
+
     if (!isInsideContactDropdown && this.showContactDropdown) {
       this.showContactDropdown = false;
     }
 
-    const isInsideCategoryDropdown = target.closest('#category')?.parentElement?.parentElement || 
+    const isInsideCategoryDropdown = target.closest('#category')?.parentElement?.parentElement ||
                                       target.closest('.dropdown-menu');
-    
+
     if (!isInsideCategoryDropdown && this.showCategoryDropdown) {
       this.showCategoryDropdown = false;
     }

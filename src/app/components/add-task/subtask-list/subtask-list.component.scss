@@ -1,0 +1,58 @@
+.subtasks-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.subtask-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 0;
+}
+.subtask-text {
+  flex: 1;
+  font-size: 15px;
+}
+.subtask-item-actions {
+  display: flex;
+  align-items: center;
+}
+.subtask-action-icon {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  margin: 0 4px;
+}
+.vertical-line-subtask {
+  width: 1px;
+  height: 18px;
+  background: #e0e0e0;
+  margin: 0 4px;
+}
+.subtask-edit-wrapper {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+.subtask-edit-input {
+  flex: 1;
+  font-size: 15px;
+  padding: 2px 8px;
+  margin-right: 8px;
+}
+.subtask-edit-actions {
+  display: flex;
+  align-items: center;
+}
+.subtask-edit-icon {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  margin: 0 4px;
+}
+.subtask-edit-divider {
+  width: 1px;
+  height: 18px;
+  background: #e0e0e0;
+  margin: 0 4px;
+}
