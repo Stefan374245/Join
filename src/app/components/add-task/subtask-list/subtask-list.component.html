@@ -14,6 +14,7 @@
         placeholder="Edit subtask"
         (keydown.enter)="onUpdate(); $event.preventDefault()"
         (keydown.escape)="onCancelEdit()"
+        (blur)="onInputBlur($event)"
         maxlength="35"
         #editInput
         aria-label="Edit subtask"
@@ -57,16 +58,16 @@
     </div>
   </li>
   <!-- Remaining count with dropdown -->
-  <li *ngIf="remainingSubtasksCount > 0" 
-      class="subtask-item remaining-count" 
+  <li *ngIf="remainingSubtasksCount > 0"
+      class="subtask-item remaining-count"
       role="listitem"
       (click)="toggleDropdown()"
       [class.active]="isDropdownOpen">
     <div class="remaining-count-content">
       <span class="subtask-text">+{{ remainingSubtasksCount }} more</span>
-      <img src="assets/images/edit-2.svg" 
-           alt="Edit remaining tasks" 
-           class="subtask-action-icon"
+      <img src="assets/images/arrow_drop_down.svg"
+           alt="Show more subtasks"
+           class="dropdown-icon"
            role="button"
            tabindex="0"/>
     </div>
@@ -74,13 +75,15 @@
     <!-- Dropdown Menu -->
     <div class="subtasks-dropdown" *ngIf="isDropdownOpen">
       <ul class="dropdown-list" role="list">
-        <li *ngFor="let subtask of remainingSubtasks" 
-            class="dropdown-item" 
+        <li *ngFor="let subtask of remainingSubtasks"
+            class="dropdown-item"
             role="listitem">
-          <span class="subtask-text">{{ subtask.title }}</span>
+          <!-- Normal View -->
+          <span class="subtask-text" *ngIf="editingSubtaskId !== subtask.id">{{ subtask.title }}</span>
+
           <!-- Edit View für Dropdown Items -->
           <div class="subtask-edit-wrapper" *ngIf="editingSubtaskId === subtask.id">
-            <input
+              <input
               type="text"
               class="subtask-edit-input"
               [(ngModel)]="subtaskEditInput"
@@ -88,6 +91,7 @@
               placeholder="Edit subtask"
               (keydown.enter)="onUpdate(); $event.preventDefault()"
               (keydown.escape)="onCancelEdit()"
+              (blur)="onInputBlur($event)"
               maxlength="35"
               #editInput
               aria-label="Edit subtask"

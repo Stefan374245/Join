@@ -43,8 +43,8 @@ export class LoginComponent implements OnInit {
    * Check if login button should be disabled
    */
   isLoginButtonDisabled(): boolean {
-    return !this.email || 
-           !this.password || 
+    return !this.email ||
+           !this.password ||
            !this.email.includes('@') ||
            this.password.length < 6;
   }
@@ -77,17 +77,17 @@ export class LoginComponent implements OnInit {
 
   validateForm(): boolean {
     let isValid = true;
-    
+
     if (!this.email || !this.email.includes('@')) {
       this.emailError = true;
       isValid = false;
     }
-    
+
     if (!this.password || this.password.length < 6) {
       this.passwordError = true;
       isValid = false;
     }
-    
+
     return isValid;
   }
 
@@ -109,7 +109,7 @@ export class LoginComponent implements OnInit {
       error: (error) => {
         console.error('Login error:', error);
         this.loginFailError = true;
-        
+
         // Handle specific Firebase error codes
         if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
           this.loginFailError = true;
@@ -137,7 +137,7 @@ export class LoginComponent implements OnInit {
 
   signInWithGoogle(): void {
     this.loginFailError = false;
-    
+
     this.authService.signInWithGoogle().subscribe({
       next: (userCredential) => {
         console.log('Google login successful:', userCredential.user);
@@ -146,7 +146,7 @@ export class LoginComponent implements OnInit {
       error: (error) => {
         console.error('Google login error:', error);
         this.loginFailError = true;
-        
+
         // Handle popup closed error gracefully
         if (error.code === 'auth/popup-closed-by-user') {
           this.loginFailError = false;

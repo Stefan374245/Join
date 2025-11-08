@@ -1,7 +1,37 @@
+@import "../../../../styles/variables";
+@import "../../../../styles/mixins";
+
+.subtask-actions {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.subtask-icon {
+  width: 22px;
+  height: 22px;
+  cursor: pointer;
+  transition: transform 0.3s ease-in-out;
+
+  &:hover {
+    transform: scale(1.1);
+  }
+}
+
 .subtasks-list {
-  margin: 0;
-  padding: 0;
+  margin-top: 0.25rem;
   list-style: none;
+  border: 1px solid #d1d1d1;
+  border-radius: 10px;
+  overflow-y: auto;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  padding: 0;
+  max-height: 200px;
+  background: white;
 }
 
 .subtask-item {
@@ -10,7 +40,6 @@
   align-items: center;
   justify-content: space-between;
   padding: 4px 4px 4px 24px;
-  margin: 4px 0;
   border-radius: 4px;
   background: transparent;
   transition: all 0.2s ease;
@@ -22,16 +51,30 @@
     top: 50%;
     transform: translateY(-50%);
     font-size: 24px;
-    color: #2A3647;
+    color: black;
+    transition: color 0.2s ease;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: $accent-color;
+    transition: width 0.3s ease;
   }
 
   &:hover {
-    box-shadow: 0 2px 0 0 #29ABE2;
     .subtask-text {
-      color: #29ABE2;
+      color: black;
     }
     &::before {
-      color: #29ABE2;
+      color: $accent-color;
+    }
+    &::after {
+      width: 100%;
     }
   }
 }
@@ -39,7 +82,7 @@
   flex: 1;
   font-size: 15px;
   padding: 4px;
-  color: #2A3647;
+  color: $primary-color;
 }
 .subtask-item-actions {
   display: flex;
@@ -66,7 +109,7 @@
 .vertical-line-subtask {
   width: 1px;
   height: 18px;
-  background: #d1d1d1;
+  background: $background-color;
   margin: 0;
 }
 .subtask-edit-wrapper {
@@ -76,27 +119,38 @@
   position: relative;
   padding-left: 20px;
 }
+
 .subtask-edit-input {
   flex: 1;
   font-size: 15px;
-  padding: 8px;
-  margin-right: 8px;
+  padding: 8px 40px 8px 8px; // Mehr Platz rechts für die Icons
   outline: none;
   border: none;
   transition: box-shadow 0.2s ease;
   background: transparent;
-
 }
+
 .subtask-edit-actions {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
   display: flex;
   align-items: center;
+  gap: 8px;
 }
-.subtask-edit-icon {
-  width: 18px;
-  height: 18px;
+
+.subtask-icon {
+  width: 22px;
+  height: 22px;
   cursor: pointer;
-  margin: 0 4px;
+  transition: transform 0.3s ease-in-out;
+
+  &:hover {
+    transform: scale(1.1);
+  }
 }
+
 .subtask-edit-divider {
   width: 1px;
   height: 18px;
@@ -105,13 +159,12 @@
 }
 
 .remaining-count {
-  color: #29ABE2;
+  color: $accent-color;
   cursor: pointer;
   position: relative;
 
-  &:hover, &.active {
-    background: rgba(41, 171, 226, 0.1);
-
+  &:hover,
+  &.active {
     .subtask-action-icon {
       opacity: 1;
     }
@@ -121,7 +174,7 @@
     content: "•";
     position: absolute;
     left: 8px;
-    color: #29ABE2;
+    color: black;
   }
 
   .remaining-count-content {
@@ -129,11 +182,18 @@
     align-items: center;
     justify-content: space-between;
     width: 100%;
+    margin-right: 12px;
   }
 
-  .subtask-action-icon {
-    opacity: 0;
-    transition: opacity 0.2s ease;
+  .dropdown-icon {
+    width: 10px;
+    height: 10px;
+    transition: transform 0.2s ease;
+    cursor: pointer;
+
+    .remaining-count.active & {
+      transform: rotate(180deg);
+    }
   }
 }
 
@@ -161,24 +221,40 @@
   align-items: center;
   justify-content: space-between;
   padding: 8px 12px;
-  transition: background-color 0.2s ease;
+  transition: all 0.2s ease;
   position: relative;
+  color: $primary-color;
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: $accent-color;
+    transition: width 0.3s ease;
+  }
 
   &:hover {
-    background-color: rgba(41, 171, 226, 0.1);
+    color: $accent-color;
+
+    &::after {
+      width: 100%;
+    }
   }
 
   .subtask-item-actions {
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  &:hover .subtask-item-actions {
     opacity: 1;
   }
+}
 
-  .subtask-edit-wrapper {
-    margin-left: 8px;
-    flex: 1;
-  }
-
-  .subtask-edit-input {
-    background: white;
-    border: 1px solid #29ABE2;
-  }
+.subtask-edit-wrapper {
+  margin-left: 8px;
+  flex: 1;
 }

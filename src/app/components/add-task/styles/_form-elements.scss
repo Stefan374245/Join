@@ -44,7 +44,7 @@ fieldset.form-group {
   font-size: 20px;
   font-weight: 400;
   color: #2a3647;
-  
+
   .required {
     color: #ff3d00;
     margin-left: 4px;
@@ -83,7 +83,7 @@ fieldset.form-group {
   min-height: 119px;
   padding-top: 16px;
   scrollbar-width: none;
-  
+
   &::-webkit-scrollbar {
     display: none;
   }
@@ -113,8 +113,8 @@ fieldset.form-group {
   .dropdown-icon {
     position: absolute;
     right: 16px;
-    width: 20px;
-    height: 20px;
+    width: 10px;
+    height: 10px;
     pointer-events: none;
   }
 }

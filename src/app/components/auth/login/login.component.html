@@ -4,15 +4,15 @@
   <div class="main-content">
     <div class="login-div">
       <h1 class="account-header">Log in</h1>
-      
+
       <div class="login-input-div">
         <div class="input-div">
-          <input 
-            type="email" 
-            id="emailInput" 
+          <input
+            type="email"
+            id="emailInput"
             name="email"
             [(ngModel)]="email"
-            placeholder="Email" 
+            placeholder="Email"
             class="login-input"
             [class.red-border]="emailError"
             (focus)="onEmailFocus()"
@@ -20,35 +20,35 @@
           <img src="assets/images/mail.svg" alt="Email" class="input-img">
         </div>
         <span class="error-span" [class.visible]="emailError">Please enter a valid email address</span>
-        
+
         <div class="input-div">
-          <input 
-            [type]="showPassword ? 'text' : 'password'" 
-            id="passwordInput" 
+          <input
+            [type]="showPassword ? 'text' : 'password'"
+            id="passwordInput"
             name="password"
             [(ngModel)]="password"
-            placeholder="Password" 
+            placeholder="Password"
             class="login-input"
             [class.red-border]="passwordError"
             (focus)="onPasswordFocus()"
             (blur)="onPasswordBlur()"
             autocomplete="current-password">
-          <img 
-            id="passwordImg" 
-            [src]="getPasswordIcon()" 
-            alt="Toggle password visibility" 
+          <img
+            id="passwordImg"
+            [src]="getPasswordIcon()"
+            alt="Toggle password visibility"
             class="input-img clickable"
             (click)="togglePasswordVisibility()"
             [class.active]="passwordFocused || password">
         </div>
         <span class="error-span" [class.visible]="passwordError">Check your email and password. Please try again.</span>
       </div>
-      
+
       <div class="login-button-div">
         <div class="button-row">
-          <button 
-            type="button" 
-            (click)="login()" 
+          <button
+            type="button"
+            (click)="login()"
             class="blue-btn"
             [disabled]="isLoginButtonDisabled()"
             [class.disabled]="isLoginButtonDisabled()">
@@ -56,11 +56,11 @@
           </button>
           <button type="button" (click)="guestLogin()" class="white-btn">Guest Log in</button>
         </div>
-        
+
         <div class="divider">
           <span class="divider-text">OR</span>
         </div>
-        
+
         <button type="button" (click)="signInWithGoogle()" class="google-btn">
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M19.8055 10.2292C19.8055 9.55207 19.7495 8.86821 19.6296 8.19775H10.2002V12.0489H15.6016C15.3768 13.3009 14.6568 14.4092 13.6036 15.1013V17.5765H16.825C18.7172 15.8338 19.8055 13.2668 19.8055 10.2292Z" fill="#4285F4"/>
@@ -70,23 +70,23 @@
           </svg>
           <span>Sign in with Google</span>
         </button>
-        
+
         <span class="error-span text-center" [class.visible]="loginFailError">
           Email and/or Password incorrect. Please try again.
         </span>
       </div>
     </div>
   </div>
-  
+
   <div class="signup-div">
     <span class="signup-span">Not a Join User?</span>
     <a routerLink="/signup" class="signup-link">Sign up</a>
   </div>
-  
+
   <div class="legal">
     <a routerLink="/privacy-policy" class="legal-text">Privacy Policy</a>
     <a routerLink="/legal-notice" class="legal-text">Legal Notice</a>
   </div>
-  
+
   <app-toast></app-toast>
 </main>
