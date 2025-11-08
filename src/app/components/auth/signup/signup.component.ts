@@ -3,11 +3,13 @@ import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../services/auth.service';
+import { ToastService } from '../../../services/toast.service';
+import { ToastComponent } from '../../../shared/components/toast/toast.component';
 
 @Component({
   selector: 'app-signup',
   standalone: true,
-  imports: [RouterLink, FormsModule, CommonModule],
+  imports: [RouterLink, FormsModule, CommonModule, ToastComponent],
   templateUrl: './signup.component.html',
   styleUrl: './signup.component.scss'
 })
@@ -17,14 +19,14 @@ export class SignupComponent implements OnInit {
   password = '';
   confirmPassword = '';
   acceptPrivacy = false;
-  
+
   nameError = false;
   emailError = false;
   passwordError = false;
   confirmPasswordError = false;
   privacyError = false;
   signupFailError = false;
-  
+
   showPassword = false;
   showConfirmPassword = false;
   showSuccessMessage = false;
@@ -34,7 +36,8 @@ export class SignupComponent implements OnInit {
 
   constructor(
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private toastService: ToastService
   ) {}
 
   ngOnInit(): void {
@@ -48,10 +51,10 @@ export class SignupComponent implements OnInit {
    * Check if signup button should be disabled (User Story 1 requirement)
    */
   isSignupButtonDisabled(): boolean {
-    return !this.name || 
-           !this.email || 
-           !this.password || 
-           !this.confirmPassword || 
+    return !this.name ||
+           !this.email ||
+           !this.password ||
+           !this.confirmPassword ||
            !this.acceptPrivacy ||
            this.name.trim().length < 2 ||
            !this.email.includes('@') ||
@@ -113,22 +116,22 @@ export class SignupComponent implements OnInit {
 
   validateForm(): boolean {
     let isValid = true;
-    
+
     if (!this.name || this.name.trim().length < 2) {
       this.nameError = true;
       isValid = false;
     }
-    
+
     if (!this.email || !this.email.includes('@')) {
       this.emailError = true;
       isValid = false;
     }
-    
+
     if (!this.password || this.password.length < 6) {
       this.passwordError = true;
       isValid = false;
     }
-    
+
     if (!this.confirmPassword || this.password !== this.confirmPassword) {
       this.confirmPasswordError = true;
       isValid = false;
@@ -138,7 +141,7 @@ export class SignupComponent implements OnInit {
       this.privacyError = true;
       isValid = false;
     }
-    
+
     return isValid;
   }
 
@@ -168,25 +171,26 @@ export class SignupComponent implements OnInit {
       },
       error: (error) => {
         console.error('Signup error:', error);
-        this.signupFailError = true;
-        
+
         // Handle specific Firebase error codes
         if (error.code === 'auth/email-already-in-use') {
           this.emailError = true;
-          this.signupFailError = false;
+          this.toastService.showToast('This email is already registered. Please use a different email or try logging in.');
         } else if (error.code === 'auth/invalid-email') {
           this.emailError = true;
-          this.signupFailError = false;
+          this.toastService.showToast('Please enter a valid email address.');
         } else if (error.code === 'auth/weak-password') {
           this.passwordError = true;
-          this.signupFailError = false;
+          this.toastService.showToast('Password is too weak. It should be at least 6 characters long.');
+        } else {
+          this.toastService.showToast('Signup failed. Please try again.');
         }
       }
     });
   }
 
   showSignupSuccess(): void {
-    this.showSuccessMessage = true;
+    this.toastService.showToast('Account created successfully!', 'success', 2000);
     setTimeout(() => {
       this.router.navigate(['/login']);
     }, 2000);

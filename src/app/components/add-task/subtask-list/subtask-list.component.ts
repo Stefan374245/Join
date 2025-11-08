@@ -91,8 +91,8 @@ export class SubtaskListComponent {
   onInputBlur(event: FocusEvent) {
     // Prüfen, ob der neue Fokus nicht auf den Aktions-Buttons liegt
     const relatedTarget = event.relatedTarget as HTMLElement;
-    if (!relatedTarget || 
-        (!relatedTarget.classList.contains('subtask-edit-icon') && 
+    if (!relatedTarget ||
+        (!relatedTarget.classList.contains('subtask-edit-icon') &&
          !relatedTarget.classList.contains('subtask-action-icon'))) {
       this.cancelEditSubtask.emit();
     }

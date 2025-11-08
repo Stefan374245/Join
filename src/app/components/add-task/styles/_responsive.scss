@@ -21,7 +21,7 @@
 
   .form-column {
     width: 100%;
-    
+
     // Inhalte horizontal nebeneinander wenn möglich
     .form-group,
     fieldset.form-group {
@@ -29,7 +29,7 @@
       flex-direction: row;
       flex-wrap: wrap;
       gap: 12px;
-      
+
       &:has(.form-input),
       &:has(.form-textarea) {
         flex-direction: column; // Inputs bleiben vertikal
@@ -55,7 +55,7 @@
     gap: 8px;
     height: auto;
     flex-wrap: wrap;
-    
+
     .priority-btn {
       flex: 1;
       min-width: 100px;
@@ -77,7 +77,7 @@
 
   .priority-buttons {
     flex-direction: column;
-    
+
     .priority-btn {
       width: 100%;
     }

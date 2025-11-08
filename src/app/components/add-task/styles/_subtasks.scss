@@ -1,10 +1,11 @@
+@import "../../../../styles/mixins";
+
 .subtask-actions {
   position: absolute;
   right: 16px;
   top: 50%;
   transform: translateY(-50%);
-  display: flex;
-  align-items: center;
+  @include flex(row, flex-start, center);
   gap: 8px;
 }
 

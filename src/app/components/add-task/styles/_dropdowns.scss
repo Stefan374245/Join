@@ -1,4 +1,4 @@
-// ========== Dropdown Menus & Contact Selection ==========
+@import "../../../../styles/mixins";
 
 .dropdown-menu {
   position: absolute;
@@ -19,9 +19,7 @@
 
 .dropdown-item {
   padding: 12px 16px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  @include flex(row, space-between, center);
   cursor: pointer;
   transition: background-color 0.2s;
   font-size: 16px;
@@ -47,8 +45,7 @@
 }
 
 .contact-info {
-  display: flex;
-  align-items: center;
+  @include flex(row, flex-start, center);
   gap: 12px;
 }
 
@@ -56,16 +53,14 @@
   width: 42px;
   height: 42px;
   border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex(row, center, center);
   color: #ffffff;
   font-weight: 600;
   font-size: 12px;
 }
 
 .selected-contacts {
-  display: flex;
+  @include flex(row, flex-start, stretch);
   flex-wrap: wrap;
   gap: 8px;
   margin-top: 8px;
@@ -75,9 +70,7 @@
   width: 42px;
   height: 42px;
   border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex(row, center, center);
   color: #ffffff;
   font-weight: 600;
   font-size: 12px;

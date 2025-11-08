@@ -1,5 +1,6 @@
 @import "../../../../styles/variables";
 @import "../../../../styles/mixins";
+@import "../../../../styles/scrollbar";
 
 // ========== Keyframe Animations ==========
 @keyframes shine {
@@ -35,10 +36,7 @@ $header-height: 54px;
   top: calc($header-height + $content-offset-top);
   margin-top: 110px;
 
-  scrollbar-width: none;
-  &::-webkit-scrollbar {
-    display: none;
-  }
+  @include hide-scrollbar;
   .board-loading {
     display: flex;
     align-items: center;

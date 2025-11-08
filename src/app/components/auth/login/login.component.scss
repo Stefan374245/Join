@@ -1,20 +1,25 @@
-@import '../../../../styles/variables';
+@import "../../../../styles/variables";
 
 .main-div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   position: relative;
   opacity: 0;
   transition: opacity 0.5s;
   width: 100vw;
   height: 100vh;
   min-height: 630px;
-  background-color: #F6F7F8;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  background-color: #f6f7f8;
 
   &.show {
     opacity: 1;
   }
+}
+.seperator {
+  width: 150px;
+  height: 3px;
+  color: $accent-color;
 }
 
 .main-content {
@@ -22,25 +27,24 @@
 }
 
 .login-div {
-  height: 350px;
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
   align-items: center;
-  background-color: white;
   width: fit-content;
+  background-color: white;
   border-radius: 30px;
   padding: 20px 40px;
   box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.05);
 }
 
 .account-header {
-  font-size: 55px;
+  font-size: 61px;
   font-weight: bold;
-  text-decoration: underline 3px #29ABE2;
-  text-underline-offset: 20px;
+  text-decoration: underline 3px #29abe2;
+  text-underline-offset: 24px;
   cursor: default;
-  margin: 0;
+  margin-bottom: 32px;
 }
 
 .login-input-div {
@@ -61,7 +65,7 @@
 }
 
 .login-input {
-  border: solid 1px #D1D1D1;
+  border: solid 1px #d1d1d1;
   border-radius: 10px;
   height: 46px;
   border-width: 1px;
@@ -76,11 +80,11 @@
   cursor: pointer;
 
   &::placeholder {
-    color: #D1D1D1;
+    color: #d1d1d1;
   }
 
   &:focus {
-    border-color: #29ABE2;
+    border-color: #29abe2;
   }
 
   &.red-border {
@@ -99,7 +103,7 @@
 
   &.clickable {
     cursor: pointer;
-    
+
     &:hover {
       opacity: 1;
       transform: scale(1.1);
@@ -153,14 +157,14 @@
   text-align: center;
   width: 100%;
   margin: 20px 0;
-  color: #A8A8A8;
+  color: #a8a8a8;
   font-size: 14px;
 
   &::before,
   &::after {
-    content: '';
+    content: "";
     flex: 1;
-    border-bottom: 1px solid #D1D1D1;
+    border-bottom: 1px solid #d1d1d1;
   }
 
   &::before {
@@ -174,10 +178,10 @@
 
 .google-btn {
   background-color: white;
-  color: #2A3647;
+  color: #2a3647;
   font-size: 21px;
   font-weight: bold;
-  border: solid 1px #D1D1D1;
+  border: solid 1px #d1d1d1;
   border-radius: 10px;
   height: 48px;
   width: fit-content;
@@ -196,8 +200,8 @@
 
   &:hover {
     box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.15);
-    border-color: #29ABE2;
-    background-color: #F6F7F8;
+    border-color: #29abe2;
+    background-color: #f6f7f8;
     transform: translateY(-1px);
   }
 
@@ -208,7 +212,7 @@
 }
 
 .blue-btn {
-  background-color: #2A3647;
+  background-color: #2a3647;
   color: white;
   font-size: 21px;
   font-weight: bold;
@@ -220,19 +224,19 @@
   cursor: pointer;
 
   &:hover {
-    background-color: #29ABE2;
+    background-color: #29abe2;
     box-shadow: 00px 3px 10px rgba(0, 0, 0, 0.25);
     transition: all 0.1s ease-in-out;
   }
 
   &:disabled,
   &.disabled {
-    background-color: #D1D1D1;
-    color: #A8A8A8;
+    background-color: #d1d1d1;
+    color: #a8a8a8;
     cursor: not-allowed;
-    
+
     &:hover {
-      background-color: #D1D1D1;
+      background-color: #d1d1d1;
       box-shadow: none;
     }
   }
@@ -243,7 +247,7 @@
   color: black;
   font-size: 21px;
   font-weight: bold;
-  border: solid 1px #2A3647;
+  border: solid 1px #2a3647;
   border-radius: 10px;
   height: 48px;
   width: 168px;
@@ -253,8 +257,8 @@
 
   &:hover {
     box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.25);
-    border-color: #29ABE2;
-    color: #29ABE2;
+    border-color: #29abe2;
+    color: #29abe2;
     transition: all 0.1s ease-in-out;
   }
 }
@@ -272,7 +276,7 @@
 }
 
 .signup-link {
-  background-color: #2A3647;
+  background-color: #2a3647;
   color: white;
   font-size: 16px;
   font-weight: bold;
@@ -284,7 +288,7 @@
   text-align: center;
 
   &:hover {
-    background-color: #29ABE2;
+    background-color: #29abe2;
     box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.25);
     transition: all 0.1s ease-in-out;
   }
@@ -295,17 +299,17 @@
   display: flex;
   justify-content: center;
   width: 100%;
-  bottom: 20px;
+  bottom: 40px;
   gap: 50px;
 }
 
 .legal-text {
   font-size: 12px;
-  color: #A8A8A8;
+  color: #a8a8a8;
   text-decoration: none;
 
   &:hover {
-    color: #29ABE2;
+    color: #29abe2;
     font-weight: bold;
   }
 }
@@ -318,7 +322,7 @@
   color: white;
   font-size: 16px;
   font-weight: bold;
-  background-color: #2A3647;
+  background-color: #2a3647;
   border-radius: 10px;
   padding: 20px 20px;
   text-align: center;

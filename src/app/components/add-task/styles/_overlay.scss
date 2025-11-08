@@ -1,9 +1,9 @@
-// ========== Task Edit Overlay & Card Styles ==========
+@import "../../../../styles/variables";
+@import "../../../../styles/mixins";
+@import "../../../../styles/scrollbar";
 
 .task-edit-overlay {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  @include flex(row, center, center);
   position: fixed;
   top: 0;
   left: 0;
@@ -26,14 +26,10 @@
   padding: 48px 40px;
   animation: slideInFromRight 0.3s ease-out;
   overflow: auto;
-  display: flex;
-  flex-direction: column;
+  @include flex(column, flex-start, stretch);
   gap: 24px;
 
-  scrollbar-width: none;
-  &::-webkit-scrollbar {
-    display: none;
-  }
+  @include hide-scrollbar;
 
   .close-btn {
     position: absolute;
@@ -44,9 +40,7 @@
     width: 32px;
     height: 32px;
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    @include flex(row, center, center);
     border-radius: 50%;
     transition: all 0.2s ease;
     z-index: 10;
@@ -98,8 +92,7 @@
 }
 
 .add-task-container {
-  display: flex;
-  flex-direction: column;
+  @include flex(column, flex-start, stretch);
 }
 
 .add-task-header {

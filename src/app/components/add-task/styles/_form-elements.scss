@@ -1,14 +1,14 @@
-// ========== Form Elements - Inputs, Labels, Textarea ==========
+@import "../../../../styles/mixins";
+@import "../../../../styles/scrollbar";
 
 .form-wrapper {
-  display: flex;
-  flex-direction: column;
+  @include flex(column, flex-start, stretch);
   max-width: 850px;
   width: 100%;
 }
 
 .add-task-form {
-  display: flex;
+  @include flex(row, flex-start, stretch);
   gap: 20px;
   flex: 1;
   margin-bottom: 0;
@@ -16,14 +16,12 @@
 
 .form-column {
   width: 50%;
-  display: flex;
-  flex-direction: column;
+  @include flex(column, flex-start, stretch);
   gap: 8px;
 }
 
 .form-group {
-  display: flex;
-  flex-direction: column;
+  @include flex(column, flex-start, stretch);
   position: relative;
   margin-bottom: 8px;
 }
@@ -82,11 +80,7 @@ fieldset.form-group {
   resize: none;
   min-height: 119px;
   padding-top: 16px;
-  scrollbar-width: none;
-
-  &::-webkit-scrollbar {
-    display: none;
-  }
+  @include hide-scrollbar;
 }
 
 .error-message {
@@ -106,8 +100,7 @@ fieldset.form-group {
 
 .input-wrapper {
   position: relative;
-  display: flex;
-  align-items: center;
+  @include flex(row, flex-start, center);
   cursor: pointer;
 
   .dropdown-icon {

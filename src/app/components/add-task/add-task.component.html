@@ -243,6 +243,7 @@
               [attr.aria-expanded]="showCategoryDropdown"
               [attr.aria-invalid]="f['category'].touched && f['category'].errors"
               [attr.aria-describedby]="f['category'].touched && f['category'].errors ? 'category-error' : null"
+              aria-label="Task category"
             />
             <img src="assets/images/arrow_drop_down.svg" alt="" class="dropdown-icon" role="presentation" />
           </div>
@@ -313,7 +314,8 @@
                 class="subtask-icon subtask-add"
                 (click)="editingSubtaskId ? updateSubtask() : addSubtask()"
                 role="button"
-                tabindex="0" />
+                tabindex="0"
+                alt="checkicon" />
             </div>
           </div>
 
