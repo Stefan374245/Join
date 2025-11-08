@@ -69,12 +69,12 @@ export class BoardViewComponent implements OnInit, AfterViewInit {
         if (remaining > 0) {
           setTimeout(() => {
             this.tasksLoading = false;
-            this.connectDropLists(); // <--- NEU
+            this.connectDropLists();
             console.log('📋 Loaded tasks:', tasks.length);
           }, remaining);
         } else {
           this.tasksLoading = false;
-          this.connectDropLists(); // <--- NEU
+          this.connectDropLists();
           console.log('📋 Loaded tasks:', tasks.length);
         }
       },
@@ -124,7 +124,6 @@ export class BoardViewComponent implements OnInit, AfterViewInit {
       const allDropListIds = this.dropLists.map(list => list.id);
       console.log('🎯 Connecting drop lists:', allDropListIds);
 
-      // Connect each drop list to all others
       this.dropLists.forEach(dropList => {
         dropList.connectedTo = this.dropLists.filter(list => list.id !== dropList.id);
       });
@@ -252,7 +251,7 @@ export class BoardViewComponent implements OnInit, AfterViewInit {
     if (status) {
       this.addTaskStatus = status as 'triage' | 'todo' | 'in-progress' | 'await-feedback' | 'done';
     } else {
-      this.addTaskStatus = 'todo'; // Default wenn oben rechts geklickt wird
+      this.addTaskStatus = 'todo';
     }
 
     this.showAddTaskOverlay = true;
@@ -294,7 +293,7 @@ export class BoardViewComponent implements OnInit, AfterViewInit {
     // Öffne Edit-Overlay statt Navigation
     this.taskToEdit = task;
     this.showEditOverlay = true;
-    this.closeTaskDetail(); // Schließe Detail-Ansicht
+    this.closeTaskDetail();
   }
 
   /**

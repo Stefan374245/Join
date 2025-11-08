@@ -4,11 +4,13 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../services/auth.service';
 import { LogoAnimationComponent } from '../logo-animation/logo-animation.component';
+import { ToastComponent } from '../../../shared/components/toast/toast.component';
+import { ToastService } from '../../../services/toast.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [RouterLink, FormsModule, CommonModule, LogoAnimationComponent],
+  imports: [RouterLink, FormsModule, CommonModule, LogoAnimationComponent, ToastComponent],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'
 })
@@ -25,7 +27,8 @@ export class LoginComponent implements OnInit {
 
   constructor(
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private toastService: ToastService
   ) {}
 
   ngOnInit(): void {
@@ -153,9 +156,8 @@ export class LoginComponent implements OnInit {
   }
 
   showLoginSuccess(): void {
-    this.showSuccessMessage = true;
+    this.toastService.showToast('You logged in successfully');
     setTimeout(() => {
-      // Navigate to board after successful login
       this.router.navigate(['/board']);
     }, 2000);
   }

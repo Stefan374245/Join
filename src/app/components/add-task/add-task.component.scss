@@ -1,3 +1,12 @@
+@import "../../../styles/variables";
+@import "../../../styles/mixins";
+@import "./styles/overlay";
+@import "./styles/form-elements";
+@import "./styles/dropdowns";
+@import "./styles/priority-buttons";
+@import "./styles/subtasks";
+@import "./styles/buttons";
+@import "./styles/responsive";
 // Subtask input wrapper for icon positioning
 .subtask-input-wrapper {
   position: relative;
@@ -15,15 +24,6 @@
   cursor: pointer;
   z-index: 2;
 }
-@import "../../../styles/variables";
-@import "../../../styles/mixins";
-@import "./styles/overlay";
-@import "./styles/form-elements";
-@import "./styles/dropdowns";
-@import "./styles/priority-buttons";
-@import "./styles/subtasks";
-@import "./styles/buttons";
-@import "./styles/responsive";
 
 // Accessibility Helper Class
 .visually-hidden {

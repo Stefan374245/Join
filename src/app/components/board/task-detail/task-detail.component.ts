@@ -9,7 +9,7 @@ import { ContactService } from '../../../services/contact.service';
 @Component({
   selector: 'app-task-detail',
   standalone: true,
-  imports: [CommonModule, LoadingSpinnerComponent],
+  imports: [CommonModule],
   templateUrl: './task-detail.component.html',
   styleUrl: './task-detail.component.scss'
 })
@@ -41,7 +41,7 @@ export class TaskDetailComponent implements OnInit {
         setTimeout(() => {
           this.contacts = contacts;
           this.contactsLoading = false;
-        }, 600); // Simuliert Ladezeit
+        }, 600);
       },
       error: (error) => {
         console.error('Error loading contacts:', error);

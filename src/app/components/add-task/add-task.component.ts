@@ -7,6 +7,7 @@ import { Task, Subtask } from '../../models/task.interface';
 import { Contact } from '../../models/contact.interface';
 import { TaskService } from '../../services/task.service';
 import { ContactService } from '../../services/contact.service';
+import { ToastService } from '../../services/toast.service';
 
 @Component({
   selector: 'app-add-task',
@@ -47,7 +48,8 @@ export class AddTaskComponent implements OnInit, AfterViewChecked {
     private fb: FormBuilder,
     private taskService: TaskService,
     private contactService: ContactService,
-    private router: Router
+    private router: Router,
+    private toastService: ToastService
   ) {}
 
   ngOnInit(): void {
@@ -207,6 +209,10 @@ export class AddTaskComponent implements OnInit, AfterViewChecked {
 
   addSubtask(): void {
     if (this.subtaskInput.trim()) {
+      if (this.subtasks.length >= 5) {
+        this.toastService.showToast('Maximum of 5 subtasks allowed');
+        return;
+      }
       const newSubtask: Subtask = {
         id: this.generateId(),
         title: this.subtaskInput.trim(),
