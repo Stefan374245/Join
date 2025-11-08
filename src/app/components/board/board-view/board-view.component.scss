@@ -39,6 +39,14 @@ $header-height: 54px;
   &::-webkit-scrollbar {
     display: none;
   }
+  .board-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+    width: 100%;
+    z-index: 10;
+  }
 }
 
 // ========== Header ==========
@@ -127,7 +135,6 @@ $header-height: 54px;
     }
   }
 }
-
 // ========== Buttons ==========
 .btn-add-task {
   display: flex;
@@ -575,7 +582,8 @@ $header-height: 54px;
       border-radius: 50%;
       background: #0d9023;
       color: white;
-      transition: margin-left 0.3s ease, transform 0.2s ease, width 0.2s ease, height 0.2s ease, font-size 0.2s ease;
+      transition: margin-left 0.3s ease, transform 0.2s ease, width 0.2s ease,
+        height 0.2s ease, font-size 0.2s ease;
 
       @media (max-width: $breakpoint-xxl) {
         margin-left: -14px;

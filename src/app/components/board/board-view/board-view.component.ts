@@ -10,12 +10,12 @@ import { Contact } from '../../../models/contact.interface';
 import { Observable, map } from 'rxjs';
 import { TaskDetailComponent } from '../task-detail/task-detail.component';
 import { AddTaskComponent } from '../../add-task/add-task.component';
+import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
 
 @Component({
   selector: 'app-board-view',
   standalone: true,
-  imports: [CommonModule, FormsModule, DragDropModule, TaskDetailComponent, AddTaskComponent],
-  templateUrl: './board-view.component.html',
+imports: [CommonModule, FormsModule, DragDropModule, TaskDetailComponent, AddTaskComponent, LoadingSpinnerComponent],  templateUrl: './board-view.component.html',
   styleUrl: './board-view.component.scss'
 })
 export class BoardViewComponent implements OnInit, AfterViewInit {
@@ -29,6 +29,8 @@ export class BoardViewComponent implements OnInit, AfterViewInit {
   allTasks: Task[] = [];
   filteredTasks: Task[] = [];
   contacts: Contact[] = [];
+
+    tasksLoading: boolean = true;
 
   triageTasks: Task[] = [];
   todoTasks: Task[] = [];
@@ -54,17 +56,45 @@ export class BoardViewComponent implements OnInit, AfterViewInit {
    * Load all tasks from TaskService
    */
   private loadTasks(): void {
+    this.tasksLoading = true;
+    const minSpinnerTime = 500;
+    const startTime = Date.now();
     this.taskService.getTasks().subscribe({
       next: (tasks: Task[]) => {
         this.allTasks = tasks;
         this.filteredTasks = tasks;
         this.updateColumnArrays();
-        console.log('📋 Loaded tasks:', tasks.length);
+        const elapsed = Date.now() - startTime;
+        const remaining = minSpinnerTime - elapsed;
+        if (remaining > 0) {
+          setTimeout(() => {
+            this.tasksLoading = false;
+            this.connectDropLists(); // <--- NEU
+            console.log('📋 Loaded tasks:', tasks.length);
+          }, remaining);
+        } else {
+          this.tasksLoading = false;
+          this.connectDropLists(); // <--- NEU
+          console.log('📋 Loaded tasks:', tasks.length);
+        }
       },
       error: (error: any) => {
+        this.tasksLoading = false;
         console.error('❌ Error loading tasks:', error);
       }
     });
+  }
+
+  // NEU:
+  private connectDropLists(): void {
+    setTimeout(() => {
+      if (this.dropLists && this.dropLists.length > 0) {
+        const allDropListIds = this.dropLists.map(list => list.id);
+        this.dropLists.forEach(dropList => {
+          dropList.connectedTo = this.dropLists.filter(list => list.id !== dropList.id);
+        });
+      }
+    }, 0);
   }
 
   /**

@@ -1,11 +1,11 @@
 <!-- Task Overlay Container -->
-<div class="task-overlay" 
-     *ngIf="isVisible && task" 
+<div class="task-overlay"
+     *ngIf="isVisible && task"
      (click)="onOverlayClick($event)">
-  
+
   <!-- Task Detail Card (525px width, 30px border-radius, shadow from Figma) -->
   <div class="task-card-overlay" (click)="$event.stopPropagation()">
-    
+
     <!-- Header with Category and Close Button -->
     <div class="task-header">
       <div class="task-category" [ngClass]="getCategoryClass(task.category)">
@@ -20,10 +20,10 @@
     <div class="task-content">
       <!-- Title -->
       <h2 class="task-title">{{ task.title }}</h2>
-      
+
       <!-- Description -->
       <p class="task-description">{{ task.description }}</p>
-      
+
       <!-- Task Details -->
       <div class="task-details">
         <!-- Due Date -->
@@ -31,7 +31,7 @@
           <span class="detail-label">Due date:</span>
           <span class="detail-value">{{ formatDate(task.dueDate) }}</span>
         </div>
-        
+
         <!-- Priority -->
         <div class="detail-row">
           <span class="detail-label">Priority:</span>
@@ -40,24 +40,33 @@
             <img [src]="getPriorityIcon(task.priority)" [alt]="task.priority + ' priority'" />
           </div>
         </div>
-        
+
         <!-- Assigned To -->
         <div class="detail-row assigned-to">
           <span class="detail-label">Assigned To:</span>
           <div class="assignee-list">
-            <!-- Erste 3 User anzeigen -->
-            <div class="assignee-item" *ngFor="let userId of task.assignedTo.slice(0, 3)">
-              <div class="assignee-avatar" [style.background-color]="getContactColor(userId)">
-                {{ getContactInitials(userId) }}
-              </div>
-              <span class="assignee-name">{{ getContactFullName(userId) }}</span>
+            <!-- Loading Spinner -->
+            <div *ngIf="contactsLoading" class="loading-spinner">
+              <img src="/assets/images/loading.svg" alt="Loading..." />
             </div>
-            <!-- +X für restliche User -->
-            <div class="assignee-item more-users" *ngIf="task.assignedTo.length > 3">
-              <div class="assignee-avatar more-avatar">
-                +{{ task.assignedTo.length - 3 }}
+
+            <!-- User/Assignee Display - Only shows when not loading -->
+            <div *ngIf="!contactsLoading">
+              <!-- Erste 3 User anzeigen -->
+              <div class="assignee-item" *ngFor="let userId of task.assignedTo.slice(0, 3)">
+                <div class="assignee-avatar" [style.background-color]="getContactColor(userId)">
+                  {{ getContactInitials(userId) }}
+                </div>
+                <span class="assignee-name">{{ getContactFullName(userId) }}</span>
               </div>
-              <span class="assignee-name">{{ task.assignedTo.length - 3 }} more</span>
+
+              <!-- +X für restliche User -->
+              <div class="assignee-item more-users" *ngIf="task.assignedTo.length > 3">
+                <div class="assignee-avatar more-avatar">
+                  +{{ task.assignedTo.length - 3 }}
+                </div>
+                <span class="assignee-name">{{ task.assignedTo.length - 3 }} more</span>
+              </div>
             </div>
           </div>
         </div>
@@ -67,10 +76,10 @@
       <div class="subtasks-section" *ngIf="task.subtasks && task.subtasks.length > 0">
         <span class="detail-label">Subtasks</span>
         <div class="subtask-list">
-          <div class="subtask-checkbox-container" 
-               *ngFor="let subtask of task.subtasks; let i = index" 
+          <div class="subtask-checkbox-container"
+               *ngFor="let subtask of task.subtasks; let i = index"
                (click)="toggleSubtask(subtask.id)">
-            <div 
+            <div
               class="subtask-checkbox-icon"
               [ngClass]="subtask.completed ? 'checkbox-checked' : 'checkbox-unchecked'"
               [title]="subtask.completed ? 'Mark as incomplete' : 'Mark as complete'"
@@ -97,8 +106,8 @@
 </div>
 
 <!-- Delete Confirmation Dialog -->
-<div class="confirm-dialog-overlay" 
-     *ngIf="showDeleteConfirm" 
+<div class="confirm-dialog-overlay"
+     *ngIf="showDeleteConfirm"
      (click)="cancelDelete()">
   <div class="confirm-dialog" (click)="$event.stopPropagation()">
     <h3>Delete permanently?</h3>

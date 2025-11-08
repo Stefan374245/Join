@@ -1,5 +1,6 @@
 import { Component, Input, Output, EventEmitter, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
 import { Task } from '../../../models/task.interface';
 import { Contact } from '../../../models/contact.interface';
 import { TaskService } from '../../../services/task.service';
@@ -8,11 +9,12 @@ import { ContactService } from '../../../services/contact.service';
 @Component({
   selector: 'app-task-detail',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, LoadingSpinnerComponent],
   templateUrl: './task-detail.component.html',
   styleUrl: './task-detail.component.scss'
 })
 export class TaskDetailComponent implements OnInit {
+  contactsLoading: boolean = true;
   @Input() task!: Task;
   @Input() isVisible: boolean = false;
   @Output() close = new EventEmitter<void>();
@@ -36,10 +38,14 @@ export class TaskDetailComponent implements OnInit {
   private loadContacts(): void {
     this.contactService.getContacts().subscribe({
       next: (contacts) => {
-        this.contacts = contacts;
+        setTimeout(() => {
+          this.contacts = contacts;
+          this.contactsLoading = false;
+        }, 600); // Simuliert Ladezeit
       },
       error: (error) => {
         console.error('Error loading contacts:', error);
+        this.contactsLoading = false;
       }
     });
   }

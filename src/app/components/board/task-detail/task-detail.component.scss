@@ -59,7 +59,7 @@
     font-weight: 500;
     color: $white;
     line-height: 1.2;
-    
+
     &.user-story {
       background: #0038ff;
     }
@@ -194,7 +194,7 @@
             font-size: 16px;
             border: 2px solid white;
             flex-shrink: 0;
-            
+
             &.more-avatar {
               background-color: $primary-color;
               font-size: 14px;
@@ -207,7 +207,7 @@
             font-weight: 400;
             color: $primary-color;
           }
-          
+
           &.more-users {
             .assignee-name {
               color: #666;
@@ -262,11 +262,11 @@
       background-repeat: no-repeat;
       background-position: center;
       flex-shrink: 0;
-      
+
       &.checkbox-unchecked {
         background-image: url('/assets/images/checkboxfalseblue.svg');
       }
-      
+
       &.checkbox-checked {
         background-image: url('/assets/images/checkboxtrueblack.svg');
       }
@@ -348,7 +348,7 @@
 
     &:hover {
       color: #29abe2;
-      
+
       img {
         filter: brightness(0) saturate(100%) invert(48%) sepia(83%) saturate(748%) hue-rotate(164deg) brightness(96%) contrast(101%);
       }
@@ -423,6 +423,24 @@
       }
     }
   }
+}
+
+// ========== Loading Spinner ==========
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 80px;
+
+  img {
+    width: 48px;
+    height: 48px;
+    animation: spin 1s linear infinite;
+  }
+}
+
+@keyframes spin {
+  100% { transform: rotate(360deg); }
 }
 
 // ========== Responsive Design ==========
