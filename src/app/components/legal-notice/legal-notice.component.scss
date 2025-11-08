@@ -2,7 +2,6 @@
 @import '../../../styles/mixins';
 
 .legal-main {
-  @include main-content-layout;
   @include flex(column, flex-start, flex-start);
   max-width: 1200px;
   gap: $spacing-xl;
@@ -17,6 +16,7 @@
   gap: $spacing-xl;
   width: 100%;
   max-width: 950px;
+  overflow: hidden;
 }
 
 .legal-section {

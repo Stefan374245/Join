@@ -2,7 +2,6 @@
 @import '../../../styles/mixins';
 
 .privacy-main {
-  @include main-content-layout;
   @include flex(column, flex-start, flex-start);
   max-width: 1200px;
   gap: $spacing-xl;
@@ -21,7 +20,6 @@
 
 .index-nav {
   background: $background-color;
-  padding: $spacing-lg;
   border-radius: $border-radius-lg;
   width: 100%;
 
@@ -147,9 +145,5 @@
     h3 {
       font-size: 18px;
     }
-  }
-
-  .index-nav {
-    padding: $spacing-md;
   }
 }
