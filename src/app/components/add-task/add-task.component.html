@@ -12,7 +12,7 @@
 
     <!-- Close Button (only for overlay) -->
     <button *ngIf="isOverlay" class="close-btn" (click)="onClose()" aria-label="Close dialog">
-      <img src="assets/images/close.svg" alt="" role="presentation" />
+      <img src="/assets/images/close.svg" alt="" role="presentation" />
     </button>
 
     <!-- Header Section -->
@@ -117,7 +117,7 @@
               aria-label="Set priority to urgent">
               <span>Urgent</span>
               <img
-                [src]="selectedPriority === 'high' ? 'assets/images/urgentwhite.svg' : 'assets/images/urgent.svg'"
+                [src]="selectedPriority === 'high' ? '/assets/images/urgentwhite.svg' : '/assets/images/urgent.svg'"
                 alt=""
                 role="presentation" />
             </button>
@@ -133,7 +133,7 @@
               aria-label="Set priority to medium">
               <span>Medium</span>
               <img
-                [src]="selectedPriority === 'medium' ? 'assets/images/mediumwhite.svg' : 'assets/images/medium.svg'"
+                [src]="selectedPriority === 'medium' ? '/assets/images/mediumwhite.svg' : '/assets/images/medium.svg'"
                 alt=""
                 role="presentation" />
             </button>
@@ -149,7 +149,7 @@
               aria-label="Set priority to low">
               <span>Low</span>
               <img
-                [src]="selectedPriority === 'low' ? 'assets/images/lowwhite.svg' : 'assets/images/low.svg'"
+                [src]="selectedPriority === 'low' ? '/assets/images/lowwhite.svg' : '/assets/images/low.svg'"
                 alt=""
                 role="presentation" />
             </button>
@@ -170,7 +170,7 @@
               [attr.aria-expanded]="showContactDropdown"
               aria-label="Assigned contacts"
             />
-            <img src="assets/images/arrow_drop_down.svg" alt="" class="dropdown-icon" role="presentation" />
+            <img src="/assets/images/arrow_drop_down.svg" alt="" class="dropdown-icon" role="presentation" />
           </div>
 
           <!-- Contact Dropdown -->
@@ -195,7 +195,7 @@
                 <span>{{ contact.firstName }} {{ contact.lastName }}</span>
               </div>
               <img
-                [src]="isContactSelected(contact) ? 'assets/images/checkboxtruewhite.svg' : 'assets/images/checkboxfalseblack.svg'"
+                [src]="isContactSelected(contact) ? '/assets/images/checkboxtruewhite.svg' : '/assets/images/checkboxfalseblack.svg'"
                 alt=""
                 class="check-icon"
                 role="presentation" />
@@ -215,7 +215,7 @@
               [attr.aria-label]="contact.firstName + ' ' + contact.lastName">
               {{ contact.initials }}
               <img
-                src="assets/images/close.svg"
+                src="/assets/images/close.svg"
                 alt="Remove contact"
                 class="remove-icon"
                 (click)="removeContact(contact.id)"
@@ -245,7 +245,7 @@
               [attr.aria-describedby]="f['category'].touched && f['category'].errors ? 'category-error' : null"
               aria-label="Task category"
             />
-            <img src="assets/images/arrow_drop_down.svg" alt="" class="dropdown-icon" role="presentation" />
+            <img src="/assets/images/arrow_drop_down.svg" alt="" class="dropdown-icon" role="presentation" />
           </div>
 
           <!-- Category Dropdown -->
@@ -292,7 +292,7 @@
             />
             <img
               *ngIf="!subtaskInputFocused && !subtaskInput"
-              src="assets/images/addDark.svg"
+              src="/assets/images/addDark.svg"
               alt="Add subtask"
               class="subtask-add-icon-absolute"
               (click)="subtaskInputRef.focus()"
@@ -301,7 +301,7 @@
             />
             <div class="subtask-actions" *ngIf="subtaskInputFocused || subtaskInput">
               <img
-                src="assets/images/close.svg"
+                src="/assets/images/close.svg"
                 alt="Clear subtask input"
                 class="subtask-icon subtask-clear"
                 (click)="clearSubtaskInput()"
@@ -309,7 +309,7 @@
                 tabindex="0" />
               <div class="subtask-divider" aria-hidden="true"></div>
               <img
-                src="assets/images/checkDark.svg"
+                src="/assets/images/checkDark.svg"
                 [attr.alt]="editingSubtaskId ? 'Update subtask' : 'Add subtask'"
                 class="subtask-icon subtask-add"
                 (click)="editingSubtaskId ? updateSubtask() : addSubtask()"
@@ -343,7 +343,7 @@
     <footer class="form-actions">
       <button type="button" class="btn btn-secondary" (click)="clearForm()" aria-label="Clear form">
         Clear
-        <img src="assets/images/close.svg" alt="" role="presentation" />
+        <img src="/assets/images/close.svg" alt="" role="presentation" />
       </button>
       <button type="submit"
               class="btn btn-primary"
@@ -351,9 +351,10 @@
               (click)="onSubmit()"
               [attr.aria-label]="isEditMode ? 'Update task' : 'Create task'">
         {{ isEditMode ? 'Update Task' : 'Create Task' }}
-        <img src="assets/images/check.svg" alt="" role="presentation" />
+        <img src="/assets/images/check.svg" alt="" role="presentation" />
       </button>
     </footer>
   </main>
   </article>
 </div>
+

@@ -192,6 +192,7 @@ export class TaskDetailComponent implements OnInit {
    * Get priority icon path
    */
   getPriorityIcon(priority: string): string {
-    return `assets/images/${priority.toLowerCase()}.svg`;
+    return `/assets/images/${priority.toLowerCase()}.svg`;
   }
 }
+

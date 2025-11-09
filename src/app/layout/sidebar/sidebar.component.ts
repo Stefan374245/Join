@@ -14,26 +14,26 @@ export class SidebarComponent {
     {
       path: '/summary',
       label: 'Summary',
-      iconGray: 'assets/images/summarygray.svg',
-      iconWhite: 'assets/images/summarywhite.svg'
+      iconGray: '/assets/images/summarygray.svg',
+      iconWhite: '/assets/images/summarywhite.svg'
     },
     {
       path: '/add-task',
       label: 'Add Task',
-      iconGray: 'assets/images/addtaskgray.svg',
-      iconWhite: 'assets/images/addtaskwhite.svg'
+      iconGray: '/assets/images/addtaskgray.svg',
+      iconWhite: '/assets/images/addtaskwhite.svg'
     },
     {
       path: '/board',
       label: 'Board',
-      iconGray: 'assets/images/boardgray.svg',
-      iconWhite: 'assets/images/boardwhite.svg'
+      iconGray: '/assets/images/boardgray.svg',
+      iconWhite: '/assets/images/boardwhite.svg'
     },
     {
       path: '/contacts',
       label: 'Contacts',
-      iconGray: 'assets/images/contactsgray.svg',
-      iconWhite: 'assets/images/contactswhite.svg'
+      iconGray: '/assets/images/contactsgray.svg',
+      iconWhite: '/assets/images/contactswhite.svg'
     }
   ];
 
@@ -42,3 +42,4 @@ export class SidebarComponent {
     { path: '/legal-notice', label: 'Legal Notice' }
   ];
 }
+

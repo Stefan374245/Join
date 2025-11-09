@@ -21,7 +21,7 @@
       />
       <div class="subtask-edit-actions">
         <img
-          src="assets/images/close.svg"
+          src="/assets/images/close.svg"
           alt="Cancel edit"
           class="subtask-edit-icon subtask-edit-clear"
           (click)="onCancelEdit()"
@@ -29,7 +29,7 @@
           tabindex="0" />
         <div class="subtask-edit-divider" aria-hidden="true"></div>
         <img
-          src="assets/images/checkDark.svg"
+          src="/assets/images/checkDark.svg"
           alt="Save subtask"
           class="subtask-edit-icon subtask-edit-add"
           (click)="onUpdate()"
@@ -41,7 +41,7 @@
     <!-- Normal Actions (Edit & Delete) -->
     <div class="subtask-item-actions" *ngIf="editingSubtaskId !== subtask.id">
       <img
-        src="assets/images/edit-2.svg"
+        src="/assets/images/edit-2.svg"
         alt="Edit subtask"
         class="subtask-action-icon"
         (click)="onEdit(subtask)"
@@ -49,7 +49,7 @@
         tabindex="0" />
       <div class="vertical-line-subtask" aria-hidden="true"></div>
       <img
-        src="assets/images/delete.svg"
+        src="/assets/images/delete.svg"
         alt="Delete subtask"
         class="subtask-action-icon"
         (click)="onDelete(subtask.id)"
@@ -65,7 +65,7 @@
       [class.active]="isDropdownOpen">
     <div class="remaining-count-content">
       <span class="subtask-text">+{{ remainingSubtasksCount }} more</span>
-      <img src="assets/images/arrow_drop_down.svg"
+      <img src="/assets/images/arrow_drop_down.svg"
            alt="Show more subtasks"
            class="dropdown-icon"
            role="button"
@@ -98,7 +98,7 @@
             />
             <div class="subtask-edit-actions">
               <img
-                src="assets/images/close.svg"
+                src="/assets/images/close.svg"
                 alt="Cancel edit"
                 class="subtask-edit-icon subtask-edit-clear"
                 (click)="onCancelEdit(); $event.stopPropagation()"
@@ -106,7 +106,7 @@
                 tabindex="0" />
               <div class="subtask-edit-divider" aria-hidden="true"></div>
               <img
-                src="assets/images/checkDark.svg"
+                src="/assets/images/checkDark.svg"
                 alt="Save subtask"
                 class="subtask-edit-icon subtask-edit-add"
                 (click)="onUpdate(); $event.stopPropagation()"
@@ -116,14 +116,14 @@
           </div>
           <!-- Normal Actions für Dropdown Items -->
           <div class="subtask-item-actions" *ngIf="editingSubtaskId !== subtask.id">
-            <img src="assets/images/edit-2.svg"
+            <img src="/assets/images/edit-2.svg"
                  alt="Edit subtask"
                  class="subtask-action-icon"
                  (click)="onEdit(subtask); $event.stopPropagation()"
                  role="button"
                  tabindex="0"/>
             <div class="vertical-line-subtask" aria-hidden="true"></div>
-            <img src="assets/images/delete.svg"
+            <img src="/assets/images/delete.svg"
                  alt="Delete subtask"
                  class="subtask-action-icon"
                  (click)="onDelete(subtask.id); $event.stopPropagation()"
@@ -135,3 +135,4 @@
     </div>
   </li>
 </ul>
+

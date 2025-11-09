@@ -1,20 +1,20 @@
 <div class="contacts-page">
 	<aside class="contacts-aside">
 		<div class="logo">
-			<img src="assets/images/joinlogowhite.svg" alt="Join" />
+			<img src="/assets/images/joinlogowhite.svg" alt="Join" />
 		</div>
 
 		<nav class="side-nav">
 			<a routerLink="/summary">
-				<img src="assets/images/summarygray.svg" alt="Summary" />
+				<img src="/assets/images/summarygray.svg" alt="Summary" />
 				<span>Summary</span>
 			</a>
 			<a routerLink="/board">
-				<img src="assets/images/boardgray.svg" alt="Board" />
+				<img src="/assets/images/boardgray.svg" alt="Board" />
 				<span>Board</span>
 			</a>
 			<a routerLink="/contacts" class="active">
-				<img src="assets/images/contactswhite.svg" alt="Contacts" />
+				<img src="/assets/images/contactswhite.svg" alt="Contacts" />
 				<span>Contacts</span>
 			</a>
 		</nav>
@@ -29,7 +29,7 @@
 		<div class="content-left">
 					<div class="add-btn" (click)="addContact()">
 						<span>Add new contact</span>
-						<img src="assets/images/person_add.svg" alt="add" />
+						<img src="/assets/images/person_add.svg" alt="add" />
 			</div>
 
 			<!-- Debug Info -->
@@ -123,3 +123,4 @@
 		(delete)="deleteContact($event)">
 	</app-contact-dialog>
 </div>
+

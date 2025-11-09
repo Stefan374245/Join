@@ -48,8 +48,9 @@ export class LogoAnimationComponent implements OnInit {
 
   getLogoSrc(): string {
     if (this.isMobile && (this.animationState === 'center' || this.animationState === 'expanding' || this.animationState === 'shrinking')) {
-      return 'assets/images/joinlogowhite.svg';
+      return '/assets/images/joinlogowhite.svg';
     }
-    return 'assets/images/joinlogodark.svg';
+    return '/assets/images/joinlogodark.svg';
   }
 }
+

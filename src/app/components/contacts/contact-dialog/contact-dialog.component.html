@@ -2,13 +2,13 @@
   <div class="dialog-container" (click)="$event.stopPropagation()">
     <!-- Close Button -->
     <button class="close-btn" (click)="onClose()" type="button">
-      <img src="assets/images/close.svg" alt="Close" />
+      <img src="/assets/images/close.svg" alt="Close" />
     </button>
 
     <!-- Left Side - Branding -->
     <div class="dialog-left">
       <div class="branding">
-        <img src="assets/images/joinlogowhite.svg" alt="Join Logo" class="logo" />
+        <img src="/assets/images/joinlogowhite.svg" alt="Join Logo" class="logo" />
         <h1>{{ title }}</h1>
         <p>Tasks are better with a team!</p>
         <div class="divider"></div>
@@ -23,7 +23,7 @@
           <div class="avatar" [style.background-color]="avatarColor">
             <img 
               *ngIf="!avatarInitials" 
-              src="assets/images/personwhite.svg" 
+              src="/assets/images/personwhite.svg" 
               alt="Person" 
               class="avatar-icon" />
             <span *ngIf="avatarInitials" class="avatar-initials">{{ avatarInitials }}</span>
@@ -43,7 +43,7 @@
                 class="form-input"
                 [class.error]="contactForm.get('firstName')?.touched && contactForm.get('firstName')?.invalid"
               />
-              <img src="assets/images/person.svg" alt="Person" class="input-icon" />
+              <img src="/assets/images/person.svg" alt="Person" class="input-icon" />
             </div>
             <span class="error-message" *ngIf="contactForm.get('firstName')?.touched">
               {{ getFieldError('firstName') }}
@@ -61,7 +61,7 @@
                 class="form-input"
                 [class.error]="contactForm.get('lastName')?.touched && contactForm.get('lastName')?.invalid"
               />
-              <img src="assets/images/person.svg" alt="Person" class="input-icon" />
+              <img src="/assets/images/person.svg" alt="Person" class="input-icon" />
             </div>
             <span class="error-message" *ngIf="contactForm.get('lastName')?.touched">
               {{ getFieldError('lastName') }}
@@ -80,7 +80,7 @@
                 [class.error]="contactForm.get('email')?.touched && contactForm.get('email')?.invalid"
                 [readonly]="mode === 'edit'"
               />
-              <img src="assets/images/mail.svg" alt="Email" class="input-icon" />
+              <img src="/assets/images/mail.svg" alt="Email" class="input-icon" />
             </div>
             <span class="error-message" *ngIf="contactForm.get('email')?.touched">
               {{ getFieldError('email') }}
@@ -98,7 +98,7 @@
                 class="form-input"
                 [class.error]="contactForm.get('phone')?.touched && contactForm.get('phone')?.invalid"
               />
-              <img src="assets/images/call.svg" alt="Phone" class="input-icon" />
+              <img src="/assets/images/call.svg" alt="Phone" class="input-icon" />
             </div>
             <span class="error-message" *ngIf="contactForm.get('phone')?.touched">
               {{ getFieldError('phone') }}
@@ -118,7 +118,7 @@
               class="btn btn-secondary"
               (click)="onDelete()">
               Delete
-              <img src="assets/images/canceldarkblue.svg" alt="Delete" class="btn-icon" />
+              <img src="/assets/images/canceldarkblue.svg" alt="Delete" class="btn-icon" />
             </button>
 
             <button
@@ -127,7 +127,7 @@
               class="btn btn-secondary"
               (click)="onClose()">
               Cancel
-              <img src="assets/images/canceldarkblue.svg" alt="Cancel" class="btn-icon" />
+              <img src="/assets/images/canceldarkblue.svg" alt="Cancel" class="btn-icon" />
             </button>
 
             <button
@@ -135,7 +135,7 @@
               class="btn btn-primary"
               [disabled]="!isFormValid || isSubmitting">
               {{ submitButtonText }}
-              <img src="assets/images/check.svg" alt="Submit" class="btn-icon" />
+              <img src="/assets/images/check.svg" alt="Submit" class="btn-icon" />
             </button>
           </div>
         </form>
@@ -143,3 +143,4 @@
     </div>
   </div>
 </div>
+

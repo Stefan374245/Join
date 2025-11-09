@@ -265,8 +265,8 @@ export class BoardViewComponent implements OnInit, AfterViewInit {
     const img = button.querySelector('img');
     if (img) {
       img.src = isHover
-        ? 'assets/images/taskPlusHover.svg'
-        : 'assets/images/taskPlus.svg';
+        ? '/assets/images/taskPlusHover.svg'
+        : '/assets/images/taskPlus.svg';
     }
   }
 
@@ -417,11 +417,12 @@ export class BoardViewComponent implements OnInit, AfterViewInit {
    */
   getPriorityIcon(priority: 'low' | 'medium' | 'high'): string {
     const iconMap = {
-      'low': 'assets/images/low.svg',
-      'medium': 'assets/images/medium.svg',
-      'high': 'assets/images/urgent.svg'
+      'low': '/assets/images/low.svg',
+      'medium': '/assets/images/medium.svg',
+      'high': '/assets/images/urgent.svg'
     };
     return iconMap[priority] || iconMap['medium'];
   }
 }
+
 
