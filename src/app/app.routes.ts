@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { LoginComponent } from './components/auth/login/login.component';
 import { SignupComponent } from './components/auth/signup/signup.component';
 import { WelcomeComponent } from './components/welcome/welcome.component';
+import { StakeholderComponent } from './components/stakeholder/stakeholder.component';
 import { LogoAnimationComponent } from './components/auth/logo-animation/logo-animation.component';
 import { AddTaskComponent } from './components/add-task/add-task.component';
 import { BoardViewComponent } from './components/board/board-view/board-view.component';
@@ -65,6 +66,10 @@ export const routes: Routes = [
   {
     path: 'help',
     component: HelpComponent
+  },
+  {
+    path: 'feature-request',
+    component: StakeholderComponent
   },
   { path: '**', redirectTo: '/login' }
 ];

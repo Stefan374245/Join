@@ -19,7 +19,10 @@ export class AppComponent {
   constructor(private router: Router) {
     this.router.events.subscribe(() => {
       const url = this.router.url;
-      this.isAuthPage = url.startsWith('/login') || url.startsWith('/signup') || url.startsWith('/welcome');
+      this.isAuthPage = url.startsWith('/login') || 
+                       url.startsWith('/signup') || 
+                       url.startsWith('/welcome') ||
+                       url.startsWith('/feature-request');
       this.isContactsPage = url.startsWith('/contacts');
     });
   }
