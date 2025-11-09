@@ -1,6 +1,8 @@
 import { Routes } from '@angular/router';
 import { LoginComponent } from './components/auth/login/login.component';
 import { SignupComponent } from './components/auth/signup/signup.component';
+import { WelcomeComponent } from './components/welcome/welcome.component';
+import { LogoAnimationComponent } from './components/auth/logo-animation/logo-animation.component';
 import { AddTaskComponent } from './components/add-task/add-task.component';
 import { BoardViewComponent } from './components/board/board-view/board-view.component';
 import { ContactsListComponent } from './components/contacts/contacts-list/contacts-list.component';
@@ -11,19 +13,29 @@ import { authGuard, guestGuard } from './guards/auth.guard';
 import { HelpComponent } from './components/help/help.component';
 
 export const routes: Routes = [
-  { path: '', redirectTo: '/login', pathMatch: 'full' },
-  { 
-    path: 'login', 
-    component: LoginComponent
-    // guestGuard entfernt - User können jederzeit zur Login-Seite
+  { path: '', redirectTo: '/logo-animation', pathMatch: 'full' },
+  {
+    path: 'logo-animation',
+    component: LogoAnimationComponent,
+    canActivate: [guestGuard]
   },
-  { 
-    path: 'signup', 
+  {
+    path: 'welcome',
+    component: WelcomeComponent,
+    canActivate: [guestGuard]
+  },
+  {
+    path: 'login',
+    component: LoginComponent,
+    canActivate: [guestGuard]
+  },
+  {
+    path: 'signup',
     component: SignupComponent
-    // guestGuard entfernt
+
   },
-  { 
-    path: 'board', 
+  {
+    path: 'board',
     component: BoardViewComponent,
     canActivate: [authGuard]
   },
@@ -32,13 +44,13 @@ export const routes: Routes = [
     component: AddTaskComponent,
     canActivate: [authGuard]
   },
-  { 
-    path: 'contacts', 
+  {
+    path: 'contacts',
     component: ContactsListComponent,
     canActivate: [authGuard]
   },
-  { 
-    path: 'summary', 
+  {
+    path: 'summary',
     component: SummaryViewComponent,
     canActivate: [authGuard]
   },

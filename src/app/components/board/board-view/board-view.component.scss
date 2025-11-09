@@ -22,7 +22,7 @@ $card-padding: 18px;
 $column-count: 5;
 $header-height: 54px;
 
-// ========== Main Container ==========
+
 .board-container {
   position: absolute;
   display: flex;
@@ -47,7 +47,6 @@ $header-height: 54px;
   }
 }
 
-// ========== Header ==========
 .board-header {
   display: flex;
   justify-content: space-between;
@@ -57,7 +56,7 @@ $header-height: 54px;
   padding-left: 72px;
 
   .board-title {
-    font-size: 3.8125rem; // 61px
+    font-size: 3.8125rem;
     font-weight: 700;
     color: $primary-color;
     margin: 0;
@@ -71,7 +70,6 @@ $header-height: 54px;
   }
 }
 
-// ========== Board Columns Grid ==========
 .board-columns {
   display: grid;
   grid-template-columns: repeat($column-count, 1fr);
@@ -83,7 +81,6 @@ $header-height: 54px;
   margin: 0;
 }
 
-// ========== Search Input ==========
 .search-wrapper {
   position: relative;
   display: flex;
@@ -133,7 +130,6 @@ $header-height: 54px;
     }
   }
 }
-// ========== Buttons ==========
 .btn-add-task {
   display: flex;
   align-items: center;
@@ -161,7 +157,6 @@ $header-height: 54px;
   }
 }
 
-// ========== Board Columns Grid ==========
 .board-columns {
   display: grid;
   grid-template-columns: repeat($column-count, 1fr);
@@ -171,7 +166,6 @@ $header-height: 54px;
   height: 100%;
 }
 
-// ========== Single Column ==========
 .board-column {
   display: flex;
   flex-direction: column;
@@ -219,13 +213,11 @@ $header-height: 54px;
     }
   }
 
-  // ========== Column Content Scrollable ==========
   .column-content {
     flex: 1;
     overflow-y: hidden;
     padding: 5px;
 
-    // Custom Scrollbar
     scrollbar-width: thin;
     scrollbar-color: $primary-color #e7e7e7;
 
@@ -247,7 +239,6 @@ $header-height: 54px;
       }
     }
 
-    // ========== No Tasks Placeholder ==========
     .no-tasks {
       display: flex;
       align-items: center;
@@ -275,7 +266,6 @@ $header-height: 54px;
   }
 }
 
-// ========== Task Card ==========
 .task-card {
   display: flex;
   flex-direction: column;
@@ -300,7 +290,6 @@ $header-height: 54px;
     margin-bottom: 0;
   }
 
-  // ========== Category Badge ==========
   .task-category {
     display: flex;
     justify-content: space-between;
@@ -330,7 +319,6 @@ $header-height: 54px;
     }
   }
 
-  // ========== Task Title ==========
   .task-title {
     font-size: 16px;
     font-weight: 700;
@@ -341,7 +329,6 @@ $header-height: 54px;
     min-height: 22px;
   }
 
-  // ========== Task Description ==========
   .task-description {
     color: #a8a8a8;
     font-size: 16px;
@@ -356,7 +343,6 @@ $header-height: 54px;
     text-overflow: ellipsis;
   }
 
-  // ========== Progress Section ==========
   .task-progress {
     display: flex;
     flex-direction: row;
@@ -370,7 +356,6 @@ $header-height: 54px;
       transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    // Hover effect when all subtasks are completed - GREEN
     &.all-completed {
       .progress-bar {
         transition: box-shadow 0.5s cubic-bezier(0.4, 0, 0.2, 1);
@@ -406,7 +391,6 @@ $header-height: 54px;
       }
     }
 
-    // Hover effect when subtasks are incomplete - RED
     &.has-incomplete {
       .progress-bar {
         transition: box-shadow 0.5s cubic-bezier(0.4, 0, 0.2, 1);
@@ -463,10 +447,8 @@ $header-height: 54px;
       box-shadow: 0 0 8px rgba($accent-color, 0.3);
       position: relative;
 
-      // Smooth animation when width changes
       will-change: width;
 
-      // Animated shine effect
       &::before {
         content: "";
         position: absolute;
@@ -484,7 +466,6 @@ $header-height: 54px;
       }
     }
 
-    // Old class names for compatibility
     .progress-bar {
       width: 100%;
       height: 8px;
@@ -752,8 +733,6 @@ $header-height: 54px;
   }
 }
 
-// ========== CDK Drag & Drop Styling ==========
-// Drag preview (element being dragged)
 .cdk-drag-preview {
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
   opacity: 0.95;
@@ -763,19 +742,16 @@ $header-height: 54px;
   z-index: 1000;
 }
 
-// Original task while dragging
 .cdk-drag-animating {
   transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
 }
 
-// Drop list while dragging over it
 .column-content.cdk-drop-list-dragging {
   .task-card:not(.cdk-drag-placeholder) {
     transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
   }
 }
 
-// Placeholder where item will be dropped
 .drag-placeholder {
   min-height: 100px;
   background: rgba(42, 54, 71, 0.05);
@@ -784,7 +760,6 @@ $header-height: 54px;
   margin-bottom: $card-spacing;
   transition: all 250ms cubic-bezier(0, 0, 0.2, 1);
 
-  // Show "Drop here" message
   display: flex;
   align-items: center;
   justify-content: center;
@@ -798,7 +773,6 @@ $header-height: 54px;
   }
 }
 
-// Highlight drop zone when dragging over different column
 .column-content.cdk-drop-list-receiving {
   background-color: $background-dragging-color;
   border-radius: 8px;
@@ -815,13 +789,11 @@ $header-height: 54px;
   }
 }
 
-// Active drop zone (while item is hovering)
 .column-content:not(.cdk-drop-list-receiving).cdk-drop-list-dragging {
   background-color: rgba($gray-200, 0.3);
   transition: background-color 250ms ease;
 }
 
-// Make task cards grabbable
 .task-card {
   cursor: grab;
   -webkit-user-select: none;
@@ -836,20 +808,17 @@ $header-height: 54px;
     cursor: default;
   }
 
-  // Hover effect on task cards
   &:hover:not(.cdk-drag-preview) {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   }
 }
 
-// Smooth transitions
 .column-content {
   transition: background-color 250ms ease;
   min-height: 200px;
 }
 
-// Column header during drag
 .board-column:has(.column-content.cdk-drop-list-receiving) {
   .column-header {
     .column-title {

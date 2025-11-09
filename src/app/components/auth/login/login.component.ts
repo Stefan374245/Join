@@ -3,14 +3,13 @@ import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../services/auth.service';
-import { LogoAnimationComponent } from '../logo-animation/logo-animation.component';
 import { ToastComponent } from '../../../shared/components/toast/toast.component';
 import { ToastService } from '../../../services/toast.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [RouterLink, FormsModule, CommonModule, LogoAnimationComponent, ToastComponent],
+  imports: [RouterLink, FormsModule, CommonModule, ToastComponent],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'
 })
@@ -22,7 +21,6 @@ export class LoginComponent implements OnInit {
   loginFailError = false;
   showPassword = false;
   showSuccessMessage = false;
-  logoAnimationComplete = false;
   passwordFocused = false;
 
   constructor(
@@ -32,11 +30,7 @@ export class LoginComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Animation wird jetzt durch die LogoAnimationComponent gesteuert
-  }
-
-  onAnimationComplete(): void {
-    this.logoAnimationComplete = true;
+    // Initialisierung wenn nötig
   }
 
   /**
@@ -100,7 +94,6 @@ export class LoginComponent implements OnInit {
       return;
     }
 
-    // Firebase login
     this.authService.login(this.email, this.password).subscribe({
       next: (userCredential) => {
         console.log('Login successful:', userCredential.user);
@@ -110,7 +103,6 @@ export class LoginComponent implements OnInit {
         console.error('Login error:', error);
         this.loginFailError = true;
 
-        // Handle specific Firebase error codes
         if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
           this.loginFailError = true;
         } else if (error.code === 'auth/invalid-email') {

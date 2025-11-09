@@ -15,7 +15,6 @@
     background-color: $primary-color;
   }
 
-  // Nach Animation: Hintergrund ausblenden
   &.background-hidden {
     background-color: transparent;
   }
@@ -26,7 +25,6 @@
   transition: all 0.5s ease-in-out;
   z-index: 10000;
 
-  // Phase 1: Hidden (initial state)
   &.hidden {
     display: none;
     width: 0;
@@ -37,7 +35,6 @@
     opacity: 0;
   }
 
-  // Phase 2: Center (appear)
   &.center {
     display: block;
     width: 0;
@@ -48,7 +45,6 @@
     opacity: 1;
   }
 
-  // Phase 3: Expanding (grow in center)
   &.expanding {
     display: block;
     width: 200px;
@@ -59,7 +55,6 @@
     opacity: 1;
   }
 
-  // Phase 4: Shrinking (move to top-left and shrink)
   &.shrinking {
     width: 80px;
     height: 80px;
@@ -76,7 +71,6 @@
     }
   }
 
-  // Phase 5: Final (static position top-left)
   &.final {
     width: 80px;
     height: 80px;

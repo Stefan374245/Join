@@ -1,5 +1,7 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-logo-animation',
@@ -10,9 +12,14 @@ import { CommonModule } from '@angular/common';
 })
 export class LogoAnimationComponent implements OnInit {
   @Output() animationComplete = new EventEmitter<void>();
-  
+
   animationState: 'hidden' | 'center' | 'expanding' | 'shrinking' | 'final' = 'hidden';
   isMobile = false;
+
+  constructor(
+    private router: Router,
+    private authService: AuthService
+  ) {}
 
   ngOnInit(): void {
     this.isMobile = window.innerWidth < 800;
@@ -20,25 +27,22 @@ export class LogoAnimationComponent implements OnInit {
   }
 
   private startAnimation(): void {
-    // Phase 1: Show logo in center (hidden -> center)
     setTimeout(() => {
       this.animationState = 'center';
     }, 0);
 
-    // Phase 2: Expand logo (center -> expanding)
     setTimeout(() => {
       this.animationState = 'expanding';
     }, 500);
 
-    // Phase 3: Shrink and move to top-right (expanding -> shrinking)
     setTimeout(() => {
       this.animationState = 'shrinking';
     }, 1500);
 
-    // Phase 4: Final position top-right (shrinking -> final)
     setTimeout(() => {
       this.animationState = 'final';
       this.animationComplete.emit();
+      this.router.navigate(['/welcome']);
     }, 2500);
   }
 
