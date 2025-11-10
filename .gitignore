@@ -47,3 +47,11 @@ Thumbs.db
 
 # MCP Server Config (contains sensitive tokens)
 mcp.config.json
+
+# Firebase Service Account Key (NEVER commit!)
+firebase-service-account.json
+*-service-account.json
+
+# N8N Configuration (contains API keys)
+n8n-config.json
+n8n-credentials.json

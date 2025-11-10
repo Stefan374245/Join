@@ -1,0 +1,48 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ========================================
+    // USERS COLLECTION
+    // Stores both registered users and contacts
+    // ========================================
+    match /users/{userId} {
+      // Any authenticated user can read all users (for contacts list)
+      allow read: if request.auth != null;
+      
+      // Allow authenticated users to create new contacts
+      allow create: if request.auth != null;
+      
+      // Allow users to update their own profile or contacts they created
+      allow update: if request.auth != null && 
+                     (request.auth.uid == userId || request.auth.uid == resource.data.userId);
+      
+      // Allow users to delete their own profile or contacts they created
+      allow delete: if request.auth != null && 
+                     (request.auth.uid == userId || request.auth.uid == resource.data.userId);
+    }
+    
+    // ========================================
+    // TASKS COLLECTION
+    // Tasks can be created by authenticated users OR n8n Workflow (AI Agent)
+    // ========================================
+    match /tasks/{taskId} {
+      // Read access for authenticated users
+      allow read: if request.auth != null;
+      
+      // Write access for authenticated users
+      allow create, update: if request.auth != null;
+      
+      // TEMPORARY: Allow n8n workflow to create tasks via Web API Key
+      // TODO: Switch to Service Account after testing
+      // This allows AI-generated tasks with specific fields
+      allow create: if request.resource.data.keys().hasAll(['createdBy', 'status', 'aiGenerated'])
+                    && request.resource.data.createdBy == "ai-agent" 
+                    && request.resource.data.status == "triage"
+                    && request.resource.data.aiGenerated == true;
+      
+      // Allow authenticated users to delete their own tasks
+      allow delete: if request.auth != null;
+    }
+  }
+}
