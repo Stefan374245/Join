@@ -30,7 +30,7 @@
     </section>
 
     <section class="action-section">
-      <button (click)="sendEmail()" class="btn-primary" [disabled]="requestsUsed >= maxRequests">
+      <button type="button" (click)="sendEmail()" class="btn-primary" [disabled]="requestsUsed >= maxRequests">
         Send Email
       </button>
       @if (requestsUsed >= maxRequests) {

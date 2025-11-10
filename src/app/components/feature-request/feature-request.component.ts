@@ -14,11 +14,16 @@ export class FeatureRequestComponent {
   maxRequests = 10;
 
   sendEmail() {
-    const subject = 'Feature Request / Bug Report';
-    const body = 'Please describe your request here...';
-    const mailtoLink = `mailto:your-email@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    console.log('sendEmail() called'); // Debug
+    const recipientEmail = 'duebel3@googlemail.com';
+    const subject = 'Feature Request - Join Kanban';
+    const body = 'Please describe your feature request, bug report, or question:\n\n';
+
+    // Gmail Web Interface URL
+    const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(recipientEmail)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     
-    window.location.href = mailtoLink;
+    console.log('Opening Gmail URL:', gmailUrl); // Debug
+    window.open(gmailUrl, '_blank');
   }
 }
 
