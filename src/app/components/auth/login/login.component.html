@@ -1,10 +1,19 @@
 <main class="main-div">
-  <div class="main-content">
-    <div class="login-div">
-      <h1 class="account-header">Log in</h1>
+  <img class="logo" src="assets/images/joinlogodark.svg" alt="Join Logo" />
+
+  <aside class="signup-div">
+    <span class="signup-span">Not a Join User?</span>
+    <a routerLink="/signup" class="signup-link" aria-label="Sign up for a new account">Sign up</a>
+  </aside>
+
+  <article class="main-content">
+    <section class="login-div">
+      <header class="account-header">
+        <h1>Log in</h1>
+      </header>
       <div class="seperator"></div>
 
-      <div class="login-input-div">
+      <form class="login-input-div">
         <div class="input-div">
           <input
             type="email"
@@ -15,10 +24,24 @@
             class="login-input"
             [class.red-border]="emailError"
             (focus)="onEmailFocus()"
-            autocomplete="email">
-          <img src="assets/images/mail.svg" alt="Email" class="input-img">
+            autocomplete="email"
+            aria-label="Email address"
+            aria-describedby="email-error"
+          />
+          <img
+            src="assets/images/mail.svg"
+            alt=""
+            aria-hidden="true"
+            class="input-img"
+          />
         </div>
-        <span class="error-span" [class.visible]="emailError">Please enter a valid email address</span>
+        <span
+          id="email-error"
+          class="error-span"
+          [class.visible]="emailError"
+          role="alert"
+          >Please enter a valid email address</span
+        >
 
         <div class="input-div">
           <input
@@ -31,62 +54,113 @@
             [class.red-border]="passwordError"
             (focus)="onPasswordFocus()"
             (blur)="onPasswordBlur()"
-            autocomplete="current-password">
+            autocomplete="current-password"
+            aria-label="Password"
+            aria-describedby="password-error"
+          />
           <img
             id="passwordImg"
             [src]="getPasswordIcon()"
-            alt="Toggle password visibility"
+            alt=""
             class="input-img clickable"
             (click)="togglePasswordVisibility()"
-            [class.active]="passwordFocused || password">
+            [class.active]="passwordFocused || password"
+            role="button"
+            [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'"
+            tabindex="0"
+            (keydown.enter)="togglePasswordVisibility()"
+            (keydown.space)="togglePasswordVisibility()"
+          />
         </div>
-        <span class="error-span" [class.visible]="passwordError">Check your email and password. Please try again.</span>
-      </div>
+        <span
+          id="password-error"
+          class="error-span"
+          [class.visible]="passwordError"
+          role="alert"
+          >Check your email and password. Please try again.</span
+        >
+      </form>
 
-      <div class="login-button-div">
+      <nav class="login-button-div">
         <div class="button-row">
           <button
             type="button"
             (click)="login()"
             class="blue-btn"
             [disabled]="isLoginButtonDisabled()"
-            [class.disabled]="isLoginButtonDisabled()">
+            [class.disabled]="isLoginButtonDisabled()"
+            aria-label="Log in to your account"
+          >
             Log in
           </button>
-          <button type="button" (click)="guestLogin()" class="white-btn">Guest Log in</button>
+          <button
+            type="button"
+            (click)="guestLogin()"
+            class="white-btn"
+            aria-label="Log in as guest"
+          >
+            Guest Log in
+          </button>
         </div>
 
-        <div class="divider">
+        <div class="divider" role="separator" aria-label="or">
           <span class="divider-text">OR</span>
         </div>
 
-        <button type="button" (click)="signInWithGoogle()" class="google-btn">
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M19.8055 10.2292C19.8055 9.55207 19.7495 8.86821 19.6296 8.19775H10.2002V12.0489H15.6016C15.3768 13.3009 14.6568 14.4092 13.6036 15.1013V17.5765H16.825C18.7172 15.8338 19.8055 13.2668 19.8055 10.2292Z" fill="#4285F4"/>
-            <path d="M10.2 19.9998C12.9515 19.9998 15.2672 19.1043 16.8285 17.5763L13.6071 15.1011C12.7146 15.7102 11.5659 16.0589 10.2034 16.0589C7.54395 16.0589 5.28554 14.2993 4.50009 11.9258H1.17969V14.4822C2.78136 17.6715 6.34463 19.9998 10.2 19.9998Z" fill="#34A853"/>
-            <path d="M4.49672 11.9258C4.05422 10.6738 4.05422 9.3297 4.49672 8.07773V5.52124H1.17969C-0.394231 8.63867 -0.394231 12.365 1.17969 15.4824L4.49672 11.9258Z" fill="#FBBC04"/>
-            <path d="M10.2 3.94111C11.6464 3.92057 13.0431 4.47111 14.1003 5.47781L16.9383 2.63985C15.1759 0.989848 12.7388 0.0849838 10.2 0.109848C6.34463 0.109848 2.78136 2.43814 1.17969 5.62742L4.49672 8.18391C5.2788 5.80372 7.54059 3.94111 10.2 3.94111Z" fill="#EA4335"/>
+        <button
+          type="button"
+          (click)="signInWithGoogle()"
+          class="google-btn"
+          aria-label="Sign in with Google"
+        >
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 20 20"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+          >
+            <path
+              d="M19.8055 10.2292C19.8055 9.55207 19.7495 8.86821 19.6296 8.19775H10.2002V12.0489H15.6016C15.3768 13.3009 14.6568 14.4092 13.6036 15.1013V17.5765H16.825C18.7172 15.8338 19.8055 13.2668 19.8055 10.2292Z"
+              fill="#4285F4"
+            />
+            <path
+              d="M10.2 19.9998C12.9515 19.9998 15.2672 19.1043 16.8285 17.5763L13.6071 15.1011C12.7146 15.7102 11.5659 16.0589 10.2034 16.0589C7.54395 16.0589 5.28554 14.2993 4.50009 11.9258H1.17969V14.4822C2.78136 17.6715 6.34463 19.9998 10.2 19.9998Z"
+              fill="#34A853"
+            />
+            <path
+              d="M4.49672 11.9258C4.05422 10.6738 4.05422 9.3297 4.49672 8.07773V5.52124H1.17969C-0.394231 8.63867 -0.394231 12.365 1.17969 15.4824L4.49672 11.9258Z"
+              fill="#FBBC04"
+            />
+            <path
+              d="M10.2 3.94111C11.6464 3.92057 13.0431 4.47111 14.1003 5.47781L16.9383 2.63985C15.1759 0.989848 12.7388 0.0849838 10.2 0.109848C6.34463 0.109848 2.78136 2.43814 1.17969 5.62742L4.49672 8.18391C5.2788 5.80372 7.54059 3.94111 10.2 3.94111Z"
+              fill="#EA4335"
+            />
           </svg>
           <span>Sign in with Google</span>
         </button>
 
-        <span class="error-span text-center" [class.visible]="loginFailError">
+        <span
+          class="error-span text-center"
+          [class.visible]="loginFailError"
+          role="alert"
+        >
           Email and/or Password incorrect. Please try again.
         </span>
+      </nav>
+
+
+    </section>
+  </article>
+<div class="signup-mobile">
+        <span class="signup-span">Not a Join User?</span>
+        <a routerLink="/signup" class="signup-link" aria-label="Sign up for a new account">Sign up</a>
       </div>
-    </div>
-  </div>
-
-  <div class="signup-div">
-    <span class="signup-span">Not a Join User?</span>
-    <a routerLink="/signup" class="signup-link">Sign up</a>
-  </div>
-
-  <div class="legal">
+  <footer class="legal">
     <a routerLink="/privacy-policy" class="legal-text">Privacy Policy</a>
     <a routerLink="/legal-notice" class="legal-text">Legal Notice</a>
-  </div>
+  </footer>
 
   <app-toast></app-toast>
 </main>
-

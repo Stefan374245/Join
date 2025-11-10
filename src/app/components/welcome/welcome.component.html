@@ -1,36 +1,35 @@
 <main class="welcome-page">
-  <div class="welcome-card">
+  <article class="welcome-card">
     <div class="welcome-content">
-      <div class="welcome-header">
+      <header class="welcome-header">
         <h1>Welcome</h1>
-      </div>
+      </header>
 
       <p class="welcome-text">
         Pick the option that suits your role: create a request as a stakeholder or log in if you're part of the team.
       </p>
 
-      <div class="options-container">
+      <section class="options-container">
         <div class="option-group">
-          <div class="option-header">
+          <header class="option-header">
             <img src="assets/images/work.svg" alt="Stakeholder icon" class="option-icon">
             <span>Are you a stakeholder?</span>
-          </div>
-          <button class="btn-primary" (click)="createRequest()">
+          </header>
+          <button class="btn-primary" (click)="createRequest()" aria-label="Create a new request">
             Create request
           </button>
         </div>
 
         <div class="option-group">
-          <div class="option-header">
+          <header class="option-header">
             <img src="assets/images/team.svg" alt="Team member icon" class="option-icon">
             <span>Are you a team member?</span>
-          </div>
-          <button class="btn-secondary" (click)="navigateToLogin()">
+          </header>
+          <button class="btn-secondary" (click)="navigateToLogin()" aria-label="Log in as team member">
             Member log in
           </button>
         </div>
-      </div>
+      </section>
     </div>
-  </div>
+  </article>
 </main>
-

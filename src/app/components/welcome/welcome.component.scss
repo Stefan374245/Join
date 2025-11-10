@@ -59,12 +59,17 @@
 
         @media (max-width: 600px) {
           flex-direction: column;
-          gap: 2rem;
+            gap: 3.5rem;
         }
 
         .option-group {
           @include flex(column, flex-start, flex-start);
           gap: 1.5rem;
+          @media (max-width: 600px) {
+            width: 100%;
+            align-items: center;
+            text-align: center;
+          }
 
           .option-header {
             @include flex(row, center, center);

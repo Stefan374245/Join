@@ -1,18 +1,19 @@
 <main class="stakeholder-page">
-  <div class="header">
+  <header class="header">
     <img src="assets/images/joinlogodark.svg" alt="Join Logo" class="logo">
-  </div>
-  <div class="request-today">
-    <a routerLink="/welcome" class="back-link">
-    <img src="assets/images/arrowbackblue.svg" alt="arrow-back">
-  </a>
-    <span class="count">0 of 10 resquests used today</span>
-  </div>
+  </header>
 
-  <div class="content">
+  <nav class="request-today">
+    <a routerLink="/welcome" class="back-link" aria-label="Back to welcome page">
+      <img src="assets/images/arrowbackblue.svg" alt="arrow-back">
+    </a>
+    <span class="count">0 of 10 requests used today</span>
+  </nav>
+
+  <article class="content">
     <h1>Welcome</h1>
 
-    <div class="info-section">
+    <section class="info-section">
       <div class="text-content">
         <h2>Easily create a ticket by sending an email — no extra steps needed.</h2>
 
@@ -23,19 +24,16 @@
         </div>
       </div>
 
-      <div class="image-container">
+      <figure class="image-container">
         <img src="assets/images/stackholder.svg" alt="Feature request process">
-      </div>
-    </div>
+      </figure>
+    </section>
 
-    <div class="action-section">
-      <button class="create-button" (click)="createRequest()">
+    <section class="action-section">
+      <button class="create-button" (click)="createRequest()" aria-label="Create a new request">
         <span>Create Request</span>
-        <img src="assets/images/check.svg" alt="Check icon">
+        <img src="assets/images/check.svg" alt="" aria-hidden="true">
       </button>
-    </div>
-  </div>
-
-
+    </section>
+  </article>
 </main>
-

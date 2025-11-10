@@ -1,13 +1,17 @@
 <app-toast />
 <main class="main-div" [class.show]="logoAnimationComplete">
+  <img class="logo" src="assets/images/joinlogodark.svg" alt="Join Logo" />
+
   <div class="main-content">
     <div class="signup-div">
       <div class="signup-header">
-        <img
-          src="assets/images/arrow-left-line.svg"
-          alt="Back to login"
-          class="back-arrow"
-        />
+        <a routerLink="/login"
+          ><img
+            src="assets/images/arrow-left-line.svg"
+            alt="Back to login"
+            class="back-arrow"
+        /></a>
+
         <h1 class="account-header">Sign up</h1>
       </div>
 
@@ -143,21 +147,12 @@
             Sign up
           </button>
         </div>
-
       </div>
     </div>
-  </div>
-
-  <div class="login-redirect-div">
-    <span class="redirect-span">Already have an account?</span>
-    <a routerLink="/login" class="redirect-link">Log in</a>
   </div>
 
   <div class="legal">
     <a routerLink="/privacy-policy" class="legal-text">Privacy Policy</a>
     <a routerLink="/legal-notice" class="legal-text">Legal Notice</a>
   </div>
-
-
 </main>
-
