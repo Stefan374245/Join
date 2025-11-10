@@ -43,13 +43,9 @@
       }
 
       .welcome-text {
-        font-family: "Open Sans", sans-serif;
-        font-weight: 400;
         font-size: clamp(1.125rem, 2vw, 1.4375rem);
-        line-height: 120%;
         color: $primary-color;
-        margin: 0;
-        width: 100%;
+        text-align: center;
       }
 
       .options-container {
@@ -59,7 +55,7 @@
 
         @media (max-width: 600px) {
           flex-direction: column;
-            gap: 3.5rem;
+          gap: 3.5rem;
         }
 
         .option-group {
@@ -103,8 +99,12 @@
             cursor: pointer;
             transition: background-color 0.3s ease;
 
+            @media (max-width: 600px) {
+              background-color: $primary-color;
+            }
+
             &:hover {
-              background-color: darken($secondary-color, 10%);
+              background-color: darken($primary-color, 10%);
             }
           }
 

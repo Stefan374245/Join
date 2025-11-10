@@ -6,7 +6,6 @@
   width: 100%;
   min-height: 100vh;
   padding: 1.8125rem 2.5rem;
-  background-color: $background-color;
 }
 
 .header {
@@ -22,7 +21,7 @@
 .request-today {
   width: 100%;
   @include flex(row, space-evenly, center);
-  gap: 640px;
+  gap: 550px;
   margin: auto;
   margin-top: 20px;
 
@@ -49,7 +48,7 @@
 }
 
 .info-section {
-  @include flex(row, space-between, flex-start);
+  @include flex(row, center, flex-start);
   width: 100%;
   gap: 3rem;
 
@@ -103,11 +102,16 @@
 }
 
 .action-section {
-  @include flex(row, center, center);
+  @include flex(row, flex-start, center);
   margin-top: 2rem;
+  width: 100%;
+
+  @media (max-width: $breakpoint-lg-xl) {
+    justify-content: center;
+  }
 
   .create-button {
-    @include flex(row, center, center);
+    @include flex(row, flex-start, center);
     gap: 0.25rem;
     padding: 1rem 1.125rem;
     background-color: $accent-color;
@@ -115,7 +119,10 @@
     border-radius: 0.625rem;
     cursor: pointer;
     transition: background-color 0.3s ease;
-    transform: translateX(-370px);
+
+    @media (max-width: $breakpoint-lg-xl) {
+      background-color: $primary-color;
+    }
 
     span {
       font-family: "Open Sans", sans-serif;
@@ -126,10 +133,14 @@
     img {
       width: 1.5rem;
       height: 1.5rem;
+
+      @media (max-width: $breakpoint-lg-xl) {
+        display: none;
+      }
     }
 
     &:hover {
-      background-color: darken($accent-color, 10%);
+      background-color: darken($primary-color, 10%);
     }
   }
 }

@@ -357,32 +357,6 @@
   }
 }
 
-.legal {
-  position: absolute;
-  display: flex;
-  justify-content: center;
-  width: 100%;
-  bottom: 40px;
-  gap: 50px;
-
-  @media (max-width: $breakpoint-md) {
-    position: absolute; // Bleibt absolut positioniert
-    bottom: 20px; // Kleinerer Abstand auf Mobile
-    gap: 20px;
-  }
-}
-
-.legal-text {
-  font-size: 12px;
-  color: #a8a8a8;
-  text-decoration: none;
-
-  &:hover {
-    color: #29abe2;
-    font-weight: bold;
-  }
-}
-
 .login-success {
   position: absolute;
   left: 50%;
@@ -410,7 +384,7 @@
 @media (max-width: $breakpoint-md) {
   .main-div {
     padding: 20px;
-    padding-bottom: 80px; // Mehr Platz für den Footer
+    padding-bottom: 80px;
   }
 
   .main-content {

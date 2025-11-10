@@ -5,11 +5,12 @@ import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../services/auth.service';
 import { ToastService } from '../../../services/toast.service';
 import { ToastComponent } from '../../../shared/components/toast/toast.component';
+import { FooterAuthComponent } from '../../../shared/components/footer-auth/footer-auth.component';
 
 @Component({
   selector: 'app-signup',
   standalone: true,
-  imports: [RouterLink, FormsModule, CommonModule, ToastComponent],
+  imports: [RouterLink, FormsModule, CommonModule, ToastComponent, FooterAuthComponent],
   templateUrl: './signup.component.html',
   styleUrl: './signup.component.scss'
 })
