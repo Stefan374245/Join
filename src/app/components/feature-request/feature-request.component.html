@@ -1,0 +1,42 @@
+<main class="stakeholder-page">
+  <header class="header">
+    <img src="assets/images/joinlogodark.svg" alt="Join Logo" class="logo">
+  </header>
+
+  <nav class="request-today">
+     <a routerLink="/welcome" class="back-link" aria-label="Back to welcome page">
+      <img src="assets/images/arrowbackblue.svg" alt="arrow-back">
+    </a>
+    <span class="count">{{ requestsUsed }} of {{ maxRequests }} requests used today</span>
+  </nav>
+
+  <article class="content">
+    <h1>Welcome</h1>
+
+    <section class="info-section">
+      <div class="text-content">
+        <p>
+          Your request will be sent directly to our team via email.
+          Our AI will analyze it and automatically create a ticket in our system.
+        </p>
+        <p>
+          Please describe your feature request, bug report, or question as detailed as possible.
+        </p>
+      </div>
+
+      <figure class="image-container">
+        <img src="assets/images/stackholder.svg" alt="Feature request process">
+      </figure>
+    </section>
+
+    <section class="action-section">
+      <button (click)="sendEmail()" class="btn-primary" [disabled]="requestsUsed >= maxRequests">
+        Send Email
+      </button>
+      @if (requestsUsed >= maxRequests) {
+        <p class="limit-message">Daily request limit reached. Please try again tomorrow.</p>
+      }
+    </section>
+  </article>
+  <app-footer-auth />
+</main>

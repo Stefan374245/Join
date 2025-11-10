@@ -1,0 +1,129 @@
+@import "../../../styles/variables";
+@import "../../../styles/mixins";
+
+.stakeholder-page {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  padding: 1.8125rem 2.5rem;
+}
+
+.header {
+  @include flex(row, flex-start, center);
+  width: 70rem;
+
+  .logo {
+    width: 3.5rem;
+    height: auto;
+  }
+}
+
+.request-today {
+  width: 100%;
+  @include flex(row, space-evenly, center);
+  gap: 550px;
+  margin: auto;
+  margin-top: 20px;
+
+  .count {
+    font-size: 19px;
+    color: $accent-color;
+  }
+}
+
+.content {
+  @include flex(column, flex-start, center);
+  width: 60.25rem;
+  margin: 3.5rem auto 0;
+  gap: 3rem;
+
+  h1 {
+    font-family: "Open Sans", sans-serif;
+    font-weight: 700;
+    font-size: 4rem;
+    text-align: center;
+    color: $primary-color;
+    margin: 0;
+  }
+}
+
+.info-section {
+  @include flex(row, center, flex-start);
+  width: 100%;
+  gap: 3rem;
+
+  @media (max-width: 1064px) {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .text-content {
+    @include flex(column, flex-start, flex-start);
+    gap: 2.5rem;
+    max-width: 31.375rem;
+
+    p {
+      font-family: "Open Sans", sans-serif;
+      font-size: 1.1875rem;
+      line-height: 120%;
+      text-align: justify;
+      color: $text-color;
+      margin: 0;
+    }
+  }
+
+  .hero-image {
+    width: 26rem;
+    height: auto;
+    border-radius: $border-radius;
+  }
+}
+
+.action-section {
+  @include flex(column, center, center);
+  margin-top: 2rem;
+  width: 100%;
+  gap: 1rem;
+
+  .btn-primary {
+    padding: 1rem 1.125rem;
+    background-color: $accent-color;
+    border: none;
+    border-radius: 0.625rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-family: "Open Sans", sans-serif;
+    font-size: 1.4375rem;
+    color: $white;
+
+    &:hover:not(:disabled) {
+      background-color: darken($primary-color, 10%);
+    }
+
+    &:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+  }
+
+  .limit-message {
+    color: #ff4444;
+    font-size: 1rem;
+    text-align: center;
+  }
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+
+  &:hover {
+    opacity: 0.7;
+  }
+
+  img {
+    display: block;
+  }
+}

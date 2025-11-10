@@ -21,6 +21,6 @@ export class StakeholderComponent {
   }
 
   createRequest() {
-    // TODO: Implement request creation
+    this.router.navigate(['/feature-request']);
   }
 }

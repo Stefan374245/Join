@@ -17,6 +17,6 @@ export class WelcomeComponent {
   }
 
   createRequest() {
-    this.router.navigate(['/feature-request']);
+    this.router.navigate(['/create-request']);
   }
 }

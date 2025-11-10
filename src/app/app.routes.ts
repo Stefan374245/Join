@@ -3,6 +3,7 @@ import { LoginComponent } from './components/auth/login/login.component';
 import { SignupComponent } from './components/auth/signup/signup.component';
 import { WelcomeComponent } from './components/welcome/welcome.component';
 import { StakeholderComponent } from './components/stakeholder/stakeholder.component';
+import { FeatureRequestComponent } from './components/feature-request/feature-request.component';
 import { LogoAnimationComponent } from './components/auth/logo-animation/logo-animation.component';
 import { AddTaskComponent } from './components/add-task/add-task.component';
 import { BoardViewComponent } from './components/board/board-view/board-view.component';
@@ -68,8 +69,12 @@ export const routes: Routes = [
     component: HelpComponent
   },
   {
-    path: 'feature-request',
+    path: 'create-request',
     component: StakeholderComponent
+  },
+  {
+    path: 'feature-request',
+    component: FeatureRequestComponent
   },
   { path: '**', redirectTo: '/login' }
 ];

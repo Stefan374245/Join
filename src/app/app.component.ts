@@ -22,6 +22,7 @@ export class AppComponent {
       this.isAuthPage = url.startsWith('/login') || 
                        url.startsWith('/signup') || 
                        url.startsWith('/welcome') ||
+                       url.startsWith('/create-request') ||
                        url.startsWith('/feature-request');
       this.isContactsPage = url.startsWith('/contacts');
     });
