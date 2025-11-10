@@ -5,7 +5,7 @@ import { Component } from '@angular/core';
   standalone: true,
   template: `
     <div class="loading-spinner">
-      <img src="/assets/images/loading.svg" alt="Loading..." />
+      <img src="assets/images/loading.svg" alt="Loading..." />
     </div>
   `,
   styleUrls: ['./loading-spinner.component.scss']

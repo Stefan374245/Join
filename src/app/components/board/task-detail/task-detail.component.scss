@@ -1,7 +1,6 @@
 @import '../../../../styles/variables';
 @import '../../../../styles/mixins';
 
-// ========== Task Overlay (Background) ==========
 .task-overlay {
   display: flex;
   justify-content: center;
@@ -15,7 +14,6 @@
   z-index: 14;
 }
 
-// ========== Task Detail Card ==========
 .task-card-overlay {
   display: flex;
   flex-direction: column;
@@ -44,7 +42,6 @@
   }
 }
 
-// ========== Header ==========
 .task-header {
   display: flex;
   align-items: flex-start;
@@ -101,7 +98,6 @@
   }
 }
 
-// ========== Task Content ==========
 .task-content {
   display: flex;
   flex-direction: column;
@@ -126,7 +122,6 @@
   }
 }
 
-// ========== Task Details ==========
 .task-details {
   display: flex;
   flex-direction: column;
@@ -220,7 +215,6 @@
   }
 }
 
-// ========== Subtasks Section ==========
 .subtasks-section {
   margin-top: 16px;
   display: flex;
@@ -285,7 +279,6 @@
     }
   }
 
-  // Old styles for backward compatibility - can be removed later
   .subtask-item {
     display: flex;
     align-items: center;
@@ -319,7 +312,6 @@
   }
 }
 
-// ========== Action Buttons ==========
 .task-actions {
   display: flex;
   align-items: center;
@@ -362,7 +354,6 @@
   }
 }
 
-// ========== Delete Confirmation Dialog ==========
 .confirm-dialog-overlay {
   position: fixed;
   inset: 0;
@@ -425,7 +416,6 @@
   }
 }
 
-// ========== Loading Spinner ==========
 .loading-spinner {
   display: flex;
   justify-content: center;
@@ -443,7 +433,6 @@
   100% { transform: rotate(360deg); }
 }
 
-// ========== Responsive Design ==========
 @media (max-width: 768px) {
   .task-card-overlay {
     width: 100%;
