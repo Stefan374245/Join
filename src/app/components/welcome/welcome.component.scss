@@ -43,7 +43,7 @@
       }
 
       .welcome-text {
-        font-size: clamp(1.125rem, 2vw, 1.4375rem);
+        font-size: clamp(1rem, 2vw, 1.125rem); // min 16px, max 18px
         color: $primary-color;
         text-align: center;
       }
@@ -80,7 +80,7 @@
             span {
               font-family: "Open Sans", sans-serif;
               font-weight: 400;
-              font-size: clamp(1.125rem, 2vw, 1.4375rem);
+              font-size: clamp(1rem, 2vw, 1.125rem); // min 16px, max 18px
               line-height: 120%;
               color: $primary-color;
             }
@@ -90,7 +90,7 @@
             @include flex(row, center, center);
             padding: 0.625rem 1.125rem;
             font-family: "Open Sans", sans-serif;
-            font-size: clamp(1.125rem, 2vw, 1.4375rem);
+            font-size: clamp(1rem, 2vw, 1.125rem); // min 16px, max 18px
             line-height: 120%;
             color: $white;
             background: $secondary-color;
@@ -112,7 +112,7 @@
             @include flex(row, center, center);
             padding: 0.75rem 1.125rem;
             font-family: "Open Sans", sans-serif;
-            font-size: clamp(1rem, 1.5vw, 1.1875rem);
+            font-size: clamp(1rem, 1.5vw, 1.125rem); // min 16px, max 18px
             line-height: 120%;
             color: $primary-color;
             background: $white;

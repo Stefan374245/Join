@@ -19,7 +19,7 @@ import { ToastService } from '../../services/toast.service';
 export class AddTaskComponent implements OnInit, AfterViewChecked {
   @Input() isOverlay: boolean = false;
   @Input() taskToEdit: Task | null = null;
-  @Input() initialStatus: 'triage' | 'todo' | 'in-progress' | 'await-feedback' | 'done' = 'todo';
+  @Input() initialStatus: 'triage' | 'todo' | 'in-progress' | 'await-feedback' | 'done' = 'triage';
   @Output() close = new EventEmitter<void>();
   @Output() taskSaved = new EventEmitter<Task>();
   @ViewChild('editInput') editInput?: ElementRef<HTMLInputElement>;
@@ -42,7 +42,7 @@ export class AddTaskComponent implements OnInit, AfterViewChecked {
   showCategoryDropdown: boolean = false;
 
   isEditMode: boolean = false;
-  minDate: string = ''; // Minimales Datum (heute)
+  minDate: string = '';
 
   constructor(
     private fb: FormBuilder,
