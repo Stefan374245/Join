@@ -34,8 +34,21 @@ export const routes: Routes = [
   {
     path: 'signup',
     component: SignupComponent
-
   },
+  // ✅ KORRIGIERT: Stakeholder & Feature Request OHNE Guards (öffentlich zugänglich)
+  {
+    path: 'stakeholder',
+    component: StakeholderComponent
+  },
+  {
+    path: 'feature-request',
+    component: FeatureRequestComponent
+  },
+  // ❌ ENTFERNT: Duplicate Route
+  // {
+  //   path: 'create-request',
+  //   component: StakeholderComponent
+  // },
   {
     path: 'board',
     component: BoardViewComponent,
@@ -67,14 +80,6 @@ export const routes: Routes = [
   {
     path: 'help',
     component: HelpComponent
-  },
-  {
-    path: 'create-request',
-    component: StakeholderComponent
-  },
-  {
-    path: 'feature-request',
-    component: FeatureRequestComponent
   },
   { path: '**', redirectTo: '/login' }
 ];

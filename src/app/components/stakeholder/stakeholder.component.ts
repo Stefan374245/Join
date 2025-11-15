@@ -19,8 +19,4 @@ export class StakeholderComponent {
   goBack() {
     this.router.navigate(['/welcome']);
   }
-
-  createRequest() {
-    this.router.navigate(['/feature-request']);
-  }
 }

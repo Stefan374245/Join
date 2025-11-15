@@ -10,4 +10,5 @@ export const environment = {
     messagingSenderId: '997212360363',
     appId: '1:997212360363:web:4790443452314fafd971ee',
   },
+  n8nWebhookUrl: 'https://shell-workflows.app.n8n.cloud/webhook/feature-request'
 };

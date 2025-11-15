@@ -30,10 +30,10 @@
     </section>
 
     <section class="action-section">
-      <button class="create-button" (click)="createRequest()" aria-label="Create a new request">
-        <span>Create Request</span>
-        <img src="assets/images/check.svg" alt="" aria-hidden="true">
-      </button>
+       <a routerLink="/feature-request" class="btn-primary create-button" aria-label="Create a new request">
+        Create Request
+        <img src="assets/images/check.svg" alt="" aria-hidden="true" class="check-icon">
+      </a>
     </section>
   </article>
   <app-footer-auth />

@@ -15,9 +15,10 @@
             <img src="assets/images/work.svg" alt="Stakeholder icon" class="option-icon">
             <span>Are you a stakeholder?</span>
           </header>
-          <button class="btn-primary" (click)="createRequest()" aria-label="Create a new request">
-            Create request
-          </button>
+          <!-- ✅ KORRIGIERT: <a> statt <button><a></button> -->
+          <a routerLink="/stakeholder" class="btn-primary" aria-label="Create a new request">
+            Create Request
+          </a>
         </div>
 
         <div class="option-group">
@@ -25,9 +26,10 @@
             <img src="assets/images/team.svg" alt="Team member icon" class="option-icon">
             <span>Are you a team member?</span>
           </header>
-          <button class="btn-secondary" (click)="navigateToLogin()" aria-label="Log in as team member">
+          <!-- ✅ KORRIGIERT: <a> statt <button><a></button> -->
+          <a routerLink="/login" class="btn-secondary" aria-label="Team member login">
             Member log in
-          </button>
+          </a>
         </div>
       </section>
     </div>
