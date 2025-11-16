@@ -35,22 +35,34 @@ export class TaskService {
   private initializeTasksListener(): void {
     try {
       const tasksCol = collection(this.firestore, 'tasks');
-      const tasksQuery = query(tasksCol, orderBy('createdAt', 'desc'));
+      // Remove orderBy to get all tasks
       
-      onSnapshot(tasksQuery, 
+      onSnapshot(tasksCol, 
         (snapshot) => {
+          console.log('📊 Firestore snapshot size:', snapshot.size);
           const tasks = snapshot.docs.map((doc) => {
             const data = doc.data();
+            console.log('Task ID:', doc.id, 'Status:', data.status);
             return this.mapFirestoreTask({ id: doc.id, ...data });
           });
           
+          // Sort in memory instead
+          tasks.sort((a, b) => {
+            const dateA = (a as any).createdAt instanceof Date ? (a as any).createdAt.getTime() : 0;
+            const dateB = (b as any).createdAt instanceof Date ? (b as any).createdAt.getTime() : 0;
+            return dateB - dateA;
+          });
+          
+          console.log('📊 Total tasks loaded:', tasks.length);
           this.tasksSubject.next(tasks);
         },
         (error) => {
+          console.error('❌ Firestore listener error:', error);
           this.tasksSubject.next([]);
         }
       );
     } catch (error) {
+      console.error('❌ Error initializing listener:', error);
       this.tasksSubject.next([]);
     }
   }
@@ -95,7 +107,8 @@ export class TaskService {
       dueDate: this.convertToDate(data.dueDate),
       priority: data.priority || 'medium',
       status: status,
-      subtasks: this.mapSubtasks(data.subtasks)
+      subtasks: this.mapSubtasks(data.subtasks),
+      createdAt: this.convertToDate(data.createdAt) // Add this for sorting
     } as Task;
   }
 
