@@ -28,7 +28,65 @@ export class FeatureRequestComponent {
   submitSuccess = false;
   submitError = '';
 
-  async sendFeatureRequest() {
+  /**
+   * Öffnet das Standard-Mail-Programm mit vorausgefüllten Daten
+   */
+  sendFeatureRequest() {
+    // E-Mail-Empfänger
+    const toEmail = 'requests@stefan-helldobler.de';
+
+    // Subject basierend auf Request Type
+    const typeLabels = {
+      'feature': 'Feature Request',
+      'bug': 'Bug Report',
+      'question': 'Question'
+    };
+    const subject = `[${typeLabels[this.requestType]}] New Request`;
+
+    // Body mit strukturierten Informationen
+    const body = `
+Hello Team,
+
+I would like to submit a new ${typeLabels[this.requestType].toLowerCase()}.
+
+---
+
+**Type:** ${typeLabels[this.requestType]}
+**Title:** ${this.requestTitle || '[Please add title]'}
+
+**Description:**
+${this.requestDescription || '[Please add description]'}
+
+---
+
+**Contact Information:**
+Name: ${this.stakeholderName || '[Your name]'}
+Email: ${this.stakeholderEmail || '[Your email]'}
+
+**Important Features/Requirements:**
+- [Add your requirements here]
+-
+-
+
+---
+
+Best regards
+`.trim();
+
+    const mailtoLink = `mailto:${toEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    window.location.href = mailtoLink;
+
+    this.requestsUsed++;
+    this.submitSuccess = true;
+    setTimeout(() => {
+      this.submitSuccess = false;
+    }, 3000);
+  }
+
+  /**
+   * Alternative: Sende direkt an n8n (falls du den Webhook behalten willst)
+   */
+  async sendDirectToN8n() {
     if (!this.requestTitle.trim() || !this.requestDescription.trim() || !this.stakeholderEmail.trim()) {
       this.submitError = 'Bitte fülle alle Pflichtfelder aus.';
       return;
@@ -65,6 +123,7 @@ export class FeatureRequestComponent {
       this.submitSuccess = true;
       this.requestsUsed++;
 
+      // Reset form
       this.requestTitle = '';
       this.requestDescription = '';
       this.stakeholderEmail = '';

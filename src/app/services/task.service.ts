@@ -1,13 +1,13 @@
 import { Injectable, inject } from '@angular/core';
-import { 
-  Firestore, 
-  collection, 
+import {
+  Firestore,
+  collection,
   collectionData,
-  doc, 
-  setDoc, 
-  deleteDoc, 
-  updateDoc, 
-  query, 
+  doc,
+  setDoc,
+  deleteDoc,
+  updateDoc,
+  query,
   where,
   Timestamp,
   orderBy,
@@ -36,41 +36,37 @@ export class TaskService {
     try {
       const tasksCol = collection(this.firestore, 'tasks');
       // Remove orderBy to get all tasks
-      
-      onSnapshot(tasksCol, 
+
+      onSnapshot(tasksCol,
         (snapshot) => {
-          console.log('📊 Firestore snapshot size:', snapshot.size);
           const tasks = snapshot.docs.map((doc) => {
             const data = doc.data();
-            console.log('Task ID:', doc.id, 'Status:', data.status);
             return this.mapFirestoreTask({ id: doc.id, ...data });
           });
-          
+
           // Sort in memory instead
           tasks.sort((a, b) => {
             const dateA = (a as any).createdAt instanceof Date ? (a as any).createdAt.getTime() : 0;
             const dateB = (b as any).createdAt instanceof Date ? (b as any).createdAt.getTime() : 0;
             return dateB - dateA;
           });
-          
-          console.log('📊 Total tasks loaded:', tasks.length);
+
           this.tasksSubject.next(tasks);
         },
         (error) => {
-          console.error('❌ Firestore listener error:', error);
           this.tasksSubject.next([]);
         }
       );
     } catch (error) {
-      console.error('❌ Error initializing listener:', error);
-      this.tasksSubject.next([]);
-    }
+      this.tasksSubject.next([]);}
   }
 
   private mapFirestoreTask(data: any): Task {
     let status: 'triage' | 'todo' | 'in-progress' | 'await-feedback' | 'done' = 'todo';
-    if (data.status) {
-      switch (data.status.toLowerCase()) {
+
+    // Ändere data.status zu data['status']
+    if (data['status']) {
+      switch (data['status'].toLowerCase()) {
         case 'triage':
           status = 'triage';
           break;
@@ -99,16 +95,16 @@ export class TaskService {
     }
 
     return {
-      id: data.id || data.taskId,
-      title: data.title || '',
-      description: data.description || '',
-      category: data.category || '',
-      assignedTo: Array.isArray(data.assignedTo) ? data.assignedTo : [],
-      dueDate: this.convertToDate(data.dueDate),
-      priority: data.priority || 'medium',
+      id: data['id'] || data['taskId'],
+      title: data['title'] || '',
+      description: data['description'] || '',
+      category: data['category'] || '',
+      assignedTo: Array.isArray(data['assignedTo']) ? data['assignedTo'] : [],
+      dueDate: this.convertToDate(data['dueDate']),
+      priority: data['priority'] || 'medium',
       status: status,
-      subtasks: this.mapSubtasks(data.subtasks),
-      createdAt: this.convertToDate(data.createdAt) // Add this for sorting
+      subtasks: this.mapSubtasks(data['subtasks']),
+      createdAt: this.convertToDate(data['createdAt'])
     } as Task;
   }
 
@@ -116,7 +112,7 @@ export class TaskService {
     if (!subtasks || !Array.isArray(subtasks)) {
       return [];
     }
-    
+
     return subtasks.map((st: any) => ({
       id: st.id || `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       title: st.title || st.name || '',
@@ -128,19 +124,19 @@ export class TaskService {
     if (!timestamp) {
       return new Date();
     }
-    
+
     if (timestamp instanceof Date) {
       return timestamp;
     }
-    
+
     if (timestamp.toDate && typeof timestamp.toDate === 'function') {
       return timestamp.toDate();
     }
-    
+
     if (timestamp.seconds) {
       return new Date(timestamp.seconds * 1000);
     }
-    
+
     return new Date(timestamp);
   }
 
@@ -194,7 +190,7 @@ export class TaskService {
         const urgentTasks = tasks
           .filter(t => t.priority === 'high' && t.status !== 'done')
           .sort((a, b) => a.dueDate.getTime() - b.dueDate.getTime());
-        
+
         return urgentTasks.length > 0 ? urgentTasks[0].dueDate : null;
       })
     );
@@ -202,7 +198,7 @@ export class TaskService {
 
   addTask(task: Task): Observable<void> {
     const taskDoc = doc(this.firestore, 'tasks', task.id);
-    
+
     const taskData = {
       title: task.title,
       description: task.description,
@@ -227,7 +223,7 @@ export class TaskService {
     if (!subtasks || subtasks.length === 0) {
       return [];
     }
-    
+
     return subtasks.map(st => ({
       id: st.id,
       title: st.title,
@@ -237,7 +233,7 @@ export class TaskService {
 
   updateTask(taskId: string, updates: Partial<Task>): Observable<void> {
     const taskDoc = doc(this.firestore, 'tasks', taskId);
-    
+
     const updateData: any = {
       ...updates,
       updatedAt: Timestamp.now()
@@ -272,7 +268,7 @@ export class TaskService {
   updateSubtaskCompletion(taskId: string, subtaskId: string, completed: boolean): Observable<void> {
     const tasks = this.tasksSubject.value;
     const task = tasks.find(t => t.id === taskId);
-    
+
     if (!task || !task.subtasks) {
       return new Observable(observer => {
         observer.error(new Error('Task or subtasks not found'));
@@ -288,17 +284,17 @@ export class TaskService {
       });
     }
 
-    const updatedSubtasks = task.subtasks.map(st => 
+    const updatedSubtasks = task.subtasks.map(st =>
       st.id === subtaskId ? { ...st, completed: completed } : st
     );
-    
+
     return this.updateTask(taskId, { subtasks: updatedSubtasks });
   }
 
   toggleSubtask(taskId: string, subtaskId: string): Observable<void> {
     const tasks = this.tasksSubject.value;
     const task = tasks.find(t => t.id === taskId);
-    
+
     if (!task || !task.subtasks) {
       return new Observable(observer => {
         observer.error(new Error('Task or subtasks not found'));
@@ -322,7 +318,7 @@ export class TaskService {
       this.getTaskById(taskId).subscribe(task => {
         if (task) {
           const updatedSubtasks = [...task.subtasks, subtask];
-          
+
           this.updateTask(taskId, { subtasks: updatedSubtasks }).subscribe({
             next: () => observer.next(),
             error: (err) => observer.error(err),
@@ -340,7 +336,7 @@ export class TaskService {
       this.getTaskById(taskId).subscribe(task => {
         if (task) {
           const updatedSubtasks = task.subtasks.filter(st => st.id !== subtaskId);
-          
+
           this.updateTask(taskId, { subtasks: updatedSubtasks }).subscribe({
             next: () => observer.next(),
             error: (err) => observer.error(err),
