@@ -12,8 +12,8 @@ export interface Task {
   // Neue Felder für AI-generierte Tasks
   createdAt?: Date;
   updatedAt?: Date;
-  source?: 'email' | 'manual' | 'api';
-  creatorType?: 'internal' | 'external';
+  source?: 'email' | 'manual' | 'member' | 'api';
+  creatorType?: 'member' | 'external';
   creatorEmail?: string;
   creatorName?: string;
   aiGenerated?: boolean;

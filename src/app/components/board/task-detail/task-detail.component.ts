@@ -194,5 +194,51 @@ export class TaskDetailComponent implements OnInit {
   getPriorityIcon(priority: string): string {
     return `/assets/images/${priority.toLowerCase()}.svg`;
   }
+
+  /**
+   * Get creator icon based on creator type
+   */
+  getCreatorIcon(): string {
+    if (this.task.creatorType === 'external' || this.task.source === 'email') {
+      return '/assets/images/card_email.svg';
+    }
+    return '/assets/images/person.svg';
+  }
+
+  /**
+   * Get creator badge CSS class
+   */
+  getCreatorBadgeClass(): string {
+    if (this.task.creatorType === 'external' || this.task.source === 'email') {
+      return 'badge-external';
+    }
+    return 'badge-member';
+  }
+
+  /**
+   * Get creator badge text
+   */
+  getCreatorBadgeText(): string {
+    if (this.task.creatorType === 'external' || this.task.source === 'email') {
+      return 'Extern';
+    }
+    return 'Member';
+  }
+
+  /**
+   * Get creator display name
+   */
+  getCreatorDisplayName(): string {
+    if (this.task.creatorName) {
+      return this.task.creatorName;
+    }
+    if (this.task.creatorEmail) {
+      return this.task.creatorEmail;
+    }
+    if (this.task.source === 'member' || this.task.creatorType === 'member') {
+      return 'Member';
+    }
+    return 'Unknown';
+  }
 }
 

@@ -11,6 +11,9 @@
       <div class="task-category" [ngClass]="getCategoryClass(task.category)">
         <span>{{ task.category }}</span>
       </div>
+      <div class="ai-generated" *ngIf="task.source === 'email'">
+        <img src="/assets/images/note_ki.svg" alt="AI Generated Note">
+      </div>
       <button class="close-btn" (click)="onClose()" aria-label="Close">
         <img src="assets/images/close.svg" alt="Close" />
       </button>
@@ -23,6 +26,18 @@
 
       <!-- Description -->
       <p class="task-description">{{ task.description }}</p>
+
+      <!-- Creator Section -->
+      <div class="creator-section" *ngIf="task.source || task.creatorType || task.creatorName || task.creatorEmail">
+        <span class="detail-label">Creator:</span>
+        <div class="creator-info">
+          <span class="creator-badge" [ngClass]="getCreatorBadgeClass()">
+            <img [src]="getCreatorIcon()" alt="Creator type" class="creator-icon" />
+            <span class="creator-badge-text">{{ getCreatorBadgeText() }}</span>
+          </span>
+          <span class="creator-name">{{ getCreatorDisplayName() }}</span>
+        </div>
+      </div>
 
       <!-- Task Details -->
       <div class="task-details">

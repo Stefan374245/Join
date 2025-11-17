@@ -7,6 +7,7 @@ import { Task, Subtask } from '../../models/task.interface';
 import { Contact } from '../../models/contact.interface';
 import { TaskService } from '../../services/task.service';
 import { ContactService } from '../../services/contact.service';
+import { AuthService } from '../../services/auth.service';
 import { ToastService } from '../../services/toast.service';
 
 @Component({
@@ -48,6 +49,7 @@ export class AddTaskComponent implements OnInit, AfterViewChecked {
     private fb: FormBuilder,
     private taskService: TaskService,
     private contactService: ContactService,
+    private authService: AuthService,
     private router: Router,
     private toastService: ToastService
   ) {}
@@ -285,6 +287,8 @@ export class AddTaskComponent implements OnInit, AfterViewChecked {
    * Neuen Task erstellen
    */
   private createTask(): void {
+    const currentUser = this.authService.currentUser;
+
     const newTask: Task = {
       id: this.generateId(),
       title: this.taskForm.value.title,
@@ -294,7 +298,14 @@ export class AddTaskComponent implements OnInit, AfterViewChecked {
       dueDate: new Date(this.taskForm.value.dueDate),
       priority: this.selectedPriority,
       status: this.initialStatus, // Verwende den initialStatus aus Input
-      subtasks: this.subtasks
+      subtasks: this.subtasks,
+      // Neue Felder für Member-erstellte Tasks
+      source: 'member',
+      creatorType: 'member',
+      creatorName: currentUser?.displayName || undefined,
+      creatorEmail: currentUser?.email || undefined,
+      createdAt: new Date(),
+      aiGenerated: false
     };
 
     this.taskService.addTask(newTask).subscribe({
@@ -326,7 +337,8 @@ export class AddTaskComponent implements OnInit, AfterViewChecked {
       assignedTo: this.selectedContacts.map(c => c.id),
       dueDate: new Date(this.taskForm.value.dueDate),
       priority: this.selectedPriority,
-      subtasks: this.subtasks
+      subtasks: this.subtasks,
+      updatedAt: new Date()
     };
 
     this.taskService.updateTask(this.taskToEdit.id, updatedTask).subscribe({

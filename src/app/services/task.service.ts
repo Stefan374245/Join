@@ -104,7 +104,13 @@ export class TaskService {
       priority: data['priority'] || 'medium',
       status: status,
       subtasks: this.mapSubtasks(data['subtasks']),
-      createdAt: this.convertToDate(data['createdAt'])
+      createdAt: this.convertToDate(data['createdAt']),
+      updatedAt: data['updatedAt'] ? this.convertToDate(data['updatedAt']) : undefined,
+      source: data['source'] || undefined,
+      creatorType: data['creatorType'] || undefined,
+      creatorEmail: data['creatorEmail'] || undefined,
+      creatorName: data['creatorName'] || undefined,
+      aiGenerated: data['aiGenerated'] || false
     } as Task;
   }
 
@@ -208,9 +214,15 @@ export class TaskService {
       priority: task.priority,
       status: task.status,
       subtasks: this.prepareSubtasks(task.subtasks),
-      createdAt: Timestamp.now(),
+      createdAt: task.createdAt ? this.convertToTimestamp(task.createdAt) : Timestamp.now(),
       updatedAt: Timestamp.now(),
-      createdBy: this.auth.currentUser?.uid || 'anonymous'
+      createdBy: this.auth.currentUser?.uid || 'anonymous',
+      // Neue Felder für Creator-Tracking
+      source: task.source || 'member',
+      creatorType: task.creatorType || 'member',
+      creatorName: task.creatorName || undefined,
+      creatorEmail: task.creatorEmail || undefined,
+      aiGenerated: task.aiGenerated || false
     };
 
     const promise = setDoc(taskDoc, taskData).then(() => {

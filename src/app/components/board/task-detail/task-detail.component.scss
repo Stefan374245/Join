@@ -2,30 +2,27 @@
 @import '../../../../styles/mixins';
 
 .task-overlay {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  @include flex(row, center, center);
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.1);
+  background-color: rgba($black, 0.1);
   z-index: 14;
 }
 
 .task-card-overlay {
-  display: flex;
-  flex-direction: column;
+  @include flex(column, flex-start, stretch);
   position: relative;
   width: 500px;
   max-width: 100%;
   max-height: 90vh;
-  background-color: #ffffff;
-  border-radius: 30px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  padding: 48px 40px;
-  margin: 16px;
+  background-color: $white;
+  border-radius: $border-radius-lg * 2.5;
+  box-shadow: $shadow-lg;
+  padding: $spacing-xl * 2.4 $spacing-xl * 2;
+  margin: $spacing-md;
   animation: slideInFromRight 0.2s ease-out;
   overflow: auto;
   scrollbar-width: none;
@@ -43,40 +40,36 @@
 }
 
 .task-header {
-  display: flex;
-  align-items: flex-start;
+  @include flex(row, space-between, center);
   text-align: center;
-  justify-content: space-between;
 
   .task-category {
     display: inline-block;
-    padding: 4px 16px;
-    border-radius: 8px;
-    font-size: 16px;
+    padding: $spacing-xs $spacing-md;
+    border-radius: $border-radius;
+    font-size: $font-size-base;
     font-weight: 500;
     color: $white;
     line-height: 1.2;
 
     &.user-story {
-      background: #0038ff;
+      background: map-get($user-colors, '0038FF');
     }
 
     &.technical-task {
-      background: #1fd7c1;
+      background: map-get($user-colors, '1FD7C1');
     }
   }
 
   .close-btn {
+    @include flex(row, center, center);
     background: none;
     border: none;
     font-size: 24px;
     cursor: pointer;
-    color: #2a3647;
+    color: $primary-color;
     width: 32px;
     height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     border-radius: 50%;
     transition: background-color 0.2s;
     padding: 0;
@@ -91,7 +84,7 @@
       transition: background-color 0.2s;
 
       &:hover {
-        background-color: #ffffff;
+        background-color: $white;
         border-radius: 50%;
       }
     }
@@ -99,56 +92,101 @@
 }
 
 .task-content {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  @include flex(column, flex-start, stretch);
+  gap: $spacing-sm * 2;
   flex: 1;
 
   .task-title {
     word-break: break-word;
     font-size: 48px;
     font-weight: 700;
-    color: #2a3647;
-    margin: 0 0 16px 0;
+    color: $primary-color;
+    margin: 0 0 $spacing-md 0;
     line-height: 1.2;
   }
 
   .task-description {
     font-size: 20px;
-    color: #2a3647;
-    margin: 0 0 24px 0;
+    color: $primary-color;
+    margin: 0 0 $spacing-lg * 1.6 0;
     line-height: 1.5;
     word-break: break-word;
   }
 }
 
-.task-details {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
+.creator-section {
+  @include flex(row, space-between, flex-start);
+  margin-bottom: $spacing-md;
+
+  .detail-label {
+    display: block;
+    color: $primary-color;
+    font-weight: 400;
+    font-size: 20px;
+    margin-bottom: $spacing-sm * 2.4;
+  }
+
+  .creator-info {
+    @include flex(row, flex-start, center);
+    gap: $spacing-sm * 2.4;
+    padding-left: $spacing-lg * 1.33;
+
+    .creator-icon {
+      width: $spacing-md;
+      height: $spacing-md;
+      flex-shrink: 0;
+    }
+
+    .creator-badge {
+      @include flex(row, center, center);
+      gap: 10px;
+      padding: $spacing-xs $spacing-sm * 2.4;
+      border-radius: $border-radius - 2px;
+      font-size: $font-size-sm;
+      font-weight: 500;
+      color: $white;
+      white-space: nowrap;
+
+      &.badge-member {
+        background-color: #4B0082;
+      }
+
+      &.badge-external {
+        background-color: #1FD7C1;
+      }
+    }
+
+    .creator-name {
+      font-size: $font-size-base;
+      color: $primary-color;
+      font-weight: 400;
+    }
+  }
+}.task-details {
+  @include flex(column, flex-start, stretch);
+  gap: $spacing-lg * 1.6;
 
   .detail-row {
-    display: flex;
-    align-items: center;
-    gap: 16px;
+    @include flex(row, flex-start, center);
+    gap: $spacing-md;
     font-size: 20px;
 
     .detail-label {
-      color: #2a3647;
+      color: $primary-color;
       font-weight: 400;
       font-size: 20px;
       min-width: 100px;
     }
 
     .detail-value {
-      color: #2a3647;
+      color: $primary-color;
       font-size: 20px;
     }
 
     .task-priority {
+      @include flex(row, flex-start, center);
       display: inline-flex;
-      align-items: center;
-      gap: 8px;
+      gap: $border-radius;
       font-weight: 400;
       color: $primary-color;
 
@@ -159,40 +197,34 @@
     }
 
     &.assigned-to {
-      display: flex;
-      flex-direction: column;
-      align-items: start;
+      @include flex(column, flex-start, flex-start);
 
       .assignee-list {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-        padding-left: 20px;
+        @include flex(column, flex-start, stretch);
+        gap: $border-radius;
+        padding-left: $spacing-lg * 1.33;
 
         .assignee-item {
-          display: flex;
-          align-items: center;
-          gap: 16px;
-          padding: 8px 0;
-          border-radius: 10px;
+          @include flex(row, flex-start, center);
+          gap: $spacing-md;
+          padding: $border-radius 0;
+          border-radius: $spacing-sm * 2;
           transition: background-color 0.2s;
 
           .assignee-avatar {
+            @include flex(row, center, center);
             width: 45px;
             height: 45px;
             border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
+            color: $white;
             font-weight: 500;
-            font-size: 16px;
-            border: 2px solid white;
+            font-size: $font-size-base;
+            border: 2px solid $white;
             flex-shrink: 0;
 
             &.more-avatar {
               background-color: $primary-color;
-              font-size: 14px;
+              font-size: $font-size-sm;
               font-weight: 600;
             }
           }
@@ -205,7 +237,7 @@
 
           &.more-users {
             .assignee-name {
-              color: #666;
+              color: $gray-600;
               font-style: italic;
             }
           }
@@ -216,10 +248,9 @@
 }
 
 .subtasks-section {
-  margin-top: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+  margin-top: $spacing-md;
+  @include flex(column, flex-start, stretch);
+  gap: $border-radius;
 
   .detail-label {
     font-size: 20px;
@@ -228,24 +259,22 @@
   }
 
   .subtask-list {
-    margin-top: 8px;
-    display: flex;
-    flex-direction: column;
+    margin-top: $border-radius;
+    @include flex(column, flex-start, stretch);
     gap: 0;
   }
 
   .subtask-checkbox-container {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 4px 8px;
-    border-radius: 16px;
+    @include flex(row, flex-start, center);
+    gap: $border-radius;
+    padding: $spacing-xs $border-radius;
+    border-radius: $spacing-md;
     cursor: pointer;
-    margin-top: 8px;
+    margin-top: $border-radius;
     transition: background-color 0.2s ease;
 
     &:hover {
-      background-color: #d1d1d1;
+      background-color: $border-color;
     }
 
     .subtask-checkbox-icon {
@@ -272,39 +301,38 @@
 
     .subtask-title {
       margin: 0;
-      color: #2a3647;
-      font-size: 16px;
+      color: $primary-color;
+      font-size: $font-size-base;
       cursor: pointer;
       flex: 1;
     }
   }
 
   .subtask-item {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    margin-bottom: 8px;
-    padding: 10px;
-    border-radius: 10px;
+    @include flex(row, flex-start, center);
+    gap: $spacing-md;
+    margin-bottom: $border-radius;
+    padding: $spacing-sm * 2;
+    border-radius: $spacing-sm * 2;
     transition: background-color 0.2s;
     cursor: pointer;
 
     &:hover {
-      background-color: #f7f7f7;
+      background-color: $gray-100;
     }
 
     .subtask-checkbox {
       width: 24px;
       height: 24px;
-      border: 2px solid #2a3647;
-      border-radius: 3px;
+      border: 2px solid $primary-color;
+      border-radius: $border-radius-sm - 1px;
       cursor: pointer;
       accent-color: $accent-color;
     }
 
     label.subtask-title {
-      color: #2a3647;
-      font-size: 16px;
+      color: $primary-color;
+      font-size: $font-size-base;
       cursor: pointer;
       flex: 1;
       margin: 0;
@@ -313,23 +341,20 @@
 }
 
 .task-actions {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 8px;
-  padding-top: 16px;
+  @include flex(row, flex-end, center);
+  gap: $border-radius;
+  padding-top: $spacing-md;
 
   .action-btn {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 16px;
+    @include flex(row, flex-start, center);
+    gap: $border-radius;
+    padding: $border-radius $spacing-md;
     border: none;
     background: none;
     cursor: pointer;
-    color: #2a3647;
-    font-size: 16px;
-    border-radius: 4px;
+    color: $primary-color;
+    font-size: $font-size-base;
+    border-radius: $border-radius-sm;
     transition: all 0.2s;
 
     img {
@@ -339,7 +364,7 @@
     }
 
     &:hover {
-      color: #29abe2;
+      color: $accent-color;
 
       img {
         filter: brightness(0) saturate(100%) invert(48%) sepia(83%) saturate(748%) hue-rotate(164deg) brightness(96%) contrast(101%);
@@ -350,25 +375,23 @@
   .action-separator {
     width: 1px;
     height: 24px;
-    background: #d1d1d1;
+    background: $border-color;
   }
 }
 
 .confirm-dialog-overlay {
+  @include flex(row, center, center);
   position: fixed;
   inset: 0;
-  background-color: rgba(0, 0, 0, 0.3);
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  background-color: rgba($black, 0.3);
   animation: slideInFromRight 0.2s ease-out;
   z-index: 15;
 
   .confirm-dialog {
-    background-color: white;
-    padding: 20px 30px;
-    border-radius: 12px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    background-color: $white;
+    padding: $spacing-lg * 1.33 $spacing-xl * 1.5;
+    border-radius: $border-radius-lg;
+    box-shadow: $shadow-lg;
     text-align: center;
     max-width: 300px;
 
@@ -376,29 +399,26 @@
       font-size: 24px;
       font-weight: 600;
       color: $primary-color;
-      margin: 0 0 24px 0;
+      margin: 0 0 $spacing-lg * 1.6 0;
     }
 
     .confirm-buttons {
-      margin-top: 20px;
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
+      @include flex(row, space-between, center);
+      margin-top: $spacing-lg * 1.33;
+      gap: $spacing-sm * 2;
 
       button {
-        padding: 12px 24px;
-        border-radius: 8px;
-        font-size: 16px;
+        @include button-base;
+        padding: $spacing-sm * 2.4 $spacing-lg * 1.6;
+        border-radius: $border-radius;
+        font-size: $font-size-base;
         font-weight: 600;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        border: none;
 
         &.btn-cancel {
           background: $gray-200;
           color: $primary-color;
 
-          &:hover {
+          &:hover:not(:disabled) {
             background: $gray-300;
           }
         }
@@ -407,7 +427,7 @@
           background: $error-color;
           color: $white;
 
-          &:hover {
+          &:hover:not(:disabled) {
             background: darken($error-color, 10%);
           }
         }
@@ -417,9 +437,7 @@
 }
 
 .loading-spinner {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  @include flex(row, center, center);
   min-height: 80px;
 
   img {
@@ -433,12 +451,12 @@
   100% { transform: rotate(360deg); }
 }
 
-@media (max-width: 768px) {
+@media (max-width: $breakpoint-md) {
   .task-card-overlay {
     width: 100%;
     max-width: 100%;
-    padding: 32px 24px;
-    border-radius: 20px;
+    padding: $spacing-xl * 1.6 $spacing-lg * 1.6;
+    border-radius: $spacing-lg * 1.33;
 
     .task-content {
       .task-title {
@@ -452,10 +470,10 @@
 
     .task-details {
       .detail-row {
-        font-size: 16px;
+        font-size: $font-size-base;
         flex-direction: column;
         align-items: flex-start;
-        gap: 8px;
+        gap: $border-radius;
 
         .detail-label {
           min-width: auto;
