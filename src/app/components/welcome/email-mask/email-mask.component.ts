@@ -4,8 +4,8 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { Router, RouterLink } from '@angular/router';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Subject, takeUntil } from 'rxjs';
-import { FooterAuthComponent } from '../../shared/components/footer-auth/footer-auth.component';
-import { environment } from '../../../environments/environment';
+import { FooterAuthComponent } from '../../../shared/components/footer-auth/footer-auth.component';
+import { environment } from '../../../../environments/environment';
 
 /**
  * Interface für Feature Request Payload

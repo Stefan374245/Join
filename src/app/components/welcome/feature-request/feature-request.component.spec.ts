@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { FeatureRequestComponent } from './feature-request.component';
+import { FeatureRequestComponent } from '../../welcome/feature-request/feature-request.component';
 
 describe('FeatureRequestComponent', () => {
   let component: FeatureRequestComponent;

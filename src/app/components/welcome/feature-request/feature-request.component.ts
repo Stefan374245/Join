@@ -3,8 +3,8 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
-import { FooterAuthComponent } from '../../shared/components/footer-auth/footer-auth.component';
-import { environment } from '../../../environments/environment';
+import { FooterAuthComponent } from '../../../shared/components/footer-auth/footer-auth.component';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-feature-request',

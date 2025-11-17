@@ -1,9 +1,10 @@
 import { Routes } from '@angular/router';
 import { LoginComponent } from './components/auth/login/login.component';
 import { SignupComponent } from './components/auth/signup/signup.component';
-import { WelcomeComponent } from './components/welcome/welcome.component';
-import { StakeholderComponent } from './components/stakeholder/stakeholder.component';
-import { FeatureRequestComponent } from './components/feature-request/feature-request.component';
+import { WelcomeComponent } from './components/welcome/welcome/welcome.component';
+import { StakeholderComponent } from './components/welcome/stakeholder/stakeholder.component';
+import { FeatureRequestComponent } from './components/welcome/feature-request/feature-request.component';
+import { EmailMaskComponent } from './components/welcome/email-mask/email-mask.component';
 import { LogoAnimationComponent } from './components/auth/logo-animation/logo-animation.component';
 import { AddTaskComponent } from './components/add-task/add-task.component';
 import { BoardViewComponent } from './components/board/board-view/board-view.component';
@@ -35,7 +36,6 @@ export const routes: Routes = [
     path: 'signup',
     component: SignupComponent
   },
-  // ✅ KORRIGIERT: Stakeholder & Feature Request OHNE Guards (öffentlich zugänglich)
   {
     path: 'stakeholder',
     component: StakeholderComponent
@@ -43,6 +43,10 @@ export const routes: Routes = [
   {
     path: 'feature-request',
     component: FeatureRequestComponent
+  },
+  {
+    path: 'emailmask',
+    component: EmailMaskComponent
   },
   // ❌ ENTFERNT: Duplicate Route
   // {

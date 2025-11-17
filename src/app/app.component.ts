@@ -21,9 +21,11 @@ export class AppComponent {
       const url = this.router.url;
       this.isAuthPage = url.startsWith('/login') ||
                        url.startsWith('/signup') ||
+                       url.startsWith('/logo-animation') ||
                        url.startsWith('/welcome') ||
-                       url.startsWith('/create-request') ||
-                       url.startsWith('/feature-request');
+                       url.startsWith('/stakeholder') ||
+                       url.startsWith('/feature-request') ||
+                       url.startsWith('/emailmask');
       this.isContactsPage = url.startsWith('/contacts');
     });
   }
