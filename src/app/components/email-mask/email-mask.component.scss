@@ -168,7 +168,7 @@
 
       &.error {
         border-color: #f44336;
-        
+
         &:focus {
           box-shadow: 0 0 0 3px rgba(244, 67, 54, 0.1);
         }
@@ -370,7 +370,7 @@
   .request-form {
     .form-actions {
       flex-direction: column;
-      
+
       button {
         width: 100%;
       }

@@ -4,9 +4,9 @@
   </header>
 
   <nav class="request-today">
-    <button 
+    <button
       type="button"
-      class="back-link" 
+      class="back-link"
       (click)="goBack()"
       aria-label="Back to feature request page">
       <img src="assets/images/arrowbackblue.svg" alt="Back">
@@ -28,11 +28,11 @@
     <!-- REQUEST FORM -->
     <section class="request-form-section">
       <form [formGroup]="requestForm" (ngSubmit)="onSubmit()" class="request-form">
-        
+
         <!-- Request Type -->
         <div class="form-group">
           <label for="requestType">What would you like to submit? *</label>
-          <select 
+          <select
             id="requestType"
             formControlName="requestType"
             [class.error]="hasError('requestType')"
@@ -52,9 +52,9 @@
             Title *
             <span class="char-count">{{ f['title'].value?.length || 0 }}/100</span>
           </label>
-          <input 
+          <input
             id="title"
-            type="text" 
+            type="text"
             formControlName="title"
             placeholder="Brief description of your request"
             maxlength="100"
@@ -72,7 +72,7 @@
             Description *
             <span class="char-count">{{ f['description'].value?.length || 0 }}/2000</span>
           </label>
-          <textarea 
+          <textarea
             id="description"
             formControlName="description"
             rows="8"
@@ -89,9 +89,9 @@
         <!-- Name -->
         <div class="form-group">
           <label for="userName">Your Name</label>
-          <input 
+          <input
             id="userName"
-            type="text" 
+            type="text"
             formControlName="userName"
             placeholder="John Doe"
             maxlength="50"
@@ -105,9 +105,9 @@
         <!-- Email -->
         <div class="form-group">
           <label for="userEmail">Your Email *</label>
-          <input 
+          <input
             id="userEmail"
-            type="email" 
+            type="email"
             formControlName="userEmail"
             placeholder="john@example.com"
             [class.error]="hasError('userEmail')"
@@ -140,7 +140,7 @@
 
         <!-- Form Actions -->
         <div class="form-actions">
-          <button 
+          <button
             type="button"
             class="btn-secondary"
             (click)="goBack()"
@@ -148,9 +148,9 @@
             Cancel
           </button>
 
-          <button 
-            type="submit" 
-            class="btn-primary" 
+          <button
+            type="submit"
+            class="btn-primary"
             [disabled]="isSubmitting || requestsUsed >= maxRequests">
             @if (isSubmitting) {
               <span class="spinner"></span>
@@ -173,6 +173,6 @@
       </form>
     </section>
   </article>
-  
+
   <app-footer-auth />
 </main>

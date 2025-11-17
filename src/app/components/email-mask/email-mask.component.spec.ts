@@ -55,7 +55,7 @@ describe('EmailMaskComponent', () => {
 
   it('should validate email format', () => {
     const emailControl = component.requestForm.get('userEmail');
-    
+
     emailControl?.setValue('invalid-email');
     expect(emailControl?.hasError('email')).toBeTruthy();
 
@@ -71,7 +71,7 @@ describe('EmailMaskComponent', () => {
   it('should display error messages for invalid fields', () => {
     const titleControl = component.requestForm.get('title');
     titleControl?.markAsTouched();
-    
+
     expect(component.hasError('title')).toBeTruthy();
     expect(component.getErrorMessage('title')).toContain('required');
   });

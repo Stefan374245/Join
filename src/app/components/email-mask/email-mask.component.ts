@@ -46,11 +46,11 @@ export class EmailMaskComponent implements OnDestroy {
   private readonly destroy$ = new Subject<void>();
 
   requestForm!: FormGroup;
-  
+
   isSubmitting = false;
   submitSuccess = false;
   submitError = '';
-  
+
   requestsUsed = 0;
   maxRequests = 10;
 
@@ -111,7 +111,7 @@ export class EmailMaskComponent implements OnDestroy {
    */
   getErrorMessage(fieldName: string): string {
     const field = this.requestForm.get(fieldName);
-    
+
     if (!field || !field.errors) {
       return '';
     }
@@ -157,7 +157,7 @@ export class EmailMaskComponent implements OnDestroy {
 
     try {
       const formValue = this.requestForm.value;
-      
+
       const payload: FeatureRequestPayload = {
         type: formValue.requestType,
         title: formValue.title.trim(),
@@ -194,7 +194,7 @@ export class EmailMaskComponent implements OnDestroy {
    */
   private handleSuccess(response: FeatureRequestResponse): void {
     this.submitSuccess = true;
-    
+
     // Update Request Counter
     if (response.requestsUsed !== undefined) {
       this.requestsUsed = response.requestsUsed;
