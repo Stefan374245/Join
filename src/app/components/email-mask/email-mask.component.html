@@ -1,0 +1,178 @@
+<main class="email-mask-page">
+  <header class="header">
+    <img src="assets/images/joinlogodark.svg" alt="Join Logo" class="logo">
+  </header>
+
+  <nav class="request-today">
+    <button 
+      type="button"
+      class="back-link" 
+      (click)="goBack()"
+      aria-label="Back to feature request page">
+      <img src="assets/images/arrowbackblue.svg" alt="Back">
+      <span>Back</span>
+    </button>
+    <span class="count">{{ requestsUsed }} of {{ maxRequests }} requests used today</span>
+  </nav>
+
+  <article class="content">
+    <h1>Submit Your Request</h1>
+
+    <section class="info-section">
+      <div class="text-content">
+        <p>📝 Fill out the form below to submit your feature request, bug report, or question.</p>
+        <p>We'll get back to you via email as soon as possible.</p>
+      </div>
+    </section>
+
+    <!-- REQUEST FORM -->
+    <section class="request-form-section">
+      <form [formGroup]="requestForm" (ngSubmit)="onSubmit()" class="request-form">
+        
+        <!-- Request Type -->
+        <div class="form-group">
+          <label for="requestType">What would you like to submit? *</label>
+          <select 
+            id="requestType"
+            formControlName="requestType"
+            [class.error]="hasError('requestType')"
+            [disabled]="isSubmitting">
+            @for (type of requestTypes; track type.value) {
+              <option [value]="type.value">{{ type.label }}</option>
+            }
+          </select>
+          @if (hasError('requestType')) {
+            <span class="error-message">{{ getErrorMessage('requestType') }}</span>
+          }
+        </div>
+
+        <!-- Title -->
+        <div class="form-group">
+          <label for="title">
+            Title *
+            <span class="char-count">{{ f['title'].value?.length || 0 }}/100</span>
+          </label>
+          <input 
+            id="title"
+            type="text" 
+            formControlName="title"
+            placeholder="Brief description of your request"
+            maxlength="100"
+            [class.error]="hasError('title')"
+            [disabled]="isSubmitting"
+            aria-required="true">
+          @if (hasError('title')) {
+            <span class="error-message">{{ getErrorMessage('title') }}</span>
+          }
+        </div>
+
+        <!-- Description -->
+        <div class="form-group">
+          <label for="description">
+            Description *
+            <span class="char-count">{{ f['description'].value?.length || 0 }}/2000</span>
+          </label>
+          <textarea 
+            id="description"
+            formControlName="description"
+            rows="8"
+            placeholder="Describe your request in detail... Please include as much information as possible."
+            maxlength="2000"
+            [class.error]="hasError('description')"
+            [disabled]="isSubmitting"
+            aria-required="true"></textarea>
+          @if (hasError('description')) {
+            <span class="error-message">{{ getErrorMessage('description') }}</span>
+          }
+        </div>
+
+        <!-- Name -->
+        <div class="form-group">
+          <label for="userName">Your Name</label>
+          <input 
+            id="userName"
+            type="text" 
+            formControlName="userName"
+            placeholder="John Doe"
+            maxlength="50"
+            [class.error]="hasError('userName')"
+            [disabled]="isSubmitting">
+          @if (hasError('userName')) {
+            <span class="error-message">{{ getErrorMessage('userName') }}</span>
+          }
+        </div>
+
+        <!-- Email -->
+        <div class="form-group">
+          <label for="userEmail">Your Email *</label>
+          <input 
+            id="userEmail"
+            type="email" 
+            formControlName="userEmail"
+            placeholder="john@example.com"
+            [class.error]="hasError('userEmail')"
+            [disabled]="isSubmitting"
+            aria-required="true">
+          <small class="help-text">We'll send you updates about your request to this email address</small>
+          @if (hasError('userEmail')) {
+            <span class="error-message">{{ getErrorMessage('userEmail') }}</span>
+          }
+        </div>
+
+        <!-- Error Message -->
+        @if (submitError) {
+          <div class="alert alert-error" role="alert">
+            <span class="alert-icon">⚠️</span>
+            <span class="alert-text">{{ submitError }}</span>
+          </div>
+        }
+
+        <!-- Success Message -->
+        @if (submitSuccess) {
+          <div class="alert alert-success" role="alert">
+            <span class="alert-icon">✅</span>
+            <div class="alert-text">
+              <strong>Your request has been submitted successfully!</strong>
+              <p>You'll receive a confirmation email at <strong>{{ f['userEmail'].value }}</strong> shortly.</p>
+            </div>
+          </div>
+        }
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+          <button 
+            type="button"
+            class="btn-secondary"
+            (click)="goBack()"
+            [disabled]="isSubmitting">
+            Cancel
+          </button>
+
+          <button 
+            type="submit" 
+            class="btn-primary" 
+            [disabled]="isSubmitting || requestsUsed >= maxRequests">
+            @if (isSubmitting) {
+              <span class="spinner"></span>
+              <span>Sending...</span>
+            } @else {
+              <span>📤 Send Request</span>
+            }
+          </button>
+        </div>
+
+        @if (requestsUsed >= maxRequests) {
+          <div class="alert alert-warning" role="alert">
+            <span class="alert-icon">⚠️</span>
+            <div class="alert-text">
+              <strong>Daily limit reached</strong>
+              <p>You've reached your daily limit of {{ maxRequests }} requests. Please try again tomorrow.</p>
+            </div>
+          </div>
+        }
+      </form>
+    </section>
+  </article>
+  
+  <app-footer-auth />
+</main>
