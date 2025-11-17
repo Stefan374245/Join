@@ -111,6 +111,118 @@
     font-size: 1rem;
     text-align: center;
   }
+
+  // DROPDOWN STYLES
+  .dropdown-container {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    margin: 1rem 0;
+  }
+
+  .btn-submit-request {
+    padding: 1rem 2rem;
+    background: $accent-color;
+    color: white;
+    border: none;
+    border-radius: 0.625rem;
+    font-size: 1.4375rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-width: 250px;
+    justify-content: center;
+    font-family: "Open Sans", sans-serif;
+
+    &:hover {
+      background: darken($accent-color, 10%);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(41, 171, 226, 0.3);
+    }
+
+    .dropdown-arrow {
+      font-size: 0.8rem;
+      transition: transform 0.3s;
+
+      &.open {
+        transform: rotate(180deg);
+      }
+    }
+  }
+
+  .dropdown-menu {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    left: 50%;
+    transform: translateX(-50%);
+    background: white;
+    border-radius: 0.625rem;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    min-width: 320px;
+    z-index: 100;
+    animation: slideDown 0.3s ease;
+    overflow: hidden;
+
+    .dropdown-item {
+      width: 100%;
+      padding: 1rem 1.5rem;
+      border: none;
+      background: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      transition: background 0.3s;
+      text-align: left;
+
+      &:not(:last-child) {
+        border-bottom: 1px solid #f0f0f0;
+      }
+
+      &:hover {
+        background: #f8f9fa;
+      }
+
+      .icon {
+        font-size: 2rem;
+        flex-shrink: 0;
+      }
+
+      .item-content {
+        flex: 1;
+
+        strong {
+          display: block;
+          color: $primary-color;
+          font-size: 1rem;
+          margin-bottom: 0.25rem;
+          font-family: "Open Sans", sans-serif;
+        }
+
+        small {
+          display: block;
+          color: #999;
+          font-size: 0.85rem;
+          font-family: "Open Sans", sans-serif;
+        }
+      }
+    }
+  }
+
+  .success-message {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: #e8f5e9;
+    border-left: 4px solid #4caf50;
+    border-radius: 4px;
+    color: #2e7d32;
+    text-align: center;
+    animation: slideIn 0.3s ease;
+    font-family: "Open Sans", sans-serif;
+  }
 }
 
 .back-link {
@@ -125,5 +237,42 @@
 
   img {
     display: block;
+  }
+}
+
+// ANIMATIONS
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .action-section {
+    .dropdown-menu {
+      min-width: 280px;
+    }
+
+    .btn-submit-request {
+      min-width: 200px;
+      font-size: 1rem;
+    }
   }
 }

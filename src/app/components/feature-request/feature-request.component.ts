@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { FooterAuthComponent } from '../../shared/components/footer-auth/footer-auth.component';
@@ -14,9 +14,13 @@ import { environment } from '../../../environments/environment';
 })
 export class FeatureRequestComponent {
   private http = inject(HttpClient);
+  private router = inject(Router);
 
   requestsUsed = 0;
   maxRequests = 10;
+
+  // Dropdown state
+  showDropdown = false;
 
   requestType: 'feature' | 'bug' | 'question' = 'feature';
   requestTitle = '';
@@ -29,13 +33,26 @@ export class FeatureRequestComponent {
   submitError = '';
 
   /**
-   * Öffnet das Standard-Mail-Programm mit vorausgefüllten Daten
+   * Toggle Dropdown
    */
-  sendFeatureRequest() {
-    // E-Mail-Empfänger
+  toggleDropdown() {
+    this.showDropdown = !this.showDropdown;
+  }
+
+  /**
+   * Close Dropdown
+   */
+  closeDropdown() {
+    this.showDropdown = false;
+  }
+
+  /**
+   * OPTION 1: Mailto-Variante (E-Mail-Client öffnen)
+   */
+  openMailtoVariant() {
+    this.closeDropdown();
     const toEmail = 'requests@stefan-helldobler.de';
 
-    // Subject basierend auf Request Type
     const typeLabels = {
       'feature': 'Feature Request',
       'bug': 'Bug Report',
@@ -43,7 +60,6 @@ export class FeatureRequestComponent {
     };
     const subject = `[${typeLabels[this.requestType]}] New Request`;
 
-    // Body mit strukturierten Informationen
     const body = `
 Hello Team,
 
@@ -81,6 +97,15 @@ Best regards
     setTimeout(() => {
       this.submitSuccess = false;
     }, 3000);
+  }
+
+  /**
+   * OPTION 2: Webhook-Variante (Formular öffnen)
+   * Navigiert zur neuen EmailMaskComponent
+   */
+  openWebhookVariant() {
+    this.closeDropdown();
+    this.router.navigate(['/email-mask']);
   }
 
   /**

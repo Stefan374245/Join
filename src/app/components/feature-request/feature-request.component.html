@@ -30,9 +30,50 @@
     </section>
 
     <section class="action-section">
-      <button type="button" (click)="sendFeatureRequest()" class="btn-primary" [disabled]="requestsUsed >= maxRequests">
-        Send Email
-      </button>
+      <!-- DROPDOWN BUTTON -->
+      <div class="dropdown-container">
+        <button
+          class="btn-submit-request"
+          (click)="toggleDropdown()"
+          type="button">
+          📤 Submit Request
+          <span class="dropdown-arrow" [class.open]="showDropdown">▼</span>
+        </button>
+
+        <!-- DROPDOWN MENU -->
+        @if (showDropdown) {
+          <div class="dropdown-menu">
+            <button
+              class="dropdown-item"
+              (click)="openMailtoVariant()"
+              type="button">
+              <span class="icon">📧</span>
+              <div class="item-content">
+                <strong>Via Email Client</strong>
+                <small>Opens your default email program</small>
+              </div>
+            </button>
+
+            <button
+              class="dropdown-item"
+              (click)="openWebhookVariant()"
+              type="button">
+              <span class="icon">📝</span>
+              <div class="item-content">
+                <strong>Via Web Form</strong>
+                <small>Fill out a form directly on our website</small>
+              </div>
+            </button>
+          </div>
+        }
+      </div>
+
+      @if (submitSuccess) {
+        <div class="success-message">
+          ✅ Email client opened successfully!
+        </div>
+      }
+
       @if (requestsUsed >= maxRequests) {
         <p class="limit-message">Daily request limit reached. Please try again tomorrow.</p>
       }
