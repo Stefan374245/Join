@@ -299,7 +299,6 @@ export class AddTaskComponent implements OnInit, AfterViewChecked {
       priority: this.selectedPriority,
       status: this.initialStatus, // Verwende den initialStatus aus Input
       subtasks: this.subtasks,
-      // Neue Felder für Member-erstellte Tasks
       source: 'member',
       creatorType: 'member',
       creatorName: currentUser?.displayName || undefined,

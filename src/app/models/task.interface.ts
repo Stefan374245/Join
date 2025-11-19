@@ -9,10 +9,9 @@ export interface Task {
   status: 'triage' | 'todo' | 'in-progress' | 'await-feedback' | 'done';
   subtasks: Subtask[];
 
-  // Neue Felder für AI-generierte Tasks
   createdAt?: Date;
   updatedAt?: Date;
-  source?: 'email' | 'manual' | 'member' | 'api';
+  source?: 'email' |'member';
   creatorType?: 'member' | 'external';
   creatorEmail?: string;
   creatorName?: string;

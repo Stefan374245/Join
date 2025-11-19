@@ -33,7 +33,7 @@
         <div class="creator-info">
           <span class="creator-badge" [ngClass]="getCreatorBadgeClass()">
             <img [src]="getCreatorIcon()" alt="Creator type" class="creator-icon" />
-            <span class="creator-badge-text">{{ getCreatorBadgeText() }}</span>
+            {{ getCreatorBadgeText() }}
           </span>
           <span class="creator-name">{{ getCreatorDisplayName() }}</span>
         </div>

@@ -357,7 +357,7 @@ export class BoardViewComponent implements OnInit, AfterViewInit {
    */
   getShortDescription(description: string): string {
     if (!description) return '';
-    const maxLength = 30;
+    const maxLength = 48;
     return description.length > maxLength
       ? description.substring(0, maxLength) + '...'
       : description;
