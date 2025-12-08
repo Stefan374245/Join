@@ -44,20 +44,22 @@
   text-align: center;
 
   .task-category {
-    display: inline-block;
-    padding: $spacing-xs $spacing-md;
-    border-radius: $border-radius;
-    font-size: $font-size-base;
-    font-weight: 500;
-    color: $white;
-    line-height: 1.2;
-
-    &.user-story {
-      background: map-get($user-colors, '0038FF');
+    span {
+      display: inline-block;
+      padding: $spacing-xs $spacing-md;
+      border-radius: $border-radius;
+      font-size: $font-size-base;
+      font-weight: 500;
+      color: $white;
+      line-height: 1.2;
     }
 
-    &.technical-task {
-      background: map-get($user-colors, '1FD7C1');
+    &.user-story span {
+      background: #0038FF;
+    }
+
+    &.technical-task span {
+      background: #1FD7C1;
     }
   }
 
