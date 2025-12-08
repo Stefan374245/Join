@@ -291,31 +291,21 @@ $header-height: 54px;
   }
 
   .task-category {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-size: 16px;
+    white-space: nowrap;
+    color: white;
     margin-bottom: 20px;
+    align-self: flex-start;
 
-    span {
-      display: inline-block;
-      padding: 4px 10px;
-      border-radius: 8px;
-      font-size: 16px;
-      max-width: 100%;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      box-sizing: border-box;
+    &.user-story {
+      background: #0038FF;
     }
 
-    &.user-story span {
-      background: #0038ff;
-      color: white;
-    }
-
-    &.technical-task span {
-      background: #1fd7c1;
-      color: white;
+    &.technical-task {
+      background: #1FD7C1;
     }
   }
 
@@ -521,8 +511,8 @@ $header-height: 54px;
     }
 
     .progress-text {
-      color: #a8a8a8;
-      font-size: 12px;
+
+      font-size: 16px;
       white-space: nowrap;
     }
   }
