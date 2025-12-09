@@ -88,6 +88,7 @@ $header-height: 54px;
 
   .search-input {
     width: 250px;
+    height: 48px;
     padding: 10px 48px 10px 16px;
     background-color: white;
     border: 1px solid #d1d1d1;
@@ -136,7 +137,7 @@ $header-height: 54px;
   justify-content: center;
   gap: 16px;
   padding: 16px;
-  height: $header-height;
+  height: 48px;
   background-color: $primary-color;
   color: white;
   border: none;
