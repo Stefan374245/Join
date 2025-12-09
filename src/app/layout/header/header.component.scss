@@ -22,6 +22,7 @@
   margin-left: calc($sidebar-width + $content-offset-left);
 
   .logo {
+    display: none;
     height: 50px;
     width: auto;
     transition: transform 0.2s ease;
@@ -149,7 +150,29 @@ hr {
   }
 }
 
-// Responsive design
+@media (max-width: $breakpoint-lg-xl) {
+  .header-left {
+    margin-left: 116px;
+
+    .header-title {
+      font-size: 18px;
+    }
+  }
+}
+@media (max-width: $breakpoint-lg) {
+  .header-left {
+    margin-left: $spacing-lg;
+
+    .logo {
+      display: block;
+    }
+
+    .header-title {
+      display: none;
+    }
+  }
+}
+
 @media (max-width: $breakpoint-md) {
   .header-left {
     margin-left: 80px;
