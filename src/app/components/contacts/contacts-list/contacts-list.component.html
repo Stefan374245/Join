@@ -75,7 +75,7 @@
 			<div class="frame-40">
 				<div class="contactsFrame">
 					<h1>Contacts</h1>
-					<div class="frame-40-vektor"></div>
+					<div class="separator"></div>
 					<p>Better with a team</p>
 				</div>
 			</div>
@@ -86,12 +86,16 @@
 					<section>
 						<p id="contactDetailsName">{{ selected.firstName }} {{ selected.lastName }}</p>
 						<div id="basicManipulate">
-							<div class="manipulateBtnDiv">
-								<button class="btn-link" (click)="editContact(selected)">Edit</button>
-							</div>
-							<div class="manipulateBtnDiv">
-								<button class="btn-link" (click)="deleteContact(selected.email)">Delete</button>
-							</div>
+							<button class="btn-link" (click)="editContact(selected)">
+								<img src="assets/images/edit-2.svg" alt="Edit" class="icon-default" />
+								<img src="assets/images/edit-1.svg" alt="Edit" class="icon-hover" />
+								<span>Edit</span>
+							</button>
+							<button class="btn-link" (click)="deleteContact(selected.email)">
+								<img src="assets/images/delete.svg" alt="Delete" class="icon-default" />
+								<img src="assets/images/delete-blue.svg" alt="Delete" class="icon-hover" />
+								<span>Delete</span>
+							</button>
 						</div>
 					</section>
 				</div>
@@ -99,7 +103,7 @@
 				<div class="contactInformations">
 					<p>Contact Information</p>
 					<strong>Email</strong>
-					<a id="contactDetailsMail" [href]="'mailto:' + selected.email">{{ selected.email }}</a>
+					<a class="contactDetailsMail" id="contactDetailsMail" [href]="'mailto:' + selected.email">{{ selected.email }}</a>
 					<strong>Phone</strong>
 					<span id="contactDetailsPhone">{{ selected.phone || '-' }}</span>
 				</div>
@@ -114,7 +118,7 @@
 	</main>
 
 	<!-- Contact Dialog -->
-	<app-contact-dialog 
+	<app-contact-dialog
 		*ngIf="showDialog"
 		[mode]="dialogMode"
 		[contact]="dialogContact"
