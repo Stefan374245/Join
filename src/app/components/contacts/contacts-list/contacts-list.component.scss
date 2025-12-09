@@ -7,7 +7,6 @@
   height: 100vh;
 }
 
-
 .contacts-page {
   display: flex;
   height: 100vh;
@@ -166,9 +165,26 @@
 }
 
 .content-right {
+  @include flex(column, flex-start, flex-start);
   flex: 1;
-  padding: $spacing-xl;
+  padding: 5rem;
   overflow-y: auto;
+}
+
+.contactsFrame {
+  @include flex(row, space-between, center);
+  gap: 30px;
+
+  .separator {
+    height: 59px;
+    background-color: $accent-color;
+    margin-top: $spacing-sm;
+    border: 2px solid $accent-color;
+    border-radius: 8px;
+  }
+  p {
+    font-size: 27px;
+  }
 }
 .empty-state {
   color: $gray-600;
@@ -178,14 +194,74 @@
 .contactDetailsPerson {
   display: flex;
   align-items: center;
-  gap: $spacing-lg;
+  gap: 54px;
   margin-top: $spacing-xl;
+
+  p {
+    font-size: 47px;
+    font-weight: 500;
+    line-height: 1.2;
+  }
 }
 .contactInformations {
   margin-top: $spacing-lg;
   display: flex;
   flex-direction: column;
   gap: $spacing-md;
+
+  p {
+    font-size: 20px;
+  }
+}
+
+#basicManipulate {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+  margin-top: $spacing-sm;
+}
+
+.btn-link {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  font-size: $font-size-base;
+  color: $primary-color;
+  transition: color 0.2s ease;
+
+  .icon-hover {
+    display: none;
+  }
+
+  .icon-default {
+    display: block;
+  }
+
+  &:hover {
+    color: $accent-color;
+
+    .icon-default {
+      display: none;
+    }
+
+    .icon-hover {
+      display: block;
+    }
+  }
+}
+
+.contactDetailsMail {
+  color: $accent-color;
+  line-height: 1.2;
+
+&:hover {
+    text-decoration: none;
+  }
 }
 
 @media (max-width: 800px) {
