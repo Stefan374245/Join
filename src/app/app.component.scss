@@ -15,9 +15,8 @@
 }
 
 .main-content {
-  // Standard Layout: Nur Sidebar-Offset (Board positioniert sich selbst absolute)
-  margin-left: $sidebar-width; // 200px
-  margin-top: calc($header-height + $content-offset-top); // 110px
+  margin-left: $sidebar-width;
+  margin-top: calc($header-height + $content-offset-top);
   padding: $spacing-xl;
   overflow-y: auto;
   overflow-x: hidden;
@@ -25,20 +24,43 @@
   width: calc(100% - #{$sidebar-width});
   min-height: calc(100vh - $header-height - $content-offset-top);
 
-  // Medium: Collapsed Sidebar
-  @media (max-width: $breakpoint-lg-xl) { // 1064px
+  @media (max-width: $breakpoint-lg-xl) {
     margin-left: 80px;
     width: calc(100% - 80px);
   }
 
-  // Mobile: Bottom Navigation
-  @media (max-width: $breakpoint-lg) { // 992px
+  @media (max-width: $breakpoint-lg) {
     margin-left: 0;
     margin-top: $header-height;
     margin-bottom: 80px;
     width: 100%;
     padding: $spacing-lg;
     padding-bottom: 100px;
+    min-height: calc(100vh - #{$header-height} - 80px);
+  }
+}
+
+// Contacts: Direkt an Sidebar ohne Padding
+.contacts-content {
+  margin-left: $sidebar-width; // 200px
+  margin-top: $header-height; // Direkt unter Header
+  padding: 0; // Kein Padding!
+  overflow-y: auto;
+  overflow-x: hidden;
+  background-color: $background-color;
+  width: calc(100% - #{$sidebar-width});
+  min-height: calc(100vh - $header-height);
+
+  @media (max-width: $breakpoint-lg-xl) {
+    margin-left: 80px;
+    width: calc(100% - 80px);
+  }
+
+  @media (max-width: $breakpoint-lg) {
+    margin-left: 0;
+    margin-top: $header-height;
+    margin-bottom: 80px;
+    width: 100%;
     min-height: calc(100vh - #{$header-height} - 80px);
   }
 }
