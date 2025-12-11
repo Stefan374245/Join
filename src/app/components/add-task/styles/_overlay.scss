@@ -6,13 +6,26 @@
   @include flex(row, center, center);
   position: fixed;
   top: 0;
-  left: 0;
-  width: 100%;
+  left: $sidebar-width;
+  width: calc(100% - #{$sidebar-width});
   height: 100%;
   background-color: rgba(0, 0, 0, 0.1);
-  z-index: 15;
+  z-index: 250;
   padding: 20px;
   overflow: auto;
+
+  @media (max-width: $breakpoint-lg-xl) {
+    left: 80px;
+    width: calc(100% - 80px);
+  }
+
+  // Mobile: Bottom Navigation
+  @media (max-width: $breakpoint-lg) {
+    left: 0;
+    width: 100%;
+    bottom: 80px;
+    height: calc(100% - 80px);
+  }
 }
 
 .task-edit-card {
@@ -43,7 +56,7 @@
     @include flex(row, center, center);
     border-radius: 50%;
     transition: all 0.2s ease;
-    z-index: 10;
+    z-index: 260;
 
     img {
       width: 24px;
