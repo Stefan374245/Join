@@ -7,7 +7,13 @@
      <a routerLink="/welcome" class="back-link" aria-label="Back to welcome page">
       <img src="assets/images/arrowbackblue.svg" alt="arrow-back">
     </a>
-    <span class="count">{{ requestsUsed }} of {{ maxRequests }} requests used today</span>
+    <span class="count" [class.limit-reached]="isLimitReached">
+      @if (isLoading) {
+        <span>Loading...</span>
+      } @else {
+        <span>{{ requestsUsed }} of {{ maxRequests }} requests used today</span>
+      }
+    </span>
   </nav>
 
   <article class="content">
@@ -30,7 +36,7 @@
     </section>
 
     <section class="action-section">
-      <!-- DROPDOWN BUTTON -->
+
       <div class="dropdown-container">
         <button
           class="btn-submit-request"
@@ -75,8 +81,8 @@
         </div>
       }
 
-      @if (requestsUsed >= maxRequests) {
-        <p class="limit-message">Daily request limit reached. Please try again tomorrow.</p>
+      @if (isLimitReached) {
+        <p class="limit-message">⚠️ Daily request limit reached. Please try again tomorrow.</p>
       }
     </section>
   </article>

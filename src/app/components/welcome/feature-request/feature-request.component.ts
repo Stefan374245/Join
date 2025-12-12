@@ -1,10 +1,12 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { FooterAuthComponent } from '../../../shared/components/footer-auth/footer-auth.component';
 import { environment } from '../../../../environments/environment';
+import { DailyLimitService } from '../../../services/daily-limit.service';
+import { ToastService } from '../../../services/toast.service';
 
 @Component({
   selector: 'app-feature-request',
@@ -12,12 +14,16 @@ import { environment } from '../../../../environments/environment';
   templateUrl: './feature-request.component.html',
   styleUrl: './feature-request.component.scss'
 })
-export class FeatureRequestComponent {
+export class FeatureRequestComponent implements OnInit {
   private http = inject(HttpClient);
   private router = inject(Router);
+  private dailyLimitService = inject(DailyLimitService);
+  private toastService = inject(ToastService);
 
   requestsUsed = 0;
   maxRequests = 10;
+  isLoading = true;
+  isLimitReached = false;
 
   // Dropdown state
   showDropdown = false;
@@ -31,6 +37,34 @@ export class FeatureRequestComponent {
   isSubmitting = false;
   submitSuccess = false;
   submitError = '';
+
+  async ngOnInit() {
+    await this.loadDailyLimit();
+  }
+
+  /**
+   * Load current daily limit from Firestore
+   */
+  async loadDailyLimit() {
+    try {
+      const limitInfo = await this.dailyLimitService.fetchDailyLimit();
+      this.requestsUsed = limitInfo.currentCount;
+      this.maxRequests = limitInfo.maxLimit;
+      this.isLimitReached = limitInfo.isLimitReached;
+
+      console.log('📊 Daily Limit loaded:', limitInfo);
+
+      if (this.isLimitReached) {
+        this.toastService.showDailyLimitReached(this.maxRequests);
+      } else if (limitInfo.remainingRequests <= 3 && limitInfo.remainingRequests > 0) {
+        this.toastService.showDailyLimitWarning(limitInfo.remainingRequests);
+      }
+    } catch (error) {
+      console.error('❌ Error loading daily limit:', error);
+    } finally {
+      this.isLoading = false;
+    }
+  }
 
   /**
    * Toggle Dropdown
@@ -49,7 +83,14 @@ export class FeatureRequestComponent {
   /**
    * OPTION 1: Mailto-Variante (E-Mail-Client öffnen)
    */
-  openMailtoVariant() {
+  async openMailtoVariant() {
+    // Prüfe Limit bevor Email geöffnet wird
+    if (this.isLimitReached) {
+      this.toastService.showDailyLimitReached(this.maxRequests);
+      this.closeDropdown();
+      return;
+    }
+
     this.closeDropdown();
     const toEmail = 'requests@stefan-helldobler.de';
 
@@ -92,8 +133,16 @@ Best regards
     const mailtoLink = `mailto:${toEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     window.location.href = mailtoLink;
 
-    this.requestsUsed++;
     this.submitSuccess = true;
+
+    // Reload limit info (wird sich beim nächsten n8n-Durchlauf erhöhen)
+    setTimeout(async () => {
+      await this.loadDailyLimit();
+      this.toastService.showSuccess(
+        'Email opened! Your request will be processed shortly.'
+      );
+    }, 2000);
+
     setTimeout(() => {
       this.submitSuccess = false;
     }, 3000);
@@ -112,18 +161,26 @@ Best regards
    * Alternative: Sende direkt an n8n (falls du den Webhook behalten willst)
    */
   async sendDirectToN8n() {
+    // Prüfe Limit
+    if (this.isLimitReached) {
+      this.toastService.showDailyLimitReached(this.maxRequests);
+      return;
+    }
+
     if (!this.requestTitle.trim() || !this.requestDescription.trim() || !this.stakeholderEmail.trim()) {
       this.submitError = 'Bitte fülle alle Pflichtfelder aus.';
+      this.toastService.showError('Please fill out all required fields.');
       return;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(this.stakeholderEmail)) {
       this.submitError = 'Bitte gib eine gültige E-Mail-Adresse ein.';
+      this.toastService.showError('Please enter a valid email address.');
       return;
     }
 
-    if (this.isSubmitting || this.requestsUsed >= this.maxRequests) {
+    if (this.isSubmitting) {
       return;
     }
 
@@ -146,7 +203,12 @@ Best regards
       console.log('✅ Request erfolgreich:', response);
 
       this.submitSuccess = true;
-      this.requestsUsed++;
+
+      // Reload limit
+      await this.loadDailyLimit();
+
+      const remaining = this.maxRequests - this.requestsUsed;
+      this.toastService.showRequestSuccess(remaining);
 
       // Reset form
       this.requestTitle = '';
@@ -164,8 +226,12 @@ Best regards
 
       if (error.status === 429) {
         this.submitError = 'Tageslimit erreicht. Bitte versuche es morgen erneut.';
+        this.toastService.showDailyLimitReached(this.maxRequests);
       } else {
         this.submitError = 'Ein Fehler ist aufgetreten. Bitte versuche es später erneut.';
+        this.toastService.showError(
+          'An error occurred. Please try again later.'
+        );
       }
     } finally {
       this.isSubmitting = false;
