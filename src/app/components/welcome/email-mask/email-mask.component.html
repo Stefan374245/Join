@@ -12,13 +12,6 @@
       <img src="assets/images/arrowbackblue.svg" alt="Back">
       <span>Back</span>
     </button>
-    <span class="count" [class.limit-reached]="isLimitReached">
-      @if (isLoading) {
-        <span>Loading...</span>
-      } @else {
-        <span>{{ requestsUsed }} of {{ maxRequests }} requests used today</span>
-      }
-    </span>
   </nav>
 
   <article class="content">
