@@ -1,4 +1,4 @@
-import { Component, inject, OnDestroy } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -6,6 +6,8 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Subject, takeUntil } from 'rxjs';
 import { FooterAuthComponent } from '../../../shared/components/footer-auth/footer-auth.component';
 import { environment } from '../../../../environments/environment';
+import { DailyLimitService } from '../../../services/daily-limit.service';
+import { ToastService } from '../../../services/toast.service';
 
 /**
  * Interface für Feature Request Payload
@@ -39,10 +41,12 @@ interface FeatureRequestResponse {
   templateUrl: './email-mask.component.html',
   styleUrl: './email-mask.component.scss'
 })
-export class EmailMaskComponent implements OnDestroy {
+export class EmailMaskComponent implements OnInit, OnDestroy {
   private readonly fb = inject(FormBuilder);
   private readonly http = inject(HttpClient);
   private readonly router = inject(Router);
+  private readonly dailyLimitService = inject(DailyLimitService);
+  private readonly toastService = inject(ToastService);
   private readonly destroy$ = new Subject<void>();
 
   requestForm!: FormGroup;
@@ -50,6 +54,8 @@ export class EmailMaskComponent implements OnDestroy {
   isSubmitting = false;
   submitSuccess = false;
   submitError = '';
+  isLoading = true;
+  isLimitReached = false;
 
   requestsUsed = 0;
   maxRequests = 10;
@@ -62,6 +68,34 @@ export class EmailMaskComponent implements OnDestroy {
 
   constructor() {
     this.initForm();
+  }
+
+  async ngOnInit() {
+    await this.loadDailyLimit();
+  }
+
+  /**
+   * Load current daily limit from Firestore
+   */
+  async loadDailyLimit() {
+    try {
+      const limitInfo = await this.dailyLimitService.fetchDailyLimit();
+      this.requestsUsed = limitInfo.currentCount;
+      this.maxRequests = limitInfo.maxLimit;
+      this.isLimitReached = limitInfo.isLimitReached;
+
+      console.log('📊 Daily Limit loaded:', limitInfo);
+
+      if (this.isLimitReached) {
+        this.toastService.showDailyLimitReached(this.maxRequests);
+      } else if (limitInfo.remainingRequests <= 3 && limitInfo.remainingRequests > 0) {
+        this.toastService.showDailyLimitWarning(limitInfo.remainingRequests);
+      }
+    } catch (error) {
+      console.error('❌ Error loading daily limit:', error);
+    } finally {
+      this.isLoading = false;
+    }
   }
 
   /**
@@ -138,16 +172,17 @@ export class EmailMaskComponent implements OnDestroy {
    * Hauptmethode: Sendet Feature Request an n8n Webhook
    */
   async onSubmit(): Promise<void> {
+    // Limit prüfen
+    if (this.isLimitReached) {
+      this.toastService.showDailyLimitReached(this.maxRequests);
+      return;
+    }
+
     // Form validieren
     if (this.requestForm.invalid) {
       this.requestForm.markAllAsTouched();
       this.submitError = 'Please fill out all required fields correctly.';
-      return;
-    }
-
-    // Rate Limiting prüfen
-    if (this.requestsUsed >= this.maxRequests) {
-      this.submitError = 'Daily limit reached. Please try again tomorrow.';
+      this.toastService.showError('Please fill out all required fields correctly.');
       return;
     }
 
@@ -192,15 +227,14 @@ export class EmailMaskComponent implements OnDestroy {
   /**
    * Behandelt erfolgreiche Submission
    */
-  private handleSuccess(response: FeatureRequestResponse): void {
+  private async handleSuccess(response: FeatureRequestResponse): Promise<void> {
     this.submitSuccess = true;
 
-    // Update Request Counter
-    if (response.requestsUsed !== undefined) {
-      this.requestsUsed = response.requestsUsed;
-    } else {
-      this.requestsUsed++;
-    }
+    // Reload limit from Firestore
+    await this.loadDailyLimit();
+
+    const remaining = this.maxRequests - this.requestsUsed;
+    this.toastService.showRequestSuccess(remaining);
 
     // Form zurücksetzen
     this.requestForm.reset({
@@ -228,20 +262,26 @@ export class EmailMaskComponent implements OnDestroy {
       switch (error.status) {
         case 429:
           this.submitError = 'Daily limit reached. Please try again tomorrow.';
+          this.toastService.showDailyLimitReached(this.maxRequests);
           break;
         case 400:
           this.submitError = 'Invalid request data. Please check your input.';
+          this.toastService.showError('Invalid request data. Please check your input.');
           break;
         case 0:
           this.submitError = 'Cannot connect to server. Please check your internet connection.';
+          this.toastService.showError('Cannot connect to server. Please check your internet connection.');
           break;
         default:
           this.submitError = `Server error (${error.status}): ${error.message || 'Unknown error'}`;
+          this.toastService.showError('Server error. Please try again later.');
       }
     } else if (error instanceof Error) {
       this.submitError = error.message;
+      this.toastService.showError(error.message);
     } else {
       this.submitError = 'An unexpected error occurred. Please try again later.';
+      this.toastService.showError('An unexpected error occurred. Please try again later.');
     }
   }
 
