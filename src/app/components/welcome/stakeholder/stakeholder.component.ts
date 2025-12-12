@@ -18,6 +18,7 @@ export class StakeholderComponent implements OnInit {
   requestsUsed = 0;
   maxRequests = 10;
   isLoading = true;
+  isLimitReached = false;
 
   async ngOnInit() {
     await this.loadDailyLimit();
@@ -28,6 +29,7 @@ export class StakeholderComponent implements OnInit {
       const limitInfo = await this.dailyLimitService.fetchDailyLimit();
       this.requestsUsed = limitInfo.currentCount;
       this.maxRequests = limitInfo.maxLimit;
+      this.isLimitReached = limitInfo.isLimitReached;
       console.log('📊 Daily Limit loaded:', limitInfo);
     } catch (error) {
       console.error('❌ Error loading daily limit:', error);
