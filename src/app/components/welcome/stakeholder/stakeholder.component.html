@@ -7,7 +7,7 @@
     <a routerLink="/welcome" class="back-link" aria-label="Back to welcome page">
       <img src="assets/images/arrowbackblue.svg" alt="arrow-back">
     </a>
-    <span class="count">
+    <span class="count" [class.limit-reached]="isLimitReached">
       @if (isLoading) {
         <span>Loading...</span>
       } @else {
@@ -19,15 +19,27 @@
   <article class="content">
     <h1>Welcome</h1>
 
+    @if (isLimitReached) {
+      <div class="limit-banner">
+        The daily {{ maxRequests }}-request limit has been reached!
+      </div>
+    }
+
     <section class="info-section">
       <div class="text-content">
         <h2>Easily create a ticket by sending an email — no extra steps needed.</h2>
 
-        <div class="description">
-          <p>On this platform, you can submit your feature requests via email. Our AI system will automatically generate a ticket with a deadline and priority level.</p>
+        @if (isLimitReached) {
+          <div class="description limit-description">
+            <p>Need more? No worries — you can still send emails, but our team will review them manually instead of using AI to create tickets.</p>
+          </div>
+        } @else {
+          <div class="description">
+            <p>On this platform, you can submit your feature requests via email. Our AI system will automatically generate a ticket with a deadline and priority level.</p>
 
-          <p>A total of 10 requests can be created per day. After this limit, emails can still be sent, but they will be manually reviewed by our team instead of generating AI tickets.</p>
-        </div>
+            <p>A total of 10 requests can be created per day. After this limit, emails can still be sent, but they will be manually reviewed by our team instead of generating AI tickets.</p>
+          </div>
+        }
       </div>
 
       <figure class="image-container">
@@ -36,10 +48,15 @@
     </section>
 
     <section class="action-section">
-       <a routerLink="/feature-request" class="btn-primary create-button" aria-label="Create a new request">
+      <button
+        [disabled]="isLimitReached"
+        [routerLink]="isLimitReached ? null : '/feature-request'"
+        class="btn-primary create-button"
+        [class.disabled]="isLimitReached"
+        [attr.aria-label]="isLimitReached ? 'Daily limit reached' : 'Create a new request'">
         Create Request
         <img src="assets/images/check.svg" alt="" aria-hidden="true" class="check-icon">
-      </a>
+      </button>
     </section>
   </article>
   <app-footer-auth />
