@@ -2,13 +2,14 @@ import { Component } from '@angular/core';
 import { Router, NavigationEnd, RouterOutlet } from '@angular/router';
 import { HeaderComponent } from './layout/header/header.component';
 import { SidebarComponent } from './layout/sidebar/sidebar.component';
+import { ToastComponent } from './shared/components/toast/toast.component';
 import { NgClass } from '@angular/common';
 import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, HeaderComponent, SidebarComponent, NgClass],
+  imports: [RouterOutlet, HeaderComponent, SidebarComponent, NgClass, ToastComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })

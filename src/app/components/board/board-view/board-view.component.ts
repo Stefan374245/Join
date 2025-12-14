@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { CdkDragDrop, DragDropModule, CdkDropList } from '@angular/cdk/drag-drop';
 import { TaskService } from '../../../services/task.service';
 import { ContactService } from '../../../services/contact.service';
+import { ToastService } from '../../../services/toast.service';
 import { Task } from '../../../models/task.interface';
 import { Contact } from '../../../models/contact.interface';
 import { Observable, map } from 'rxjs';
@@ -23,6 +24,7 @@ export class BoardViewComponent implements OnInit, AfterViewInit {
 
   private taskService = inject(TaskService);
   private contactService = inject(ContactService);
+  private toastService = inject(ToastService);
   private router = inject(Router);
 
   searchQuery: string = '';
@@ -334,13 +336,18 @@ export class BoardViewComponent implements OnInit, AfterViewInit {
    * Handle task delete
    */
   onDeleteTask(taskId: string): void {
+    const taskToDelete = this.allTasks.find(t => t.id === taskId);
+    const taskTitle = taskToDelete?.title || 'Task';
+
     this.taskService.deleteTask(taskId).subscribe({
       next: () => {
         console.log('✅ Task deleted successfully');
+        this.toastService.showTaskDeleted(taskTitle);
         this.closeTaskDetail();
       },
       error: (error) => {
         console.error('Error deleting task:', error);
+        this.toastService.showTaskDeleteError();
       }
     });
   }

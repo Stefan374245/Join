@@ -20,7 +20,7 @@ import { ToastService } from '../../services/toast.service';
 export class AddTaskComponent implements OnInit, AfterViewChecked {
   @Input() isOverlay: boolean = false;
   @Input() taskToEdit: Task | null = null;
-  @Input() initialStatus: 'triage' | 'todo' | 'in-progress' | 'await-feedback' | 'done' = 'triage';
+  @Input() initialStatus: 'triage' | 'todo' | 'in-progress' | 'await-feedback' | 'done' = 'todo';
   @Output() close = new EventEmitter<void>();
   @Output() taskSaved = new EventEmitter<Task>();
   @ViewChild('editInput') editInput?: ElementRef<HTMLInputElement>;
@@ -310,6 +310,7 @@ export class AddTaskComponent implements OnInit, AfterViewChecked {
     this.taskService.addTask(newTask).subscribe({
       next: () => {
         console.log('✅ Task created successfully');
+        this.toastService.showTaskCreated(newTask.title);
         if (this.isOverlay) {
           this.taskSaved.emit(newTask);
           this.onClose();
@@ -319,6 +320,7 @@ export class AddTaskComponent implements OnInit, AfterViewChecked {
       },
       error: (error: any) => {
         console.error('❌ Error creating task:', error);
+        this.toastService.showTaskCreateError();
       }
     });
   }
@@ -343,6 +345,7 @@ export class AddTaskComponent implements OnInit, AfterViewChecked {
     this.taskService.updateTask(this.taskToEdit.id, updatedTask).subscribe({
       next: () => {
         console.log('✅ Task updated successfully');
+        this.toastService.showTaskUpdated(updatedTask.title!);
         const fullTask: Task = { ...this.taskToEdit!, ...updatedTask };
         if (this.isOverlay) {
           this.taskSaved.emit(fullTask);
@@ -353,6 +356,7 @@ export class AddTaskComponent implements OnInit, AfterViewChecked {
       },
       error: (error: any) => {
         console.error('❌ Error updating task:', error);
+        this.toastService.showTaskUpdateError();
       }
     });
   }

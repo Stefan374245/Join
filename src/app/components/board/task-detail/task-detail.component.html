@@ -11,7 +11,7 @@
       <div class="task-category" [ngClass]="getCategoryClass(task.category)">
         <span>{{ task.category }}</span>
       </div>
-      <div class="ai-generated" *ngIf="task.source === 'email'">
+      <div class="ai-generated" *ngIf="task.aiGenerated ">
         <img src="/assets/images/note_ki.svg" alt="AI Generated Note">
       </div>
       <button class="close-btn" (click)="onClose()" aria-label="Close">

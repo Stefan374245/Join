@@ -68,6 +68,51 @@ export class ToastService {
     );
   }
 
+  /**
+   * Show task-specific toast messages
+   */
+  showTaskCreated(taskTitle: string): void {
+    this.showSuccess(
+      `Task "${taskTitle}" created successfully!`,
+      3000
+    );
+  }
+
+  showTaskUpdated(taskTitle: string): void {
+    this.showSuccess(
+      `Task "${taskTitle}" updated successfully!`,
+      3000
+    );
+  }
+
+  showTaskDeleted(taskTitle: string): void {
+    this.showSuccess(
+      `Task "${taskTitle}" deleted successfully!`,
+      3000
+    );
+  }
+
+  showTaskCreateError(): void {
+    this.showError(
+      'Failed to create task. Please try again.',
+      3000
+    );
+  }
+
+  showTaskUpdateError(): void {
+    this.showError(
+      'Failed to update task. Please try again.',
+      3000
+    );
+  }
+
+  showTaskDeleteError(): void {
+    this.showError(
+      'Failed to delete task. Please try again.',
+      3000
+    );
+  }
+
   hideToast(): void {
     this.toastState.next({
       show: false,
