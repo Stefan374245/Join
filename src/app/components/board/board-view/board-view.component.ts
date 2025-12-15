@@ -1,8 +1,19 @@
-import { Component, OnInit, inject, ViewChildren, QueryList, AfterViewInit } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  inject,
+  ViewChildren,
+  QueryList,
+  AfterViewInit,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { CdkDragDrop, DragDropModule, CdkDropList } from '@angular/cdk/drag-drop';
+import {
+  CdkDragDrop,
+  DragDropModule,
+  CdkDropList,
+} from '@angular/cdk/drag-drop';
 import { TaskService } from '../../../services/task.service';
 import { ContactService } from '../../../services/contact.service';
 import { ToastService } from '../../../services/toast.service';
@@ -17,8 +28,17 @@ import { ClickOutsideDirective } from '../../../shared/directives/click-outside.
 @Component({
   selector: 'app-board-view',
   standalone: true,
-imports: [CommonModule, FormsModule, DragDropModule, TaskDetailComponent, AddTaskComponent, LoadingSpinnerComponent, ClickOutsideDirective],  templateUrl: './board-view.component.html',
-  styleUrl: './board-view.component.scss'
+  imports: [
+    CommonModule,
+    FormsModule,
+    DragDropModule,
+    TaskDetailComponent,
+    AddTaskComponent,
+    LoadingSpinnerComponent,
+    ClickOutsideDirective,
+  ],
+  templateUrl: './board-view.component.html',
+  styleUrl: './board-view.component.scss',
 })
 export class BoardViewComponent implements OnInit, AfterViewInit {
   @ViewChildren(CdkDropList) dropLists!: QueryList<CdkDropList>;
@@ -33,7 +53,7 @@ export class BoardViewComponent implements OnInit, AfterViewInit {
   filteredTasks: Task[] = [];
   contacts: Contact[] = [];
 
-    tasksLoading: boolean = true;
+  tasksLoading: boolean = true;
 
   triageTasks: Task[] = [];
   todoTasks: Task[] = [];
@@ -48,7 +68,8 @@ export class BoardViewComponent implements OnInit, AfterViewInit {
   showEditOverlay: boolean = false;
 
   showAddTaskOverlay: boolean = false;
-  addTaskStatus: 'triage' | 'todo' | 'in-progress' | 'await-feedback' | 'done' = 'todo';
+  addTaskStatus: 'triage' | 'todo' | 'in-progress' | 'await-feedback' | 'done' =
+    'todo';
 
   ngOnInit(): void {
     this.loadTasks();
@@ -81,44 +102,58 @@ export class BoardViewComponent implements OnInit, AfterViewInit {
       error: (error: any) => {
         this.tasksLoading = false;
         console.error('❌ Error loading tasks:', error);
-      }
+      },
     });
   }
 
   private connectDropLists(): void {
     setTimeout(() => {
       if (this.dropLists && this.dropLists.length > 0) {
-        const allDropListIds = this.dropLists.map(list => list.id);
-        this.dropLists.forEach(dropList => {
-          dropList.connectedTo = this.dropLists.filter(list => list.id !== dropList.id);
+        const allDropListIds = this.dropLists.map((list) => list.id);
+        this.dropLists.forEach((dropList) => {
+          dropList.connectedTo = this.dropLists.filter(
+            (list) => list.id !== dropList.id
+          );
         });
       }
     }, 0);
   }
 
   private updateColumnArrays(): void {
-    this.triageTasks = this.filteredTasks.filter(task => task.status === 'triage');
-    this.todoTasks = this.filteredTasks.filter(task => task.status === 'todo');
-    this.inProgressTasks = this.filteredTasks.filter(task => task.status === 'in-progress');
-    this.awaitFeedbackTasks = this.filteredTasks.filter(task => task.status === 'await-feedback');
-    this.doneTasks = this.filteredTasks.filter(task => task.status === 'done');
+    this.triageTasks = this.filteredTasks.filter(
+      (task) => task.status === 'triage'
+    );
+    this.todoTasks = this.filteredTasks.filter(
+      (task) => task.status === 'todo'
+    );
+    this.inProgressTasks = this.filteredTasks.filter(
+      (task) => task.status === 'in-progress'
+    );
+    this.awaitFeedbackTasks = this.filteredTasks.filter(
+      (task) => task.status === 'await-feedback'
+    );
+    this.doneTasks = this.filteredTasks.filter(
+      (task) => task.status === 'done'
+    );
 
     console.log('📊 Column Arrays Updated:', {
       triage: this.triageTasks.length,
       todo: this.todoTasks.length,
       inProgress: this.inProgressTasks.length,
       awaitFeedback: this.awaitFeedbackTasks.length,
-      done: this.doneTasks.length
+      done: this.doneTasks.length,
     });
   }
 
   ngAfterViewInit(): void {
     setTimeout(() => {
-      const allDropListIds = this.dropLists.map(list => list.id);
+      const allDropListIds = this.dropLists.map((list) => list.id);
       console.log('🎯 Connecting drop lists:', allDropListIds);
 
-      this.dropLists.forEach(dropList => {
-        dropList.connectedTo = this.dropLists.filter(list => list.id !== dropList.id);
+      this.dropLists.forEach((dropList) => {
+        dropList.connectedTo = this.dropLists.filter(
+          (list) => list.id !== dropList.id
+        );
       });
 
       console.log('✅ All drop lists connected');
@@ -133,12 +168,12 @@ export class BoardViewComponent implements OnInit, AfterViewInit {
       },
       error: (error: any) => {
         console.error('❌ Error loading contacts:', error);
-      }
+      },
     });
   }
 
   getTasksByStatus(status: string): Task[] {
-    switch(status) {
+    switch (status) {
       case 'triage':
         return this.triageTasks;
       case 'todo':
@@ -162,15 +197,19 @@ export class BoardViewComponent implements OnInit, AfterViewInit {
     }
 
     const query = this.searchQuery.toLowerCase();
-    this.filteredTasks = this.allTasks.filter(task =>
-      task.title.toLowerCase().includes(query) ||
-      task.description.toLowerCase().includes(query) ||
-      task.category.toLowerCase().includes(query)
+    this.filteredTasks = this.allTasks.filter(
+      (task) =>
+        task.title.toLowerCase().includes(query) ||
+        task.description.toLowerCase().includes(query) ||
+        task.category.toLowerCase().includes(query)
     );
     this.updateColumnArrays();
   }
 
-  onTaskDrop(event: CdkDragDrop<Task[]>, targetStatus: 'triage' | 'todo' | 'in-progress' | 'await-feedback' | 'done'): void {
+  onTaskDrop(
+    event: CdkDragDrop<Task[]>,
+    targetStatus: 'triage' | 'todo' | 'in-progress' | 'await-feedback' | 'done'
+  ): void {
     const task = event.item.data as Task;
     this.logDropEvent(task, event, targetStatus);
     if (task.status === targetStatus) return this.logNoUpdate();
@@ -178,14 +217,21 @@ export class BoardViewComponent implements OnInit, AfterViewInit {
     this.updateLocalTaskStatus(task.id, targetStatus);
     this.taskService.updateTaskStatus(task.id, targetStatus).subscribe({
       next: () => setTimeout(() => this.scrollToTask(task.id), 400),
-      error: () => this.revertLocalTaskStatus(task.id, oldStatus)
+      error: () => this.revertLocalTaskStatus(task.id, oldStatus),
     });
   }
-  private logDropEvent(task: Task, event: CdkDragDrop<Task[]>, targetStatus: Task['status']) {
+  private logDropEvent(
+    task: Task,
+    event: CdkDragDrop<Task[]>,
+    targetStatus: Task['status']
+  ) {
     console.log('🔍 DROP EVENT:', {
-      task: task.title, currentStatus: task.status, targetStatus,
-      previousContainer: event.previousContainer.id, currentContainer: event.container.id,
-      sameContainer: event.previousContainer === event.container
+      task: task.title,
+      currentStatus: task.status,
+      targetStatus,
+      previousContainer: event.previousContainer.id,
+      currentContainer: event.container.id,
+      sameContainer: event.previousContainer === event.container,
     });
   }
 
@@ -194,7 +240,7 @@ export class BoardViewComponent implements OnInit, AfterViewInit {
   }
 
   private updateLocalTaskStatus(id: string, status: Task['status']) {
-    const i = this.allTasks.findIndex(t => t.id === id);
+    const i = this.allTasks.findIndex((t) => t.id === id);
     if (i !== -1) {
       this.allTasks[i].status = status;
       this.filteredTasks = [...this.allTasks];
@@ -213,14 +259,19 @@ export class BoardViewComponent implements OnInit, AfterViewInit {
     if (taskElement) {
       taskElement.scrollIntoView({
         behavior: 'smooth',
-        block: 'center'
+        block: 'center',
       });
     }
   }
 
   openAddTaskModal(status?: string): void {
     if (status) {
-      this.addTaskStatus = status as 'triage' | 'todo' | 'in-progress' | 'await-feedback' | 'done';
+      this.addTaskStatus = status as
+        | 'triage'
+        | 'todo'
+        | 'in-progress'
+        | 'await-feedback'
+        | 'done';
     } else {
       this.addTaskStatus = 'todo';
     }
@@ -275,7 +326,7 @@ export class BoardViewComponent implements OnInit, AfterViewInit {
   }
 
   onDeleteTask(taskId: string): void {
-    const taskToDelete = this.allTasks.find(t => t.id === taskId);
+    const taskToDelete = this.allTasks.find((t) => t.id === taskId);
     const taskTitle = taskToDelete?.title || 'Task';
 
     this.taskService.deleteTask(taskId).subscribe({
@@ -287,7 +338,7 @@ export class BoardViewComponent implements OnInit, AfterViewInit {
       error: (error) => {
         console.error('Error deleting task:', error);
         this.toastService.showTaskDeleteError();
-      }
+      },
     });
   }
 
@@ -305,43 +356,41 @@ export class BoardViewComponent implements OnInit, AfterViewInit {
 
   getSubtaskProgress(task: Task): number {
     if (!task.subtasks || task.subtasks.length === 0) return 0;
-    const completed = task.subtasks.filter(st => st.completed).length;
+    const completed = task.subtasks.filter((st) => st.completed).length;
     return Math.round((completed / task.subtasks.length) * 100);
   }
 
   getCompletedSubtasks(task: Task): number {
     if (!task.subtasks) return 0;
-    return task.subtasks.filter(st => st.completed).length;
+    return task.subtasks.filter((st) => st.completed).length;
   }
 
   areAllSubtasksCompleted(task: Task): boolean {
     if (!task.subtasks || task.subtasks.length === 0) return false;
-    return task.subtasks.every(st => st.completed);
+    return task.subtasks.every((st) => st.completed);
   }
 
   hasIncompleteSubtasks(task: Task): boolean {
     if (!task.subtasks || task.subtasks.length === 0) return false;
-    return task.subtasks.some(st => !st.completed);
+    return task.subtasks.some((st) => !st.completed);
   }
 
   getContactColor(userId: string): string {
-    const contact = this.contacts.find(c => c.id === userId);
+    const contact = this.contacts.find((c) => c.id === userId);
     return contact?.color || '#29abe2';
   }
 
   getContactInitials(userId: string): string {
-    const contact = this.contacts.find(c => c.id === userId);
+    const contact = this.contacts.find((c) => c.id === userId);
     return contact?.initials || '??';
   }
 
   getPriorityIcon(priority: 'low' | 'medium' | 'high'): string {
     const iconMap = {
-      'low': '/assets/images/low.svg',
-      'medium': '/assets/images/medium.svg',
-      'high': '/assets/images/urgent.svg'
+      low: '/assets/images/low.svg',
+      medium: '/assets/images/medium.svg',
+      high: '/assets/images/urgent.svg',
     };
     return iconMap[priority] || iconMap['medium'];
   }
 }
-
-

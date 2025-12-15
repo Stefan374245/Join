@@ -67,9 +67,9 @@ export class ContactDialogComponent implements OnInit {
   get avatarInitials(): string {
     const firstName = this.contactForm.get('firstName')?.value || '';
     const lastName = this.contactForm.get('lastName')?.value || '';
-    
+
     if (!firstName && !lastName) return '';
-    
+
     const firstInitial = firstName.charAt(0).toUpperCase();
     const lastInitial = lastName.charAt(0).toUpperCase();
     return `${firstInitial}${lastInitial}`;
@@ -144,7 +144,7 @@ export class ContactDialogComponent implements OnInit {
       '#1FD7C1', '#FF745E', '#FFA35E', '#FC71FF', '#FFC701',
       '#0038FF', '#C3FF2B', '#FFE62B', '#FF4646', '#FFBB2B'
     ];
-    
+
     const hash = email.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
     const colorIndex = hash % colors.length;
     return colors[colorIndex];
