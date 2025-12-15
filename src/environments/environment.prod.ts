@@ -1,5 +1,3 @@
-// Firebase configuration for production
-// TODO: Replace with your actual Firebase config from Firebase Console
 export const environment = {
   production: true,
   firebase: {
@@ -10,5 +8,5 @@ export const environment = {
     messagingSenderId: '997212360363',
     appId: '1:997212360363:web:4790443452314fafd971ee',
   },
-   n8nWebhookUrl: 'http://localhost:5678/webhook/feature-request',
+   n8nWebhookUrl: 'https://your-n8n-domain.com/webhook/feature-request',
 };
