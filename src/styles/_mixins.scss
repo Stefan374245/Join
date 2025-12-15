@@ -13,50 +13,24 @@
 
 @mixin responsive($breakpoint) {
   @if $breakpoint == sm {
-    @media (min-width: $breakpoint-sm) { @content; }
+    @media (min-width: $breakpoint-sm) {
+      @content;
+    }
   } @else if $breakpoint == md {
-    @media (min-width: $breakpoint-md) { @content; }
+    @media (min-width: $breakpoint-md) {
+      @content;
+    }
   } @else if $breakpoint == lg {
-    @media (min-width: $breakpoint-lg) { @content; }
+    @media (min-width: $breakpoint-lg) {
+      @content;
+    }
   } @else if $breakpoint == xl {
-    @media (min-width: $breakpoint-xl) { @content; }
+    @media (min-width: $breakpoint-xl) {
+      @content;
+    }
   }
 }
 
-@mixin button-base {
-  padding: $spacing-sm $spacing-md;
-  border: none;
-  border-radius: $border-radius;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-family: $font-family-base;
-
-  &:disabled {
-    opacity: 0.7;
-    cursor: not-allowed;
-  }
-}
-
-@mixin button-primary {
-  @include button-base;
-  background-color: $primary-color;
-  color: $white;
-
-  &:hover:not(:disabled) {
-    background-color: $primary-dark;
-  }
-}
-
-@mixin button-secondary {
-  @include button-base;
-  background-color: $white;
-  color: $primary-color;
-  border: 1px solid $primary-color;
-
-  &:hover:not(:disabled) {
-    background-color: rgba($primary-color, 0.1);
-  }
-}
 
 @mixin input-base {
   width: 100%;
@@ -92,19 +66,21 @@
 }
 
 // Priority indicator mixin
-@mixin priority-indicator($priority: 'low') {
-  @if $priority == 'low' {
+@mixin priority-indicator($priority: "low") {
+  @if $priority == "low" {
     background-color: $priority-color-low;
-  } @else if $priority == 'medium' {
+  } @else if $priority == "medium" {
     background-color: $priority-color-medium;
-  } @else if $priority == 'urgent' {
+  } @else if $priority == "urgent" {
     background-color: $priority-color-urgent;
   }
 }
 
 // Main content layout with sidebar and header offset
 @mixin main-content-layout {
-  margin-left: calc($sidebar-width + $content-offset-left); // 200px + 96px = 296px
+  margin-left: calc(
+    $sidebar-width + $content-offset-left
+  ); // 200px + 96px = 296px
   margin-top: calc($header-height + $content-offset-top); // 90px + 20px = 110px
   padding: $spacing-xl;
   min-height: calc(100vh - $header-height - $content-offset-top);

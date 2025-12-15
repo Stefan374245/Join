@@ -1,5 +1,6 @@
 @import "../../../../styles/variables";
 @import "../../../../styles/mixins";
+@import "../../../../styles/components/buttons";
 
 .main-div {
   @include flex(column, center, center);

@@ -1,0 +1,278 @@
+// ========== Modular Button System ==========
+// Base button with shared properties
+.btn {
+  @include flex(row, center, center);
+  gap: 10px;
+  padding: 16px 16px;
+  border-radius: 10px;
+  font-size: 21px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  white-space: nowrap;
+  line-height: 1;
+
+  img {
+    width: 20px;
+    height: 20px;
+    transition: filter 0.2s, transform 0.2s;
+  }
+
+  &:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+    opacity: 0.6;
+
+    &:hover {
+      transform: none;
+      box-shadow: none;
+    }
+  }
+}
+
+// ========== Color Variants ==========
+.btn-primary {
+  background-color: $primary-color;
+  color: white;
+
+  &:hover:not(:disabled) {
+    background-color: $accent-color;
+    box-shadow: 0 4px 8px rgba($accent-color, 0.3);
+  }
+}
+
+.btn-secondary {
+  background: white;
+  color: $primary-color;
+  border: 1px solid $primary-color;
+
+  &:hover:not(:disabled) {
+    border-color: $accent-color;
+    color: $accent-color;
+
+    img {
+      filter: brightness(0) saturate(100%) invert(64%) sepia(98%) saturate(1613%) hue-rotate(164deg) brightness(95%) contrast(92%);
+    }
+  }
+}
+
+.btn-danger {
+  background: $error-color;
+  color: $white;
+
+  &:hover:not(:disabled) {
+    background: darken($error-color, 10%);
+  }
+}
+
+.btn-cancel {
+  background: $gray-200;
+  color: $primary-color;
+
+  &:hover:not(:disabled) {
+    background: $gray-300;
+  }
+}
+
+.btn-link {
+  @include flex(row, flex-start, center);
+  gap: 4px;
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: $font-size-base;
+  color: $primary-color;
+  font-weight: 400;
+  transition: color 0.2s ease;
+
+  img {
+    width: 24px;
+    height: 24px;
+  }
+
+  .icon-hover {
+    display: none;
+  }
+
+  .icon-default {
+    display: block;
+  }
+
+  &:hover:not(:disabled) {
+    color: $accent-color;
+
+    .icon-default {
+      display: none;
+    }
+
+    .icon-hover {
+      display: block;
+    }
+  }
+}
+
+// ========== Style Variants ==========
+.btn-text {
+  background: none;
+  color: $primary-color;
+  padding: $border-radius $spacing-md;
+  font-weight: 400;
+
+  &:hover:not(:disabled) {
+    color: $accent-color;
+
+    img {
+      filter: brightness(0) saturate(100%) invert(48%) sepia(83%)
+        saturate(748%) hue-rotate(164deg) brightness(96%) contrast(101%);
+    }
+  }
+}
+
+.btn-round {
+  border-radius: 50%;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+
+  &:hover:not(:disabled) {
+    transform: scale(1.1);
+  }
+}
+
+// ========== Size Variants ==========
+.btn-sm {
+  padding: 12px 16px;
+  font-size: 16px;
+  height: auto;
+
+  img {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.btn-lg {
+  padding: 18px 24px;
+  font-size: 21px;
+
+  img {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+.btn-xs {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border-radius: 50%;
+  background: transparent;
+
+  img {
+    width: 24px;
+    height: 24px;
+  }
+
+  &:hover:not(:disabled) {
+    transform: scale(1.1);
+  }
+}
+
+// ========== Special Purpose Buttons ==========
+.btn-icon {
+  @include flex(row, center, center);
+  gap: 16px;
+
+  .add-icon,
+  img {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.btn-close {
+  @include flex(row, center, center);
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: $primary-color;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  transition: all 0.2s;
+  padding: 0;
+
+  &:hover:not(:disabled) {
+    transform: scale(1.1);
+  }
+
+  img {
+    width: 100%;
+    height: 100%;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background-color: $white;
+      border-radius: 50%;
+    }
+  }
+}
+
+// ========== Button Groups & Containers ==========
+.form-actions {
+  @include flex(row, flex-end, center);
+  gap: 32px;
+  padding-top: 24px;
+  margin-top: auto;
+  position: sticky;
+  bottom: 0;
+}
+
+.button-row,
+.button-group {
+  display: flex;
+  gap: 16px;
+
+  @media (max-width: $breakpoint-md) {
+    flex-direction: column;
+  }
+}
+
+// ========== Utility Classes ==========
+.required-label {
+  position: relative;
+  width: fit-content;
+  font-size: 12px;
+  color: #2a3647;
+  margin-top: 24px;
+
+  span {
+    color: #ff3d00;
+  }
+}
+
+// ========== Legacy Compatibility (Specific Names) ==========
+// These can be removed once all components are migrated
+.btn-add-task {
+  @extend .btn;
+  @extend .btn-primary;
+  @extend .btn-icon;
+  height: 48px;
+}
+
+.btn-add-column-task {
+  @extend .btn;
+  @extend .btn-xs;
+  margin-top: -2px;
+}
+
+.action-btn {
+  @extend .btn;
+  @extend .btn-text;
+}
+
+.close-btn {
+  @extend .btn-close;
+}

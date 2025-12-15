@@ -1,6 +1,8 @@
 @import "../../../../styles/_variables.scss";
 @import "../../../../styles/_mixins.scss";
 @import "../../../../styles/_utilities.scss";
+@import "../../../../styles/components/animations";
+@import "../../../../styles/components/buttons";
 
 :host {
   display: block;
@@ -32,22 +34,15 @@
 }
 
 .add-btn {
+  @extend .btn;
+  @extend .btn-primary;
   display: flex;
   gap: $spacing-xl;
   align-items: center;
   justify-content: center;
-  background-color: $primary-color;
-  color: $white;
-  border-radius: 10px;
   padding: 12px 20px;
   width: 300px;
-  cursor: pointer;
   margin-bottom: $spacing-md;
-  transition: ease background-color 0.3s;
-
-  &:hover {
-    background-color: $accent-color;
-  }
 
   @media (max-width: 900px) {
     display: none;
@@ -213,40 +208,6 @@
   margin-top: $spacing-sm;
 }
 
-.btn-link {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 4px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  font-size: $font-size-base;
-  color: $primary-color;
-  transition: color 0.2s ease;
-
-  .icon-hover {
-    display: none;
-  }
-
-  .icon-default {
-    display: block;
-  }
-
-  &:hover {
-    color: $accent-color;
-
-    .icon-default {
-      display: none;
-    }
-
-    .icon-hover {
-      display: block;
-    }
-  }
-}
-
 .contactDetailsMail {
   color: $accent-color;
   line-height: 1.2;
@@ -344,17 +305,6 @@
       width: 20px;
       height: 20px;
     }
-  }
-}
-
-@keyframes slideUpFade {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
   }
 }
 

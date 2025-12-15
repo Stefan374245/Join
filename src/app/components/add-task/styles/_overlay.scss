@@ -19,7 +19,6 @@
     width: calc(100% - 80px);
   }
 
-  // Mobile: Bottom Navigation
   @media (max-width: $breakpoint-lg) {
     left: 0;
     width: 100%;
@@ -48,24 +47,7 @@
     position: absolute;
     top: 24px;
     right: 24px;
-    background: none;
-    border: none;
-    width: 32px;
-    height: 32px;
-    cursor: pointer;
-    @include flex(row, center, center);
-    border-radius: 50%;
-    transition: all 0.2s ease;
     z-index: 260;
-
-    img {
-      width: 24px;
-      height: 24px;
-    }
-
-    &:hover {
-      background-color: rgba($primary-color, 0.1);
-    }
   }
 
   .edit-header {
@@ -90,17 +72,6 @@
 
   .add-task-form {
     gap: 2rem;
-  }
-}
-
-@keyframes slideInFromRight {
-  from {
-    transform: translateX(100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
   }
 }
 

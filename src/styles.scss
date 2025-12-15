@@ -51,18 +51,6 @@ a {
   }
 }
 
-.btn {
-  @include button-base;
-
-  &-primary {
-    @include button-primary;
-  }
-
-  &-secondary {
-    @include button-secondary;
-  }
-}
-
 .form-control {
   @include input-base;
 }

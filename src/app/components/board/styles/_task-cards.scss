@@ -1,0 +1,105 @@
+// ========== Task Card Shared Styles ==========
+
+.task-category {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 16px;
+  white-space: nowrap;
+  color: white;
+  margin-bottom: 20px;
+  align-self: flex-start;
+
+  span {
+    display: inline-block;
+    padding: $spacing-xs $spacing-md;
+    border-radius: $border-radius;
+    font-size: $font-size-base;
+    font-weight: 500;
+    color: $white;
+    line-height: 1.2;
+  }
+
+  &.user-story {
+    background: $category-user-story;
+  }
+
+  &.user-story span {
+    background: $category-user-story;
+  }
+
+  &.technical-task {
+    background: $category-technical-task;
+  }
+
+  &.technical-task span {
+    background: $category-technical-task;
+  }
+}
+
+.task-title {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0 0 10px 0;
+  color: $primary-color;
+  line-height: 1.4;
+  word-break: break-word;
+  min-height: 22px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.task-description {
+  color: #a8a8a8;
+  font-size: 16px;
+  margin: 0 0 20px 0;
+  line-height: 1.4;
+  word-break: break-word;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.task-priority {
+  @include flex(row, flex-start, center);
+  display: inline-flex;
+  gap: $border-radius;
+  font-weight: 400;
+  color: $primary-color;
+
+  img {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+// Task Detail specific overrides
+.task-content {
+  .task-title {
+    word-break: break-word;
+    font-size: 48px;
+    font-weight: 700;
+    color: $primary-color;
+    margin: 0 0 $spacing-md 0;
+    line-height: 1.2;
+    display: block; // Override line-clamp for detail view
+    -webkit-line-clamp: unset;
+  }
+
+  .task-description {
+    font-size: 20px;
+    color: $primary-color;
+    margin: 0 0 $spacing-lg * 1.6 0;
+    line-height: 1.5;
+    word-break: break-word;
+    display: block; // Override line-clamp for detail view
+    -webkit-line-clamp: unset;
+  }
+}

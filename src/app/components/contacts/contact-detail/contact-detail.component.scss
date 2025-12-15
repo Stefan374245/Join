@@ -1,5 +1,7 @@
 @import "../../../../styles/variables";
 @import "../../../../styles/mixins";
+@import "../../../../styles/components/animations";
+@import "../../../../styles/components/buttons";
 
 .contact-detail-page {
   min-height: 100vh;
@@ -198,16 +200,5 @@
       width: 20px;
       height: 20px;
     }
-  }
-}
-
-@keyframes slideUpFade {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
   }
 }

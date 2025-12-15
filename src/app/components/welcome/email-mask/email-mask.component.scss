@@ -1,5 +1,6 @@
 @import "../../../../styles/variables";
 @import "../../../../styles/mixins";
+@import "../../../../styles/components/buttons";
 
 .email-mask-page {
   position: relative;
@@ -284,8 +285,6 @@
     }
 
     .btn-secondary {
-      background: white;
-      color: $primary-color;
       border: 2px solid #e0e0e0;
 
       &:hover:not(:disabled) {
@@ -295,16 +294,6 @@
     }
 
     .btn-primary {
-      background: $accent-color;
-      color: white;
-      border: none;
-
-      &:hover:not(:disabled) {
-        background: darken($accent-color, 10%);
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(41, 171, 226, 0.3);
-      }
-
       .spinner {
         display: inline-block;
         width: 16px;

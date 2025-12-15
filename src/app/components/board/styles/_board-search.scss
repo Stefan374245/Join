@@ -1,0 +1,58 @@
+// ========== Board Search Styles ==========
+
+.search-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  .search-input {
+    width: 250px;
+    height: 48px;
+    padding: 10px 48px 10px 16px;
+    background-color: white;
+    border: 1px solid #d1d1d1;
+    border-radius: 10px;
+    font-size: 1rem;
+    color: $primary-color;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s ease-in-out;
+
+    &:focus {
+      border-color: $accent-color;
+    }
+
+    &::placeholder {
+      color: #a8a8a8;
+    }
+  }
+
+  .search-icon {
+    position: absolute;
+    right: 10px;
+    width: 32px;
+    height: 32px;
+    padding: 5px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover {
+      background-color: #e7e7e7;
+    }
+
+    img {
+      width: 20px;
+      height: 20px;
+    }
+  }
+}
+
+@media (max-width: 1024px) {
+  .search-wrapper .search-input {
+    width: 200px;
+  }
+}

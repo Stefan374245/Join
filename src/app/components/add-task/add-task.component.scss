@@ -1,11 +1,12 @@
 @import "../../../styles/variables";
 @import "../../../styles/mixins";
+@import "../../../styles/components/animations";
+@import "../../../styles/components/buttons";
 @import "./styles/overlay";
 @import "./styles/form-elements";
 @import "./styles/dropdowns";
 @import "./styles/priority-buttons";
 @import "./styles/subtasks";
-@import "./styles/buttons";
 @import "./styles/responsive";
 
 // Subtask input wrapper for icon positioning

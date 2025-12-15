@@ -1,0 +1,184 @@
+// ========== Progress Bar Shared Styles ==========
+
+.task-progress {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  width: 100%;
+  align-items: center;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &:hover .subtask-count {
+    transform: scale(1.15);
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  &.all-completed {
+    .progress-bar {
+      transition: box-shadow 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+
+      .progress-fill {
+        transition: background 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+          box-shadow 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+          width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+    }
+
+    .progress-text {
+      transition: color 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    &:hover {
+      .progress-bar {
+        box-shadow: 0 0 12px rgba(13, 144, 35, 0.5);
+
+        .progress-fill {
+          background: linear-gradient(
+            90deg,
+            #0d9023 0%,
+            lighten(#0d9023, 10%) 100%
+          );
+          box-shadow: 0 0 12px rgba(13, 144, 35, 0.6);
+        }
+      }
+
+      .progress-text {
+        color: #0d9023;
+      }
+    }
+  }
+
+  &.has-incomplete {
+    .progress-bar {
+      transition: box-shadow 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+
+      .progress-fill {
+        transition: background 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+          box-shadow 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+          width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+    }
+
+    .progress-text {
+      transition: color 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    &:hover {
+      .progress-bar {
+        box-shadow: 0 0 12px rgba(255, 61, 0, 0.5);
+
+        .progress-fill {
+          background: linear-gradient(
+            90deg,
+            #ff3d00 0%,
+            lighten(#ff3d00, 10%) 100%
+          );
+          box-shadow: 0 0 12px rgba(255, 61, 0, 0.6);
+        }
+      }
+
+      .progress-text {
+        color: #ff3d00;
+      }
+    }
+  }
+
+  .subtask-progress-container {
+    width: 100%;
+    height: 8px;
+    background: #f4f4f4;
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .subtask-progress-bar {
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      $accent-color 0%,
+      lighten($accent-color, 10%) 100%
+    );
+    border-radius: 4px;
+    transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 0 8px rgba($accent-color, 0.3);
+    position: relative;
+
+    will-change: width;
+
+    &::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.4),
+        transparent
+      );
+      animation: shine 2s ease-in-out infinite;
+    }
+  }
+
+  .progress-bar {
+    width: 100%;
+    height: 8px;
+    background: #f4f4f4;
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(
+        90deg,
+        $accent-color 0%,
+        lighten($accent-color, 10%) 100%
+      );
+      border-radius: 4px;
+      transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 0 8px rgba($accent-color, 0.3);
+      will-change: width;
+      position: relative;
+
+      &::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.4),
+          transparent
+        );
+        animation: shine 2s ease-in-out infinite;
+      }
+    }
+  }
+
+  .subtask-count {
+    color: #a8a8a8;
+    font-size: 12px;
+    white-space: nowrap;
+    transition: transform 0.2s ease-in-out;
+
+    &.all-done:hover {
+      color: #0d9023 !important;
+    }
+
+    &.not-done:hover {
+      color: #ff3d00 !important;
+    }
+  }
+
+  .progress-text {
+    font-size: 16px;
+    white-space: nowrap;
+  }
+}
