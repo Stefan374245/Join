@@ -1,6 +1,6 @@
 import { Component, OnInit, inject, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { ContactService } from '../../../services/contact.service';
 import { AuthService } from '../../../services/auth.service';
 import { Contact } from '../../../models/contact.interface';
@@ -19,6 +19,7 @@ type Grouped = { letter: string; items: Contact[] }[];
 export class ContactsListComponent implements OnInit {
   private contactService = inject(ContactService);
   private authService = inject(AuthService);
+  private router = inject(Router);
 
   contacts$ = new BehaviorSubject<Contact[]>([]);
   grouped$ = new BehaviorSubject<Grouped>([]);
@@ -26,7 +27,8 @@ export class ContactsListComponent implements OnInit {
   // UI state
   selected: Contact | null = null;
   showRight = true;
-  
+  isMobile = false;
+
   // Dialog state
   showDialog = false;
   dialogMode: 'add' | 'edit' = 'add';
@@ -45,7 +47,7 @@ export class ContactsListComponent implements OnInit {
         console.log('✅ Contacts loaded:', list.length, 'contacts', list);
         this.contacts$.next(list);
         this.group(list);
-        
+
         // Additional debug info
         console.log('📊 Contacts$ value:', this.contacts$.value);
         console.log('📊 Grouped$ value:', this.grouped$.value);
@@ -70,13 +72,17 @@ export class ContactsListComponent implements OnInit {
     this.grouped$.next(grouped);
   }
 
-  select(contact: Contact) {
+  select(contact: Contact, event?: Event) {
+    // On desktop (>= 900px), show in right panel and prevent navigation
+    if (window.innerWidth >= 900) {
+      if (event) {
+        event.preventDefault();
+      }
+    }
+    // Set selected contact for both mobile and desktop
     this.selected = contact;
     localStorage.setItem('selectedContactEmail', contact.email);
     localStorage.setItem('lastEditedContact', contact.email);
-    if (window.innerWidth <= 800) {
-      this.showRight = true;
-    }
   }
 
   addContact() {
@@ -102,42 +108,42 @@ export class ContactsListComponent implements OnInit {
         // Create new contact (non-auth user)
         // Generate ID from email
         const contactId = contact.email.replace(/[.@]/g, '_'); // sanitize email for Firestore ID
-        
+
         // Create complete contact object with ID
         const newContact: Contact = {
           ...contact,
           id: contactId
         };
-        
+
         await this.contactService.saveContact(newContact).toPromise();
         console.log('✅ Contact added successfully');
       } else if (contact.id) {
         // Update existing contact
         const isOwnProfile = this.authService.currentUser?.email === contact.email;
-        
+
         // Update Firestore
         await this.contactService.updateUser(contact.id, {
           firstName: contact.firstName,
           lastName: contact.lastName,
           phone: contact.phone
         }).toPromise();
-        
+
         // If editing own profile, also update Firebase Auth profile
         if (isOwnProfile) {
           const displayName = `${contact.firstName} ${contact.lastName}`;
           await this.authService.updateDisplayName(displayName);
           console.log('✅ Profile updated in both Firestore and Auth');
         }
-        
+
         console.log('✅ Contact updated successfully');
       }
-      
+
       // Reload contacts list
       this.load();
-      
+
       // Close dialog
       this.closeDialog();
-      
+
       // Select the saved/updated contact
       this.selected = contact;
       localStorage.setItem('selectedContactEmail', contact.email);
@@ -157,18 +163,18 @@ export class ContactsListComponent implements OnInit {
       if (!contact?.id) {
         throw new Error('Contact ID not found');
       }
-      
+
       await this.contactService.deleteUser(contact.id).toPromise();
       console.log('✅ Contact deleted successfully');
-      
+
       // Clear selection if deleted contact was selected
       if (this.selected?.email === email) {
         this.clearSelection();
       }
-      
+
       // Reload contacts list
       this.load();
-      
+
       // Close dialog
       this.closeDialog();
     } catch (error) {
@@ -201,7 +207,10 @@ export class ContactsListComponent implements OnInit {
   }
 
   // responsive helper
-  @HostListener('window:resize') onResize() {
-    this.showRight = window.innerWidth >= 800;
+  @HostListener('window:resize')
+  onResize() {
+    const w = window.innerWidth;
+    this.showRight = w >= 900;
+    this.isMobile = w < 900;
   }
 }
