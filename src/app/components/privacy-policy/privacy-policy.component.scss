@@ -115,18 +115,6 @@
   }
 }
 
-// Responsive
-@media (max-width: $breakpoint-md) {
-  .privacy-main {
-    margin: 90px $spacing-md 0 $spacing-md;
-    padding: $spacing-lg;
-
-    h1 {
-      font-size: 48px;
-    }
-  }
-}
-
 @media (max-width: $breakpoint-sm) {
   .privacy-main {
     margin: 70px $spacing-sm 0 $spacing-sm;
