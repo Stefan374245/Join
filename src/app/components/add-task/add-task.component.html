@@ -6,16 +6,13 @@
      [attr.aria-modal]="isOverlay"
      [attr.aria-labelledby]="isEditMode ? 'edit-task-title' : 'add-task-title'">
 
-  <!-- Content Card (only for overlay) -->
   <article [class.task-edit-card]="isOverlay"
        (click)="isOverlay ? $event.stopPropagation() : null">
 
-    <!-- Close Button (only for overlay) -->
     <button *ngIf="isOverlay" class="close-btn" (click)="onClose()" aria-label="Close dialog">
       <img src="assets/images/close.svg" alt="" role="presentation" />
     </button>
 
-    <!-- Header Section -->
     <header [class.edit-header]="isOverlay" [class.add-task-header]="!isOverlay">
       <h1 [class.edit-title]="isOverlay"
           [class.page-title]="!isOverlay"
@@ -24,12 +21,11 @@
       </h1>
     </header>
 
-    <!-- Form Container -->
     <main class="form-wrapper">
       <form [formGroup]="taskForm" (ngSubmit)="onSubmit()" class="add-task-form" aria-label="Task form">
-      <!-- Left Column -->
+
       <section class="form-column form-column-left" aria-labelledby="basic-info-heading">
-        <!-- Title Input -->
+
         <fieldset class="form-group">
           <label for="title" class="form-label">
             Title<span class="required" aria-label="required">*</span>
@@ -53,7 +49,6 @@
           </span>
         </fieldset>
 
-        <!-- Description Textarea -->
         <fieldset class="form-group">
           <label for="description" class="form-label">Description</label>
           <textarea
@@ -67,7 +62,6 @@
           ></textarea>
         </fieldset>
 
-        <!-- Due Date Input -->
         <fieldset class="form-group">
           <label for="dueDate" class="form-label">
             Due date<span class="required" aria-label="required">*</span>
@@ -95,13 +89,10 @@
         </fieldset>
       </section>
 
-      <!-- Separator -->
       <hr class="separator" aria-hidden="true" />
 
-      <!-- Right Column -->
       <section class="form-column form-column-right" aria-labelledby="task-details-heading">
 
-        <!-- Priority Selection -->
         <fieldset class="form-group">
           <legend class="form-label">Priority</legend>
           <div class="priority-buttons" role="group" aria-label="Priority selection">
@@ -156,7 +147,6 @@
           </div>
         </fieldset>
 
-        <!-- Assigned To Dropdown -->
         <fieldset class="form-group">
           <legend class="form-label">Assigned to</legend>
           <div class="input-wrapper" (click)="toggleContactDropdown()">
@@ -173,7 +163,6 @@
             <img src="assets/images/arrow_drop_down.svg" alt="" class="dropdown-icon" role="presentation" />
           </div>
 
-          <!-- Contact Dropdown -->
           <ul class="dropdown-menu"
               *ngIf="showContactDropdown"
               role="listbox"
@@ -202,7 +191,6 @@
             </li>
           </ul>
 
-          <!-- Selected Contacts Display -->
           <div class="selected-contacts"
                *ngIf="selectedContacts.length > 0"
                role="list"
@@ -225,7 +213,6 @@
           </div>
         </fieldset>
 
-        <!-- Category Dropdown -->
         <fieldset class="form-group">
           <legend class="form-label">
             Category<span class="required" aria-label="required">*</span>
@@ -248,7 +235,6 @@
             <img src="assets/images/arrow_drop_down.svg" alt="" class="dropdown-icon" role="presentation" />
           </div>
 
-          <!-- Category Dropdown -->
           <ul class="dropdown-menu"
               *ngIf="showCategoryDropdown"
               role="listbox"
@@ -272,7 +258,6 @@
           </span>
         </fieldset>
 
-        <!-- Subtasks Section -->
         <fieldset class="form-group">
           <legend class="form-label">Subtasks</legend>
           <div class="input-wrapper subtask-input-wrapper">
@@ -319,7 +304,6 @@
             </div>
           </div>
 
-          <!-- Subtasks List -->
           <app-subtask-list
             [subtasks]="subtasks"
             [editingSubtaskId]="editingSubtaskId"
@@ -334,12 +318,10 @@
       </section>
     </form>
 
-    <!-- Required Label -->
     <p class="required-label">
       <span aria-hidden="true">*</span>This field is required
     </p>
 
-    <!-- Form Actions -->
     <footer class="form-actions">
       <button type="button" class="btn btn-secondary" (click)="clearForm()" aria-label="Clear form">
         Clear

@@ -71,7 +71,6 @@ export class SubtaskListComponent {
 
   onEdit(subtask: any) {
     this.editSubtask.emit(subtask);
-    // Warte kurz bis das Input-Feld gerendert ist
     setTimeout(() => {
       if (this.editInput) {
         this.editInput.nativeElement.focus();
@@ -89,7 +88,6 @@ export class SubtaskListComponent {
   }
 
   onInputBlur(event: FocusEvent) {
-    // Prüfen, ob der neue Fokus nicht auf den Aktions-Buttons liegt
     const relatedTarget = event.relatedTarget as HTMLElement;
     if (!relatedTarget ||
         (!relatedTarget.classList.contains('subtask-edit-icon') &&

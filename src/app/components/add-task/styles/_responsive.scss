@@ -1,18 +1,10 @@
-// ========== Responsive Design ==========
 
-// Large tablets & smaller desktops (Sidebar wird schmaler)
-@media (max-width: $breakpoint-xxl) {
-  // No container margins needed - handled by main layout
-}
-
-// Tablets (Sidebar geht nach unten)
 @media (max-width: $breakpoint-lg) {
   .form-wrapper {
     max-width: 100%;
   }
 }
 
-// Mobile & Small Tablets (Columns untereinander, Inhalte horizontal)
 @media (max-width: $breakpoint-md) {
   .add-task-form {
     flex-direction: column;
@@ -22,7 +14,6 @@
   .form-column {
     width: 100%;
 
-    // Inhalte horizontal nebeneinander wenn möglich
     .form-group,
     fieldset.form-group {
       display: flex;
@@ -32,7 +23,7 @@
 
       &:has(.form-input),
       &:has(.form-textarea) {
-        flex-direction: column; // Inputs bleiben vertikal
+        flex-direction: column;
       }
     }
   }
@@ -69,7 +60,6 @@
   }
 }
 
-// Very small mobile screens
 @media (max-width: 480px) {
   .add-task-header .page-title {
     font-size: 28px;
@@ -85,7 +75,7 @@
 
   .form-input,
   .form-textarea {
-    font-size: 16px; // Verhindert Auto-Zoom auf iOS
+    font-size: 16px;
   }
 }
 

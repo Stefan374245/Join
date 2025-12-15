@@ -83,18 +83,18 @@
     right: -4px;
     width: 16px;
     height: 16px;
-    background: rgba(211, 211, 211, 0.9);  // Hellgrauer, leicht transparenter Hintergrund
+    background: rgba(211, 211, 211, 0.9);
     border-radius: 50%;
     display: none;
     cursor: pointer;
     padding: 3px;
-    filter: brightness(1.2);  // Macht das Icon etwas heller
-    opacity: 0.7;  // Zusätzliche Transparenz
-    transition: all 0.2s ease;  // Sanfter Übergang für Hover-Effekt
+    filter: brightness(1.2);
+    opacity: 0.7;
+    transition: all 0.2s ease;
   }
 
   &:hover .remove-icon {
     display: block;
-    opacity: 0.9;  // Beim Hover etwas weniger transparent
+    opacity: 0.9;
   }
 }

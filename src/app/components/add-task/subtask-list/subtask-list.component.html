@@ -1,10 +1,8 @@
 <app-toast></app-toast>
 <ul class="subtasks-list" *ngIf="subtasks.length > 0" role="list" aria-label="Subtasks">
   <li *ngFor="let subtask of visibleSubtasks" class="subtask-item" role="listitem">
-    <!-- Normal View -->
     <span class="subtask-text" *ngIf="editingSubtaskId !== subtask.id">{{ subtask.title }}</span>
 
-    <!-- Edit View -->
     <div class="subtask-edit-wrapper" *ngIf="editingSubtaskId === subtask.id">
       <input
         type="text"
@@ -38,7 +36,6 @@
       </div>
     </div>
 
-    <!-- Normal Actions (Edit & Delete) -->
     <div class="subtask-item-actions" *ngIf="editingSubtaskId !== subtask.id">
       <img
         src="assets/images/edit-2.svg"
@@ -57,7 +54,6 @@
         tabindex="0" />
     </div>
   </li>
-  <!-- Remaining count with dropdown -->
   <li *ngIf="remainingSubtasksCount > 0"
       class="subtask-item remaining-count"
       role="listitem"
@@ -72,16 +68,13 @@
            tabindex="0"/>
     </div>
 
-    <!-- Dropdown Menu -->
     <div class="subtasks-dropdown" *ngIf="isDropdownOpen">
       <ul class="dropdown-list" role="list">
         <li *ngFor="let subtask of remainingSubtasks"
             class="dropdown-item"
             role="listitem">
-          <!-- Normal View -->
           <span class="subtask-text" *ngIf="editingSubtaskId !== subtask.id">{{ subtask.title }}</span>
 
-          <!-- Edit View für Dropdown Items -->
           <div class="subtask-edit-wrapper" *ngIf="editingSubtaskId === subtask.id">
               <input
               type="text"
@@ -114,7 +107,6 @@
                 tabindex="0" />
             </div>
           </div>
-          <!-- Normal Actions für Dropdown Items -->
           <div class="subtask-item-actions" *ngIf="editingSubtaskId !== subtask.id">
             <img src="assets/images/edit-2.svg"
                  alt="Edit subtask"
