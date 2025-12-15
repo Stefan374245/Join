@@ -9,6 +9,7 @@ import { LogoAnimationComponent } from './components/auth/logo-animation/logo-an
 import { AddTaskComponent } from './components/add-task/add-task.component';
 import { BoardViewComponent } from './components/board/board-view/board-view.component';
 import { ContactsListComponent } from './components/contacts/contacts-list/contacts-list.component';
+import { ContactDetailComponent } from './components/contacts/contact-detail/contact-detail.component';
 import { SummaryViewComponent } from './components/summary/summary-view/summary-view.component';
 import { LegalNoticeComponent } from './components/legal-notice/legal-notice.component';
 import { PrivacyPolicyComponent } from './components/privacy-policy/privacy-policy.component';
@@ -66,6 +67,11 @@ export const routes: Routes = [
   {
     path: 'contacts',
     component: ContactsListComponent,
+    canActivate: [authGuard]
+  },
+  {
+    path: 'contacts/:email',
+    component: ContactDetailComponent,
     canActivate: [authGuard]
   },
   {
