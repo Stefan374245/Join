@@ -2,18 +2,19 @@ import { Component, inject } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { CommonModule } from '@angular/common';
+import { ClickOutsideDirective } from '../../shared/directives/click-outside.directive';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, ClickOutsideDirective],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss'
 })
 export class HeaderComponent {
   private authService = inject(AuthService);
   private router = inject(Router);
-  
+
   showUserMenu = false;
   user$ = this.authService.user$;
 
@@ -25,7 +26,7 @@ export class HeaderComponent {
   }
 
   /**
-   * Close user menu when clicking outside
+   * Close user menu
    */
   closeUserMenu(): void {
     this.showUserMenu = false;
@@ -67,7 +68,7 @@ export class HeaderComponent {
    */
   getUserColor(email: string | null): string {
     if (!email) return 'var(--user-color-1)';
-    
+
     const colors = 15;
     const hash = email.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
     const colorIndex = (hash % colors) + 1;

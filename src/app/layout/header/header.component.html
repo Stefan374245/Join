@@ -10,7 +10,7 @@
         <img src="assets/images/help20x20.svg" alt="Help" />  
       </a>
       
-      <div class="user-menu-container">
+      <div class="user-menu-container" (clickOutside)="closeUserMenu()">
         <button 
           class="user-avatar-btn" 
           (click)="toggleUserMenu()"

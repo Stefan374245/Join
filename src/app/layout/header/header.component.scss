@@ -1,5 +1,5 @@
-@import '../../../styles/variables';
-@import '../../../styles/mixins';
+@import "../../../styles/variables";
+@import "../../../styles/mixins";
 
 .main-header {
   height: 90px;
@@ -95,10 +95,10 @@
 
 .user-dropdown {
   position: absolute;
-  top: calc(100% + 15px);
-  right: 0;
+  top: 48px;
+  right: 20px;
   background: $primary-color;
-   border-radius: 20px 0px 20px 20px;
+  border-radius: 20px 0px 20px 20px;
   box-shadow: $shadow-lg;
   min-width: 200px;
   z-index: 1000;
@@ -174,16 +174,14 @@ hr {
 }
 
 @media (max-width: $breakpoint-md) {
-
-    .header-title {
-      display: none;
-    }
+  .header-title {
+    display: none;
   }
+}
 
-  .header-container {
-    padding: 0 $spacing-md;
-  }
-
+.header-container {
+  padding: 0 $spacing-md;
+}
 
 @media (max-width: $breakpoint-sm) {
   .main-header {
