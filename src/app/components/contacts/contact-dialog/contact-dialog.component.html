@@ -18,13 +18,13 @@
     <!-- Right Side - Form -->
     <div class="dialog-right">
       <div class="form-container">
-        <!-- Avatar -->
-        <div class="avatar-section">
+        <!-- Avatar Desktop -->
+        <div class="avatar-section-desktop">
           <div class="avatar" [style.background-color]="avatarColor">
-            <img 
-              *ngIf="!avatarInitials" 
-              src="assets/images/personwhite.svg" 
-              alt="Person" 
+            <img
+              *ngIf="!avatarInitials"
+              src="assets/images/personwhite.svg"
+              alt="Person"
               class="avatar-icon" />
             <span *ngIf="avatarInitials" class="avatar-initials">{{ avatarInitials }}</span>
           </div>
@@ -139,6 +139,18 @@
             </button>
           </div>
         </form>
+      </div>
+    </div>
+
+    <!-- Avatar Mobile -->
+    <div class="avatar-section-mobile">
+      <div class="avatar" [style.background-color]="avatarColor">
+        <img
+          *ngIf="!avatarInitials"
+          src="assets/images/personwhite.svg"
+          alt="Person"
+          class="avatar-icon" />
+        <span *ngIf="avatarInitials" class="avatar-initials">{{ avatarInitials }}</span>
       </div>
     </div>
   </div>
