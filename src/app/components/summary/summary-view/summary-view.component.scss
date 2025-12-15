@@ -1,384 +1,559 @@
-@import '../../../../styles/variables';
-@import '../../../../styles/mixins';
+@import "../../../../styles/variables";
+@import "../../../../styles/mixins";
 
-.summary-container {
+%card-base {
+  background: $white;
+  border-radius: 1.875rem;
+  box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, background-color 0.3s ease-in-out;
+}
+
+%card-hover {
+  box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.4);
+  background-color: $primary-color;
+}
+
+%text-transition {
+  transition: color 0.3s ease-in-out;
+}
+
+.main-summary {
+  position: relative;
   background-color: $background-color;
   max-width: 100%;
-  box-sizing: border-box;
 
-  // Guest mode: Center the stats box
   &.guest-mode {
-    .summary-content {
-      justify-content: center;
-      align-items: center;
-    }
-  }
-
-  @media (max-width: 768px) {
-    padding: 20px;
+    summary { align-items: center; }
+    .summary-grid { justify-content: center; }
   }
 }
 
-.summary-content {
-  @include flex(row, flex-start, center);
-  gap: 60px;
-  max-width: 1200px;
-
-  @media (max-width: 968px) {
-    flex-direction: column;
-    gap: 40px;
-  }
-}
-
-// Left Side: Stats Box Wrapper
-.stats-box-wrapper {
+summary {
   @include flex(column, flex-start, flex-start);
-  gap: 0;
+  gap: 3.5rem;
+
+  @media (max-width: 650px) {
+    gap: 0;
+  }
 }
 
-.stats-header {
+.summary-header {
   @include flex(row, flex-start, center);
-  gap: 20px;
-  margin-bottom: 56px;
+  gap: $spacing-md;
 
-  .main-title {
-    font-size: 61px;
+  h1 {
+    font-size: 3rem;
     font-weight: 700;
     color: $primary-color;
     margin: 0;
-    font-family: $font-family-base;
-    line-height: 1;
+    white-space: nowrap;
   }
 
-  .divider {
+  .header-divider-wrapper {
+    @include flex(row, flex-start, center);
+    gap: $spacing-md;
+  }
+
+  .header-divider {
     width: 3px;
-    height: 60px;
+    height: 3rem;
     background-color: $secondary-color;
   }
 
-  .subtitle {
-    font-size: 21px;
-    font-weight: 400;
-    color: $primary-color;
+  p {
     margin: 0;
-    font-family: $font-family-base;
+    font-size: 1.25rem;
+    color: $primary-color;
+    cursor: default;
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: 650px) {
     flex-direction: column;
     align-items: flex-start;
-    gap: 10px;
+    margin-bottom: 2.5rem;
+    gap: 0;
+    height: 7.5rem;
+    justify-content: space-between;
 
-    .main-title {
-      font-size: 42px;
+    h1 { font-size: 2.9375rem; }
+
+    .header-divider-wrapper {
+      flex-direction: column-reverse;
+      gap: $spacing-md;
+      align-items: flex-start;
     }
 
-    .divider {
-      display: none;
-    }
-
-    .subtitle {
-      font-size: 18px;
+    .header-divider {
+      width: 5.625rem;
+      height: 3px;
     }
   }
 }
 
-// Stats Box with Blue Border
-.stats-box {
-  @include flex(column, flex-start, stretch);
-  gap: 25px;
-  width: 560px;
-  max-width: 100%;
-  box-sizing: border-box;
-
-  @media (max-width: 768px) {
-    width: 100%;
-    padding: 25px 20px;
-    gap: 20px;
-  }
-}
-
-// Top Row: To-do and Done
-.top-row {
-  @include flex(row, flex-start, stretch);
-  gap: 25px;
-
-  @media (max-width: 768px) {
-    flex-direction: column;
-    gap: 15px;
-  }
-}
-
-.stat-item {
-  flex: 1;
-  background: $white;
-  border-radius: 10px;
-  padding: 25px 20px;
+.summary-grid {
   @include flex(row, flex-start, center);
-  gap: 15px;
+  gap: 3.75rem;
 
-  .stat-icon {
-    width: 50px;
-    height: 50px;
-    min-width: 50px;
+  @media (max-width: 968px) {
+    flex-direction: column;
+    gap: 2.5rem;
+  }
+}
+
+.stats-panel {
+  @include flex(column, flex-start, stretch);
+  gap: $spacing-lg;
+  min-width: 25rem;
+  max-width: 35rem;
+
+  @media (max-width: 650px) {
+    min-width: 100%;
+    width: 100%;
+    gap: $spacing-md;
+  }
+}
+
+%stats-row {
+  @include flex(row, space-between, stretch);
+  gap: $spacing-md;
+
+  @media (max-width: 650px) {
+    gap: 0.9375rem;
+  }
+
+  @media (max-width: 410px) {
+    gap: 0.625rem;
+  }
+}
+
+.stats-row-top {
+  @extend %stats-row;
+  flex-direction: row-reverse;
+}
+
+.stats-row-middle {
+  @extend %stats-row;
+}
+
+.stats-row-bottom {
+  @extend %stats-row;
+}
+
+.done-card,
+.todo-card {
+  @extend %card-base;
+  width: 16.5rem;
+  height: 10.5rem;
+  @include flex(row, center, center);
+  gap: 1.125rem;
+  padding: 2.375rem 1.1875rem;
+
+  .card-icon-wrapper {
+    position: relative;
+    width: 3.125rem;
+    height: 3.125rem;
+    min-width: 3.125rem;
     border-radius: 50%;
     background-color: $primary-color;
     @include flex(row, center, center);
 
-    &.done {
-      background-color: $primary-color;
-    }
+    img {
+      position: absolute;
+      height: 1.5rem;
+      width: 1.5rem;
+      transition: opacity 0.3s ease-in-out;
 
-    svg {
-      width: 22px;
-      height: 22px;
+      &.icon-hover { opacity: 0; }
     }
   }
 
-  .stat-content {
+  .card-content {
     @include flex(column, center, flex-start);
 
-    .stat-number {
-      font-size: 47px;
+    h4 {
+      margin: 0;
       font-weight: 600;
+      font-size: 3rem;
       color: $primary-color;
-      line-height: 1;
-      font-family: $font-family-base;
+      @extend %text-transition;
     }
 
-    .stat-label {
-      font-size: 16px;
-      font-weight: 400;
+    p {
+      margin: 0;
+      font-size: $font-size-sm;
       color: $primary-color;
-      font-family: $font-family-base;
+      @extend %text-transition;
     }
   }
 
-  @media (max-width: 768px) {
-    padding: 20px 15px;
+  &:hover {
+    @extend %card-hover;
+    transform: scale(1.07);
 
-    .stat-icon {
-      width: 45px;
-      height: 45px;
-      min-width: 45px;
-    }
+    .card-content h4,
+    .card-content p { color: $white; }
 
-    .stat-content {
-      .stat-number {
-        font-size: 36px;
-      }
+    .card-icon-wrapper {
+      background-color: $white;
 
-      .stat-label {
-        font-size: 14px;
-      }
+      img.icon-default { opacity: 0; }
+      img.icon-hover { opacity: 1; }
     }
   }
 }
 
-// Middle Row: Urgent and Email
-.middle-row {
-  @include flex(row, flex-start, stretch);
-  gap: 25px;
+.done-card {
+  padding: 2.375rem 3.625rem;
 
-  @media (max-width: 768px) {
-    flex-direction: column;
-    gap: 15px;
-  }
+  &:hover { transform-origin: right center; }
 }
 
-.urgent-item {
-  flex: 3;
-  background: $white;
-  border-radius: 10px;
-  padding: 25px 20px;
-  @include flex(row, space-between, center);
-  gap: 15px;
+.todo-card:hover {
+  transform-origin: left center;
+}
+.urgent-card {
+  @extend %card-base;
+  width: 22.75rem;
+  height: 10.5rem;
+  padding: 1.75rem 3rem;
+  @include flex(row, center, center);
+  gap: $spacing-md;
 
-  .urgent-icon {
-    width: 50px;
-    height: 50px;
-    min-width: 50px;
+  .urgent-left {
+    @include flex(row, flex-start, center);
+    gap: $spacing-md;
+  }
+
+  .urgent-icon-wrapper {
+    width: 3.125rem;
+    height: 3.125rem;
+    min-width: 3.125rem;
     border-radius: 50%;
     background-color: $priority-color-urgent;
     @include flex(row, center, center);
 
-    svg {
-      width: 26px;
-      height: 26px;
+    img {
+      width: 1.5rem;
+      height: 1.5rem;
     }
   }
 
-  .urgent-content {
+  .urgent-info {
     @include flex(column, center, flex-start);
 
-    .urgent-number {
-      font-size: 47px;
+    h3 {
+      margin: 0;
       font-weight: 600;
+      font-size: 3rem;
       color: $primary-color;
-      line-height: 1;
-      font-family: $font-family-base;
+      @extend %text-transition;
     }
 
-    .urgent-label {
-      font-size: 16px;
-      font-weight: 400;
+    p {
+      margin: 0;
+      font-size: $font-size-base;
       color: $primary-color;
-      font-family: $font-family-base;
+      @extend %text-transition;
     }
   }
 
-  .deadline-info {
-    @include flex(column, center, flex-end);
-    text-align: right;
+  .urgent-divider {
+    height: 4.25rem;
+    border: 1px solid $border-color;
+    @extend %text-transition;
+  }
+
+  .urgent-right {
+    @include flex(column, center, flex-start);
+    gap: $spacing-sm;
 
     .deadline-date {
-      font-size: 14px;
+      margin: 0;
+      font-size: $font-size-base;
       font-weight: 700;
       color: $primary-color;
-      margin-bottom: 3px;
-      font-family: $font-family-base;
+      @extend %text-transition;
     }
 
     .deadline-label {
-      font-size: 12px;
-      font-weight: 400;
+      margin: 0;
+      font-size: 0.8125rem;
       color: $primary-color;
-      font-family: $font-family-base;
+      @extend %text-transition;
     }
   }
 
-  @media (max-width: 768px) {
-    flex-direction: column;
-    align-items: flex-start;
-    padding: 20px 15px;
+  &:hover {
+    @extend %card-hover;
+    transform: translate(5px, 5px);
 
-    .deadline-info {
-      align-items: flex-start;
-      text-align: left;
-    }
+    .urgent-info h3,
+    .urgent-info p,
+    .urgent-right .deadline-date,
+    .urgent-right .deadline-label { color: $white; }
+
+    .urgent-divider { border-color: $white; }
   }
 }
 
-.email-item {
-  flex: 1;
-  background: $white;
-  border-radius: 10px;
-  padding: 25px 20px;
+.email-card,
+.stat-card {
+  @extend %card-base;
+  width: 10.5rem;
+  height: 10.5rem;
+  padding: 1.5625rem 0;
   @include flex(column, center, center);
-  text-align: center;
+  gap: 0.8125rem;
 
-  .email-number {
-    font-size: 47px;
-    font-weight: 600;
-    color: $secondary-color;
-    line-height: 1;
-    margin-bottom: 5px;
-    font-family: $font-family-base;
-  }
-
-  .email-label {
-    font-size: 16px;
-    font-weight: 400;
-    color: $primary-color;
-    line-height: 1.2;
-    font-family: $font-family-base;
-  }
-
-  @media (max-width: 768px) {
-    padding: 20px 15px;
-
-    .email-number {
-      font-size: 36px;
-    }
-
-    .email-label {
-      font-size: 14px;
-    }
+  &:hover {
+    @extend %card-hover;
+    transform: translate(5px, 5px);
   }
 }
 
-// Bottom Row: Task Stats
-.bottom-row {
-  @include flex(row, flex-start, stretch);
-  gap: 25px;
+.email-card {
+  .email-content {
+    @include flex(column, center, center);
+    gap: $spacing-xs;
+    text-align: center;
 
-  @media (max-width: 768px) {
-    flex-direction: column;
-    gap: 15px;
+    h4 {
+      margin: 0;
+      font-weight: 600;
+      font-size: 4rem;
+      background: linear-gradient(180deg, #8933fc 0%, #29abe2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      transition: opacity 0.3s ease-in-out;
+    }
+
+    p {
+      margin: 0;
+      font-size: $font-size-sm;
+      line-height: 1.3;
+      color: $primary-color;
+      @extend %text-transition;
+    }
+  }
+
+  &:hover {
+    .email-content h4 {
+      background: $white;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .email-content p { color: $white; }
   }
 }
 
-.task-stat {
-  flex: 1;
-  background: $white;
-  border-radius: 10px;
-  padding: 25px 20px;
-  @include flex(column, center, center);
-  text-align: center;
+.stat-card {
+  .stat-content {
+    @include flex(column, center, center);
+    gap: $spacing-xs;
 
-  .task-number {
-    font-size: 47px;
-    font-weight: 600;
-    color: $primary-color;
-    line-height: 1;
-    margin-bottom: 5px;
-    font-family: $font-family-base;
-  }
-
-  .task-label {
-    font-size: 16px;
-    font-weight: 400;
-    color: $primary-color;
-    line-height: 1.2;
-    font-family: $font-family-base;
-  }
-
-  @media (max-width: 768px) {
-    padding: 20px 15px;
-
-    .task-number {
-      font-size: 36px;
+    h3 {
+      margin: 0;
+      font-weight: 600;
+      font-size: 3rem;
+      color: $primary-color;
+      @extend %text-transition;
     }
 
-    .task-label {
-      font-size: 14px;
+    p {
+      margin: 0;
+      font-size: $font-size-sm;
+      color: $primary-color;
+      @extend %text-transition;
     }
+  }
+
+  &:hover {
+    .stat-content h3,
+    .stat-content p { color: $white; }
   }
 }
 
-// Right Side: Greeting
-.greeting-section {
+.greeting-card {
   @include flex(column, flex-start, flex-start);
-  gap: 8px;
-  padding-top: 120px;
+  gap: $spacing-xs;
+  padding-top: 6.25rem;
 
-  .greeting-text {
-    font-size: 47px;
+  h2 {
+    margin: 0;
     font-weight: 500;
+    font-size: 2.5rem;
     color: $primary-color;
-    font-family: $font-family-base;
+    cursor: default;
   }
 
-  .greeting-name {
-    font-size: 64px;
+  h3 {
+    margin: 0;
     font-weight: 700;
+    font-size: 3rem;
     color: $secondary-color;
-    font-family: $font-family-base;
+    cursor: default;
   }
 
   @media (max-width: 968px) {
-    padding-top: 0;
+    display: none;
+  }
+}
+
+@media (max-width: 650px) {
+  .done-card,
+  .todo-card {
+    width: 11.625rem;
+    height: 6.875rem;
+    gap: 0.625rem;
+    border-radius: 1.25rem;
+
+    .card-icon-wrapper {
+      width: 2.5rem;
+      height: 2.5rem;
+      min-width: 2.5rem;
+
+      img {
+        height: 1.25rem;
+        width: 1.25rem;
+      }
+    }
+
+    .card-content h4 { font-size: 2.25rem; }
+    .card-content p { font-size: 0.75rem; }
   }
 
-  @media (max-width: 768px) {
-    gap: 5px;
+  .urgent-card {
+    width: 16rem;
+    height: 6.875rem;
+    padding: 1.75rem 0;
+    gap: $spacing-sm;
+    border-radius: 1.25rem;
 
-    .greeting-text {
-      font-size: 32px;
+    .urgent-left { gap: 0.75rem; }
+
+    .urgent-icon-wrapper {
+      width: 2.5rem;
+      height: 2.5rem;
+      min-width: 2.5rem;
+
+      img {
+        width: 1.25rem;
+        height: 1.25rem;
+      }
     }
 
-    .greeting-name {
-      font-size: 42px;
+    .urgent-info h3 { font-size: 2rem; }
+    .urgent-info p { font-size: 0.75rem; }
+    .urgent-divider { height: 3rem; }
+
+    .urgent-right {
+      gap: $spacing-xs;
+
+      .deadline-date { font-size: $font-size-sm; }
+      .deadline-label { font-size: 0.75rem; }
     }
+  }
+
+  .email-card,
+  .stat-card {
+    border-radius: 1.25rem;
+  }
+
+  .email-card {
+    width: 7.25rem;
+    height: 6.875rem;
+    padding: 1.5625rem 0;
+
+    .email-content h4 { font-size: 2.5rem; }
+    .email-content p { font-size: 0.6875rem; }
+  }
+
+  .stat-card {
+    width: 7.25rem;
+    height: 7.25rem;
+
+    .stat-content h3 { font-size: 2rem; }
+    .stat-content p { font-size: 0.6875rem; }
+  }
+
+  .greeting-card {
+    h2 { font-size: 2rem; }
+    h3 { font-size: 2.25rem; }
+  }
+}
+
+@media (max-width: 410px) {
+  .done-card,
+  .todo-card {
+    width: 9rem;
+    height: 5.5rem;
+    padding: 1.5rem 0.75rem;
+    gap: $spacing-sm;
+
+    .card-icon-wrapper {
+      width: 2rem;
+      height: 2rem;
+      min-width: 2rem;
+
+      img {
+        height: 1rem;
+        width: 1rem;
+      }
+    }
+
+    .card-content h4 { font-size: 1.75rem; }
+    .card-content p { font-size: 0.625rem; }
+  }
+
+  .urgent-card {
+    width: 12rem;
+    height: 5.5rem;
+    padding: $spacing-md $spacing-sm;
+    gap: 0.375rem;
+
+    .urgent-left { gap: $spacing-sm; }
+
+    .urgent-icon-wrapper {
+      width: 2rem;
+      height: 2rem;
+      min-width: 2rem;
+
+      img {
+        width: 1rem;
+        height: 1rem;
+      }
+    }
+
+    .urgent-info h3 { font-size: 1.5rem; }
+    .urgent-info p { font-size: 0.625rem; }
+    .urgent-divider { height: 2.5rem; }
+
+    .urgent-right {
+      gap: 0.125rem;
+
+      .deadline-date { font-size: 0.75rem; }
+      .deadline-label { font-size: 0.625rem; }
+    }
+  }
+
+  .email-card,
+  .stat-card {
+    width: 5.5rem;
+    height: 5.5rem;
+    padding: $spacing-md 0;
+    gap: $spacing-sm;
+  }
+
+  .email-card {
+    .email-content h4 { font-size: 1.75rem; }
+    .email-content p { font-size: 0.5625rem; }
+  }
+
+  .stat-card {
+    .stat-content h3 { font-size: 1.5rem; }
+    .stat-content p { font-size: 0.5625rem; }
   }
 }

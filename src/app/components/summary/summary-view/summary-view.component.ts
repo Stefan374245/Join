@@ -1,5 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
 import { TaskService } from '../../../services/task.service';
 import { Observable, map, combineLatest } from 'rxjs';
@@ -14,7 +15,8 @@ import { Observable, map, combineLatest } from 'rxjs';
 export class SummaryViewComponent implements OnInit {
   private authService = inject(AuthService);
   private taskService = inject(TaskService);
-  
+  private router = inject(Router);
+
   isGuest$: Observable<boolean>;
   userName$: Observable<string>;
   greeting: string = '';
@@ -25,6 +27,7 @@ export class SummaryViewComponent implements OnInit {
   inProgressTasks$: Observable<number>;
   doneTasks$: Observable<number>;
   urgentTasks$: Observable<number>;
+  emailRequestsTasks$: Observable<number>;
   awaitingFeedbackTasks$: Observable<number>;
   nextUrgentDeadline$: Observable<Date | null>;
   formattedDeadline$: Observable<string>;
@@ -38,7 +41,6 @@ export class SummaryViewComponent implements OnInit {
       map(user => user?.displayName || 'User')
     );
 
-    // Initialize task statistics
     this.totalTasks$ = this.taskService.getTasks().pipe(
       map(tasks => tasks.length)
     );
@@ -59,9 +61,12 @@ export class SummaryViewComponent implements OnInit {
       map(tasks => tasks.length)
     );
 
-    // For now, "Awaiting Feedback" will be 0 (we can add this status later)
+    this.emailRequestsTasks$ = this.taskService.getTasks().pipe(
+      map(tasks => tasks.filter(t => t.aiGenerated === true).length)
+    );
+
     this.awaitingFeedbackTasks$ = this.taskService.getTasks().pipe(
-      map(tasks => tasks.filter(t => t.status === 'todo' && t.priority === 'medium').length)
+      map(tasks => tasks.filter(t => t.status === 'await-feedback').length)
     );
 
     this.nextUrgentDeadline$ = this.taskService.getNextUrgentDeadline();
@@ -69,11 +74,11 @@ export class SummaryViewComponent implements OnInit {
     this.formattedDeadline$ = this.nextUrgentDeadline$.pipe(
       map(deadline => {
         if (!deadline) return 'No urgent deadlines';
-        
-        const options: Intl.DateTimeFormatOptions = { 
-          year: 'numeric', 
-          month: 'long', 
-          day: 'numeric' 
+
+        const options: Intl.DateTimeFormatOptions = {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
         };
         return deadline.toLocaleDateString('en-US', options);
       })
@@ -84,12 +89,13 @@ export class SummaryViewComponent implements OnInit {
     this.setGreeting();
   }
 
-  /**
-   * Set greeting based on current time
-   */
+  navigateToBoard(): void {
+    this.router.navigate(['/board']);
+  }
+
   private setGreeting(): void {
     const hour = new Date().getHours();
-    
+
     if (hour >= 5 && hour < 12) {
       this.greeting = 'Good morning,';
     } else if (hour >= 12 && hour < 18) {
