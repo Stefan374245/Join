@@ -21,11 +21,15 @@
 							</div>
 
 							<ng-container *ngFor="let user of g.items; index as i">
-								<nav class="singleUser" [class.singleUserChosen]="selected?.email === user.email" (click)="select(user)">
+								<nav
+									class="singleUser"
+									[class.singleUserChosen]="selected?.email === user.email"
+								[routerLink]="isMobile ? ['/contacts', user.email] : null"
+									(click)="select(user, $event)">
 									<span class="userInitials" [ngStyle]="{'background-color': user.color}">{{ user.initials }}</span>
 									<div class="userDetails">
 										<span class="userName">{{ user.firstName }} {{ user.lastName }}</span>
-										<a class="emailText" [href]="'mailto:' + user.email">{{ user.email }}</a>
+										<a class="emailText" [href]="'mailto:' + user.email" (click)="$event.stopPropagation()">{{ user.email }}</a>
 									</div>
 								</nav>
 							</ng-container>
@@ -100,5 +104,12 @@
 		(save)="saveContact($event)"
 		(delete)="deleteContact($event)">
 	</app-contact-dialog>
+
+	<!-- FAB Add Contact Button (Mobile Only) -->
+	<div class="fab-add-contact">
+		<button class="fab-button" (click)="addContact()" title="Add Contact">
+			<img src="assets/images/person_add.svg" alt="Add Contact" />
+		</button>
+	</div>
 </div>
 
