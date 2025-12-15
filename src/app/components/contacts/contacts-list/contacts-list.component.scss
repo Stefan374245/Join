@@ -25,6 +25,10 @@
   box-shadow: 2px 2px 5px rgba($black, 0.06);
   padding: $spacing-md;
   overflow-y: auto;
+
+  @media (max-width: 900px) {
+    width: 100%;
+  }
 }
 
 .add-btn {
@@ -43,6 +47,10 @@
 
   &:hover {
     background-color: $accent-color;
+  }
+
+  @media (max-width: 900px) {
+    display: none;
   }
 }
 
@@ -145,6 +153,14 @@
   flex: 1;
   padding: 5rem;
   overflow-y: auto;
+
+  @media (max-width: $breakpoint-xl) {
+    padding: 5rem 1rem;
+  }
+
+  @media (max-width: 900px) {
+    display: none;
+  }
 }
 
 .contactsFrame {
@@ -240,13 +256,111 @@
   }
 }
 
+// FAB Add Contact Button for Mobile
+.fab-add-contact {
+  position: fixed;
+  bottom: 100px;
+  right: 24px;
+  z-index: 10;
+  display: none;
+
+  @media (max-width: 900px) {
+    display: block;
+  }
+}
+
+// Mobile Action Menu
+.mobile-action-menu {
+  position: fixed;
+  bottom: 100px;
+  right: 24px;
+  z-index: 100;
+  display: none;
+
+  @media (max-width: $breakpoint-lg) {
+    display: block;
+  }
+}
+
+.fab-button {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background-color: $primary-color;
+  color: $white;
+  border: none;
+  box-shadow: 0 4px 12px rgba($black, 0.2);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background-color: $accent-color;
+    transform: scale(1.05);
+  }
+
+  img {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+.action-popup {
+  position: absolute;
+  bottom: 70px;
+  right: 0;
+  background: $white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba($black, 0.15);
+  min-width: 180px;
+  overflow: hidden;
+  animation: slideUpFade 0.2s ease;
+
+  .popup-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    font-size: 16px;
+    color: $primary-color;
+
+    &:hover {
+      background-color: $gray-100;
+    }
+
+    &:not(:last-child) {
+      border-bottom: 1px solid $gray-200;
+    }
+
+    img {
+      width: 20px;
+      height: 20px;
+    }
+  }
+}
+
+@keyframes slideUpFade {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @media (max-width: 800px) {
   .contacts-aside {
     width: 64px;
-  }
-  .contacts-main {
-    margin-left: 64px;
-    width: calc(100% - 64px);
   }
   .content-right {
     display: none;
