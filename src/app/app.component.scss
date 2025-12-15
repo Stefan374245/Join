@@ -38,13 +38,15 @@
     padding-bottom: 100px;
     min-height: calc(100vh - #{$header-height} - 80px);
   }
+  @media (max-width: $breakpoint-lg) {
+    margin-top: 48px;
+  }
 }
 
-// Contacts: Direkt an Sidebar ohne Padding
 .contacts-content {
-  margin-left: $sidebar-width; // 200px
-  margin-top: $header-height; // Direkt unter Header
-  padding: 0; // Kein Padding!
+  margin-left: $sidebar-width;
+  margin-top: $header-height;
+  padding: 0;
   overflow-y: auto;
   overflow-x: hidden;
   background-color: $background-color;

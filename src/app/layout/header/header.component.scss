@@ -174,8 +174,6 @@ hr {
 }
 
 @media (max-width: $breakpoint-md) {
-  .header-left {
-    margin-left: 80px;
 
     .header-title {
       display: none;
@@ -185,7 +183,7 @@ hr {
   .header-container {
     padding: 0 $spacing-md;
   }
-}
+
 
 @media (max-width: $breakpoint-sm) {
   .main-header {
