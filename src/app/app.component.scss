@@ -45,7 +45,7 @@
 
 .contacts-content {
   margin-left: $sidebar-width;
-  margin-top: $header-height;
+  margin-top: 0;
   padding: 0;
   overflow-y: auto;
   overflow-x: hidden;
@@ -60,7 +60,7 @@
 
   @media (max-width: $breakpoint-lg) {
     margin-left: 0;
-    margin-top: $header-height;
+    margin-top: 0;
     margin-bottom: 80px;
     width: 100%;
     min-height: calc(100vh - #{$header-height} - 80px);
