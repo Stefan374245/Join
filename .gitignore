@@ -48,6 +48,9 @@ Thumbs.db
 # MCP Server Config (contains sensitive tokens)
 mcp.config.json
 
+# Service Documentation (local development only)
+src/app/services/README.md
+
 # Firebase Service Account Key (NEVER commit!)
 firebase-service-account.json
 *-service-account.json
