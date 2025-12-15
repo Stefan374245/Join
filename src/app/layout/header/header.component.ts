@@ -18,23 +18,14 @@ export class HeaderComponent {
   showUserMenu = false;
   user$ = this.authService.user$;
 
-  /**
-   * Toggle user menu dropdown
-   */
   toggleUserMenu(): void {
     this.showUserMenu = !this.showUserMenu;
   }
 
-  /**
-   * Close user menu
-   */
   closeUserMenu(): void {
     this.showUserMenu = false;
   }
 
-  /**
-   * Logout current user
-   */
   logout(): void {
     this.authService.logout().subscribe({
       next: () => {
@@ -47,11 +38,7 @@ export class HeaderComponent {
     });
   }
 
-  /**
-   * Get user initials for avatar
-   */
   getUserInitials(displayName: string | null, email?: string | null): string {
-    // If guest user, always return 'G'
     if (email && email.toLowerCase() === 'guest@join.com') {
       return 'G';
     }
@@ -63,9 +50,6 @@ export class HeaderComponent {
     return displayName.substring(0, 2).toUpperCase();
   }
 
-  /**
-   * Get user color based on email
-   */
   getUserColor(email: string | null): string {
     if (!email) return 'var(--user-color-1)';
 

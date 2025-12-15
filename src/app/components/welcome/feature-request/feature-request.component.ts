@@ -27,7 +27,6 @@ export class FeatureRequestComponent implements OnInit {
   isLoading = true;
   isLimitReached = false;
 
-  // Dropdown state
   showDropdown = false;
 
   requestType: 'feature' | 'bug' | 'question' = 'feature';
@@ -44,9 +43,6 @@ export class FeatureRequestComponent implements OnInit {
     await this.loadDailyLimit();
   }
 
-  /**
-   * Load current daily limit from Firestore
-   */
   async loadDailyLimit() {
     try {
       const limitInfo = await this.dailyLimitService.fetchDailyLimit();
@@ -68,25 +64,15 @@ export class FeatureRequestComponent implements OnInit {
     }
   }
 
-  /**
-   * Toggle Dropdown
-   */
   toggleDropdown() {
     this.showDropdown = !this.showDropdown;
   }
 
-  /**
-   * Close Dropdown
-   */
   closeDropdown() {
     this.showDropdown = false;
   }
 
-  /**
-   * OPTION 1: Mailto-Variante (E-Mail-Client öffnen)
-   */
   async openMailtoVariant() {
-    // Prüfe Limit bevor Email geöffnet wird
     if (this.isLimitReached) {
       this.toastService.showDailyLimitReached(this.maxRequests);
       this.closeDropdown();
@@ -137,7 +123,6 @@ Best regards
 
     this.submitSuccess = true;
 
-    // Reload limit info (wird sich beim nächsten n8n-Durchlauf erhöhen)
     setTimeout(async () => {
       await this.loadDailyLimit();
       this.toastService.showSuccess(
@@ -150,20 +135,12 @@ Best regards
     }, 3000);
   }
 
-  /**
-   * OPTION 2: Webhook-Variante (Formular öffnen)
-   * Navigiert zur neuen EmailMaskComponent
-   */
   openWebhookVariant() {
     this.closeDropdown();
     this.router.navigate(['/email-mask']);
   }
 
-  /**
-   * Alternative: Sende direkt an n8n (falls du den Webhook behalten willst)
-   */
   async sendDirectToN8n() {
-    // Prüfe Limit
     if (this.isLimitReached) {
       this.toastService.showDailyLimitReached(this.maxRequests);
       return;
@@ -206,13 +183,11 @@ Best regards
 
       this.submitSuccess = true;
 
-      // Reload limit
       await this.loadDailyLimit();
 
       const remaining = this.maxRequests - this.requestsUsed;
       this.toastService.showRequestSuccess(remaining);
 
-      // Reset form
       this.requestTitle = '';
       this.requestDescription = '';
       this.stakeholderEmail = '';

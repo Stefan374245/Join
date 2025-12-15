@@ -73,9 +73,6 @@ export class AddTaskComponent implements OnInit, AfterViewChecked {
     }
   }
 
-  /**
-   * Contacts laden und dann Form befüllen (für Edit-Modus)
-   */
   private loadContactsAndPopulateForm(task: Task): void {
     this.contactService.getContacts().subscribe({
       next: (contacts: Contact[]) => {
@@ -89,9 +86,6 @@ export class AddTaskComponent implements OnInit, AfterViewChecked {
     });
   }
 
-  /**
-   * Formular mit Task-Daten befüllen (Edit-Modus)
-   */
   private populateFormWithTask(task: Task): void {
     this.taskForm.patchValue({
       title: task.title,
@@ -108,9 +102,6 @@ export class AddTaskComponent implements OnInit, AfterViewChecked {
     );
   }
 
-  /**
-   * Datum für Input-Feld formatieren (YYYY-MM-DD)
-   */
   private formatDateForInput(date: Date): string {
     const d = new Date(date);
     const year = d.getFullYear();
@@ -119,9 +110,6 @@ export class AddTaskComponent implements OnInit, AfterViewChecked {
     return `${year}-${month}-${day}`;
   }
 
-  /**
-   * Setze das minimale Datum auf heute
-   */
   private setMinDate(): void {
     this.minDate = this.formatDateForInput(new Date());
   }
@@ -254,14 +242,11 @@ export class AddTaskComponent implements OnInit, AfterViewChecked {
     this.subtasks = this.subtasks.filter(s => s.id !== subtaskId);
   }
 
-  // Form Actions
   onSubmit(): void {
     if (this.taskForm.valid) {
       if (this.isEditMode && this.taskToEdit) {
-        // UPDATE existierenden Task
         this.updateTask();
       } else {
-        // CREATE neuen Task
         this.createTask();
       }
     } else {
@@ -269,9 +254,6 @@ export class AddTaskComponent implements OnInit, AfterViewChecked {
     }
   }
 
-  /**
-   * Neuen Task erstellen
-   */
   private createTask(): void {
     const currentUser = this.authService.currentUser;
 
@@ -283,7 +265,7 @@ export class AddTaskComponent implements OnInit, AfterViewChecked {
       assignedTo: this.selectedContacts.map(c => c.id),
       dueDate: new Date(this.taskForm.value.dueDate),
       priority: this.selectedPriority,
-      status: this.initialStatus, // Verwende den initialStatus aus Input
+      status: this.initialStatus,
       subtasks: this.subtasks,
       source: 'member',
       creatorType: 'member',
@@ -311,9 +293,6 @@ export class AddTaskComponent implements OnInit, AfterViewChecked {
     });
   }
 
-  /**
-   * Existierenden Task aktualisieren
-   */
   private updateTask(): void {
     if (!this.taskToEdit) return;
 
@@ -347,16 +326,10 @@ export class AddTaskComponent implements OnInit, AfterViewChecked {
     });
   }
 
-  /**
-   * Overlay schließen
-   */
   onClose(): void {
     this.close.emit();
   }
 
-  /**
-   * Overlay-Hintergrund-Click
-   */
   onOverlayClick(event: MouseEvent): void {
     if ((event.target as HTMLElement).classList.contains('task-overlay')) {
       this.onClose();
@@ -382,7 +355,6 @@ export class AddTaskComponent implements OnInit, AfterViewChecked {
     return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
   }
 
-  // Getter for form validation
   get f() {
     return this.taskForm.controls;
   }

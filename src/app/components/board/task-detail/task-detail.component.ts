@@ -32,9 +32,6 @@ export class TaskDetailComponent implements OnInit {
     this.loadContacts();
   }
 
-  /**
-   * Load all contacts
-   */
   private loadContacts(): void {
     this.contactService.getContacts().subscribe({
       next: (contacts) => {
@@ -50,57 +47,35 @@ export class TaskDetailComponent implements OnInit {
     });
   }
 
-  /**
-   * Close overlay
-   */
   onClose(): void {
     this.close.emit();
   }
 
-  /**
-   * Close on overlay background click
-   */
   onOverlayClick(event: MouseEvent): void {
     if ((event.target as HTMLElement).classList.contains('task-overlay')) {
       this.onClose();
     }
   }
 
-  /**
-   * Open edit mode
-   */
   onEdit(): void {
     this.edit.emit(this.task);
   }
 
-  /**
-   * Show delete confirmation
-   */
   showDeleteConfirmation(): void {
     this.showDeleteConfirm = true;
   }
 
-  /**
-   * Cancel delete
-   */
   cancelDelete(): void {
     this.showDeleteConfirm = false;
   }
 
-  /**
-   * Confirm delete
-   */
   confirmDelete(): void {
     this.delete.emit(this.task.id);
     this.showDeleteConfirm = false;
     this.onClose();
   }
 
-  /**
-   * Toggle subtask completion - Update UI immediately, then sync with service
-   */
   toggleSubtask(subtaskId: string): void {
-    // Debounce: Ignore clicks within 300ms of last toggle
     const now = Date.now();
     if (now - this.lastToggleTime < 300) {
       console.log('⏸️ Click ignored (debounce)');
@@ -123,81 +98,54 @@ export class TaskDetailComponent implements OnInit {
     const newState = !currentState;
     console.log('🎯 Component: Toggling subtask:', subtaskId, 'Current:', currentState, '→ New:', newState);
 
-    // 1. IMMEDIATE UI UPDATE: Toggle locally first for instant feedback
     subtask.completed = newState;
     console.log('🖼️ Component: UI updated immediately to:', subtask.completed);
 
-    // 2. THEN sync with Firestore using the NEW method that sets the value instead of toggling
     this.taskService.updateSubtaskCompletion(this.task.id, subtaskId, newState).subscribe({
       next: () => {
         console.log('✅ Component: Firestore sync completed with state:', newState);
       },
       error: (error) => {
         console.error('❌ Component: Error syncing with Firestore:', error);
-        // Revert on error
         subtask.completed = currentState;
         console.log('⏮️ Component: Reverted to:', currentState);
       }
     });
   }
 
-  /**
-   * Get contact by user ID
-   */
   getContact(userId: string): Contact | undefined {
     return this.contacts.find(c => c.id === userId);
   }
 
-  /**
-   * Get contact initials
-   */
   getContactInitials(userId: string): string {
     const contact = this.getContact(userId);
     return contact?.initials || '??';
   }
 
-  /**
-   * Get contact color
-   */
   getContactColor(userId: string): string {
     const contact = this.getContact(userId);
     return contact?.color || '#2A3647';
   }
 
-  /**
-   * Get contact full name
-   */
   getContactFullName(userId: string): string {
     const contact = this.getContact(userId);
     return contact ? `${contact.firstName} ${contact.lastName}` : 'Unknown';
   }
 
-  /**
-   * Get category CSS class
-   */
   getCategoryClass(category: string): string {
     return category.toLowerCase().replace(/\s+/g, '-');
   }
 
-  /**
-   * Format date for display
-   */
   formatDate(date: Date): string {
     if (!date) return '';
     const d = new Date(date);
     return d.toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '/');
   }
 
-  /**
-   * Get priority icon path
-   */
   getPriorityIcon(priority: string): string {
     return `/assets/images/${priority.toLowerCase()}.svg`;
   }
 
-  /**
-   * Get creator icon based on creator type
-   */
   getCreatorIcon(): string {
     if (this.task.creatorType === 'external' || this.task.source === 'email') {
       return '/assets/images/creator-external.svg';
@@ -205,9 +153,6 @@ export class TaskDetailComponent implements OnInit {
     return '/assets/images/team.svg';
   }
 
-  /**
-   * Get creator content icon - unterscheidet zwischen Email und Profil
-   */
   getCreatorContentIcon(): string {
     if (this.task.source === 'email' || this.task.creatorType === 'external') {
       return '/assets/images/card_email.svg';
@@ -215,9 +160,6 @@ export class TaskDetailComponent implements OnInit {
     return '/assets/images/creator-profil.svg';
   }
 
-  /**
-   * Get creator content text - unterscheidet zwischen Email und Profil
-   */
   getCreatorContentText(): string {
     if (this.task.source === 'email' || this.task.creatorType === 'external') {
       return 'E-mail';
@@ -225,9 +167,6 @@ export class TaskDetailComponent implements OnInit {
     return 'Profil';
   }
 
-  /**
-   * Get creator content CSS class
-   */
   getCreatorContentClass(): string {
     if (this.task.source === 'email' || this.task.creatorType === 'external') {
       return 'content-external';
@@ -235,9 +174,6 @@ export class TaskDetailComponent implements OnInit {
     return 'content-member';
   }
 
-  /**
-   * Get creator badge CSS class
-   */
   getCreatorBadgeClass(): string {
     if (this.task.creatorType === 'external' || this.task.source === 'email') {
       return 'badge-external';
@@ -245,9 +181,6 @@ export class TaskDetailComponent implements OnInit {
     return 'badge-member';
   }
 
-  /**
-   * Get creator badge text
-   */
   getCreatorBadgeText(): string {
     if (this.task.creatorType === 'external' || this.task.source === 'email') {
       return 'Extern';
@@ -255,9 +188,6 @@ export class TaskDetailComponent implements OnInit {
     return 'Member';
   }
 
-  /**
-   * Get creator display name
-   */
   getCreatorDisplayName(): string {
     if (this.task.creatorName) {
       return this.task.creatorName;

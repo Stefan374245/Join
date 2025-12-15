@@ -35,7 +35,6 @@ export class TaskService {
   private initializeTasksListener(): void {
     try {
       const tasksCol = collection(this.firestore, 'tasks');
-      // Remove orderBy to get all tasks
 
       onSnapshot(tasksCol,
         (snapshot) => {
@@ -44,7 +43,6 @@ export class TaskService {
             return this.mapFirestoreTask({ id: doc.id, ...data });
           });
 
-          // Sort in memory instead
           tasks.sort((a, b) => {
             const dateA = (a as any).createdAt instanceof Date ? (a as any).createdAt.getTime() : 0;
             const dateB = (b as any).createdAt instanceof Date ? (b as any).createdAt.getTime() : 0;
@@ -64,7 +62,6 @@ export class TaskService {
   private mapFirestoreTask(data: any): Task {
     let status: 'triage' | 'todo' | 'in-progress' | 'await-feedback' | 'done' = 'todo';
 
-    // Ändere data.status zu data['status']
     if (data['status']) {
       switch (data['status'].toLowerCase()) {
         case 'triage':
@@ -217,7 +214,6 @@ export class TaskService {
       createdAt: task.createdAt ? this.convertToTimestamp(task.createdAt) : Timestamp.now(),
       updatedAt: Timestamp.now(),
       createdBy: this.auth.currentUser?.uid || 'anonymous',
-      // Neue Felder für Creator-Tracking
       source: task.source || 'member',
       creatorType: task.creatorType || 'member',
       creatorName: task.creatorName || undefined,

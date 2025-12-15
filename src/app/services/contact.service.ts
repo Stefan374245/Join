@@ -15,10 +15,6 @@ export class ContactService {
 
   constructor() { }
 
-  /**
-   * Load all registered users from Firestore 'users' collection
-   * This collection should be automatically populated when users register
-   */
   loadAll(): Observable<Contact[]> {
     const usersCol = collection(this.firestore, 'users');
 

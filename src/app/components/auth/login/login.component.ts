@@ -31,12 +31,8 @@ export class LoginComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Initialisierung wenn nötig
   }
 
-  /**
-   * Check if login button should be disabled
-   */
   isLoginButtonDisabled(): boolean {
     return !this.email ||
            !this.password ||
@@ -140,7 +136,6 @@ export class LoginComponent implements OnInit {
         console.error('Google login error:', error);
         this.loginFailError = true;
 
-        // Handle popup closed error gracefully
         if (error.code === 'auth/popup-closed-by-user') {
           this.loginFailError = false;
         }
@@ -155,4 +150,5 @@ export class LoginComponent implements OnInit {
     }, 2000);
   }
 }
+
 

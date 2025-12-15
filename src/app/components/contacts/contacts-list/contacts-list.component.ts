@@ -25,12 +25,10 @@ export class ContactsListComponent implements OnInit {
   contacts$ = new BehaviorSubject<Contact[]>([]);
   grouped$ = new BehaviorSubject<Grouped>([]);
 
-  // UI state
   selected: Contact | null = null;
   showRight = true;
   isMobile = false;
 
-  // Dialog state
   showDialog = false;
   dialogMode: 'add' | 'edit' = 'add';
   dialogContact: Contact | null = null;
@@ -49,7 +47,6 @@ export class ContactsListComponent implements OnInit {
         this.contacts$.next(list);
         this.group(list);
 
-        // Additional debug info
         console.log('📊 Contacts$ value:', this.contacts$.value);
         console.log('📊 Grouped$ value:', this.grouped$.value);
       },
@@ -74,13 +71,11 @@ export class ContactsListComponent implements OnInit {
   }
 
   select(contact: Contact, event?: Event) {
-    // On desktop (>= 900px), show in right panel and prevent navigation
     if (window.innerWidth >= 900) {
       if (event) {
         event.preventDefault();
       }
     }
-    // Set selected contact for both mobile and desktop
     this.selected = contact;
     localStorage.setItem('selectedContactEmail', contact.email);
     localStorage.setItem('lastEditedContact', contact.email);
@@ -106,11 +101,8 @@ export class ContactsListComponent implements OnInit {
   async saveContact(contact: Contact) {
     try {
       if (this.dialogMode === 'add') {
-        // Create new contact (non-auth user)
-        // Generate ID from email
-        const contactId = contact.email.replace(/[.@]/g, '_'); // sanitize email for Firestore ID
+        const contactId = contact.email.replace(/[.@]/g, '_');
 
-        // Create complete contact object with ID
         const newContact: Contact = {
           ...contact,
           id: contactId
@@ -119,17 +111,14 @@ export class ContactsListComponent implements OnInit {
         await this.contactService.saveContact(newContact).toPromise();
         console.log('✅ Contact added successfully');
       } else if (contact.id) {
-        // Update existing contact
         const isOwnProfile = this.authService.currentUser?.email === contact.email;
 
-        // Update Firestore
         await this.contactService.updateUser(contact.id, {
           firstName: contact.firstName,
           lastName: contact.lastName,
           phone: contact.phone
         }).toPromise();
 
-        // If editing own profile, also update Firebase Auth profile
         if (isOwnProfile) {
           const displayName = `${contact.firstName} ${contact.lastName}`;
           await this.authService.updateDisplayName(displayName);
@@ -139,13 +128,10 @@ export class ContactsListComponent implements OnInit {
         console.log('✅ Contact updated successfully');
       }
 
-      // Reload contacts list
       this.load();
 
-      // Close dialog
       this.closeDialog();
 
-      // Select the saved/updated contact
       this.selected = contact;
       localStorage.setItem('selectedContactEmail', contact.email);
     } catch (error) {
@@ -159,7 +145,6 @@ export class ContactsListComponent implements OnInit {
     if (!confirmed) return;
 
     try {
-      // Find the contact by email to get the ID
       const contact = this.contacts$.value.find(c => c.email === email);
       if (!contact?.id) {
         throw new Error('Contact ID not found');
@@ -168,15 +153,12 @@ export class ContactsListComponent implements OnInit {
       await this.contactService.deleteUser(contact.id).toPromise();
       console.log('✅ Contact deleted successfully');
 
-      // Clear selection if deleted contact was selected
       if (this.selected?.email === email) {
         this.clearSelection();
       }
 
-      // Reload contacts list
       this.load();
 
-      // Close dialog
       this.closeDialog();
     } catch (error) {
       console.error('❌ Error deleting contact:', error);
@@ -197,9 +179,6 @@ export class ContactsListComponent implements OnInit {
     });
   }
 
-  /**
-   * Check if the selected contact is the currently logged-in user
-   */
   get isOwnProfile(): boolean {
     if (!this.selected || !this.authService.currentUser) {
       return false;
@@ -207,7 +186,6 @@ export class ContactsListComponent implements OnInit {
     return this.selected.email === this.authService.currentUser.email;
   }
 
-  // responsive helper
   @HostListener('window:resize')
   onResize() {
     const w = window.innerWidth;

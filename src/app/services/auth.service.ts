@@ -29,10 +29,8 @@ export class AuthService {
   private firestore = inject(Firestore);
   private router = inject(Router);
   
-  // Observable of the current user
   user$: Observable<User | null> = authState(this.auth);
   
-  // Get current user synchronously
   get currentUser(): User | null {
     return this.auth.currentUser;
   }
@@ -93,13 +91,11 @@ export class AuthService {
       data.email, 
       data.password
     ).then(async (userCredential) => {
-      // Update user profile with display name
       if (userCredential.user) {
         await updateProfile(userCredential.user, {
           displayName: data.name
         });
         
-        // Save user to Firestore for contacts list
         await this.saveUserToFirestore(userCredential.user, data.name);
       }
       return userCredential;
@@ -108,47 +104,26 @@ export class AuthService {
     return from(promise);
   }
 
-  /**
-   * Sign in with email and password
-   * @param email - User email
-   * @param password - User password
-   * @returns Observable of UserCredential
-   */
   login(email: string, password: string): Observable<UserCredential> {
     const promise = signInWithEmailAndPassword(this.auth, email, password)
       .then(async (userCredential) => {
-        // Ensure user exists in Firestore (migration for existing users)
         await this.ensureUserInFirestore(userCredential.user);
         return userCredential;
       });
     return from(promise);
   }
 
-  /**
-   * Sign in as guest (anonymous)
-   * For now, uses a test account
-   * TODO: Implement proper anonymous auth if needed
-   */
   guestLogin(): Observable<UserCredential> {
-    // You can implement anonymous auth here
-    // For now, use a guest account
     return this.login('guest@join.com', 'guest123');
   }
 
-  /**
-   * Sign in with Google
-   * Opens a popup window for Google authentication
-   * @returns Observable of UserCredential
-   */
   signInWithGoogle(): Observable<UserCredential> {
     const provider = new GoogleAuthProvider();
-    // Optional: Add custom parameters
     provider.setCustomParameters({
       prompt: 'select_account'
     });
     
     const promise = signInWithPopup(this.auth, provider).then(async (userCredential) => {
-      // Ensure user exists in Firestore
       await this.ensureUserInFirestore(userCredential.user);
       return userCredential;
     });
@@ -156,10 +131,6 @@ export class AuthService {
     return from(promise);
   }
 
-  /**
-   * Sign out the current user
-   * @returns Observable of void
-   */
   logout(): Observable<void> {
     const promise = signOut(this.auth).then(() => {
       this.router.navigate(['/login']);
@@ -167,43 +138,24 @@ export class AuthService {
     return from(promise);
   }
 
-  /**
-   * Check if user is authenticated
-   * @returns boolean
-   */
   isAuthenticated(): boolean {
     return this.currentUser !== null;
   }
 
-  /**
-   * Get user display name
-   * @returns string or null
-   */
   getUserDisplayName(): string | null {
     return this.currentUser?.displayName || null;
   }
 
-  /**
-   * Get user email
-   * @returns string or null
-   */
   getUserEmail(): string | null {
     return this.currentUser?.email || null;
   }
 
-  /**
-   * Update the display name of the current user
-   * Updates both the Firebase Auth profile
-   * @param displayName - The new display name
-   * @returns Promise<void>
-   */
   async updateDisplayName(displayName: string): Promise<void> {
     if (!this.currentUser) {
       throw new Error('No user is currently logged in');
     }
 
     try {
-      // Update Firebase Auth profile
       await updateProfile(this.currentUser, {
         displayName: displayName
       });

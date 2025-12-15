@@ -21,7 +21,6 @@ export class SummaryViewComponent implements OnInit {
   userName$: Observable<string>;
   greeting: string = '';
 
-  // Task Statistics Observables
   totalTasks$: Observable<number>;
   todoTasks$: Observable<number>;
   inProgressTasks$: Observable<number>;

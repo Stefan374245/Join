@@ -42,15 +42,11 @@ export class SignupComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Logo animation on load
     setTimeout(() => {
       this.logoAnimationComplete = true;
     }, 500);
   }
 
-  /**
-   * Check if signup button should be disabled (User Story 1 requirement)
-   */
   isSignupButtonDisabled(): boolean {
     return !this.name ||
            !this.email ||
@@ -158,7 +154,6 @@ export class SignupComponent implements OnInit {
       return;
     }
 
-    // Firebase signup
     const signupData = {
       name: this.name,
       email: this.email,
@@ -173,7 +168,6 @@ export class SignupComponent implements OnInit {
       error: (error) => {
         console.error('Signup error:', error);
 
-        // Handle specific Firebase error codes
         if (error.code === 'auth/email-already-in-use') {
           this.emailError = true;
           this.toastService.showToast('This email is already registered. Please use a different email or try logging in.');

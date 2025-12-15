@@ -44,9 +44,6 @@ export class ToastService {
     this.showToast(message, 'info', duration);
   }
 
-  /**
-   * Show daily limit specific toast messages
-   */
   showDailyLimitReached(maxLimit: number = 10): void {
     this.showError(
       `Daily limit of ${maxLimit} requests reached. Please try again tomorrow.`,
@@ -68,9 +65,6 @@ export class ToastService {
     );
   }
 
-  /**
-   * Show task-specific toast messages
-   */
   showTaskCreated(taskTitle: string): void {
     this.showSuccess(
       `Task "${taskTitle}" created successfully!`,

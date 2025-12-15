@@ -4,22 +4,22 @@
       <img src="assets/images/joinlogodark.svg" alt="Join Logo" class="logo" />
       <span class="header-title">Kanban Project Management Tool</span>
     </div>
-    
+
     <section class="header-right">
       <a routerLink="/help" class="help-icon" title="Help">
-        <img src="assets/images/help20x20.svg" alt="Help" />  
+        <img src="assets/images/help20x20.svg" alt="Help" />
       </a>
-      
+
       <div class="user-menu-container" (clickOutside)="closeUserMenu()">
-        <button 
-          class="user-avatar-btn" 
+        <button
+          class="user-avatar-btn"
           (click)="toggleUserMenu()"
           [style.background-color]="getUserColor((user$ | async)?.email || null)"
           *ngIf="user$ | async as user"
           title="User Menu">
           {{ getUserInitials(user.displayName, user.email) }}
         </button>
-        
+
         <div class="user-dropdown" *ngIf="showUserMenu" (click)="closeUserMenu()">
           <div class="dropdown-content">
             <a routerLink="/legal-notice" class="dropdown-item">

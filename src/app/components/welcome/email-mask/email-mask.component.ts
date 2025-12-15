@@ -9,9 +9,6 @@ import { environment } from '../../../../environments/environment';
 import { DailyLimitService } from '../../../services/daily-limit.service';
 import { ToastService } from '../../../services/toast.service';
 
-/**
- * Interface für Feature Request Payload
- */
 interface FeatureRequestPayload {
   type: 'feature' | 'bug' | 'question';
   title: string;
@@ -21,9 +18,6 @@ interface FeatureRequestPayload {
   timestamp: string;
 }
 
-/**
- * Interface für API Response
- */
 interface FeatureRequestResponse {
   success: boolean;
   message: string;
@@ -74,9 +68,6 @@ export class EmailMaskComponent implements OnInit, OnDestroy {
     await this.loadDailyLimit();
   }
 
-  /**
-   * Load current daily limit from Firestore
-   */
   async loadDailyLimit() {
     try {
       const limitInfo = await this.dailyLimitService.fetchDailyLimit();
@@ -98,9 +89,6 @@ export class EmailMaskComponent implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * Initialisiert das Reactive Form mit Validatoren
-   */
   private initForm(): void {
     this.requestForm = this.fb.group({
       requestType: ['feature', [Validators.required]],
@@ -125,24 +113,15 @@ export class EmailMaskComponent implements OnInit, OnDestroy {
     });
   }
 
-  /**
-   * Getter für einfachen Zugriff auf Form Controls
-   */
   get f() {
     return this.requestForm.controls;
   }
 
-  /**
-   * Prüft ob ein Feld einen Fehler hat und touched wurde
-   */
   hasError(fieldName: string): boolean {
     const field = this.requestForm.get(fieldName);
     return !!(field && field.invalid && (field.dirty || field.touched));
   }
 
-  /**
-   * Gibt die Fehlermeldung für ein Feld zurück
-   */
   getErrorMessage(fieldName: string): string {
     const field = this.requestForm.get(fieldName);
 
@@ -168,17 +147,12 @@ export class EmailMaskComponent implements OnInit, OnDestroy {
     return 'Invalid input';
   }
 
-  /**
-   * Hauptmethode: Sendet Feature Request an n8n Webhook
-   */
   async onSubmit(): Promise<void> {
-    // Limit prüfen
     if (this.isLimitReached) {
       this.toastService.showDailyLimitReached(this.maxRequests);
       return;
     }
 
-    // Form validieren
     if (this.requestForm.invalid) {
       this.requestForm.markAllAsTouched();
       this.submitError = 'Please fill out all required fields correctly.';
@@ -224,37 +198,23 @@ export class EmailMaskComponent implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * Behandelt erfolgreiche Submission
-   */
   private async handleSuccess(response: FeatureRequestResponse): Promise<void> {
     this.submitSuccess = true;
 
-    // Reload limit from Firestore
     await this.loadDailyLimit();
 
     const remaining = this.maxRequests - this.requestsUsed;
     this.toastService.showRequestSuccess(remaining);
 
-    // Form zurücksetzen
     this.requestForm.reset({
       requestType: 'feature'
     });
 
-    // Success Message nach 5 Sekunden ausblenden
     setTimeout(() => {
       this.submitSuccess = false;
     }, 5000);
-
-    // Optional: Nach Success zurück zur Feature Request Seite
-    // setTimeout(() => {
-    //   this.router.navigate(['/feature-request']);
-    // }, 3000);
   }
 
-  /**
-   * Behandelt Fehler bei Submission
-   */
   private handleError(error: unknown): void {
     console.error('❌ Error submitting request:', error);
 
@@ -285,16 +245,10 @@ export class EmailMaskComponent implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * Navigiert zurück zur Feature Request Seite
-   */
   goBack(): void {
     this.router.navigate(['/feature-request']);
   }
 
-  /**
-   * Cleanup bei Component Destroy
-   */
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();

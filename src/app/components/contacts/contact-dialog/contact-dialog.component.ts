@@ -104,10 +104,9 @@ export class ContactDialogComponent implements OnInit {
       const initials = this.avatarInitials;
 
       if (this.mode === 'add') {
-        // For new contacts, generate color and ID from email
         const email = formValue.email;
         const color = this.generateColorFromEmail(email);
-        const id = email.replace(/[.@]/g, '_'); // sanitize email for Firestore ID
+        const id = email.replace(/[.@]/g, '_');
 
         const newContact: Contact = {
           id: id,
@@ -121,7 +120,6 @@ export class ContactDialogComponent implements OnInit {
 
         this.save.emit(newContact);
       } else if (this.mode === 'edit' && this.contact) {
-        // For editing, keep existing color
         const updatedContact: Contact = {
           ...this.contact,
           firstName: formValue.firstName,
