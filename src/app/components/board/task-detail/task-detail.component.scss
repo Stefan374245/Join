@@ -1,5 +1,5 @@
-@import '../../../../styles/variables';
-@import '../../../../styles/mixins';
+@import "../../../../styles/variables";
+@import "../../../../styles/mixins";
 
 .task-overlay {
   @include flex(row, center, center);
@@ -42,6 +42,7 @@
 .task-header {
   @include flex(row, space-between, center);
   text-align: center;
+  margin-bottom: 16px;
 
   .task-category {
     span {
@@ -55,11 +56,11 @@
     }
 
     &.user-story span {
-      background: #0038FF;
+      background: $category-user-story;
     }
 
     &.technical-task span {
-      background: #1FD7C1;
+      background: $category-technical-task;
     }
   }
 
@@ -129,7 +130,7 @@
   }
 
   .creator-info {
-    @include flex(row, flex-start, center);
+    @include flex(row, flex-start, flex-start);
     gap: $spacing-sm * 2.4;
     padding-left: $spacing-lg * 1.33;
 
@@ -146,16 +147,26 @@
       border-radius: $border-radius - 2px;
       font-size: $font-size-sm;
       font-weight: 500;
-      color: $white;
+      color: $primary-color;
       white-space: nowrap;
 
       &.badge-member {
-        background-color: #4B0082;
+        background-color: $creator-member-color;
       }
 
       &.badge-external {
-        background-color: #1FD7C1;
+        background-color: $creator-external-color;
       }
+    }
+
+    .creator-content {
+      @include flex(row, center, flex-start);
+      gap: 6px;
+      padding: $spacing-xs $spacing-sm * 2;
+      border-radius: $border-radius - 2px;
+      font-size: $font-size-sm;
+      font-weight: 500;
+      white-space: nowrap;
     }
 
     .creator-name {
@@ -164,7 +175,8 @@
       font-weight: 400;
     }
   }
-}.task-details {
+}
+.task-details {
   @include flex(column, flex-start, stretch);
   gap: $spacing-lg * 1.6;
 
@@ -289,11 +301,11 @@
       flex-shrink: 0;
 
       &.checkbox-unchecked {
-        background-image: url('/assets/images/checkboxfalseblue.svg');
+        background-image: url("/assets/images/checkboxfalseblue.svg");
       }
 
       &.checkbox-checked {
-        background-image: url('/assets/images/checkboxtrueblack.svg');
+        background-image: url("/assets/images/checkboxtrueblack.svg");
       }
     }
 
@@ -369,7 +381,8 @@
       color: $accent-color;
 
       img {
-        filter: brightness(0) saturate(100%) invert(48%) sepia(83%) saturate(748%) hue-rotate(164deg) brightness(96%) contrast(101%);
+        filter: brightness(0) saturate(100%) invert(48%) sepia(83%)
+          saturate(748%) hue-rotate(164deg) brightness(96%) contrast(101%);
       }
     }
   }
@@ -450,7 +463,9 @@
 }
 
 @keyframes spin {
-  100% { transform: rotate(360deg); }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 @media (max-width: $breakpoint-md) {
@@ -484,4 +499,3 @@
     }
   }
 }
-

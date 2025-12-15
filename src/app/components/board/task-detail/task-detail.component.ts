@@ -200,9 +200,39 @@ export class TaskDetailComponent implements OnInit {
    */
   getCreatorIcon(): string {
     if (this.task.creatorType === 'external' || this.task.source === 'email') {
+      return '/assets/images/creator-external.svg';
+    }
+    return '/assets/images/team.svg';
+  }
+
+  /**
+   * Get creator content icon - unterscheidet zwischen Email und Profil
+   */
+  getCreatorContentIcon(): string {
+    if (this.task.source === 'email' || this.task.creatorType === 'external') {
       return '/assets/images/card_email.svg';
     }
-    return '/assets/images/person.svg';
+    return '/assets/images/creator-profil.svg';
+  }
+
+  /**
+   * Get creator content text - unterscheidet zwischen Email und Profil
+   */
+  getCreatorContentText(): string {
+    if (this.task.source === 'email' || this.task.creatorType === 'external') {
+      return 'E-mail';
+    }
+    return 'Profil';
+  }
+
+  /**
+   * Get creator content CSS class
+   */
+  getCreatorContentClass(): string {
+    if (this.task.source === 'email' || this.task.creatorType === 'external') {
+      return 'content-external';
+    }
+    return 'content-member';
   }
 
   /**

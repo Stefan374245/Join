@@ -331,11 +331,11 @@ $header-height: 54px;
     align-self: flex-start;
 
     &.user-story {
-      background: #0038ff;
+      background: $category-user-story;
     }
 
     &.technical-task {
-      background: #1fd7c1;
+      background: $category-technical-task;
     }
   }
 
