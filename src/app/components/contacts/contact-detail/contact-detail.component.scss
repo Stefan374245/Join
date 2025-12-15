@@ -8,16 +8,13 @@
 }
 
 .detail-header {
-  display: flex;
-  align-items: center;
+  @include flex(row, space-between, center);
   gap: $spacing-lg;
-  padding: $spacing-lg $spacing-xl;
-  background-color: $white;
-  box-shadow: 0 2px 4px rgba($black, 0.06);
+  padding: $spacing-lg $spacing-xl 0 $spacing-xl;
 
   h1 {
-    font-size: 32px;
-    font-weight: 700;
+    @include page-title;
+
     margin: 0;
   }
 }
@@ -43,9 +40,7 @@
 }
 
 .detail-subheader {
-  padding: $spacing-md $spacing-xl;
-  background-color: $white;
-  border-bottom: 1px solid $gray-200;
+  padding: 0 $spacing-xl;
 
   p {
     margin: 0;
@@ -54,9 +49,15 @@
   }
 }
 
+.separator {
+  width: 90px;
+  height: 3px;
+  background: $accent-color;
+  margin: 12px 32px;
+}
+
 .contact-info {
   padding: $spacing-xl;
-  background-color: $white;
   margin: $spacing-lg 0;
   text-align: center;
 }
@@ -92,7 +93,6 @@
 
 .contact-details {
   padding: $spacing-xl;
-  background-color: $white;
   margin: $spacing-lg 0;
 
   h3 {
@@ -163,10 +163,10 @@
 
 .action-popup {
   position: absolute;
-  bottom: 70px;
-  right: 0;
+  bottom: 64px;
+  right: 32px;
   background: $white;
-  border-radius: 12px;
+  border-radius: 12px 20px 0px 20px;
   box-shadow: 0 4px 20px rgba($black, 0.15);
   min-width: 180px;
   overflow: hidden;

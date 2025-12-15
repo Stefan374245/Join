@@ -4,11 +4,12 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ContactService } from '../../../services/contact.service';
 import { Contact } from '../../../models/contact.interface';
 import { ContactDialogComponent } from '../contact-dialog/contact-dialog.component';
+import { ClickOutsideDirective } from '../../../shared/directives/click-outside.directive';
 
 @Component({
   selector: 'app-contact-detail',
   standalone: true,
-  imports: [CommonModule, ContactDialogComponent],
+  imports: [CommonModule, ContactDialogComponent, ClickOutsideDirective],
   templateUrl: './contact-detail.component.html',
   styleUrl: './contact-detail.component.scss'
 })
@@ -50,6 +51,10 @@ export class ContactDetailComponent implements OnInit {
 
   toggleActionMenu() {
     this.showActionMenu = !this.showActionMenu;
+  }
+
+  closeActionMenu() {
+    this.showActionMenu = false;
   }
 
   editContact() {

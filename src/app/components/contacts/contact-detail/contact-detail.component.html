@@ -1,16 +1,17 @@
 <div class="contact-detail-page" *ngIf="contact">
   <!-- Header -->
   <div class="detail-header">
+    <h1>Contacts</h1>
     <button class="back-btn" (click)="goBack()">
       <img src="assets/images/arrow-left-line.svg" alt="Back" />
     </button>
-    <h1>Contacts</h1>
   </div>
 
   <!-- Subheader -->
   <div class="detail-subheader">
     <p>Better with a team</p>
   </div>
+  <div class="separator"></div>
 
   <!-- Contact Info -->
   <div class="contact-info">
@@ -41,7 +42,7 @@
   </div>
 
   <!-- Floating Action Button -->
-  <div class="mobile-action-menu">
+  <div class="mobile-action-menu" (clickOutside)="closeActionMenu()">
     <button class="fab-button" (click)="toggleActionMenu()">
       <img src="assets/images/more_vert.svg" alt="More" />
     </button>
