@@ -1,0 +1,71 @@
+<div class="contact-detail-page" *ngIf="contact">
+  <!-- Header -->
+  <div class="detail-header">
+    <button class="back-btn" (click)="goBack()">
+      <img src="assets/images/arrow-left-line.svg" alt="Back" />
+    </button>
+    <h1>Contacts</h1>
+  </div>
+
+  <!-- Subheader -->
+  <div class="detail-subheader">
+    <p>Better with a team</p>
+  </div>
+
+  <!-- Contact Info -->
+  <div class="contact-info">
+    <div class="contact-avatar">
+      <span class="avatar-large" [style.background-color]="contact.color">
+        {{ contact.initials }}
+      </span>
+    </div>
+
+    <div class="contact-name">
+      <h2>{{ contact.firstName }} {{ contact.lastName }}</h2>
+    </div>
+  </div>
+
+  <!-- Contact Details -->
+  <div class="contact-details">
+    <h3>Contact Information</h3>
+
+    <div class="detail-item">
+      <strong>Email</strong>
+      <a [href]="'mailto:' + contact.email" class="contact-email">{{ contact.email }}</a>
+    </div>
+
+    <div class="detail-item">
+      <strong>Phone</strong>
+      <span>{{ contact.phone || '-' }}</span>
+    </div>
+  </div>
+
+  <!-- Floating Action Button -->
+  <div class="mobile-action-menu">
+    <button class="fab-button" (click)="toggleActionMenu()">
+      <img src="assets/images/more_vert.svg" alt="More" />
+    </button>
+
+    <!-- Action Popup -->
+    <div class="action-popup" *ngIf="showActionMenu">
+      <button class="popup-item" (click)="editContact()">
+        <img src="assets/images/edit-2.svg" alt="Edit" />
+        <span>Edit</span>
+      </button>
+      <button class="popup-item" (click)="deleteContact()">
+        <img src="assets/images/delete.svg" alt="Delete" />
+        <span>Delete</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Contact Dialog -->
+  <app-contact-dialog
+    *ngIf="showDialog"
+    [mode]="dialogMode"
+    [contact]="contact"
+    (close)="closeDialog()"
+    (save)="saveContact($event)"
+    (delete)="handleDelete($event)">
+  </app-contact-dialog>
+</div>

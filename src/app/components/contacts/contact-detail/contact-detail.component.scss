@@ -1,0 +1,213 @@
+@import "../../../../styles/variables";
+@import "../../../../styles/mixins";
+
+.contact-detail-page {
+  min-height: 100vh;
+  background-color: $background-color;
+  padding-bottom: 100px;
+}
+
+.detail-header {
+  display: flex;
+  align-items: center;
+  gap: $spacing-lg;
+  padding: $spacing-lg $spacing-xl;
+  background-color: $white;
+  box-shadow: 0 2px 4px rgba($black, 0.06);
+
+  h1 {
+    font-size: 32px;
+    font-weight: 700;
+    margin: 0;
+  }
+}
+
+.back-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: scale(1.1);
+  }
+
+  img {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+.detail-subheader {
+  padding: $spacing-md $spacing-xl;
+  background-color: $white;
+  border-bottom: 1px solid $gray-200;
+
+  p {
+    margin: 0;
+    font-size: 18px;
+    color: $gray-600;
+  }
+}
+
+.contact-info {
+  padding: $spacing-xl;
+  background-color: $white;
+  margin: $spacing-lg 0;
+  text-align: center;
+}
+
+.contact-avatar {
+  display: flex;
+  justify-content: center;
+  margin-bottom: $spacing-lg;
+}
+
+.avatar-large {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: $white;
+  font-weight: 700;
+  font-size: 48px;
+  border: solid 3px $white;
+  box-shadow: 0 4px 12px rgba($black, 0.15);
+}
+
+.contact-name {
+  h2 {
+    font-size: 36px;
+    font-weight: 500;
+    margin: 0;
+    line-height: 1.2;
+  }
+}
+
+.contact-details {
+  padding: $spacing-xl;
+  background-color: $white;
+  margin: $spacing-lg 0;
+
+  h3 {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0 0 $spacing-lg 0;
+  }
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-lg;
+
+  strong {
+    font-weight: 600;
+    color: $gray-700;
+  }
+
+  span {
+    font-size: 18px;
+  }
+}
+
+.contact-email {
+  color: $accent-color;
+  text-decoration: none;
+  font-size: 18px;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+// Mobile Action Menu
+.mobile-action-menu {
+  position: fixed;
+  bottom: 100px;
+  right: 24px;
+  z-index: 100;
+}
+
+.fab-button {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background-color: $primary-color;
+  color: $white;
+  border: none;
+  box-shadow: 0 4px 12px rgba($black, 0.2);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background-color: $accent-color;
+    transform: scale(1.05);
+  }
+
+  img {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+.action-popup {
+  position: absolute;
+  bottom: 70px;
+  right: 0;
+  background: $white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba($black, 0.15);
+  min-width: 180px;
+  overflow: hidden;
+  animation: slideUpFade 0.2s ease;
+
+  .popup-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    font-size: 16px;
+    color: $primary-color;
+
+    &:hover {
+      background-color: $gray-100;
+    }
+
+    &:not(:last-child) {
+      border-bottom: 1px solid $gray-200;
+    }
+
+    img {
+      width: 20px;
+      height: 20px;
+    }
+  }
+}
+
+@keyframes slideUpFade {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
