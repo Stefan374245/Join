@@ -7,10 +7,12 @@ import { FooterAuthComponent } from '../../../shared/components/footer-auth/foot
 import { environment } from '../../../../environments/environment';
 import { DailyLimitService } from '../../../services/daily-limit.service';
 import { ToastService } from '../../../services/toast.service';
+import { ClickOutsideDirective } from '../../../shared/directives/click-outside.directive';
 
 @Component({
   selector: 'app-feature-request',
-  imports: [CommonModule, RouterLink, FooterAuthComponent, FormsModule],
+  standalone: true,
+  imports: [CommonModule, RouterLink, FooterAuthComponent, FormsModule, ClickOutsideDirective],
   templateUrl: './feature-request.component.html',
   styleUrl: './feature-request.component.scss'
 })

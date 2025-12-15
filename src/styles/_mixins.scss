@@ -135,8 +135,12 @@
 
 // Page title spacing
 @mixin page-title {
-  font-size: 61px;
+  font-size: 3.8125rem; // 61px
   font-weight: 700;
   color: $primary-color;
   margin: 0 0 $spacing-xl 0;
+
+  @media (max-width: 650px) {
+    font-size: 2.9375rem; // 47px
+  }
 }

@@ -58,6 +58,7 @@
       class="subtask-item remaining-count"
       role="listitem"
       (click)="toggleDropdown()"
+      (clickOutside)="closeDropdown()"
       [class.active]="isDropdownOpen">
     <div class="remaining-count-content">
       <span class="subtask-text">+{{ remainingSubtasksCount }} more</span>

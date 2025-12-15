@@ -1,13 +1,14 @@
-import { Component, Input, Output, EventEmitter, ViewChild, ElementRef, HostListener } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ViewChild, ElementRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ToastService } from '../../../services/toast.service';
 import { ToastComponent } from '../../../shared/components/toast/toast.component';
+import { ClickOutsideDirective } from '../../../shared/directives/click-outside.directive';
 
 @Component({
   selector: 'app-subtask-list',
   standalone: true,
-  imports: [FormsModule, CommonModule, ToastComponent],
+  imports: [FormsModule, CommonModule, ToastComponent, ClickOutsideDirective],
   templateUrl: './subtask-list.component.html',
   styleUrls: ['./subtask-list.component.scss']
 })
@@ -61,12 +62,8 @@ export class SubtaskListComponent {
     this.isDropdownOpen = !this.isDropdownOpen;
   }
 
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: MouseEvent): void {
-    const target = event.target as HTMLElement;
-    if (!target.closest('.remaining-count')) {
-      this.isDropdownOpen = false;
-    }
+  closeDropdown(): void {
+    this.isDropdownOpen = false;
   }
 
   onEdit(subtask: any) {

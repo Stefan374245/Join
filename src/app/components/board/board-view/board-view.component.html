@@ -420,30 +420,33 @@
 </main>
 
 <!-- Task Detail Overlay -->
-<app-task-detail
-  *ngIf="selectedTask"
-  [task]="selectedTask"
-  [isVisible]="showTaskDetail"
-  (close)="closeTaskDetail()"
-  (edit)="onEditTask($event)"
-  (delete)="onDeleteTask($event)">
-</app-task-detail>
+<div *ngIf="selectedTask" (clickOutside)="closeTaskDetail()">
+  <app-task-detail
+    [task]="selectedTask"
+    [isVisible]="showTaskDetail"
+    (close)="closeTaskDetail()"
+    (edit)="onEditTask($event)"
+    (delete)="onDeleteTask($event)">
+  </app-task-detail>
+</div>
 
 <!-- Task Edit Overlay -->
-<app-add-task
-  *ngIf="showEditOverlay && taskToEdit"
-  [isOverlay]="true"
-  [taskToEdit]="taskToEdit"
-  (close)="closeEditOverlay()"
-  (taskSaved)="onTaskSaved($event)">
-</app-add-task>
+<div *ngIf="showEditOverlay && taskToEdit" (clickOutside)="closeEditOverlay()">
+  <app-add-task
+    [isOverlay]="true"
+    [taskToEdit]="taskToEdit"
+    (close)="closeEditOverlay()"
+    (taskSaved)="onTaskSaved($event)">
+  </app-add-task>
+</div>
 
 <!-- Add Task Overlay -->
-<app-add-task
-  *ngIf="showAddTaskOverlay"
-  [isOverlay]="true"
-  [initialStatus]="addTaskStatus"
-  (close)="closeAddTaskOverlay()"
-  (taskSaved)="onTaskCreated($event)">
-</app-add-task>
+<div *ngIf="showAddTaskOverlay" (clickOutside)="closeAddTaskOverlay()">
+  <app-add-task
+    [isOverlay]="true"
+    [initialStatus]="addTaskStatus"
+    (close)="closeAddTaskOverlay()"
+    (taskSaved)="onTaskCreated($event)">
+  </app-add-task>
+</div>
 

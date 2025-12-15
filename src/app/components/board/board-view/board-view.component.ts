@@ -12,11 +12,12 @@ import { Observable, map } from 'rxjs';
 import { TaskDetailComponent } from '../task-detail/task-detail.component';
 import { AddTaskComponent } from '../../add-task/add-task.component';
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
+import { ClickOutsideDirective } from '../../../shared/directives/click-outside.directive';
 
 @Component({
   selector: 'app-board-view',
   standalone: true,
-imports: [CommonModule, FormsModule, DragDropModule, TaskDetailComponent, AddTaskComponent, LoadingSpinnerComponent],  templateUrl: './board-view.component.html',
+imports: [CommonModule, FormsModule, DragDropModule, TaskDetailComponent, AddTaskComponent, LoadingSpinnerComponent, ClickOutsideDirective],  templateUrl: './board-view.component.html',
   styleUrl: './board-view.component.scss'
 })
 export class BoardViewComponent implements OnInit, AfterViewInit {

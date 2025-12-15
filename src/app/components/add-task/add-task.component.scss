@@ -59,14 +59,9 @@
   padding-left: 0;
 
   .page-title {
-    font-size: 61px;
-    font-weight: 700;
-    color: $primary-color;
+    @include page-title;
     margin: 0;
 
-    @media (max-width: $breakpoint-md) {
-      font-size: 36px;
-    }
   }
 }
 

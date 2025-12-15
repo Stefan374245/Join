@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter, ViewChild, ElementRef, AfterViewChecked, HostListener } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, ViewChild, ElementRef, AfterViewChecked } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SubtaskListComponent } from './subtask-list/subtask-list.component';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
@@ -9,11 +9,12 @@ import { TaskService } from '../../services/task.service';
 import { ContactService } from '../../services/contact.service';
 import { AuthService } from '../../services/auth.service';
 import { ToastService } from '../../services/toast.service';
+import { ClickOutsideDirective } from '../../shared/directives/click-outside.directive';
 
 @Component({
   selector: 'app-add-task',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, SubtaskListComponent],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, SubtaskListComponent, ClickOutsideDirective],
   templateUrl: './add-task.component.html',
   styleUrl: './add-task.component.scss'
 })
@@ -173,27 +174,12 @@ export class AddTaskComponent implements OnInit, AfterViewChecked {
     this.selectedContacts = this.selectedContacts.filter(c => c.id !== contactId);
   }
 
-  /**
-   * Schließt Dropdowns wenn außerhalb geklickt wird
-   */
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: MouseEvent): void {
-    const target = event.target as HTMLElement;
+  closeContactDropdown(): void {
+    this.showContactDropdown = false;
+  }
 
-    const isInsideContactDropdown = target.closest('#assignedTo')?.parentElement?.parentElement ||
-                                     target.closest('.dropdown-menu') ||
-                                     target.closest('.selected-contacts');
-
-    if (!isInsideContactDropdown && this.showContactDropdown) {
-      this.showContactDropdown = false;
-    }
-
-    const isInsideCategoryDropdown = target.closest('#category')?.parentElement?.parentElement ||
-                                      target.closest('.dropdown-menu');
-
-    if (!isInsideCategoryDropdown && this.showCategoryDropdown) {
-      this.showCategoryDropdown = false;
-    }
+  closeCategoryDropdown(): void {
+    this.showCategoryDropdown = false;
   }
 
   toggleCategoryDropdown(): void {

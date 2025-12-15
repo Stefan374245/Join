@@ -149,7 +149,7 @@
 
         <fieldset class="form-group">
           <legend class="form-label">Assigned to</legend>
-          <div class="input-wrapper" (click)="toggleContactDropdown()">
+          <div class="input-wrapper" (click)="toggleContactDropdown()" (clickOutside)="closeContactDropdown()">
             <input
               type="text"
               id="assignedTo"
@@ -217,7 +217,7 @@
           <legend class="form-label">
             Category<span class="required" aria-label="required">*</span>
           </legend>
-          <div class="input-wrapper" (click)="toggleCategoryDropdown()">
+          <div class="input-wrapper" (click)="toggleCategoryDropdown()" (clickOutside)="closeCategoryDropdown()">
             <input
               type="text"
               id="category"

@@ -107,13 +107,8 @@
   }
 
   h1 {
-    font-size: 48px;
-    font-weight: 700;
+    @include page-title;
     margin: 0 0 10px 0;
-
-    @media (max-width: $breakpoint-lg) {
-      font-size: 36px;
-    }
   }
 
   p {
