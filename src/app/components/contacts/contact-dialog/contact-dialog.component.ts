@@ -2,6 +2,8 @@ import { Component, inject, Output, EventEmitter, Input, OnInit } from '@angular
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ContactService } from '../../../services/contact.service';
+import { AuthService } from '../../../services/auth.service';
+import { ToastService } from '../../../services/toast.service';
 import { Contact } from '../../../models/contact.interface';
 
 @Component({
@@ -20,6 +22,8 @@ export class ContactDialogComponent implements OnInit {
 
   private fb = inject(FormBuilder);
   private contactService = inject(ContactService);
+  private authService = inject(AuthService);
+  private toastService = inject(ToastService);
 
   contactForm!: FormGroup;
   isSubmitting = false;
@@ -94,6 +98,11 @@ export class ContactDialogComponent implements OnInit {
 
   async onSubmit(): Promise<void> {
     if (!this.isFormValid || this.isSubmitting) return;
+
+    if (this.authService.isGuestUser()) {
+      this.toastService.showGuestCannotAddContacts();
+      return;
+    }
 
     this.isSubmitting = true;
     this.errorMessage = '';

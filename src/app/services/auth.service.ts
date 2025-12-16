@@ -13,6 +13,7 @@ import {
 } from '@angular/fire/auth';
 import { Firestore, doc, setDoc, getDoc } from '@angular/fire/firestore';
 import { Observable, from } from 'rxjs';
+import { catchError, switchMap, map } from 'rxjs/operators';
 import { Router } from '@angular/router';
 
 /**
@@ -172,11 +173,40 @@ export class AuthService {
 
   /**
    * Meldet den Benutzer als Gast an
-   * Verwendet vordefinierte Gast-Credentials
+   * Erstellt automatisch einen Gast-Account, falls dieser nicht existiert
    * @returns {Observable<UserCredential>} Observable mit den Gast-Credentials
    */
   guestLogin(): Observable<UserCredential> {
-    return this.login('guest@join.com', 'guest123');
+    const guestEmail = 'guest@join.com';
+    const guestPassword = 'GuestJoin2024!';
+
+    return this.login(guestEmail, guestPassword).pipe(
+      catchError((error) => {
+        // Wenn Guest-User nicht existiert, erstellen wir ihn automatisch
+        if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
+          console.log('🔧 Guest user does not exist. Creating guest account...');
+          
+          return this.signup({
+            name: 'Guest User',
+            email: guestEmail,
+            password: guestPassword
+          }).pipe(
+            switchMap(() => {
+              console.log('✅ Guest account created successfully');
+              return this.login(guestEmail, guestPassword);
+            }),
+            catchError((signupError) => {
+              // Falls der Guest-User bereits existiert aber Passwort falsch ist
+              if (signupError.code === 'auth/email-already-in-use') {
+                console.error('❌ Guest account exists but wrong password. Please check credentials.');
+              }
+              throw signupError;
+            })
+          );
+        }
+        throw error;
+      })
+    );
   }
 
   /**
@@ -231,6 +261,24 @@ export class AuthService {
    */
   getUserEmail(): string | null {
     return this.currentUser?.email || null;
+  }
+
+  /**
+   * Prüft, ob der aktuelle Benutzer ein Gast ist
+   * @returns {boolean} True wenn Gast, sonst false
+   */
+  isGuestUser(): boolean {
+    return this.currentUser?.email === 'guest@join.com';
+  }
+
+  /**
+   * Gibt ein Observable zurück, das prüft ob der Benutzer ein Gast ist
+   * @returns {Observable<boolean>} Observable mit Gast-Status
+   */
+  isGuestUser$(): Observable<boolean> {
+    return this.user$.pipe(
+      map(user => user?.email === 'guest@join.com')
+    );
   }
 
   /**

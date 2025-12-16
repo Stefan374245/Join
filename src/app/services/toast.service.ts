@@ -204,6 +204,40 @@ export class ToastService {
   }
 
   /**
+   * Zeigt eine Warnung an, dass Gäste keine Kontakte erstellen können
+   * @returns {void}
+   */
+  showGuestCannotAddContacts(): void {
+    this.showWarning(
+      'Guests cannot create or edit contacts. Please sign up for full access.',
+      4000
+    );
+  }
+
+  /**
+   * Zeigt eine Warnung an, dass Gäste keine Tasks erstellen können
+   * @returns {void}
+   */
+  showGuestCannotAddTasks(): void {
+    this.showWarning(
+      'Guests cannot create tasks. Please sign up for full access.',
+      4000
+    );
+  }
+
+  /**
+   * Zeigt eine allgemeine Warnung für Gast-Einschränkungen an
+   * @param {string} action - Die eingeschränkte Aktion
+   * @returns {void}
+   */
+  showGuestRestriction(action: string): void {
+    this.showWarning(
+      `Guests cannot ${action}. Please sign up for full access.`,
+      4000
+    );
+  }
+
+  /**
    * Versteckt den aktuell angezeigten Toast
    * @returns {void}
    */

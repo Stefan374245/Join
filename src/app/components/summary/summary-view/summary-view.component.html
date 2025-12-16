@@ -1,4 +1,4 @@
-<main class="main-summary" [class.guest-mode]="(isGuest$ | async)">
+<main class="main-summary" [class.guest-mode]="isGuest$ | async">
   <summary id="summaryContent">
     <header class="summary-header">
       <h1>Join 360</h1>
@@ -14,13 +14,26 @@
           <article
             class="done-card"
             aria-labelledby="done-label"
-            (click)="navigateToBoard()">
+            (click)="navigateToBoard()"
+          >
             <div class="card-icon-wrapper">
-              <img class="icon-default" src="assets/images/check.svg" alt="" aria-hidden="true" />
-              <img class="icon-hover" src="assets/images/check-2.svg" alt="" aria-hidden="true" />
+              <img
+                class="icon-default"
+                src="assets/images/check.svg"
+                alt=""
+                aria-hidden="true"
+              />
+              <img
+                class="icon-hover"
+                src="assets/images/check-2.svg"
+                alt=""
+                aria-hidden="true"
+              />
             </div>
             <div class="card-content">
-              <h4 [attr.aria-label]="(doneTasks$ | async) + ' tasks done'">{{ doneTasks$ | async }}</h4>
+              <h4 [attr.aria-label]="(doneTasks$ | async) + ' tasks done'">
+                {{ doneTasks$ | async }}
+              </h4>
               <p id="done-label">Done</p>
             </div>
           </article>
@@ -28,13 +41,26 @@
           <article
             class="todo-card"
             aria-labelledby="todo-label"
-            (click)="navigateToBoard()">
+            (click)="navigateToBoard()"
+          >
             <div class="card-icon-wrapper">
-              <img class="icon-default" src="assets/images/edit.svg" alt="" aria-hidden="true" />
-              <img class="icon-hover" src="assets/images/edit-2.svg" alt="" aria-hidden="true" />
+              <img
+                class="icon-default"
+                src="assets/images/edit.svg"
+                alt=""
+                aria-hidden="true"
+              />
+              <img
+                class="icon-hover"
+                src="assets/images/edit-2.svg"
+                alt=""
+                aria-hidden="true"
+              />
             </div>
             <div class="card-content">
-              <h4 [attr.aria-label]="(todoTasks$ | async) + ' tasks to do'">{{ todoTasks$ | async }}</h4>
+              <h4 [attr.aria-label]="(todoTasks$ | async) + ' tasks to do'">
+                {{ todoTasks$ | async }}
+              </h4>
               <p id="todo-label">To-do</p>
             </div>
           </article>
@@ -44,19 +70,32 @@
           <article
             class="urgent-card"
             aria-labelledby="urgent-label"
-            (click)="navigateToBoard()">
+            (click)="navigateToBoard()"
+          >
             <div class="urgent-left">
               <div class="urgent-icon-wrapper">
-                <img src="assets/images/urgentwhite.svg" alt="" aria-hidden="true" />
+                <img
+                  src="assets/images/urgentwhite.svg"
+                  alt=""
+                  aria-hidden="true"
+                />
               </div>
               <div class="urgent-info">
-                <h3 [attr.aria-label]="(urgentTasks$ | async) + ' urgent tasks'">{{ urgentTasks$ | async }}</h3>
+                <h3
+                  [attr.aria-label]="(urgentTasks$ | async) + ' urgent tasks'"
+                >
+                  {{ urgentTasks$ | async }}
+                </h3>
                 <p id="urgent-label">Urgent</p>
               </div>
             </div>
             <div class="urgent-divider" aria-hidden="true"></div>
             <div class="urgent-right">
-              <time class="deadline-date" [attr.datetime]="formattedDeadline$ | async">{{ formattedDeadline$ | async }}</time>
+              <time
+                class="deadline-date"
+                [attr.datetime]="formattedDeadline$ | async"
+                >{{ formattedDeadline$ | async }}</time
+              >
               <p class="deadline-label">Upcoming Deadline</p>
             </div>
           </article>
@@ -64,10 +103,17 @@
           <article
             class="email-card"
             aria-labelledby="email-label"
-            (click)="navigateToBoard()">
+            (click)="navigateToBoard()"
+          >
             <div class="email-content">
-              <h4 [attr.aria-label]="(emailRequestsTasks$ | async) + ' email requests'">{{ emailRequestsTasks$ | async }}</h4>
-              <p id="email-label">Email<br>requests</p>
+              <h4
+                [attr.aria-label]="
+                  (emailRequestsTasks$ | async) + ' email requests'
+                "
+              >
+                {{ emailRequestsTasks$ | async }}
+              </h4>
+              <p id="email-label">Email<br />requests</p>
             </div>
           </article>
         </div>
@@ -76,36 +122,57 @@
           <article
             class="stat-card"
             aria-labelledby="total-tasks-label"
-            (click)="navigateToBoard()">
+            (click)="navigateToBoard()"
+          >
             <div class="stat-content">
-              <h3 [attr.aria-label]="(totalTasks$ | async) + ' total tasks'">{{ totalTasks$ | async }}</h3>
-              <p id="total-tasks-label">Tasks In<br>Board</p>
+              <h3 [attr.aria-label]="(totalTasks$ | async) + ' total tasks'">
+                {{ totalTasks$ | async }}
+              </h3>
+              <p id="total-tasks-label">Tasks In<br />Board</p>
             </div>
           </article>
 
           <article
             class="stat-card"
             aria-labelledby="progress-tasks-label"
-            (click)="navigateToBoard()">
+            (click)="navigateToBoard()"
+          >
             <div class="stat-content">
-              <h3 [attr.aria-label]="(inProgressTasks$ | async) + ' tasks in progress'">{{ inProgressTasks$ | async }}</h3>
-              <p id="progress-tasks-label">Tasks In<br>Progress</p>
+              <h3
+                [attr.aria-label]="
+                  (inProgressTasks$ | async) + ' tasks in progress'
+                "
+              >
+                {{ inProgressTasks$ | async }}
+              </h3>
+              <p id="progress-tasks-label">Tasks In<br />Progress</p>
             </div>
           </article>
 
           <article
             class="stat-card"
             aria-labelledby="awaiting-label"
-            (click)="navigateToBoard()">
+            (click)="navigateToBoard()"
+          >
             <div class="stat-content">
-              <h3 [attr.aria-label]="(awaitingFeedbackTasks$ | async) + ' tasks awaiting feedback'">{{ awaitingFeedbackTasks$ | async }}</h3>
-              <p id="awaiting-label">Awaiting<br>Feedback</p>
+              <h3
+                [attr.aria-label]="
+                  (awaitingFeedbackTasks$ | async) + ' tasks awaiting feedback'
+                "
+              >
+                {{ awaitingFeedbackTasks$ | async }}
+              </h3>
+              <p id="awaiting-label">Awaiting<br />Feedback</p>
             </div>
           </article>
         </div>
       </section>
 
-      <aside class="greeting-card" *ngIf="!(isGuest$ | async)" aria-label="User greeting">
+      <aside
+        class="greeting-card"
+        *ngIf="!(isGuest$ | async)"
+        aria-label="User greeting"
+      >
         <h2 id="greeting">{{ greeting }}</h2>
         <h3 id="userName">{{ userName$ | async }}</h3>
       </aside>
