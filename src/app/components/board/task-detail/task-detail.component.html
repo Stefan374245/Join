@@ -111,12 +111,12 @@
 
     <!-- Action Buttons -->
     <div class="task-actions">
-      <button class="action-btn delete-btn" (click)="showDeleteConfirmation()">
+      <button class="btn btn-text delete-btn" (click)="showDeleteConfirmation()">
         <img src="assets/images/subtaskBin.svg" alt="Delete" />
         <span>Delete</span>
       </button>
       <div class="action-separator"></div>
-      <button class="action-btn edit-btn" (click)="onEdit()">
+      <button class="btn btn-text edit-btn" (click)="onEdit()">
         <img src="assets/images/edit-2.svg" alt="Edit" />
         <span>Edit</span>
       </button>
@@ -131,8 +131,8 @@
   <div class="confirm-dialog" (click)="$event.stopPropagation()">
     <h3>Delete permanently?</h3>
     <div class="confirm-buttons">
-      <button class="btn-cancel" (click)="cancelDelete()">Cancel</button>
-      <button class="btn-delete" (click)="confirmDelete()">Delete</button>
+      <button class="btn btn-secondary" (click)="cancelDelete()">Cancel</button>
+      <button class="btn btn-danger" (click)="confirmDelete()">Delete</button>
     </div>
   </div>
 </div>

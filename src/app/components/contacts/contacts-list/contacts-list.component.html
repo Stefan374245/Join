@@ -1,7 +1,11 @@
 <div class="contacts-page">
 	<main class="contacts-main">
 		<div class="content-left">
-					<div class="add-btn" (click)="addContact()">
+					<div 
+						class="add-btn" 
+						[class.disabled]="(isGuest$ | async)"
+						(click)="addContact()"
+						[title]="(isGuest$ | async) ? 'Guests cannot add contacts. Please sign up for full access.' : 'Add new contact'">
 						<span>Add new contact</span>
 						<img src="assets/images/person_add.svg" alt="add" />
 			</div>
@@ -69,7 +73,7 @@
 								<img src="assets/images/edit-1.svg" alt="Edit" class="icon-hover" />
 								<span>Edit</span>
 							</button>
-							<button class="btn-link" (click)="deleteContact(selected.email)">
+							<button class="btn-link" (click)="showDeleteConfirmation(selected)">
 								<img src="assets/images/delete.svg" alt="Delete" class="icon-default" />
 								<img src="assets/images/delete-blue.svg" alt="Delete" class="icon-hover" />
 								<span>Delete</span>
@@ -102,7 +106,7 @@
 		[contact]="dialogContact"
 		(close)="closeDialog()"
 		(save)="saveContact($event)"
-		(delete)="deleteContact($event)">
+		(delete)="showDeleteConfirmation(dialogContact!)">
 	</app-contact-dialog>
 
 	<!-- FAB Add Contact Button (Mobile Only) -->
@@ -110,6 +114,19 @@
 		<button class="fab-button" (click)="addContact()" title="Add Contact">
 			<img src="assets/images/person_add.svg" alt="Add Contact" />
 		</button>
+	</div>
+
+	<!-- Delete Confirmation Dialog -->
+	<div class="confirm-dialog-overlay"
+			 *ngIf="showDeleteConfirm"
+			 (click)="cancelDelete()">
+		<div class="confirm-dialog" (click)="$event.stopPropagation()">
+			<h3>Delete permanently?</h3>
+			<div class="confirm-buttons">
+				<button class="btn btn-secondary" (click)="cancelDelete()">Cancel <img src="assets/images/canceldarkblue.svg" alt="Cancel"></button>
+				<button class="btn btn-danger" (click)="confirmDelete()">Delete</button>
+			</div>
+		</div>
 	</div>
 </div>
 

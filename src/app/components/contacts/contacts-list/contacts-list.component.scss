@@ -3,6 +3,7 @@
 @import "../../../../styles/_utilities.scss";
 @import "../../../../styles/components/animations";
 @import "../../../../styles/components/buttons";
+@import "../../board/styles/overlays";
 
 :host {
   display: block;
@@ -43,6 +44,16 @@
   padding: 12px 20px;
   width: 300px;
   margin-bottom: $spacing-md;
+
+  &.disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+    
+    &:hover {
+      transform: none;
+      box-shadow: none;
+    }
+  }
 
   @media (max-width: 900px) {
     display: none;

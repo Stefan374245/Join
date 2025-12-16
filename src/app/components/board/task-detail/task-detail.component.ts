@@ -5,6 +5,7 @@ import { Task } from '../../../models/task.interface';
 import { Contact } from '../../../models/contact.interface';
 import { TaskService } from '../../../services/task.service';
 import { ContactService } from '../../../services/contact.service';
+import { ToastService } from '../../../services/toast.service';
 
 @Component({
   selector: 'app-task-detail',
@@ -23,6 +24,7 @@ export class TaskDetailComponent implements OnInit {
 
   private taskService = inject(TaskService);
   private contactService = inject(ContactService);
+  private toastService = inject(ToastService);
 
   contacts: Contact[] = [];
   showDeleteConfirm: boolean = false;
@@ -70,6 +72,7 @@ export class TaskDetailComponent implements OnInit {
   }
 
   confirmDelete(): void {
+    this.toastService.showTaskDeleted(this.task.title);
     this.delete.emit(this.task.id);
     this.showDeleteConfirm = false;
     this.onClose();

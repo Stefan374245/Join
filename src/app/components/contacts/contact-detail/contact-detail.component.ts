@@ -2,6 +2,8 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ContactService } from '../../../services/contact.service';
+import { AuthService } from '../../../services/auth.service';
+import { ToastService } from '../../../services/toast.service';
 import { Contact } from '../../../models/contact.interface';
 import { ContactDialogComponent } from '../contact-dialog/contact-dialog.component';
 import { ClickOutsideDirective } from '../../../shared/directives/click-outside.directive';
@@ -17,6 +19,8 @@ export class ContactDetailComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private contactService = inject(ContactService);
+  private authService = inject(AuthService);
+  private toastService = inject(ToastService);
 
   contact: Contact | null = null;
   showActionMenu = false;
@@ -58,21 +62,33 @@ export class ContactDetailComponent implements OnInit {
   }
 
   editContact() {
+    if (this.authService.isGuestUser()) {
+      this.toastService.showGuestCannotAddContacts();
+      this.showActionMenu = false;
+      return;
+    }
     this.showActionMenu = false;
     this.dialogMode = 'edit';
     this.showDialog = true;
   }
 
   async deleteContact() {
+    if (this.authService.isGuestUser()) {
+      this.toastService.showGuestCannotAddContacts();
+      this.showActionMenu = false;
+      return;
+    }
+    
     if (!this.contact?.id) return;
 
     if (confirm(`Delete contact ${this.contact.firstName} ${this.contact.lastName}?`)) {
       try {
         await this.contactService.deleteUser(this.contact.id).toPromise();
+        this.toastService.showSuccess(`Contact ${this.contact.firstName} ${this.contact.lastName} deleted successfully!`);
         this.router.navigate(['/contacts']);
       } catch (error) {
         console.error('Error deleting contact:', error);
-        alert('Failed to delete contact');
+        this.toastService.showError('Failed to delete contact. Please try again.');
       }
     }
     this.showActionMenu = false;
@@ -93,9 +109,10 @@ export class ContactDetailComponent implements OnInit {
       }).toPromise();
       this.contact = updatedContact;
       this.showDialog = false;
+      this.toastService.showSuccess(`Contact ${updatedContact.firstName} ${updatedContact.lastName} updated successfully!`);
     } catch (error) {
       console.error('Error updating contact:', error);
-      alert('Failed to update contact');
+      this.toastService.showError('Failed to update contact. Please try again.');
     }
   }
 

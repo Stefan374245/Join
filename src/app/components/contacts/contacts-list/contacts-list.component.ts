@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { ContactService } from '../../../services/contact.service';
 import { AuthService } from '../../../services/auth.service';
+import { ToastService } from '../../../services/toast.service';
 import { Contact } from '../../../models/contact.interface';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { ContactDialogComponent } from '../contact-dialog/contact-dialog.component';
@@ -20,10 +21,12 @@ type Grouped = { letter: string; items: Contact[] }[];
 export class ContactsListComponent implements OnInit {
   private contactService = inject(ContactService);
   private authService = inject(AuthService);
+  private toastService = inject(ToastService);
   private router = inject(Router);
 
   contacts$ = new BehaviorSubject<Contact[]>([]);
   grouped$ = new BehaviorSubject<Grouped>([]);
+  isGuest$ = this.authService.isGuestUser$();
 
   selected: Contact | null = null;
   showRight = true;
@@ -32,6 +35,9 @@ export class ContactsListComponent implements OnInit {
   showDialog = false;
   dialogMode: 'add' | 'edit' = 'add';
   dialogContact: Contact | null = null;
+
+  showDeleteConfirm = false;
+  contactToDelete: Contact | null = null;
 
   ngOnInit(): void {
     this.load();
@@ -82,12 +88,20 @@ export class ContactsListComponent implements OnInit {
   }
 
   addContact() {
+    if (this.authService.isGuestUser()) {
+      this.toastService.showGuestCannotAddContacts();
+      return;
+    }
     this.dialogMode = 'add';
     this.dialogContact = null;
     this.showDialog = true;
   }
 
   editContact(contact: Contact) {
+    if (this.authService.isGuestUser()) {
+      this.toastService.showGuestCannotAddContacts();
+      return;
+    }
     this.dialogMode = 'edit';
     this.dialogContact = contact;
     this.showDialog = true;
@@ -110,6 +124,7 @@ export class ContactsListComponent implements OnInit {
 
         await this.contactService.saveContact(newContact).toPromise();
         console.log('✅ Contact added successfully');
+        this.toastService.showSuccess(`Contact ${contact.firstName} ${contact.lastName} added successfully!`);
       } else if (contact.id) {
         const isOwnProfile = this.authService.currentUser?.email === contact.email;
 
@@ -126,6 +141,7 @@ export class ContactsListComponent implements OnInit {
         }
 
         console.log('✅ Contact updated successfully');
+        this.toastService.showSuccess(`Contact ${contact.firstName} ${contact.lastName} updated successfully!`);
       }
 
       this.load();
@@ -136,33 +152,49 @@ export class ContactsListComponent implements OnInit {
       localStorage.setItem('selectedContactEmail', contact.email);
     } catch (error) {
       console.error('❌ Error saving contact:', error);
-      alert('Failed to save contact. Please try again.');
+      this.toastService.showError('Failed to save contact. Please try again.');
     }
   }
 
-  async deleteContact(email: string) {
-    const confirmed = confirm('Are you sure you want to delete this contact?');
-    if (!confirmed) return;
+  showDeleteConfirmation(contact: Contact) {
+    if (this.authService.isGuestUser()) {
+      this.toastService.showGuestCannotAddContacts();
+      return;
+    }
+    this.contactToDelete = contact;
+    this.showDeleteConfirm = true;
+  }
+
+  cancelDelete() {
+    this.showDeleteConfirm = false;
+    this.contactToDelete = null;
+  }
+
+  async confirmDelete() {
+    if (!this.contactToDelete) return;
+
+    const contact = this.contactToDelete;
+    this.showDeleteConfirm = false;
+    this.contactToDelete = null;
 
     try {
-      const contact = this.contacts$.value.find(c => c.email === email);
-      if (!contact?.id) {
+      if (!contact.id) {
         throw new Error('Contact ID not found');
       }
 
       await this.contactService.deleteUser(contact.id).toPromise();
       console.log('✅ Contact deleted successfully');
+      this.toastService.showSuccess(`Contact ${contact.firstName} ${contact.lastName} deleted successfully!`);
 
-      if (this.selected?.email === email) {
+      if (this.selected?.email === contact.email) {
         this.clearSelection();
       }
 
       this.load();
-
       this.closeDialog();
     } catch (error) {
       console.error('❌ Error deleting contact:', error);
-      alert('Failed to delete contact. Please try again.');
+      this.toastService.showError('Failed to delete contact. Please try again.');
     }
   }
 
