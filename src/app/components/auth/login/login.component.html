@@ -86,9 +86,8 @@
           <button
             type="button"
             (click)="login()"
-            class="blue-btn"
+            class="btn btn-primary"
             [disabled]="isLoginButtonDisabled()"
-            [class.disabled]="isLoginButtonDisabled()"
             aria-label="Log in to your account"
           >
             Log in
@@ -96,7 +95,7 @@
           <button
             type="button"
             (click)="guestLogin()"
-            class="white-btn"
+            class="btn btn-secondary"
             aria-label="Log in as guest"
           >
             Guest Log in
@@ -110,7 +109,7 @@
         <button
           type="button"
           (click)="signInWithGoogle()"
-          class="google-btn"
+          class="btn google-btn"
           aria-label="Sign in with Google"
         >
           <svg

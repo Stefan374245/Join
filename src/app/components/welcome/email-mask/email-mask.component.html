@@ -10,7 +10,6 @@
       (click)="goBack()"
       aria-label="Back to feature request page">
       <img src="assets/images/arrowbackblue.svg" alt="Back">
-      <span>Back</span>
     </button>
   </nav>
 
@@ -132,7 +131,7 @@
         <div class="form-actions">
           <button
             type="button"
-            class="btn-secondary"
+            class="btn btn-secondary"
             (click)="goBack()"
             [disabled]="isSubmitting">
             Cancel
@@ -140,7 +139,7 @@
 
           <button
             type="submit"
-            class="btn-primary"
+            class="btn btn-primary"
             [disabled]="isSubmitting || isLimitReached">
             @if (isSubmitting) {
               <span class="spinner"></span>

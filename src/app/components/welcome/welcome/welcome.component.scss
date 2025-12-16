@@ -87,22 +87,19 @@
             }
           }
 
-          .btn-primary {
-            font-size: clamp(1rem, 2vw, 1.125rem);
-            padding: 0.625rem 1.125rem;
-
-            @media (max-width: 600px) {
-              background-color: $primary-color;
-            }
-          }
-
-          .btn-secondary {
+          // Nutze globale Button-Styles aus _buttons.scss
+          // Minimale responsive Anpassungen falls nötig
+          .btn {
+            width: 100%;
+            max-width: 200px;
             font-size: clamp(1rem, 1.5vw, 1.125rem);
-            padding: 0.75rem 1.125rem;
 
-            &:hover {
-              background-color: $primary-color;
-              color: $white;
+            a {
+              text-decoration: none;
+            }
+            
+            @media (max-width: 600px) {
+              max-width: none;
             }
           }
         }

@@ -237,37 +237,6 @@
   gap: 16px;
 }
 
-.blue-btn {
-  background-color: #2a3647;
-  color: white;
-  font-size: 21px;
-  font-weight: bold;
-  border: none;
-  border-radius: 10px;
-  height: 48px;
-  width: fit-content;
-  padding: 0px 30px;
-  cursor: pointer;
-
-  &:hover {
-    background-color: #29abe2;
-    box-shadow: 00px 3px 10px rgba(0, 0, 0, 0.25);
-    transition: all 0.1s ease-in-out;
-  }
-
-  &:disabled,
-  &.disabled {
-    background-color: #d1d1d1;
-    color: #a8a8a8;
-    cursor: not-allowed;
-
-    &:hover {
-      background-color: #d1d1d1;
-      box-shadow: none;
-    }
-  }
-}
-
 .signup-success {
   position: absolute;
   left: 50%;
@@ -319,7 +288,7 @@
     }
   }
 
-  .blue-btn {
+  .btn {
     font-size: 18px;
     height: 44px;
     padding: 0px 25px;

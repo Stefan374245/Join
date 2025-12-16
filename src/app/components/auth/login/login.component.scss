@@ -249,18 +249,9 @@
 .google-btn {
   background-color: white;
   color: #2a3647;
-  font-size: 21px;
-  font-weight: bold;
   border: solid 1px #d1d1d1;
-  border-radius: 10px;
   height: 48px;
   width: fit-content;
-  padding: 0px 20px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  transition: all 0.15s ease-in-out;
 
   svg {
     width: 24px;
@@ -269,67 +260,8 @@
   }
 
   &:hover {
-    box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.15);
-    border-color: #29abe2;
     background-color: #f6f7f8;
     transform: translateY(-1px);
-  }
-
-  &:active {
-    transform: translateY(0);
-    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
-  }
-}
-
-.blue-btn {
-  background-color: #2a3647;
-  color: white;
-  font-size: 21px;
-  font-weight: bold;
-  border: none;
-  border-radius: 10px;
-  height: 48px;
-  width: 100%;
-  padding: 0px 20px;
-  cursor: pointer;
-
-  &:hover {
-    background-color: #29abe2;
-    box-shadow: 00px 3px 10px rgba(0, 0, 0, 0.25);
-    transition: all 0.1s ease-in-out;
-  }
-
-  &:disabled,
-  &.disabled {
-    background-color: #d1d1d1;
-    color: #a8a8a8;
-    cursor: not-allowed;
-
-    &:hover {
-      background-color: #d1d1d1;
-      box-shadow: none;
-    }
-  }
-}
-
-.white-btn {
-  background-color: white;
-  color: black;
-  font-size: 21px;
-  font-weight: bold;
-  border: solid 1px #2a3647;
-  border-radius: 10px;
-  height: 48px;
-  width: 168px;
-  white-space: nowrap;
-  padding: 0px 20px;
-  cursor: pointer;
-
-  &:hover {
-    box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.25);
-    border-color: #29abe2;
-    color: #29abe2;
-    transition: all 0.1s ease-in-out;
   }
 }
 
@@ -340,22 +272,12 @@
 }
 
 .signup-link {
-  background-color: #2a3647;
-  color: white;
-  font-size: 16px;
-  font-weight: bold;
-  border: none;
-  border-radius: 10px;
+  @extend .btn;
+  @extend .btn-primary;
+  @extend .btn-sm;
   width: 110px;
   text-decoration: none;
-  padding: 10px 20px;
   text-align: center;
-
-  &:hover {
-    background-color: #29abe2;
-    box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.25);
-    transition: all 0.1s ease-in-out;
-  }
 }
 
 .login-success {

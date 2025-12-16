@@ -1,5 +1,6 @@
 @import "../../../../styles/variables";
 @import "../../../../styles/mixins";
+@import "../../../../styles/components/buttons";
 
 .stakeholder-page {
   position: relative;
@@ -129,22 +130,7 @@
     @include flex(row, flex-start, center);
     gap: 0.25rem;
     padding: 1rem 1.125rem;
-    background-color: $accent-color;
-    border: none;
-    border-radius: 0.625rem;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    text-decoration: none;
-
-    @media (max-width: $breakpoint-lg-xl) {
-      background-color: $primary-color;
-    }
-
-    span {
-      font-family: "Open Sans", sans-serif;
-      font-size: 1.4375rem;
-      color: $white;
-    }
+    font-size: 1.4375rem;
 
     img {
       width: 1.5rem;
@@ -155,27 +141,18 @@
       }
     }
 
-    &:hover:not(.disabled) {
-      background-color: darken($primary-color, 10%);
-    }
-
     &.disabled {
-      background-color: $gray-400;
       cursor: not-allowed;
       opacity: 0.6;
-
-      &:hover {
-        background-color: $gray-400;
-      }
     }
   }
 }
 
 .back-button {
   position: absolute;
-  top: 5.3125rem; // 85px
+  top: 5.3125rem;
   left: 2rem;
-  width: 2.3125rem; // 37px
+  width: 2.3125rem;
   height: 2.3125rem;
   border: none;
   background: none;
