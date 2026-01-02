@@ -6,27 +6,34 @@
   position: relative;
   width: 100%;
   min-height: 100vh;
-  padding: 1.8125rem 2.5rem;
+  padding: clamp(1.5rem, 3vw, 2.5rem);
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
 }
 
 .header {
   @include flex(row, flex-start, center);
-  width: 70rem;
-  margin-bottom: 2rem;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto $spacing-lg;
 
   .logo {
-    width: 3.5rem;
+    width: clamp(2.5rem, 4vw, 3.5rem);
     height: auto;
   }
 }
 
 .request-today {
   width: 100%;
+  max-width: 1000px;
   @include flex(row, space-between, center);
-  max-width: 800px;
-  margin: 0 auto 2rem;
-  padding: 0 1rem;
+  margin: 0 auto clamp(1.5rem, 3vw, 2rem);
+  padding: 0 $spacing-md;
+
+  @media (max-width: $breakpoint-md) {
+    flex-direction: column;
+    gap: $spacing-md;
+    align-items: flex-start;
+  }
 
   .back-link {
     @include flex(row, flex-start, center);
@@ -69,32 +76,34 @@
 
 .content {
   @include flex(column, flex-start, center);
-  max-width: 800px;
+  max-width: 1000px;
   margin: 0 auto;
   width: 100%;
-  gap: 2rem;
+  padding: 0 $spacing-md;
+  gap: clamp(1.5rem, 3vw, 2rem);
 
   h1 {
     @include page-title;
     text-align: center;
     margin: 0;
+    font-size: clamp(2rem, 4vw, 3.75rem);
   }
 }
 
 .info-section {
   width: 100%;
-  background: white;
-  padding: 1.5rem;
-  border-radius: 12px;
+  background: $white;
+  padding: clamp(1rem, 2vw, 1.5rem);
+  border-radius: $border-radius-lg;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   border-left: 4px solid $accent-color;
 
   .text-content {
     p {
-      margin-bottom: 0.75rem;
-      color: #666;
+      margin-bottom: $spacing-sm;
+      color: $gray-600;
       line-height: 1.6;
-      font-size: 1rem;
+      font-size: clamp(0.875rem, 1.5vw, 1rem);
       font-family: "Open Sans", sans-serif;
 
       &:last-child {
