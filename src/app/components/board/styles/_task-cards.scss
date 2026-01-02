@@ -1,4 +1,141 @@
-// ========== Task Card Shared Styles ==========
+.task-card {
+  display: flex;
+  flex-direction: column;
+  background: white;
+  border-radius: 24px;
+  padding: 18px;
+  margin-bottom: 20px;
+  cursor: pointer;
+  box-shadow: 0 0 14px 3px rgba(0, 0, 0, 0.04);
+  transition: transform 0.2s ease-in-out;
+  height: 284px;
+  min-height: 200px;
+  position: relative;
+  gap: 12px;
+
+  &:hover {
+    transform: scale(1.02);
+    cursor: grab;
+  }
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  .mobile-move-btn {
+    position: absolute;
+    top: 18px;
+    right: 16px;
+    width: 32px;
+    height: 32px;
+    background: $white;
+    border: 2px solid $primary-color;
+    border-radius: 50%;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    z-index: 5;
+
+    &:hover {
+      background: $primary-color;
+      transform: scale(1.1);
+
+      img {
+        filter: brightness(0) invert(1);
+      }
+    }
+
+    img {
+      width: 16px;
+      height: 16px;
+      transition: filter 0.2s ease;
+    }
+
+    @media (max-width: 768px) {
+      display: flex;
+    }
+  }
+
+  .task-footer {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-top: auto;
+  }
+
+  .task-bottom-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+  }
+
+  .task-assignees {
+    display: flex;
+    min-width: 0;
+    gap: 4px;
+    flex-wrap: nowrap;
+
+    .assignee-avatar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      font-size: 12px;
+      border: 2px solid white;
+      margin-left: -8px;
+      min-width: 0;
+      border-radius: 50%;
+      background: #0d9023;
+      color: white;
+      transition: margin-left 0.3s ease, transform 0.2s ease, width 0.2s ease,
+        height 0.2s ease, font-size 0.2s ease;
+
+      @media (max-width: $breakpoint-xxl) {
+        margin-left: -14px;
+      }
+      @media (max-width: $breakpoint-xl) {
+        width: 28px;
+        height: 28px;
+        font-size: 10px;
+      }
+
+      &:first-child {
+        margin-left: 0;
+      }
+
+      &:hover {
+        transform: scale(1.1);
+        z-index: 10;
+      }
+
+      &.more {
+        background: $primary-color;
+        font-size: 12px;
+      }
+    }
+  }
+
+  .task-priority {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    img {
+      width: 24px;
+      height: 24px;
+      transition: transform 0.2s ease;
+    }
+
+    &:hover img {
+      transform: scale(1.1);
+    }
+  }
+}
 
 .task-category {
   display: inline-block;
@@ -53,11 +190,23 @@
   text-overflow: ellipsis;
 }
 
+.task-content {
+  .task-title {
+    word-break: break-word;
+    font-size: 48px;
+    font-weight: 700;
+    color: $primary-color;
+    margin: 0 0 $spacing-md 0;
+    line-height: 1.2;
+    display: block;
+    -webkit-line-clamp: unset;
+  }
+}
+
 .task-description {
   color: #a8a8a8;
   font-size: 16px;
-  margin: 0 0 20px 0;
-  line-height: 1.4;
+  line-height: 1.2;
   word-break: break-word;
   display: -webkit-box;
   -webkit-line-clamp: 3;
@@ -77,29 +226,5 @@
   img {
     width: 20px;
     height: 20px;
-  }
-}
-
-// Task Detail specific overrides
-.task-content {
-  .task-title {
-    word-break: break-word;
-    font-size: 48px;
-    font-weight: 700;
-    color: $primary-color;
-    margin: 0 0 $spacing-md 0;
-    line-height: 1.2;
-    display: block; // Override line-clamp for detail view
-    -webkit-line-clamp: unset;
-  }
-
-  .task-description {
-    font-size: 20px;
-    color: $primary-color;
-    margin: 0 0 $spacing-lg * 1.6 0;
-    line-height: 1.5;
-    word-break: break-word;
-    display: block; // Override line-clamp for detail view
-    -webkit-line-clamp: unset;
   }
 }

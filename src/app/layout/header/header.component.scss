@@ -7,7 +7,9 @@
   box-shadow: $shadow;
   position: sticky;
   top: 0;
-  z-index: 100;
+  left: 0;
+  right: 0;
+  z-index: 10;
 }
 
 .header-container {
