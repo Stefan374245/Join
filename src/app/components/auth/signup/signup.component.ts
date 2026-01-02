@@ -64,9 +64,21 @@ export class SignupComponent implements OnInit {
     this.signupFailError = false;
   }
 
+  onNameBlur(): void {
+    if (this.name && this.name.trim().length < 2) {
+      this.nameError = true;
+    }
+  }
+
   onEmailFocus(): void {
     this.emailError = false;
     this.signupFailError = false;
+  }
+
+  onEmailBlur(): void {
+    if (this.email && !this.email.includes('@')) {
+      this.emailError = true;
+    }
   }
 
   onPasswordFocus(): void {
@@ -77,6 +89,9 @@ export class SignupComponent implements OnInit {
 
   onPasswordBlur(): void {
     this.passwordFocused = false;
+    if (this.password && this.password.length < 6) {
+      this.passwordError = true;
+    }
   }
 
   onConfirmPasswordFocus(): void {
@@ -87,6 +102,9 @@ export class SignupComponent implements OnInit {
 
   onConfirmPasswordBlur(): void {
     this.confirmPasswordFocused = false;
+    if (this.confirmPassword && this.password !== this.confirmPassword) {
+      this.confirmPasswordError = true;
+    }
   }
 
   togglePasswordVisibility(): void {

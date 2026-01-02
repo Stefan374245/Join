@@ -15,7 +15,7 @@
         <h1 class="account-header">Sign up</h1>
       </div>
 
-      <div class="signup-input-div">
+      <div class="signup-input-div" (keydown.enter)="$event.preventDefault(); !isSignupButtonDisabled() && signup()">
         <div class="input-div">
           <input
             type="text"
@@ -26,6 +26,7 @@
             class="signup-input"
             [class.red-border]="nameError"
             (focus)="onNameFocus()"
+            (blur)="onNameBlur()"
             autocomplete="name"
           />
           <img src="assets/images/person.svg" alt="Name" class="input-img" />
@@ -44,6 +45,7 @@
             class="signup-input"
             [class.red-border]="emailError"
             (focus)="onEmailFocus()"
+            (blur)="onEmailBlur()"
             autocomplete="email"
           />
           <img src="assets/images/mail.svg" alt="Email" class="input-img" />
