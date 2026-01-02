@@ -13,7 +13,7 @@
       </header>
       <div class="seperator"></div>
 
-      <form class="login-input-div">
+      <form class="login-input-div" (keydown.enter)="$event.preventDefault(); !isLoginButtonDisabled() && login()">
         <div class="input-div">
           <input
             type="email"
