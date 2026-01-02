@@ -27,6 +27,14 @@
     }
   }
 
+
+  .separator {
+    position: absolute;
+    right: 48px;
+    width: 1px;
+    height: 24px;
+    background-color: #d1d1d1;
+  }
   .search-icon {
     position: absolute;
     right: 10px;

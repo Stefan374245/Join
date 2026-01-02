@@ -5,6 +5,7 @@ import {
   ViewChildren,
   QueryList,
   AfterViewInit,
+  OnDestroy,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -40,7 +41,7 @@ import { ClickOutsideDirective } from '../../../shared/directives/click-outside.
   templateUrl: './board-view.component.html',
   styleUrl: './board-view.component.scss',
 })
-export class BoardViewComponent implements OnInit, AfterViewInit {
+export class BoardViewComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChildren(CdkDropList) dropLists!: QueryList<CdkDropList>;
 
   private taskService = inject(TaskService);
@@ -71,9 +72,77 @@ export class BoardViewComponent implements OnInit, AfterViewInit {
   addTaskStatus: 'triage' | 'todo' | 'in-progress' | 'await-feedback' | 'done' =
     'todo';
 
+  // Auto-scroll properties for drag and drop
+  private autoScrollInterval: any = null;
+  private readonly scrollSpeed = 20;
+  private readonly scrollThreshold = 100;
+
   ngOnInit(): void {
     this.loadTasks();
     this.loadContacts();
+    this.initAutoScroll();
+  }
+
+  ngOnDestroy(): void {
+    this.stopAutoScroll();
+  }
+
+  private initAutoScroll(): void {
+    // Listen to drag events for auto-scrolling
+    document.addEventListener('dragover', this.handleDragOver.bind(this), { passive: false });
+    document.addEventListener('touchmove', this.handleTouchMove.bind(this), { passive: false });
+  }
+
+  private handleDragOver(event: DragEvent): void {
+    this.checkAndScroll(event.clientY);
+  }
+
+  private handleTouchMove(event: TouchEvent): void {
+    if (event.touches.length > 0) {
+      this.checkAndScroll(event.touches[0].clientY);
+    }
+  }
+
+  private checkAndScroll(clientY: number): void {
+    const viewportHeight = window.innerHeight;
+    const container = document.querySelector('.board-container');
+    
+    if (!container) return;
+
+    // Check if near bottom of viewport
+    if (clientY > viewportHeight - this.scrollThreshold) {
+      this.startAutoScroll('down', container);
+    }
+    // Check if near top of viewport
+    else if (clientY < this.scrollThreshold) {
+      this.startAutoScroll('up', container);
+    }
+    // Stop scrolling if in middle area
+    else {
+      this.stopAutoScroll();
+    }
+  }
+
+  private startAutoScroll(direction: 'up' | 'down', container: Element): void {
+    // Clear existing interval
+    if (this.autoScrollInterval) {
+      return; // Already scrolling
+    }
+
+    this.autoScrollInterval = setInterval(() => {
+      if (direction === 'down') {
+        container.scrollTop += this.scrollSpeed;
+      } else {
+        container.scrollTop -= this.scrollSpeed;
+      }
+    }, 16); // ~60fps
+  }
+
+  private stopAutoScroll(): void {
+    if (this.autoScrollInterval) {
+      clearInterval(this.autoScrollInterval);
+      this.autoScrollInterval = null;
+    }
   }
 
   private loadTasks(): void {

@@ -14,12 +14,26 @@
           (input)="onSearch()"
           aria-label="Search tasks"
         />
-  <img src="assets/images/search.svg" alt="Search icon" class="search-icon" />
+        <div class="separator"></div>
+        <img
+          src="assets/images/search.svg"
+          alt="Search icon"
+          class="search-icon"
+        />
       </div>
 
-      <button class="btn-add-task" (click)="openAddTaskModal()" aria-label="Add new task">
+      <button
+        class="btn-add-task"
+        (click)="openAddTaskModal()"
+        aria-label="Add new task"
+      >
         <span>Add task</span>
-  <img src="assets/images/add.svg" alt="Add" title="Add" class="add-icon" />
+        <img
+          src="assets/images/add.svg"
+          alt="Add"
+          title="Add"
+          class="add-icon"
+        />
       </button>
     </nav>
   </header>
@@ -32,74 +46,122 @@
       <section class="board-column" aria-labelledby="triage-heading">
         <header class="column-header">
           <h2 class="column-title" id="triage-heading">Triage</h2>
-          <button class="btn-add-column-task"
-                  (click)="openAddTaskModal('triage')"
-                  (mouseenter)="onAddButtonHover($event, true)"
-                  (mouseleave)="onAddButtonHover($event, false)"
-                  aria-label="Add task to Triage">
-            <img src="assets/images/taskPlus.svg" alt="Add task" title="Add task" role="presentation" />
+          <button
+            class="btn-add-column-task"
+            (click)="openAddTaskModal('triage')"
+            (mouseenter)="onAddButtonHover($event, true)"
+            (mouseleave)="onAddButtonHover($event, false)"
+            aria-label="Add task to Triage"
+          >
+            <img
+              src="assets/images/taskPlus.svg"
+              alt="Add task"
+              title="Add task"
+              role="presentation"
+            />
           </button>
         </header>
 
-        <div class="column-content"
-             cdkDropList
-             [cdkDropListData]="triageTasks"
-             cdkDropListId="triage-list"
-             (cdkDropListDropped)="onTaskDrop($event, 'triage')">
+        <div
+          class="column-content"
+          cdkDropList
+          [cdkDropListData]="triageTasks"
+          cdkDropListId="triage-list"
+          (cdkDropListDropped)="onTaskDrop($event, 'triage')"
+        >
           <div class="no-tasks" *ngIf="triageTasks.length === 0" role="status">
-          <p *ngIf="!tasksLoading">No tasks in triage</p>
+            <p *ngIf="!tasksLoading">No tasks in triage</p>
           </div>
 
-          <article class="task-card"
-                   *ngFor="let task of triageTasks"
-                   cdkDrag
-                   [cdkDragData]="task"
-                   [attr.data-task-id]="task.id"
-                   (click)="openTaskDetail(task)">
-
+          <article
+            class="task-card"
+            *ngFor="let task of triageTasks"
+            cdkDrag
+            [cdkDragData]="task"
+            [cdkDragStartDelay]="80"
+            [attr.data-task-id]="task.id"
+            (click)="openTaskDetail(task)"
+          >
             <div class="drag-placeholder" *cdkDragPlaceholder></div>
 
-            <span class="task-category" [ngClass]="getCategoryClass(task.category)">
+            <span
+              class="task-category"
+              [ngClass]="getCategoryClass(task.category)"
+            >
               {{ task.category }}
             </span>
             <h3 class="task-title">{{ task.title }}</h3>
-            <p class="task-description">{{ getShortDescription(task.description) }}</p>
+            <p class="task-description">
+              {{ getShortDescription(task.description) }}
+            </p>
 
-            <div class="task-progress" title="Subtask progress" aria-label="Subtask progress"
-                 *ngIf="task.subtasks && task.subtasks.length > 0"
-                 [ngClass]="{
-                   'all-completed': areAllSubtasksCompleted(task),
-                   'has-incomplete': hasIncompleteSubtasks(task)
-                 }"
-                 role="progressbar"
-                 [attr.aria-valuenow]="getSubtaskProgress(task)"
-                 aria-valuemin="0"
-                 aria-valuemax="100"
-                 [attr.aria-label]="getCompletedSubtasks(task) + ' of ' + task.subtasks.length + ' subtasks completed'">
+            <div
+              class="task-progress"
+              title="Subtask progress"
+              aria-label="Subtask progress"
+              *ngIf="task.subtasks && task.subtasks.length > 0"
+              [ngClass]="{
+                'all-completed': areAllSubtasksCompleted(task),
+                'has-incomplete': hasIncompleteSubtasks(task)
+              }"
+              role="progressbar"
+              [attr.aria-valuenow]="getSubtaskProgress(task)"
+              aria-valuemin="0"
+              aria-valuemax="100"
+              [attr.aria-label]="
+                getCompletedSubtasks(task) +
+                ' of ' +
+                task.subtasks.length +
+                ' subtasks completed'
+              "
+            >
               <div class="progress-bar">
-                <div class="progress-fill" [style.width.%]="getSubtaskProgress(task)"></div>
+                <div
+                  class="progress-fill"
+                  [style.width.%]="getSubtaskProgress(task)"
+                ></div>
               </div>
               <span class="progress-text">
-                {{ getCompletedSubtasks(task) }}/{{ task.subtasks.length }} Subtasks
+                {{ getCompletedSubtasks(task) }}/{{
+                  task.subtasks.length
+                }}
+                Subtasks
               </span>
             </div>
 
             <footer class="task-footer">
-              <div class="task-assignees" role="list" aria-label="Assigned contacts">
+              <div
+                class="task-assignees"
+                role="list"
+                aria-label="Assigned contacts"
+              >
                 <div
                   class="assignee-avatar"
                   *ngFor="let userId of task.assignedTo.slice(0, 3)"
                   [style.background-color]="getContactColor(userId)"
                   role="listitem"
-                  [attr.aria-label]="getContactInitials(userId)">
+                  [attr.aria-label]="getContactInitials(userId)"
+                >
                   {{ getContactInitials(userId) }}
                 </div>
-                <div class="assignee-avatar more" *ngIf="task.assignedTo.length > 3" role="listitem">
+                <div
+                  class="assignee-avatar more"
+                  *ngIf="task.assignedTo.length > 3"
+                  role="listitem"
+                >
                   +{{ task.assignedTo.length - 3 }}
                 </div>
               </div>
-              <div class="task-priority" [ngClass]="'priority-' + task.priority" [attr.aria-label]="task.priority + ' priority'">
-                <img [src]="getPriorityIcon(task.priority)" [alt]="task.priority + ' priority'" [title]="task.priority + ' priority'" />
+              <div
+                class="task-priority"
+                [ngClass]="'priority-' + task.priority"
+                [attr.aria-label]="task.priority + ' priority'"
+              >
+                <img
+                  [src]="getPriorityIcon(task.priority)"
+                  [alt]="task.priority + ' priority'"
+                  [title]="task.priority + ' priority'"
+                />
               </div>
             </footer>
           </article>
@@ -109,151 +171,240 @@
       <section class="board-column" aria-labelledby="todo-heading">
         <header class="column-header">
           <h2 class="column-title" id="todo-heading">To do</h2>
-          <button class="btn-add-column-task"
-                  (click)="openAddTaskModal('todo')"
-                  (mouseenter)="onAddButtonHover($event, true)"
-                  (mouseleave)="onAddButtonHover($event, false)"
-                  aria-label="Add task to To do">
+          <button
+            class="btn-add-column-task"
+            (click)="openAddTaskModal('todo')"
+            (mouseenter)="onAddButtonHover($event, true)"
+            (mouseleave)="onAddButtonHover($event, false)"
+            aria-label="Add task to To do"
+          >
             <img src="assets/images/taskPlus.svg" alt="" role="presentation" />
           </button>
         </header>
 
-        <div class="column-content"
-             cdkDropList
-             [cdkDropListData]="todoTasks"
-             cdkDropListId="todo-list"
-             (cdkDropListDropped)="onTaskDrop($event, 'todo')">
+        <div
+          class="column-content"
+          cdkDropList
+          [cdkDropListData]="todoTasks"
+          cdkDropListId="todo-list"
+          (cdkDropListDropped)="onTaskDrop($event, 'todo')"
+        >
           <div class="no-tasks" *ngIf="todoTasks.length === 0" role="status">
-          <p *ngIf="!tasksLoading">No tasks To do</p>
+            <p *ngIf="!tasksLoading">No tasks To do</p>
           </div>
 
-          <article class="task-card"
-                   *ngFor="let task of todoTasks"
-                   cdkDrag
-                   [cdkDragData]="task"
-                   [attr.data-task-id]="task.id"
-                   (click)="openTaskDetail(task)">
-
+          <article
+            class="task-card"
+            *ngFor="let task of todoTasks"
+            cdkDrag
+            [cdkDragData]="task"
+            [cdkDragStartDelay]="80"
+            [attr.data-task-id]="task.id"
+            (click)="openTaskDetail(task)"
+          >
             <div class="drag-placeholder" *cdkDragPlaceholder></div>
 
-            <span class="task-category" [ngClass]="getCategoryClass(task.category)">
+            <span
+              class="task-category"
+              [ngClass]="getCategoryClass(task.category)"
+            >
               {{ task.category }}
             </span>
             <h3 class="task-title">{{ task.title }}</h3>
-            <p class="task-description">{{ getShortDescription(task.description) }}</p>
+            <p class="task-description">
+              {{ getShortDescription(task.description) }}
+            </p>
 
-            <div class="task-progress" title="Subtask progress" aria-label="Subtask progress"
-                 *ngIf="task.subtasks && task.subtasks.length > 0"
-                 [ngClass]="{
-                   'all-completed': areAllSubtasksCompleted(task),
-                   'has-incomplete': hasIncompleteSubtasks(task)
-                 }"
-                 role="progressbar"
-                 [attr.aria-valuenow]="getSubtaskProgress(task)"
-                 aria-valuemin="0"
-                 aria-valuemax="100"
-                 [attr.aria-label]="getCompletedSubtasks(task) + ' of ' + task.subtasks.length + ' subtasks completed'">
+            <div
+              class="task-progress"
+              title="Subtask progress"
+              aria-label="Subtask progress"
+              *ngIf="task.subtasks && task.subtasks.length > 0"
+              [ngClass]="{
+                'all-completed': areAllSubtasksCompleted(task),
+                'has-incomplete': hasIncompleteSubtasks(task)
+              }"
+              role="progressbar"
+              [attr.aria-valuenow]="getSubtaskProgress(task)"
+              aria-valuemin="0"
+              aria-valuemax="100"
+              [attr.aria-label]="
+                getCompletedSubtasks(task) +
+                ' of ' +
+                task.subtasks.length +
+                ' subtasks completed'
+              "
+            >
               <div class="progress-bar">
-                <div class="progress-fill" [style.width.%]="getSubtaskProgress(task)"></div>
+                <div
+                  class="progress-fill"
+                  [style.width.%]="getSubtaskProgress(task)"
+                ></div>
               </div>
               <span class="progress-text">
-                {{ getCompletedSubtasks(task) }}/{{ task.subtasks.length }} Subtasks
+                {{ getCompletedSubtasks(task) }}/{{
+                  task.subtasks.length
+                }}
+                Subtasks
               </span>
             </div>
 
             <footer class="task-footer">
-              <div class="task-assignees" role="list" aria-label="Assigned contacts">
+              <div
+                class="task-assignees"
+                role="list"
+                aria-label="Assigned contacts"
+              >
                 <div
                   class="assignee-avatar"
                   *ngFor="let userId of task.assignedTo.slice(0, 3)"
                   [style.background-color]="getContactColor(userId)"
                   role="listitem"
-                  [attr.aria-label]="getContactInitials(userId)">
+                  [attr.aria-label]="getContactInitials(userId)"
+                >
                   {{ getContactInitials(userId) }}
                 </div>
-                <div class="assignee-avatar more" *ngIf="task.assignedTo.length > 3" role="listitem">
+                <div
+                  class="assignee-avatar more"
+                  *ngIf="task.assignedTo.length > 3"
+                  role="listitem"
+                >
                   +{{ task.assignedTo.length - 3 }}
                 </div>
               </div>
-              <div class="task-priority" [ngClass]="'priority-' + task.priority" [attr.aria-label]="task.priority + ' priority'">
-                <img [src]="getPriorityIcon(task.priority)" [alt]="task.priority + ' priority'" />
+              <div
+                class="task-priority"
+                [ngClass]="'priority-' + task.priority"
+                [attr.aria-label]="task.priority + ' priority'"
+              >
+                <img
+                  [src]="getPriorityIcon(task.priority)"
+                  [alt]="task.priority + ' priority'"
+                />
               </div>
             </footer>
           </article>
         </div>
       </section>
 
-      <!-- In Progress Column --><section class="board-column" aria-labelledby="in-progress-heading">
+      <!-- In Progress Column -->
+      <section class="board-column" aria-labelledby="in-progress-heading">
         <header class="column-header">
           <h2 class="column-title" id="in-progress-heading">In progress</h2>
-          <button class="btn-add-column-task"
-                  (click)="openAddTaskModal('in-progress')"
-                  (mouseenter)="onAddButtonHover($event, true)"
-                  (mouseleave)="onAddButtonHover($event, false)"
-                  aria-label="Add task to In progress">
+          <button
+            class="btn-add-column-task"
+            (click)="openAddTaskModal('in-progress')"
+            (mouseenter)="onAddButtonHover($event, true)"
+            (mouseleave)="onAddButtonHover($event, false)"
+            aria-label="Add task to In progress"
+          >
             <img src="assets/images/taskPlus.svg" alt="" role="presentation" />
           </button>
         </header>
 
-        <div class="column-content"
-             cdkDropList
-             [cdkDropListData]="inProgressTasks"
-             cdkDropListId="in-progress-list"
-             (cdkDropListDropped)="onTaskDrop($event, 'in-progress')">
-          <div class="no-tasks" *ngIf="inProgressTasks.length === 0" role="status">
-          <p *ngIf="!tasksLoading">No tasks in progress</p>
+        <div
+          class="column-content"
+          cdkDropList
+          [cdkDropListData]="inProgressTasks"
+          cdkDropListId="in-progress-list"
+          (cdkDropListDropped)="onTaskDrop($event, 'in-progress')"
+        >
+          <div
+            class="no-tasks"
+            *ngIf="inProgressTasks.length === 0"
+            role="status"
+          >
+            <p *ngIf="!tasksLoading">No tasks in progress</p>
           </div>
 
-          <article class="task-card"
-                   *ngFor="let task of inProgressTasks"
-                   cdkDrag
-                   [cdkDragData]="task"
-                   [attr.data-task-id]="task.id"
-                   (click)="openTaskDetail(task)">
-
+          <article
+            class="task-card"
+            *ngFor="let task of inProgressTasks"
+            cdkDrag
+            [cdkDragData]="task"
+            [cdkDragStartDelay]="80"
+            [attr.data-task-id]="task.id"
+            (click)="openTaskDetail(task)"
+          >
             <div class="drag-placeholder" *cdkDragPlaceholder></div>
 
-            <span class="task-category" [ngClass]="getCategoryClass(task.category)">
+            <span
+              class="task-category"
+              [ngClass]="getCategoryClass(task.category)"
+            >
               {{ task.category }}
             </span>
             <h3 class="task-title">{{ task.title }}</h3>
-            <p class="task-description">{{ getShortDescription(task.description) }}</p>
+            <p class="task-description">
+              {{ getShortDescription(task.description) }}
+            </p>
 
-            <div class="task-progress" title="Subtask progress" aria-label="Subtask progress"
-                 *ngIf="task.subtasks && task.subtasks.length > 0"
-                 [ngClass]="{
-                   'all-completed': areAllSubtasksCompleted(task),
-                   'has-incomplete': hasIncompleteSubtasks(task)
-                 }"
-                 role="progressbar"
-                 [attr.aria-valuenow]="getSubtaskProgress(task)"
-                 aria-valuemin="0"
-                 aria-valuemax="100"
-                 [attr.aria-label]="getCompletedSubtasks(task) + ' of ' + task.subtasks.length + ' subtasks completed'">
+            <div
+              class="task-progress"
+              title="Subtask progress"
+              aria-label="Subtask progress"
+              *ngIf="task.subtasks && task.subtasks.length > 0"
+              [ngClass]="{
+                'all-completed': areAllSubtasksCompleted(task),
+                'has-incomplete': hasIncompleteSubtasks(task)
+              }"
+              role="progressbar"
+              [attr.aria-valuenow]="getSubtaskProgress(task)"
+              aria-valuemin="0"
+              aria-valuemax="100"
+              [attr.aria-label]="
+                getCompletedSubtasks(task) +
+                ' of ' +
+                task.subtasks.length +
+                ' subtasks completed'
+              "
+            >
               <div class="progress-bar">
-                <div class="progress-fill" [style.width.%]="getSubtaskProgress(task)"></div>
+                <div
+                  class="progress-fill"
+                  [style.width.%]="getSubtaskProgress(task)"
+                ></div>
               </div>
               <span class="progress-text">
-                {{ getCompletedSubtasks(task) }}/{{ task.subtasks.length }} Subtasks
+                {{ getCompletedSubtasks(task) }}/{{
+                  task.subtasks.length
+                }}
+                Subtasks
               </span>
             </div>
 
             <footer class="task-footer">
-              <div class="task-assignees" role="list" aria-label="Assigned contacts">
+              <div
+                class="task-assignees"
+                role="list"
+                aria-label="Assigned contacts"
+              >
                 <div
                   class="assignee-avatar"
                   *ngFor="let userId of task.assignedTo.slice(0, 3)"
                   [style.background-color]="getContactColor(userId)"
                   role="listitem"
-                  [attr.aria-label]="getContactInitials(userId)">
+                  [attr.aria-label]="getContactInitials(userId)"
+                >
                   {{ getContactInitials(userId) }}
                 </div>
-                <div class="assignee-avatar more" *ngIf="task.assignedTo.length > 3" role="listitem">
+                <div
+                  class="assignee-avatar more"
+                  *ngIf="task.assignedTo.length > 3"
+                  role="listitem"
+                >
                   +{{ task.assignedTo.length - 3 }}
                 </div>
               </div>
-              <div class="task-priority" [ngClass]="'priority-' + task.priority" [attr.aria-label]="task.priority + ' priority'">
-                <img [src]="getPriorityIcon(task.priority)" [alt]="task.priority + ' priority'" />
+              <div
+                class="task-priority"
+                [ngClass]="'priority-' + task.priority"
+                [attr.aria-label]="task.priority + ' priority'"
+              >
+                <img
+                  [src]="getPriorityIcon(task.priority)"
+                  [alt]="task.priority + ' priority'"
+                />
               </div>
             </footer>
           </article>
@@ -263,75 +414,123 @@
       <!-- Await Feedback Column -->
       <section class="board-column" aria-labelledby="await-feedback-heading">
         <header class="column-header">
-          <h2 class="column-title" id="await-feedback-heading">Await feedback</h2>
-          <button class="btn-add-column-task"
-                  (click)="openAddTaskModal('await-feedback')"
-                  (mouseenter)="onAddButtonHover($event, true)"
-                  (mouseleave)="onAddButtonHover($event, false)"
-                  aria-label="Add task to Await feedback">
+          <h2 class="column-title" id="await-feedback-heading">
+            Await feedback
+          </h2>
+          <button
+            class="btn-add-column-task"
+            (click)="openAddTaskModal('await-feedback')"
+            (mouseenter)="onAddButtonHover($event, true)"
+            (mouseleave)="onAddButtonHover($event, false)"
+            aria-label="Add task to Await feedback"
+          >
             <img src="assets/images/taskPlus.svg" alt="" role="presentation" />
           </button>
         </header>
 
-        <div class="column-content"
-             cdkDropList
-             [cdkDropListData]="awaitFeedbackTasks"
-             cdkDropListId="await-feedback-list"
-             (cdkDropListDropped)="onTaskDrop($event, 'await-feedback')">
-          <div class="no-tasks" *ngIf="awaitFeedbackTasks.length === 0" role="status">
-          <p *ngIf="!tasksLoading">No tasks awaiting feedback</p>
+        <div
+          class="column-content"
+          cdkDropList
+          [cdkDropListData]="awaitFeedbackTasks"
+          cdkDropListId="await-feedback-list"
+          (cdkDropListDropped)="onTaskDrop($event, 'await-feedback')"
+        >
+          <div
+            class="no-tasks"
+            *ngIf="awaitFeedbackTasks.length === 0"
+            role="status"
+          >
+            <p *ngIf="!tasksLoading">No tasks awaiting feedback</p>
           </div>
 
-          <article class="task-card"
-                   *ngFor="let task of awaitFeedbackTasks"
-                   cdkDrag
-                   [cdkDragData]="task"
-                   [attr.data-task-id]="task.id"
-                   (click)="openTaskDetail(task)">
-
+          <article
+            class="task-card"
+            *ngFor="let task of awaitFeedbackTasks"
+            cdkDrag
+            [cdkDragData]="task"
+            [cdkDragStartDelay]="80"
+            [attr.data-task-id]="task.id"
+            (click)="openTaskDetail(task)"
+          >
             <div class="drag-placeholder" *cdkDragPlaceholder></div>
 
-            <span class="task-category" [ngClass]="getCategoryClass(task.category)">
+            <span
+              class="task-category"
+              [ngClass]="getCategoryClass(task.category)"
+            >
               {{ task.category }}
             </span>
             <h3 class="task-title">{{ task.title }}</h3>
-            <p class="task-description">{{ getShortDescription(task.description) }}</p>
+            <p class="task-description">
+              {{ getShortDescription(task.description) }}
+            </p>
 
-            <div class="task-progress" title="Subtask progress" aria-label="Subtask progress"
-                 *ngIf="task.subtasks && task.subtasks.length > 0"
-                 [ngClass]="{
-                   'all-completed': areAllSubtasksCompleted(task),
-                   'has-incomplete': hasIncompleteSubtasks(task)
-                 }"
-                 role="progressbar"
-                 [attr.aria-valuenow]="getSubtaskProgress(task)"
-                 aria-valuemin="0"
-                 aria-valuemax="100"
-                 [attr.aria-label]="getCompletedSubtasks(task) + ' of ' + task.subtasks.length + ' subtasks completed'">
+            <div
+              class="task-progress"
+              title="Subtask progress"
+              aria-label="Subtask progress"
+              *ngIf="task.subtasks && task.subtasks.length > 0"
+              [ngClass]="{
+                'all-completed': areAllSubtasksCompleted(task),
+                'has-incomplete': hasIncompleteSubtasks(task)
+              }"
+              role="progressbar"
+              [attr.aria-valuenow]="getSubtaskProgress(task)"
+              aria-valuemin="0"
+              aria-valuemax="100"
+              [attr.aria-label]="
+                getCompletedSubtasks(task) +
+                ' of ' +
+                task.subtasks.length +
+                ' subtasks completed'
+              "
+            >
               <div class="progress-bar">
-                <div class="progress-fill" [style.width.%]="getSubtaskProgress(task)"></div>
+                <div
+                  class="progress-fill"
+                  [style.width.%]="getSubtaskProgress(task)"
+                ></div>
               </div>
               <span class="progress-text">
-                {{ getCompletedSubtasks(task) }}/{{ task.subtasks.length }} Subtasks
+                {{ getCompletedSubtasks(task) }}/{{
+                  task.subtasks.length
+                }}
+                Subtasks
               </span>
             </div>
 
             <footer class="task-footer">
-              <div class="task-assignees" role="list" aria-label="Assigned contacts">
+              <div
+                class="task-assignees"
+                role="list"
+                aria-label="Assigned contacts"
+              >
                 <div
                   class="assignee-avatar"
                   *ngFor="let userId of task.assignedTo.slice(0, 3)"
                   [style.background-color]="getContactColor(userId)"
                   role="listitem"
-                  [attr.aria-label]="getContactInitials(userId)">
+                  [attr.aria-label]="getContactInitials(userId)"
+                >
                   {{ getContactInitials(userId) }}
                 </div>
-                <div class="assignee-avatar more" *ngIf="task.assignedTo.length > 3" role="listitem">
+                <div
+                  class="assignee-avatar more"
+                  *ngIf="task.assignedTo.length > 3"
+                  role="listitem"
+                >
                   +{{ task.assignedTo.length - 3 }}
                 </div>
               </div>
-              <div class="task-priority" [ngClass]="'priority-' + task.priority" [attr.aria-label]="task.priority + ' priority'">
-                <img [src]="getPriorityIcon(task.priority)" [alt]="task.priority + ' priority'" />
+              <div
+                class="task-priority"
+                [ngClass]="'priority-' + task.priority"
+                [attr.aria-label]="task.priority + ' priority'"
+              >
+                <img
+                  [src]="getPriorityIcon(task.priority)"
+                  [alt]="task.priority + ' priority'"
+                />
               </div>
             </footer>
           </article>
@@ -342,74 +541,116 @@
       <section class="board-column" aria-labelledby="done-heading">
         <header class="column-header">
           <h2 class="column-title" id="done-heading">Done</h2>
-          <button class="btn-add-column-task"
-                  (click)="openAddTaskModal('done')"
-                  (mouseenter)="onAddButtonHover($event, true)"
-                  (mouseleave)="onAddButtonHover($event, false)"
-                  aria-label="Add task to Done">
+          <button
+            class="btn-add-column-task"
+            (click)="openAddTaskModal('done')"
+            (mouseenter)="onAddButtonHover($event, true)"
+            (mouseleave)="onAddButtonHover($event, false)"
+            aria-label="Add task to Done"
+          >
             <img src="assets/images/taskPlus.svg" alt="" role="presentation" />
           </button>
         </header>
 
-        <div class="column-content"
-             cdkDropList
-             [cdkDropListData]="doneTasks"
-             cdkDropListId="done-list"
-             (cdkDropListDropped)="onTaskDrop($event, 'done')">
+        <div
+          class="column-content"
+          cdkDropList
+          [cdkDropListData]="doneTasks"
+          cdkDropListId="done-list"
+          (cdkDropListDropped)="onTaskDrop($event, 'done')"
+        >
           <div class="no-tasks" *ngIf="doneTasks.length === 0" role="status">
-          <p *ngIf="!tasksLoading">No tasks done</p>
+            <p *ngIf="!tasksLoading">No tasks done</p>
           </div>
 
-          <article class="task-card"
-                   *ngFor="let task of doneTasks"
-                   cdkDrag
-                   [cdkDragData]="task"
-                   [attr.data-task-id]="task.id"
-                   (click)="openTaskDetail(task)">
-
+          <article
+            class="task-card"
+            *ngFor="let task of doneTasks"
+            cdkDrag
+            [cdkDragData]="task"
+            [cdkDragStartDelay]="80"
+            [attr.data-task-id]="task.id"
+            (click)="openTaskDetail(task)"
+          >
             <div class="drag-placeholder" *cdkDragPlaceholder></div>
 
-            <span class="task-category" [ngClass]="getCategoryClass(task.category)">
+            <span
+              class="task-category"
+              [ngClass]="getCategoryClass(task.category)"
+            >
               {{ task.category }}
             </span>
             <h3 class="task-title">{{ task.title }}</h3>
-            <p class="task-description">{{ getShortDescription(task.description) }}</p>
+            <p class="task-description">
+              {{ getShortDescription(task.description) }}
+            </p>
 
-            <div class="task-progress" title="Subtask progress" aria-label="Subtask progress"
-                 *ngIf="task.subtasks && task.subtasks.length > 0"
-                 [ngClass]="{
-                   'all-completed': areAllSubtasksCompleted(task),
-                   'has-incomplete': hasIncompleteSubtasks(task)
-                 }"
-                 role="progressbar"
-                 [attr.aria-valuenow]="getSubtaskProgress(task)"
-                 aria-valuemin="0"
-                 aria-valuemax="100"
-                 [attr.aria-label]="getCompletedSubtasks(task) + ' of ' + task.subtasks.length + ' subtasks completed'">
+            <div
+              class="task-progress"
+              title="Subtask progress"
+              aria-label="Subtask progress"
+              *ngIf="task.subtasks && task.subtasks.length > 0"
+              [ngClass]="{
+                'all-completed': areAllSubtasksCompleted(task),
+                'has-incomplete': hasIncompleteSubtasks(task)
+              }"
+              role="progressbar"
+              [attr.aria-valuenow]="getSubtaskProgress(task)"
+              aria-valuemin="0"
+              aria-valuemax="100"
+              [attr.aria-label]="
+                getCompletedSubtasks(task) +
+                ' of ' +
+                task.subtasks.length +
+                ' subtasks completed'
+              "
+            >
               <div class="progress-bar">
-                <div class="progress-fill" [style.width.%]="getSubtaskProgress(task)"></div>
+                <div
+                  class="progress-fill"
+                  [style.width.%]="getSubtaskProgress(task)"
+                ></div>
               </div>
               <span class="progress-text">
-                {{ getCompletedSubtasks(task) }}/{{ task.subtasks.length }} Subtasks
+                {{ getCompletedSubtasks(task) }}/{{
+                  task.subtasks.length
+                }}
+                Subtasks
               </span>
             </div>
 
             <footer class="task-footer">
-              <div class="task-assignees" role="list" aria-label="Assigned contacts">
+              <div
+                class="task-assignees"
+                role="list"
+                aria-label="Assigned contacts"
+              >
                 <div
                   class="assignee-avatar"
                   *ngFor="let userId of task.assignedTo.slice(0, 3)"
                   [style.background-color]="getContactColor(userId)"
                   role="listitem"
-                  [attr.aria-label]="getContactInitials(userId)">
+                  [attr.aria-label]="getContactInitials(userId)"
+                >
                   {{ getContactInitials(userId) }}
                 </div>
-                <div class="assignee-avatar more" *ngIf="task.assignedTo.length > 3" role="listitem">
+                <div
+                  class="assignee-avatar more"
+                  *ngIf="task.assignedTo.length > 3"
+                  role="listitem"
+                >
                   +{{ task.assignedTo.length - 3 }}
                 </div>
               </div>
-              <div class="task-priority" [ngClass]="'priority-' + task.priority" [attr.aria-label]="task.priority + ' priority'">
-                <img [src]="getPriorityIcon(task.priority)" [alt]="task.priority + ' priority'" />
+              <div
+                class="task-priority"
+                [ngClass]="'priority-' + task.priority"
+                [attr.aria-label]="task.priority + ' priority'"
+              >
+                <img
+                  [src]="getPriorityIcon(task.priority)"
+                  [alt]="task.priority + ' priority'"
+                />
               </div>
             </footer>
           </article>
@@ -426,7 +667,8 @@
     [isVisible]="showTaskDetail"
     (close)="closeTaskDetail()"
     (edit)="onEditTask($event)"
-    (delete)="onDeleteTask($event)">
+    (delete)="onDeleteTask($event)"
+  >
   </app-task-detail>
 </div>
 
@@ -436,7 +678,8 @@
     [isOverlay]="true"
     [taskToEdit]="taskToEdit"
     (close)="closeEditOverlay()"
-    (taskSaved)="onTaskSaved($event)">
+    (taskSaved)="onTaskSaved($event)"
+  >
   </app-add-task>
 </div>
 
@@ -446,7 +689,7 @@
     [isOverlay]="true"
     [initialStatus]="addTaskStatus"
     (close)="closeAddTaskOverlay()"
-    (taskSaved)="onTaskCreated($event)">
+    (taskSaved)="onTaskCreated($event)"
+  >
   </app-add-task>
 </div>
-
