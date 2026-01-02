@@ -1,5 +1,6 @@
 @import "../../../../styles/variables";
 @import "../../../../styles/mixins";
+@import "../../../../styles/page-layouts";
 
 %card-base {
   background: $white;
@@ -19,12 +20,11 @@
 }
 
 .main-summary {
-  position: relative;
+  @include page-layout-standard; // ✅ 96px left Desktop, responsive padding
   background-color: $background-color;
   max-width: 100%;
 
   &.guest-mode {
-    summary { align-items: center; }
     .summary-grid { justify-content: center; }
   }
 }

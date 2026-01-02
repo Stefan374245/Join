@@ -1,40 +1,14 @@
-// ========== Board Layout Styles ==========
+
 
 .board-container {
-  position: absolute;
-  display: flex;
-  flex-direction: column;
-  max-width: 100%;
-  height: calc(100vh - 90px);
-  overflow: auto;
-  gap: 40px;
-  left: calc($sidebar-width + 24px);
-  right: 20px;
-  top: 90px;
-  padding-top: 40px;
+  @include page-layout-board; // ✅ 2rem padding Desktop, responsive cascade
 
-  @media (max-width: $breakpoint-lg-xl) {
-    left: 110px;
-    padding-top: 4rem;
-  }
-  @media (max-width: $breakpoint-lg) {
-    left: 0;
-    right: 0;
-    top: 90px;
-    padding-top: 20px;
-    padding-left: 20px;
-    padding-right: 20px;
-    gap: 20px;
-  }
-
-  @include hide-scrollbar;
   .board-loading {
     display: flex;
     align-items: center;
     justify-content: center;
     min-height: 300px;
     width: 100%;
-    z-index: 10;
   }
 }
 
@@ -43,8 +17,14 @@
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  margin-bottom: 40px;
-  padding-left: 72px;
+  margin-top: 4rem;
+  flex-shrink: 0;
+  padding-left: 3rem;
+  padding-bottom: 3rem;
+
+  @media (max-width: $breakpoint-lg) {
+    margin-top: 3rem;
+  }
 
   .board-title {
     @include page-title;
@@ -55,30 +35,30 @@
   .board-actions {
     display: flex;
     align-items: center;
-    gap: 30px;
+    gap: $spacing-lg;
   }
 }
 
 .board-columns {
   display: grid;
   grid-template-columns: repeat($column-count, 1fr);
-  gap: $board-gap;
+  gap: 16px;
   flex: 1;
+  min-height: 0;
   overflow: visible;
-  height: 100%;
-  padding: 0;
-  margin: 0;
 
-  @media (max-width: $breakpoint-lg-xl) {
-    gap: 16px;
+  @media (max-width: $breakpoint-md) {
+    grid-template-columns: 1fr;
+    gap: $spacing-md;
   }
 }
 
 .board-column {
-  display: flex;
-  flex-direction: column;
-  min-width: 120px;
-  height: calc(100% - 52px);
+  display: 100%;
+  min-height: 0;
+  @media (max-width: $breakpoint-lg) {
+    max-height: calc(100vh - $header-height - 100px - 80px - 60px);
+  }
 
   .column-header {
     display: flex;
@@ -109,28 +89,19 @@
 
   .column-content {
     flex: 1;
-    overflow-y: hidden;
+    overflow-y: auto;
+    overflow-x: hidden;
     padding: 5px;
-
-    scrollbar-width: thin;
-    scrollbar-color: $primary-color #e7e7e7;
+    padding-bottom: 20px;
+    max-height: 100%;
+    height: 100%;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
 
     &::-webkit-scrollbar {
-      width: auto;
-    }
-
-    &::-webkit-scrollbar-track {
-      background: #e7e7e7;
-    }
-
-    &::-webkit-scrollbar-thumb {
-      background-color: $primary-color;
-      border-radius: 10px;
-      border: 2px solid #e7e7e7;
-
-      &:hover {
-        background-color: $accent-color;
-      }
+      display: none;
+      width: 0;
+      height: 0;
     }
 
     .no-tasks {
@@ -325,13 +296,15 @@
 @media (max-width: 900px) {
   .board-container {
     padding: 20px;
-    padding-bottom: 100px;
+    padding-bottom: 120px;
     margin: 0;
     gap: 20px;
     -webkit-overflow-scrolling: touch;
     scroll-behavior: smooth;
-    height: calc(100vh - 70px - 80px);
-    top: 110px;
+    height: calc(100vh - $header-height - 80px);
+    top: $header-height;
+    left: 0;
+    right: 0;
   }
 
   .board-header {
@@ -402,32 +375,16 @@
       -webkit-overflow-scrolling: touch;
       overscroll-behavior-x: contain;
 
-      scrollbar-width: thin;
-      scrollbar-color: $primary-color #e7e7e7;
+      scrollbar-width: none;
 
       &::-webkit-scrollbar {
-        height: 8px;
-      }
-
-      &::-webkit-scrollbar-track {
-        background: #e7e7e7;
-        border-radius: 4px;
-      }
-
-      &::-webkit-scrollbar-thumb {
-        background-color: $primary-color;
-        border-radius: 4px;
-
-        &:hover {
-          background-color: $accent-color;
-        }
+        display: none;
       }
 
       .no-tasks {
         min-width: 100%;
       }
 
-      // Fix für Drag & Drop auf Mobile
       &.cdk-drop-list-dragging {
         .task-card {
           flex-shrink: 0;

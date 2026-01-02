@@ -8,10 +8,10 @@
   cursor: pointer;
   box-shadow: 0 0 14px 3px rgba(0, 0, 0, 0.04);
   transition: transform 0.2s ease-in-out;
-  height: 284px;
+  height: 320px;
   min-height: 200px;
   position: relative;
-  gap: 12px;
+  gap: 10px;
 
   &:hover {
     transform: scale(1.02);
@@ -144,8 +144,9 @@
   font-size: 16px;
   white-space: nowrap;
   color: white;
-  margin-bottom: 20px;
+  margin-bottom: 8px;
   align-self: flex-start;
+  flex-shrink: 0;
 
   span {
     display: inline-block;
@@ -177,7 +178,7 @@
 .task-title {
   font-size: 16px;
   font-weight: 700;
-  margin: 0 0 10px 0;
+  margin: 0 0 8px 0;
   color: $primary-color;
   line-height: 1.4;
   word-break: break-word;
@@ -188,6 +189,7 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
+  flex-shrink: 0;
 }
 
 .task-content {
@@ -206,14 +208,16 @@
 .task-description {
   color: #a8a8a8;
   font-size: 16px;
-  line-height: 1.2;
+  line-height: 1.4;
   word-break: break-word;
   display: -webkit-box;
-  -webkit-line-clamp: 3;
-  line-clamp: 3;
+  -webkit-line-clamp: 5;
+  line-clamp: 5;
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
+  flex: 1;
+  margin-bottom: 8px;
 }
 
 .task-priority {

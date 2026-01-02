@@ -1,12 +1,10 @@
 @import '../../../styles/variables';
 @import '../../../styles/mixins';
+@import '../../../styles/page-layouts';
 
 .help-main {
-  @include flex(column, flex-start, flex-start);
-  width: 100%;
-  min-height: 100vh;
-  background: $background-color;
-  padding: $spacing-xl;
+  @include page-layout-standard; // ✅ 5rem top Desktop, 3rem Mobile + 96px left Desktop
+  max-width: 1200px;
 }
 
 .help-container {

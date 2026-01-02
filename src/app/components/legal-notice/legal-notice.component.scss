@@ -1,13 +1,15 @@
 @import '../../../styles/variables';
 @import '../../../styles/mixins';
+@import '../../../styles/page-layouts';
 
 .legal-main {
-  @include flex(column, flex-start, flex-start);
+  @include page-layout-standard; // ✅ 5rem top Desktop, 3rem Mobile + 96px left Desktop
   max-width: 1200px;
   gap: $spacing-xl;
 
   h1 {
     @include page-title;
+    margin: 0 0 $spacing-xl 0;
   }
 }
 

@@ -324,12 +324,30 @@ export class BoardViewComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private scrollToTask(taskId: string): void {
-    const taskElement = document.querySelector(`[data-task-id="${taskId}"]`);
+    const taskElement = document.querySelector(`[data-task-id="${taskId}"]`) as HTMLElement;
     if (taskElement) {
-      taskElement.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center',
-      });
+      // Finde die parent column-content
+      const columnContent = taskElement.closest('.column-content');
+      if (columnContent) {
+        // Scroll nur innerhalb der Column, nicht den gesamten Viewport
+        const elementRect = taskElement.getBoundingClientRect();
+        const containerRect = columnContent.getBoundingClientRect();
+        
+        if (elementRect.bottom > containerRect.bottom || elementRect.top < containerRect.top) {
+          taskElement.scrollIntoView({
+            behavior: 'smooth',
+            block: 'nearest',
+          });
+        }
+        
+        // Visuelle Highlight-Animation
+        setTimeout(() => {
+          taskElement.classList.add('task-just-dropped');
+          setTimeout(() => {
+            taskElement.classList.remove('task-just-dropped');
+          }, 1500);
+        }, 300);
+      }
     }
   }
 
@@ -417,7 +435,7 @@ export class BoardViewComponent implements OnInit, AfterViewInit, OnDestroy {
 
   getShortDescription(description: string): string {
     if (!description) return '';
-    const maxLength = 48;
+    const maxLength = 120;
     return description.length > maxLength
       ? description.substring(0, maxLength) + '...'
       : description;

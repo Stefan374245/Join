@@ -1,5 +1,6 @@
 @import "../../../../styles/_variables.scss";
 @import "../../../../styles/_mixins.scss";
+@import "../../../../styles/_page-layouts.scss";
 @import "../../../../styles/_utilities.scss";
 @import "../../../../styles/components/animations";
 @import "../../../../styles/components/buttons";
@@ -8,18 +9,14 @@
 :host {
   display: block;
   width: 100%;
-}
-
-.contacts-page {
-  display: flex;
-  width: 100%;
-  background-color: $background-color;
+  height: 100%;
 }
 
 .contacts-main {
+  @include page-layout-contacts; // ✅ padding-top: 5rem Desktop, 3rem Mobile
   display: flex;
   width: 100%;
-  gap: $spacing-md;
+  background-color: $background-color;
 }
 
 .content-left {
@@ -28,6 +25,18 @@
   box-shadow: 2px 2px 5px rgba($black, 0.06);
   padding: $spacing-md;
   overflow-y: auto;
+  overflow-x: hidden;
+  height: 100%;
+
+  // Scrollbar verstecken
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+  }
 
   @media (max-width: 900px) {
     width: 100%;
@@ -61,7 +70,7 @@
 }
 
 .all-contacts {
-  padding-bottom: 200px;
+  padding-bottom: 40px;
 }
 
 .capital {
@@ -155,14 +164,10 @@
 }
 
 .content-right {
-  @include flex(column, flex-start, flex-start);
   flex: 1;
-  padding: 5rem;
+  padding: $spacing-xl;
+  height: 100%;
   overflow-y: auto;
-
-  @media (max-width: $breakpoint-xl) {
-    padding: 5rem 1rem;
-  }
 
   @media (max-width: 900px) {
     display: none;
@@ -170,7 +175,7 @@
 }
 
 .contactsFrame {
-  @include flex(row, space-between, center);
+  @include flex(row, flex-start center);
   gap: 30px;
 
   .separator {

@@ -1,5 +1,7 @@
 @import "../../../styles/variables";
 @import "../../../styles/mixins";
+@import "../../../styles/page-layouts";
+@import "../../../styles/scrollbar";
 @import "../../../styles/components/animations";
 @import "../../../styles/components/buttons";
 @import "./styles/overlay";
@@ -9,7 +11,39 @@
 @import "./styles/subtasks";
 @import "./styles/responsive";
 
-// Subtask input wrapper for icon positioning
+/**
+ * 🎯 Add Task Component
+ * Layout: page-layout-standard (5rem top Desktop, 3rem Mobile + 96px left Desktop)
+ * Overlay Mode: Eigenes Padding-System (.task-edit-overlay)
+ */
+
+// ========================================
+// Container: Standard Page Layout
+// ========================================
+.add-task-container {
+  @include page-layout-standard; // ✅ 5rem top Desktop, 3rem Mobile + 96px left Desktop
+}
+
+// ========================================
+// Header Section
+// ========================================
+.add-task-header {
+  flex-shrink: 0;
+  margin-bottom: 2rem;
+
+  @media (max-width: $breakpoint-md) {
+    margin-bottom: 1.5rem;
+  }
+
+  .page-title {
+    @include page-title;
+    margin: 0;
+  }
+}
+
+// ========================================
+// Component-Specific Helpers
+// ========================================
 .subtask-input-wrapper {
   position: relative;
 }
@@ -27,7 +61,6 @@
   z-index: 2;
 }
 
-// Accessibility Helper Class
 .visually-hidden {
   position: absolute;
   width: 1px;
@@ -38,23 +71,4 @@
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border-width: 0;
-}
-
-.add-task-container {
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
-}
-
-.add-task-header {
-  margin-bottom: 2rem;
-  padding-left: 0;
-  @media (max-width: $breakpoint-md) {
-    margin-bottom: 0;
-  }
-
-  .page-title {
-    @include page-title;
-    margin: 0;
-  }
 }
