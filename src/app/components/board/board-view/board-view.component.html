@@ -1,10 +1,8 @@
 <main class="board-container">
-  <!-- Board Header -->
   <header class="board-header">
     <h1 class="board-title">Board</h1>
 
     <nav class="board-actions" aria-label="Board actions">
-      <!-- Search Input -->
       <div class="search-wrapper" role="search">
         <input
           type="text"
@@ -19,6 +17,7 @@
           src="assets/images/search.svg"
           alt="Search icon"
           class="search-icon"
+          title="Search"
         />
       </div>
 
@@ -33,6 +32,7 @@
           alt="Add"
           title="Add"
           class="add-icon"
+
         />
       </button>
     </nav>
@@ -58,6 +58,7 @@
               alt="Add task"
               title="Add task"
               role="presentation"
+
             />
           </button>
         </header>
@@ -122,9 +123,7 @@
                 ></div>
               </div>
               <span class="progress-text">
-                {{ getCompletedSubtasks(task) }}/{{
-                  task.subtasks.length
-                }}
+                {{ getCompletedSubtasks(task) }}/{{ task.subtasks.length }}
                 Subtasks
               </span>
             </div>
@@ -160,7 +159,7 @@
                 <img
                   [src]="getPriorityIcon(task.priority)"
                   [alt]="task.priority + ' priority'"
-                  [title]="task.priority + ' priority'"
+                  title="priority"
                 />
               </div>
             </footer>
@@ -178,7 +177,12 @@
             (mouseleave)="onAddButtonHover($event, false)"
             aria-label="Add task to To do"
           >
-            <img src="assets/images/taskPlus.svg" alt="" role="presentation" />
+            <img
+              src="assets/images/taskPlus.svg"
+              alt="Add task"
+              role="presentation"
+              title="Add task"
+            />
           </button>
         </header>
 
@@ -242,9 +246,7 @@
                 ></div>
               </div>
               <span class="progress-text">
-                {{ getCompletedSubtasks(task) }}/{{
-                  task.subtasks.length
-                }}
+                {{ getCompletedSubtasks(task) }}/{{ task.subtasks.length }}
                 Subtasks
               </span>
             </div>
@@ -280,6 +282,7 @@
                 <img
                   [src]="getPriorityIcon(task.priority)"
                   [alt]="task.priority + ' priority'"
+                  title="priority"
                 />
               </div>
             </footer>
@@ -298,7 +301,12 @@
             (mouseleave)="onAddButtonHover($event, false)"
             aria-label="Add task to In progress"
           >
-            <img src="assets/images/taskPlus.svg" alt="" role="presentation" />
+            <img
+              src="assets/images/taskPlus.svg"
+              alt="Add task"
+              role="presentation"
+              title="Add task"
+            />
           </button>
         </header>
 
@@ -366,9 +374,7 @@
                 ></div>
               </div>
               <span class="progress-text">
-                {{ getCompletedSubtasks(task) }}/{{
-                  task.subtasks.length
-                }}
+                {{ getCompletedSubtasks(task) }}/{{ task.subtasks.length }}
                 Subtasks
               </span>
             </div>
@@ -404,6 +410,7 @@
                 <img
                   [src]="getPriorityIcon(task.priority)"
                   [alt]="task.priority + ' priority'"
+                  title="priority"
                 />
               </div>
             </footer>
@@ -424,7 +431,12 @@
             (mouseleave)="onAddButtonHover($event, false)"
             aria-label="Add task to Await feedback"
           >
-            <img src="assets/images/taskPlus.svg" alt="" role="presentation" />
+            <img
+              src="assets/images/taskPlus.svg"
+              alt="Add task"
+              role="presentation"
+              title="Add task"
+            />
           </button>
         </header>
 
@@ -492,9 +504,7 @@
                 ></div>
               </div>
               <span class="progress-text">
-                {{ getCompletedSubtasks(task) }}/{{
-                  task.subtasks.length
-                }}
+                {{ getCompletedSubtasks(task) }}/{{ task.subtasks.length }}
                 Subtasks
               </span>
             </div>
@@ -530,6 +540,7 @@
                 <img
                   [src]="getPriorityIcon(task.priority)"
                   [alt]="task.priority + ' priority'"
+                  title="priority"
                 />
               </div>
             </footer>
@@ -548,7 +559,12 @@
             (mouseleave)="onAddButtonHover($event, false)"
             aria-label="Add task to Done"
           >
-            <img src="assets/images/taskPlus.svg" alt="" role="presentation" />
+            <img
+              src="assets/images/taskPlus.svg"
+              alt="Add task"
+              role="presentation"
+              title="Add task"
+            />
           </button>
         </header>
 
@@ -612,9 +628,7 @@
                 ></div>
               </div>
               <span class="progress-text">
-                {{ getCompletedSubtasks(task) }}/{{
-                  task.subtasks.length
-                }}
+                {{ getCompletedSubtasks(task) }}/{{ task.subtasks.length }}
                 Subtasks
               </span>
             </div>
@@ -650,6 +664,7 @@
                 <img
                   [src]="getPriorityIcon(task.priority)"
                   [alt]="task.priority + ' priority'"
+                  title="priority"
                 />
               </div>
             </footer>
