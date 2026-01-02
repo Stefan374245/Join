@@ -1,5 +1,6 @@
 @import "../../../../styles/variables";
 @import "../../../../styles/mixins";
+@import "../../../../styles/components/buttons";
 
 .stakeholder-page {
   position: relative;
@@ -19,16 +20,13 @@
 }
 
 .request-today {
+  position: relative;
   width: 100%;
-  @include flex(row, space-evenly, center);
+  left: 184px;
+  @include flex(row,flex-start, center);
   gap: 550px;
   margin: auto;
   margin-top: 20px;
-
-  .count {
-    font-size: 19px;
-    color: $accent-color;
-  }
 }
 
 .content {
@@ -38,11 +36,8 @@
   gap: 3rem;
 
   h1 {
-    font-family: "Open Sans", sans-serif;
-    font-weight: 700;
-    font-size: 4rem;
+    @include page-title;
     text-align: center;
-    color: $primary-color;
     margin: 0;
   }
 }
@@ -87,23 +82,7 @@
 
   .btn-primary {
     padding: 1rem 1.125rem;
-    background-color: $accent-color;
-    border: none;
-    border-radius: 0.625rem;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    font-family: "Open Sans", sans-serif;
     font-size: 1.4375rem;
-    color: $white;
-
-    &:hover:not(:disabled) {
-      background-color: darken($primary-color, 10%);
-    }
-
-    &:disabled {
-      background-color: #ccc;
-      cursor: not-allowed;
-    }
   }
 
   .limit-message {
@@ -121,26 +100,15 @@
   }
 
   .btn-submit-request {
+    @extend .btn;
+    @extend .btn-primary;
     padding: 1rem 2rem;
-    background: $accent-color;
-    color: white;
-    border: none;
-    border-radius: 0.625rem;
     font-size: 1.4375rem;
     font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
     min-width: 250px;
-    justify-content: center;
-    font-family: "Open Sans", sans-serif;
 
     &:hover {
-      background: darken($accent-color, 10%);
       transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(41, 171, 226, 0.3);
     }
 
     .dropdown-arrow {

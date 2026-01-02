@@ -4,16 +4,9 @@
   </header>
 
   <nav class="request-today">
-     <a routerLink="/welcome" class="back-link" aria-label="Back to welcome page">
+    <a routerLink="/welcome" class="back-link" aria-label="Back to welcome page">
       <img src="assets/images/arrowbackblue.svg" alt="arrow-back">
     </a>
-    <span class="count" [class.limit-reached]="isLimitReached">
-      @if (isLoading) {
-        <span>Loading...</span>
-      } @else {
-        <span>{{ requestsUsed }} of {{ maxRequests }} requests used today</span>
-      }
-    </span>
   </nav>
 
   <article class="content">
@@ -37,7 +30,7 @@
 
     <section class="action-section">
 
-      <div class="dropdown-container">
+      <div class="dropdown-container" (clickOutside)="closeDropdown()">
         <button
           class="btn-submit-request"
           (click)="toggleDropdown()"
@@ -46,7 +39,6 @@
           <span class="dropdown-arrow" [class.open]="showDropdown">▼</span>
         </button>
 
-        <!-- DROPDOWN MENU -->
         @if (showDropdown) {
           <div class="dropdown-menu">
             <button
