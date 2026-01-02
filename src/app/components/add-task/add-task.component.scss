@@ -44,25 +44,17 @@
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
-
-  @media (max-width: $breakpoint-lg) {
-    padding: $spacing-lg;
-  }
-
-  @media (max-width: $breakpoint-md) {
-    padding: $spacing-md;
-    margin: 0;
-  }
 }
 
 .add-task-header {
   margin-bottom: 2rem;
   padding-left: 0;
+  @media (max-width: $breakpoint-md) {
+    margin-bottom: 0;
+  }
 
   .page-title {
     @include page-title;
     margin: 0;
-
   }
 }
-
