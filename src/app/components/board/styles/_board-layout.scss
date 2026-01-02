@@ -15,7 +15,7 @@
 
   @media (max-width: $breakpoint-lg-xl) {
     left: 110px;
-    padding-top: 24px;
+    padding-top: 4rem;
   }
   @media (max-width: $breakpoint-lg) {
     left: 0;
@@ -115,10 +115,8 @@
     scrollbar-width: thin;
     scrollbar-color: $primary-color #e7e7e7;
 
-
     &::-webkit-scrollbar {
       width: auto;
-       
     }
 
     &::-webkit-scrollbar-track {
@@ -324,7 +322,7 @@
 
 // ========== Responsive Design ==========
 
-@media (max-width: 768px) {
+@media (max-width: 900px) {
   .board-container {
     padding: 20px;
     padding-bottom: 100px;
@@ -333,7 +331,7 @@
     -webkit-overflow-scrolling: touch;
     scroll-behavior: smooth;
     height: calc(100vh - 70px - 80px);
-    top: 70px;
+    top: 110px;
   }
 
   .board-header {
@@ -386,7 +384,7 @@
     }
 
     .column-header {
-     margin: 0;
+      margin: 0;
     }
 
     .column-content {
