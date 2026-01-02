@@ -1,0 +1,329 @@
+@import './variables';
+@import './mixins';
+@import './scrollbar';
+
+/**
+ * 🎯 PAGE LAYOUT MIXIN SYSTEM
+ * 
+ * Wiederverwendbare Layout-Patterns für alle Page-Typen
+ * Verwendung: @include page-layout-standard;
+ * 
+ * Verfügbare Mixins:
+ * - page-layout-standard    → Standard Pages (Summary, Add-Task, Legal, etc.)
+ * - page-layout-board        → Kanban Board Layout
+ * - page-layout-contacts     → Split-View Layout (kein Padding)
+ * - page-layout-centered     → Zentrierte Content-Pages
+ * - page-header             → Fixed Page Header
+ * - page-content-scrollable → Scrollbare Content-Area
+ * - page-content-static     → Statische Content-Area
+ */
+
+// ========================================
+// 1. STANDARD PAGE LAYOUT
+// Für: Summary, Add-Task, Legal Notice, Privacy Policy, Help
+// Desktop: 96px Abstand zur Sidebar, 80px H1 Abstand zum Header
+// Mobile: 48px H1 Abstand zum Header (aside bottom)
+// ========================================
+@mixin page-layout-standard {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  padding: $spacing-xl;
+  padding-top: 5rem; // ✅ H1 Abstand zum Header (Desktop)
+  padding-left: 96px; // ✅ Abstand zur Sidebar (Desktop)
+  box-sizing: border-box;
+
+  @media (max-width: $breakpoint-lg-xl) {
+    padding-left: $spacing-xl; // Schmale Sidebar: normales Padding
+  }
+
+  @media (max-width: $breakpoint-lg) {
+    padding: $spacing-lg;
+    padding-top: 3rem; // ✅ H1 Abstand zum Header (Mobile, aside bottom)
+    padding-left: $spacing-lg; // Mobile: kein extra Abstand
+  }
+
+  @media (max-width: $breakpoint-md) {
+    padding: $spacing-md;
+    padding-top: 3rem; // ✅ H1 Abstand bleibt 48px
+  }
+
+  @media (max-width: $breakpoint-sm) {
+    padding: $spacing-sm;
+    padding-top: 3rem; // ✅ H1 Abstand bleibt 48px
+  }
+}
+
+// ========================================
+// 2. BOARD PAGE LAYOUT
+// Für: Board View (Kanban mit Spalten)
+// KEIN left padding - geht direkt an Sidebar ran
+// KEIN padding-top - nur .board-header hat margin-top
+// ========================================
+@mixin page-layout-board {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  padding: $spacing-xl;
+  padding-left: $spacing-xl; // KEIN extra Abstand zur Sidebar
+  box-sizing: border-box;
+
+  @media (max-width: $breakpoint-lg) {
+    padding: $spacing-lg;
+  }
+
+  @media (max-width: $breakpoint-md) {
+    padding: $spacing-md;
+  }
+}
+
+// ========================================
+// 3. CONTACTS PAGE LAYOUT
+// Für: Contacts (Split-View, kein Padding)
+// KEIN Abstand zur Sidebar - geht direkt ran
+// Desktop: 80px H1 Abstand zum Header
+// Mobile: 48px H1 Abstand zum Header (aside bottom)
+// ========================================
+@mixin page-layout-contacts {
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+  width: 100%;
+  padding: 0;
+  padding-top: 5rem; // ✅ Desktop: 80px H1 Abstand zum Header
+  box-sizing: border-box;
+
+  @media (max-width: $breakpoint-lg) {
+    padding-top: 3rem; // ✅ Mobile: 48px H1 Abstand
+  }
+}
+
+// ========================================
+// 4. CENTERED PAGE LAYOUT
+// Für: Einfache zentrierte Content-Pages
+// ========================================
+@mixin page-layout-centered {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  padding: $spacing-xl;
+  box-sizing: border-box;
+
+  @media (max-width: $breakpoint-md) {
+    padding: $spacing-md;
+  }
+}
+
+// ========================================
+// 5. FULLWIDTH NO PADDING
+// Für: Pages mit eigenem Padding-System
+// ========================================
+@mixin page-layout-fullwidth {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+// ========================================
+// PAGE HEADER (Fixed Section)
+// ========================================
+@mixin page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0; // Nimmt nur nötigen Platz, wächst nicht
+  margin-bottom: $spacing-xl;
+
+  @media (max-width: $breakpoint-md) {
+    margin-bottom: $spacing-lg;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: $spacing-md;
+  }
+
+  @media (max-width: $breakpoint-sm) {
+    margin-bottom: $spacing-md;
+  }
+
+  h1 {
+    @include page-title;
+    margin: 0;
+  }
+}
+
+// Variante: Header ohne Margin (für spezielle Cases)
+@mixin page-header-compact {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+  margin-bottom: $spacing-md;
+
+  h1 {
+    @include page-title;
+    margin: 0;
+  }
+}
+
+// ========================================
+// PAGE CONTENT (Scrollable Section)
+// ========================================
+@mixin page-content-scrollable {
+  flex: 1; // Nimmt restlichen verfügbaren Platz
+  min-height: 0; // ⭐ MAGIC - ermöglicht Scrolling in Flexbox
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  // Custom Scrollbar (optional, kann überschrieben werden)
+  @include custom-scrollbar(
+    $width: 8px,
+    $track-color: transparent,
+    $thumb-color: rgba($primary-color, 0.2)
+  );
+}
+
+// Variante: Scrollbar verstecken
+@mixin page-content-scrollable-hidden {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  
+  @include hide-scrollbar;
+}
+
+// ========================================
+// PAGE CONTENT (Static / No Scroll)
+// Für: Content mit eigenem Scroll-Management
+// ========================================
+@mixin page-content-static {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden; // Kein Scroll auf diesem Level
+}
+
+// ========================================
+// UTILITY: Content Grid
+// Für: Card-basierte Layouts (Summary, etc.)
+// ========================================
+@mixin content-grid($columns: 4, $gap: $spacing-lg) {
+  display: grid;
+  grid-template-columns: repeat($columns, 1fr);
+  gap: $gap;
+  width: 100%;
+
+  @media (max-width: $breakpoint-xl) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  @media (max-width: $breakpoint-lg) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: $spacing-md;
+  }
+
+  @media (max-width: $breakpoint-md) {
+    grid-template-columns: 1fr;
+    gap: $spacing-sm;
+  }
+}
+
+// ========================================
+// UTILITY: Split View Layout
+// Für: Contacts und ähnliche Split-Views
+// ========================================
+@mixin split-view-layout($left-width: 340px, $gap: $spacing-md) {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  gap: $gap;
+
+  .split-left {
+    width: $left-width;
+    flex-shrink: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  .split-right {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  @media (max-width: $breakpoint-lg) {
+    flex-direction: column;
+
+    .split-left,
+    .split-right {
+      width: 100%;
+      height: auto;
+      flex: 1;
+    }
+  }
+}
+
+// ========================================
+// UTILITY: Form Layout
+// Für: Add-Task und ähnliche Formulare
+// ========================================
+@mixin form-layout-two-column {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: $spacing-lg;
+  width: 100%;
+
+  // Separator zwischen Spalten
+  .form-separator {
+    width: 1px;
+    background-color: $border-color;
+    align-self: stretch;
+  }
+
+  @media (max-width: $breakpoint-lg) {
+    grid-template-columns: 1fr;
+
+    .form-separator {
+      width: 100%;
+      height: 1px;
+    }
+  }
+}
+
+// ========================================
+// UTILITY: Action Bar (Buttons, Search, etc.)
+// ========================================
+@mixin action-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: $spacing-lg;
+  flex-wrap: wrap;
+
+  @media (max-width: $breakpoint-md) {
+    flex-direction: column;
+    align-items: stretch;
+    gap: $spacing-md;
+  }
+}
+
+// ========================================
+// DEBUG: Visualize Layout
+// Verwendung: @include debug-layout;
+// ========================================
+@mixin debug-layout {
+  outline: 2px solid red;
+  background-color: rgba(255, 0, 0, 0.05);
+
+  * {
+    outline: 1px solid blue;
+    background-color: rgba(0, 0, 255, 0.02);
+  }
+}

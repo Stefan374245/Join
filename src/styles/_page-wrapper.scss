@@ -1,0 +1,79 @@
+@import '../../../../styles/variables';
+@import '../../../../styles/mixins';
+
+/**
+ * 🎯 Page Wrapper - Standardisiertes Layout für alle Pages
+ * 
+ * Vorteile:
+ * ✅ Kein position: absolute
+ * ✅ Kein manuelles calc()
+ * ✅ Automatischer Scrollbereich
+ * ✅ Responsive ohne Media Queries in Components
+ */
+
+.page-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  padding: $spacing-xl;
+  box-sizing: border-box;
+
+  @media (max-width: $breakpoint-lg) {
+    padding: $spacing-lg;
+  }
+
+  @media (max-width: $breakpoint-md) {
+    padding: $spacing-md;
+  }
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-xl;
+  flex-shrink: 0;
+
+  h1 {
+    @include page-title;
+    margin: 0;
+  }
+}
+
+.page-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-height: 0; // Wichtig für Flexbox Scrolling
+
+  // Scrollbar verstecken wenn gewünscht
+  &.hide-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+}
+
+// Spezielle Wrapper für verschiedene Page-Typen
+.page-wrapper--board {
+  .page-content {
+    padding: 0;
+  }
+}
+
+.page-wrapper--contacts {
+  padding: 0;
+  
+  .page-content {
+    overflow: hidden; // Contacts hat eigenes Scroll-Management
+  }
+}
+
+.page-wrapper--centered {
+  justify-content: center;
+  align-items: center;
+}
