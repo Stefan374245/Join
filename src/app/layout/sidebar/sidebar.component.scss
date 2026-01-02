@@ -1,15 +1,15 @@
 @import '../../../styles/variables';
 @import '../../../styles/mixins';
 
+/**
+ * ✅ Kein position: fixed mehr
+ * CSS Grid managed die Position
+ */
 .sidebar {
-  height: 100vh;
-  width: 200px;
+  height: 100%;
+  width: 100%;
   background-color: $primary-color;
   @include flex(column, space-between, stretch);
-  position: fixed;
-  left: 0;
-  top: 0;
-  z-index: 200;
   overflow-y: auto;
   box-shadow: $shadow-lg;
 }

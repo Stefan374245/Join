@@ -1,14 +1,15 @@
 @import "../../../styles/variables";
 @import "../../../styles/mixins";
 
+/**
+ * ✅ Kein position: fixed mehr
+ * CSS Grid managed die Position
+ */
 .main-header {
-  height: 90px;
+  height: $header-height;
   background-color: $white;
   box-shadow: $shadow;
-  position: sticky;
-  top: 0;
-  left: 0;
-  right: 0;
+  width: 100%;
   z-index: 10;
 }
 

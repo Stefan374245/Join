@@ -1,75 +1,14 @@
 @import '../styles/variables';
 @import '../styles/mixins';
 
+/**
+ * 🎯 Simplicity: CSS Grid übernimmt das Layout
+ * App Component muss sich nicht mehr um Layout kümmern
+ */
+
 :host {
   display: block;
   height: 100vh;
+  width: 100vw;
   overflow: hidden;
-}
-
-.app-container {
-  @include flex(row, flex-start, stretch);
-  height: 100vh;
-  background-color: $background-color;
-  width: 100%;
-}
-
-.main-content {
-  margin-left: $sidebar-width;
-  padding: 4rem;
-  overflow-y: auto;
-  overflow-x: hidden;
-  background-color: $background-color;
-  width: calc(100% - #{$sidebar-width});
-  min-height: calc(100vh - $header-height - $content-offset-top);
-
-  @media (max-width: $breakpoint-lg-xl) {
-    margin-left: 80px;
-    width: calc(100% - 80px);
-  }
-
-  @media (max-width: $breakpoint-lg) {
-    margin-left: 0;
-    margin-top: $header-height;
-    margin-bottom: 80px;
-    width: 100%;
-    padding: $spacing-lg;
-    padding-bottom: 100px;
-    min-height: calc(100vh - #{$header-height} - 80px);
-  }
-  @media (max-width: $breakpoint-lg) {
-    margin-top: 48px;
-  }
-}
-
-.contacts-content {
-  margin-left: $sidebar-width;
-  margin-top: 0;
-  padding: 0;
-  overflow-y: auto;
-  overflow-x: hidden;
-  background-color: $background-color;
-  width: calc(100% - #{$sidebar-width});
-  min-height: calc(100vh - $header-height);
-
-  @media (max-width: $breakpoint-lg-xl) {
-    margin-left: 80px;
-    width: calc(100% - 80px);
-  }
-
-  @media (max-width: $breakpoint-lg) {
-    margin-left: 0;
-    margin-top: 0;
-    margin-bottom: 80px;
-    width: 100%;
-    min-height: calc(100vh - #{$header-height} - 80px);
-  }
-}
-
-.auth-content {
-  width: 100%;
-  min-height: 100vh;
-  @include flex(column, center, center);
-  background-color: $background-color;
-  padding: $spacing-lg;
 }

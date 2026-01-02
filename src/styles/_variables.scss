@@ -64,8 +64,11 @@ $font-size-base: 1rem;
 $font-size-lg: 1.25rem;
 $font-size-sm: 0.875rem;
 
-$sidebar-width: 200px;
-$header-height: 90px;
+$sidebar-width: 232px; // Desktop Sidebar Breite
+$sidebar-width-narrow: 80px; // Tablet schmale Sidebar
+$sidebar-height-mobile: 80px; // Mobile Bottom Bar
+$header-height: 96px; // Desktop Header
+$header-height-mobile: 80px; // Mobile/Tablet Header
 $content-offset-left: 96px;
 $content-offset-top: 20px;
 
