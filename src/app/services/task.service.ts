@@ -14,7 +14,7 @@ import {
   getDocs,
   onSnapshot
 } from '@angular/fire/firestore';
-import { Auth } from '@angular/fire/auth';
+import { Auth, authState } from '@angular/fire/auth';
 import { Observable, from, BehaviorSubject, of } from 'rxjs';
 import { map, catchError, tap } from 'rxjs/operators';
 import { Task, Subtask } from '../models/task.interface';
@@ -41,9 +41,23 @@ export class TaskService {
   private tasksSubject = new BehaviorSubject<Task[]>([]);
   /** Observable Stream aller Tasks */
   public tasks$ = this.tasksSubject.asObservable();
+  /** Referenz zum Snapshot-Listener */
+  private unsubscribe: (() => void) | null = null;
 
   constructor() {
-    this.initializeTasksListener();
+    // Warte auf Auth-State-Änderungen, bevor Tasks geladen werden
+    authState(this.auth).subscribe(user => {
+      if (user) {
+        this.initializeTasksListener();
+      } else {
+        // Wenn kein User eingeloggt ist, leere die Tasks und stoppe den Listener
+        if (this.unsubscribe) {
+          this.unsubscribe();
+          this.unsubscribe = null;
+        }
+        this.tasksSubject.next([]);
+      }
+    });
   }
 
   /**
@@ -52,10 +66,15 @@ export class TaskService {
    * @returns {void}
    */
   private initializeTasksListener(): void {
+    // Wenn bereits ein Listener aktiv ist, stoppe ihn
+    if (this.unsubscribe) {
+      this.unsubscribe();
+    }
+
     try {
       const tasksCol = collection(this.firestore, 'tasks');
 
-      onSnapshot(tasksCol,
+      this.unsubscribe = onSnapshot(tasksCol,
         (snapshot) => {
           const tasks = snapshot.docs.map((doc) => {
             const data = doc.data();
@@ -75,7 +94,8 @@ export class TaskService {
         }
       );
     } catch (error) {
-      this.tasksSubject.next([]);}
+      this.tasksSubject.next([]);
+    }
   }
 
   /**
