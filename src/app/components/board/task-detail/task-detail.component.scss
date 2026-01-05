@@ -5,7 +5,6 @@
 @import "../styles/overlays";
 @import "../styles/task-cards";
 
-
 .task-header {
   @include flex(row, space-between, center);
   text-align: center;
@@ -19,21 +18,19 @@
 }
 
 .creator-section {
-  @include flex(row, space-between, flex-start);
-  margin-bottom: $spacing-md;
+  @include flex(row, flex-start, center);
+  gap: 16px;
 
   .detail-label {
     display: block;
     color: $primary-color;
     font-weight: 400;
     font-size: 20px;
-    margin-bottom: $spacing-sm * 2.4;
   }
 
   .creator-info {
-    @include flex(row, flex-start, flex-start);
-    gap: $spacing-sm * 2.4;
-    padding-left: $spacing-lg * 1.33;
+    @include flex(row, flex-start, center);
+    gap: 0.5rem;
 
     .creator-icon {
       width: $spacing-md;
@@ -61,10 +58,9 @@
     }
 
     .creator-content {
-      @include flex(row, center, flex-start);
-      gap: 6px;
-      padding: $spacing-xs $spacing-sm * 2;
-      border-radius: $border-radius - 2px;
+      @include flex(row, center, center);
+      gap: 4px;
+      margin-left: 25px;
       font-size: $font-size-sm;
       font-weight: 500;
       white-space: nowrap;
@@ -79,7 +75,7 @@
 }
 .task-details {
   @include flex(column, flex-start, stretch);
-  gap: $spacing-lg * 1.6;
+  gap: 1rem;
 
   .detail-row {
     @include flex(row, flex-start, center);
@@ -150,9 +146,8 @@
 }
 
 .subtasks-section {
-  margin-top: $spacing-md;
   @include flex(column, flex-start, stretch);
-  gap: $border-radius;
+  gap: 16px;
 
   .detail-label {
     font-size: 20px;
@@ -161,9 +156,8 @@
   }
 
   .subtask-list {
-    margin-top: $border-radius;
     @include flex(column, flex-start, stretch);
-    gap: 0;
+    gap: 4px;
   }
 
   .subtask-checkbox-container {
@@ -189,7 +183,7 @@
       flex-shrink: 0;
 
       &.checkbox-unchecked {
-        background-image: url("/assets/images/checkboxfalseblue.svg");
+        background-image: url("/assets/images/checkboxfalseblack.svg");
       }
 
       &.checkbox-checked {
@@ -245,7 +239,7 @@
 .task-actions {
   @include flex(row, flex-end, center);
   gap: $border-radius;
-  padding-top: $spacing-md;
+  padding-top: 2rem;
 
   .action-separator {
     width: 1px;
