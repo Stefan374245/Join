@@ -22,7 +22,6 @@
 .header-left {
   @include flex(row, flex-start, center);
   gap: $spacing-md;
-  margin-left: calc($sidebar-width + $content-offset-left);
 
   .logo {
     display: none;
@@ -41,6 +40,7 @@
     font-weight: 400;
     white-space: nowrap;
     line-height: 1.2;
+    margin-left: 116px;
   }
 }
 
