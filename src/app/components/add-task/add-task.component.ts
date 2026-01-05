@@ -358,5 +358,17 @@ export class AddTaskComponent implements OnInit, AfterViewChecked {
   get f() {
     return this.taskForm.controls;
   }
+
+  getDisplayedContacts(): Contact[] {
+    return this.selectedContacts.slice(0, 3);
+  }
+
+  getRemainingContactsCount(): number {
+    return Math.max(0, this.selectedContacts.length - 3);
+  }
+
+  hasMoreContacts(): boolean {
+    return this.selectedContacts.length > 3;
+  }
 }
 

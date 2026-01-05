@@ -196,7 +196,7 @@
                role="list"
                aria-label="Selected contacts">
             <div
-              *ngFor="let contact of selectedContacts"
+              *ngFor="let contact of getDisplayedContacts()"
               class="contact-badge"
               [style.background-color]="contact.color"
               role="listitem"
@@ -209,6 +209,13 @@
                 (click)="removeContact(contact.id)"
                 role="button"
                 tabindex="0" />
+            </div>
+            <div
+              *ngIf="hasMoreContacts()"
+              class="contact-badge more-badge"
+              role="listitem"
+              [attr.aria-label]="getRemainingContactsCount() + ' more contacts'">
+              +{{ getRemainingContactsCount() }}
             </div>
           </div>
         </fieldset>
