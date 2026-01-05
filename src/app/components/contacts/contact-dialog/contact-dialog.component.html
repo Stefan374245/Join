@@ -1,11 +1,9 @@
 <div class="dialog-overlay" (click)="onClose()">
   <div class="dialog-container" (click)="$event.stopPropagation()">
-    <!-- Close Button -->
     <button class="close-btn" (click)="onClose()" type="button">
-      <img src="assets/images/close.svg" alt="Close" />
+      <img src="assets/images/closeWhite.svg" alt="Close" />
     </button>
 
-    <!-- Left Side - Branding -->
     <div class="dialog-left">
       <div class="branding">
         <img src="assets/images/joinlogowhite.svg" alt="Join Logo" class="logo" />
@@ -15,10 +13,8 @@
       </div>
     </div>
 
-    <!-- Right Side - Form -->
     <div class="dialog-right">
       <div class="form-container">
-        <!-- Avatar Desktop -->
         <div class="avatar-section-desktop">
           <div class="avatar" [style.background-color]="avatarColor">
             <img
@@ -30,9 +26,7 @@
           </div>
         </div>
 
-        <!-- Form -->
         <form [formGroup]="contactForm" (ngSubmit)="onSubmit()" class="contact-form">
-          <!-- First Name -->
           <div class="form-group">
             <div class="input-wrapper">
               <input
@@ -50,7 +44,6 @@
             </span>
           </div>
 
-          <!-- Last Name -->
           <div class="form-group">
             <div class="input-wrapper">
               <input
@@ -68,7 +61,6 @@
             </span>
           </div>
 
-          <!-- Email -->
           <div class="form-group">
             <div class="input-wrapper">
               <input
@@ -87,7 +79,6 @@
             </span>
           </div>
 
-          <!-- Phone -->
           <div class="form-group">
             <div class="input-wrapper">
               <input
@@ -105,12 +96,10 @@
             </span>
           </div>
 
-          <!-- Error Message -->
           <div class="error-message general-error" *ngIf="errorMessage">
             {{ errorMessage }}
           </div>
 
-          <!-- Action Buttons -->
           <div class="button-group">
             <button
               *ngIf="mode === 'edit'"
@@ -124,7 +113,7 @@
             <button
               *ngIf="mode === 'add'"
               type="button"
-              class="btn btn-secondary"
+              class="btn btn-secondary btn-cancel"
               (click)="onClose()">
               Cancel
               <img src="assets/images/canceldarkblue.svg" alt="Cancel" class="btn-icon" />
