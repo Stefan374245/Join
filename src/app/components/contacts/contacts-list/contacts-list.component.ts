@@ -41,7 +41,7 @@ export class ContactsListComponent implements OnInit {
 
   ngOnInit(): void {
     this.load();
-    this.checkAutoSelect();
+    // this.checkAutoSelect(); // Deaktiviert: Kein Auto-Select beim Laden
     this.onResize();
   }
 
