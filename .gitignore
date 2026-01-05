@@ -51,6 +51,19 @@ mcp.config.json
 # Service Documentation (local development only)
 src/app/services/README.md
 
+# Development Documentation (internal use only)
+JSDOC_PROGRESS.md
+LAYOUT_MIGRATION_PLAN.md
+LAYOUT_VISUAL_GUIDE.md
+MIGRATION_QUICKSTART.md
+MIGRATION_STEP_BY_STEP_PLAN.md
+PUBLIC_AUTH_ROUTING_ARCHITECTURE.md
+QUICK_REFERENCE.md
+REFACTORING_GUIDE.md
+ROUTE_LAYOUT_MAPPING.md
+ROUTING_INTEGRATION_GUIDE.md
+FINAL_PREFLIGHT_CHECK.md
+
 # Firebase Service Account Key (NEVER commit!)
 firebase-service-account.json
 *-service-account.json
