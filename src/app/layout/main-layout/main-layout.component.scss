@@ -1,35 +1,20 @@
 @import '../../../styles/variables';
 
-/**
- * 🎯 CSS GRID LAYOUT - Die moderne Lösung
- * 
- * Vorteile:
- * ✅ Keine absolute Positionierung
- * ✅ Keine manuellen calc() mehr
- * ✅ Automatische Höhenberechnung
- * ✅ Eine zentrale Stelle für Responsive
- * ✅ Komponenten müssen nichts über Layout wissen
- */
-
 .app-grid {
   display: grid;
   height: 100vh;
   width: 100vw;
   overflow: hidden;
-  
-  // Desktop Layout: Header oben (96px), Sidebar links (232px), Content scrollt
   grid-template-columns: $sidebar-width 1fr;
   grid-template-rows: $header-height 1fr;
   grid-template-areas:
-    "header header"
+    "sidebar header"
     "sidebar content";
 
-  // Medium Screens (schmale Sidebar 80px)
   @media (max-width: $breakpoint-lg-xl) {
     grid-template-columns: $sidebar-width-narrow 1fr;
   }
 
-  // Mobile Layout: Header oben (80px), Content scrollt, Sidebar unten (80px)
   @media (max-width: $breakpoint-lg) {
     grid-template-columns: 1fr;
     grid-template-rows: $header-height-mobile 1fr $sidebar-height-mobile;
@@ -40,17 +25,16 @@
   }
 }
 
-// Grid Areas - Komponenten positionieren sich selbst
 .grid-header {
   grid-area: header;
   position: sticky;
   top: 0;
-  z-index: 100;
+  z-index: 90;
 }
 
 .grid-sidebar {
   grid-area: sidebar;
-  z-index: 90;
+  z-index: 100;
 }
 
 .grid-content {
@@ -59,7 +43,6 @@
   overflow-x: hidden;
   background-color: $background-color;
   
-  // Scrollbar stylen
   scrollbar-width: thin;
   scrollbar-color: rgba($primary-color, 0.3) transparent;
 
@@ -77,6 +60,17 @@
     
     &:hover {
       background-color: rgba($primary-color, 0.5);
+    }
+  }
+
+  @media (max-width: $breakpoint-lg) {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+      width: 0;
+      height: 0;
     }
   }
 }
