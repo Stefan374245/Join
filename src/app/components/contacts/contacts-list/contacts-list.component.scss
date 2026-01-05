@@ -13,9 +13,10 @@
 }
 
 .contacts-main {
-  @include page-layout-contacts; // ✅ padding-top: 5rem Desktop, 3rem Mobile
+  @include page-layout-contacts;
   display: flex;
   width: 100%;
+  height: 100%;
   background-color: $background-color;
 }
 
@@ -27,8 +28,6 @@
   overflow-y: auto;
   overflow-x: hidden;
   height: 100%;
-
-  // Scrollbar verstecken
   scrollbar-width: none;
   -ms-overflow-style: none;
 
@@ -40,6 +39,8 @@
 
   @media (max-width: 900px) {
     width: 100%;
+    padding: 2rem; 
+    padding-bottom: 120px;
   }
 }
 
@@ -165,7 +166,7 @@
 
 .content-right {
   flex: 1;
-  padding: $spacing-xl;
+  padding: 5rem 4rem;
   height: 100%;
   overflow-y: auto;
 
@@ -175,7 +176,7 @@
 }
 
 .contactsFrame {
-  @include flex(row, flex-start center);
+  @include flex(row, flex-start, center);
   gap: 30px;
 
   .separator {
