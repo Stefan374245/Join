@@ -52,7 +52,8 @@
     color: $accent-color;
 
     img {
-      filter: brightness(0) saturate(100%) invert(64%) sepia(98%) saturate(1613%) hue-rotate(164deg) brightness(95%) contrast(92%);
+      filter: brightness(0) saturate(100%) invert(64%) sepia(98%)
+        saturate(1613%) hue-rotate(164deg) brightness(95%) contrast(92%);
     }
   }
 }
@@ -123,8 +124,8 @@
     color: $accent-color;
 
     img {
-      filter: brightness(0) saturate(100%) invert(48%) sepia(83%)
-        saturate(748%) hue-rotate(164deg) brightness(96%) contrast(101%);
+      filter: brightness(0) saturate(100%) invert(48%) sepia(83%) saturate(748%)
+        hue-rotate(164deg) brightness(96%) contrast(101%);
     }
   }
 }
@@ -214,7 +215,6 @@
     transition: background-color 0.2s;
 
     &:hover {
-      background-color: $white;
       border-radius: 50%;
     }
   }
@@ -234,9 +234,8 @@
 .button-group {
   display: flex;
   gap: 16px;
-
-  @media (max-width: $breakpoint-md) {
-    flex-direction: column;
+  @media (max-width: $breakpoint-lg) {
+    justify-content: center;
   }
 }
 
