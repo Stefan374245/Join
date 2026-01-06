@@ -229,12 +229,12 @@ export class AuthService {
   }
 
   /**
-   * Meldet den aktuellen Benutzer ab und navigiert zur Login-Seite
+   * Meldet den aktuellen Benutzer ab und navigiert zur Logo-Animation
    * @returns {Observable<void>} Observable des Logout-Vorgangs
    */
   logout(): Observable<void> {
     const promise = signOut(this.auth).then(() => {
-      this.router.navigate(['/login']);
+      this.router.navigate(['/logo-animation']);
     });
     return from(promise);
   }

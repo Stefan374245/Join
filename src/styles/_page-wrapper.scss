@@ -1,16 +1,6 @@
 @import '../../../../styles/variables';
 @import '../../../../styles/mixins';
 
-/**
- * 🎯 Page Wrapper - Standardisiertes Layout für alle Pages
- * 
- * Vorteile:
- * ✅ Kein position: absolute
- * ✅ Kein manuelles calc()
- * ✅ Automatischer Scrollbereich
- * ✅ Responsive ohne Media Queries in Components
- */
-
 .page-wrapper {
   display: flex;
   flex-direction: column;
@@ -45,9 +35,8 @@
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  min-height: 0; // Wichtig für Flexbox Scrolling
+  min-height: 0;
 
-  // Scrollbar verstecken wenn gewünscht
   &.hide-scrollbar {
     scrollbar-width: none;
     -ms-overflow-style: none;
@@ -58,7 +47,6 @@
   }
 }
 
-// Spezielle Wrapper für verschiedene Page-Typen
 .page-wrapper--board {
   .page-content {
     padding: 0;
@@ -69,7 +57,7 @@
   padding: 0;
   
   .page-content {
-    overflow: hidden; // Contacts hat eigenes Scroll-Management
+    overflow: hidden;
   }
 }
 

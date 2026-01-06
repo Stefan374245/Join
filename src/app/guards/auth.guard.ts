@@ -13,7 +13,7 @@ export const authGuard: CanActivateFn = (route, state) => {
       if (user) {
         return true;
       } else {
-        router.navigate(['/login']);
+        router.navigate(['/logo-animation']);
         return false;
       }
     })
@@ -30,7 +30,7 @@ export const guestGuard: CanActivateFn = (route, state) => {
       if (!user) {
         return true;
       } else {
-        router.navigate(['/board']);
+        router.navigate(['/summary']);
         return false;
       }
     })

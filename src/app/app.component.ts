@@ -20,9 +20,11 @@ export class AppComponent {
                          url.startsWith('/signup') ||
                          url.startsWith('/logo-animation') ||
                          url.startsWith('/welcome') ||
-                         url.startsWith('/stakeholder') ||
-                         url.startsWith('/feature-request') ||
-                         url.startsWith('/emailmask');
+                         url.startsWith('/role/') ||
+                         url.startsWith('/emailmask') ||
+                         url.startsWith('/legal-notice') ||
+                         url.startsWith('/privacy-policy') ||
+                         url.startsWith('/help');
       this.showMainLayout = !isAuthPage;
     });
   }
