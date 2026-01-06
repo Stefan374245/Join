@@ -6,7 +6,7 @@
       (click)="addContact()"
       [title]="(isGuest$ | async) ? 'Guests cannot add contacts. Please sign up for full access.' : 'Add new contact'">
       <span>Add new contact</span>
-      <img src="assets/images/person_add.svg" alt="add" />
+      <img src="/assets/images/person_add.svg" alt="add" />
     </div>
 
     <div id="allContacts" class="all-contacts">
@@ -63,13 +63,13 @@
           <p id="contactDetailsName">{{ selected.firstName }} {{ selected.lastName }}</p>
           <div id="basicManipulate">
             <button class="btn-link" (click)="editContact(selected)">
-              <img src="assets/images/edit-2.svg" alt="Edit" class="icon-default" />
-              <img src="assets/images/edit-1.svg" alt="Edit" class="icon-hover" />
+              <img src="/assets/images/edit-2.svg" alt="Edit" class="icon-default" />
+              <img src="/assets/images/edit-1.svg" alt="Edit" class="icon-hover" />
               <span>Edit</span>
             </button>
             <button class="btn-link" (click)="showDeleteConfirmation(selected)">
-              <img src="assets/images/delete.svg" alt="Delete" class="icon-default" />
-              <img src="assets/images/delete-blue.svg" alt="Delete" class="icon-hover" />
+              <img src="/assets/images/delete.svg" alt="Delete" class="icon-default" />
+              <img src="/assets/images/delete-blue.svg" alt="Delete" class="icon-hover" />
               <span>Delete</span>
             </button>
           </div>
@@ -106,7 +106,7 @@
 <!-- FAB Add Contact Button (Mobile Only) -->
 <div class="fab-add-contact">
   <button class="fab-button" (click)="addContact()" title="Add Contact">
-    <img src="assets/images/person_add.svg" alt="Add Contact" />
+    <img src="/assets/images/person_add.svg" alt="Add Contact" />
   </button>
 </div>
 
@@ -117,7 +117,7 @@
   <div class="confirm-dialog" (click)="$event.stopPropagation()">
     <h3>Delete permanently?</h3>
     <div class="confirm-buttons">
-      <button class="btn btn-secondary" (click)="cancelDelete()">Cancel <img src="assets/images/canceldarkblue.svg" alt="Cancel"></button>
+      <button class="btn btn-secondary" (click)="cancelDelete()">Cancel <img src="/assets/images/canceldarkblue.svg" alt="Cancel"></button>
       <button class="btn btn-danger" (click)="confirmDelete()">Delete</button>
     </div>
   </div>
