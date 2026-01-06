@@ -1,8 +1,8 @@
-@import "../../../../styles/variables";
-@import "../../../../styles/mixins";
-@import "../../../../styles/components/buttons";
+@import "../../../../../styles/variables";
+@import "../../../../../styles/mixins";
+@import "../../../../../styles/components/buttons";
 
-.stakeholder-page {
+.role-page {
   position: relative;
   width: 100%;
   min-height: 100vh;
@@ -68,11 +68,6 @@
   max-width: 1000px;
   margin: 0 auto;
   padding: clamp(2rem, 4vw, 3.5rem) $spacing-md;
-  gap: clamp(1rem, 2vw, 3rem);
-
-  @media (min-width: $breakpoint-md) {
-    gap: clamp(2rem, 3vw, 3rem);
-  }
 
   .title-section {
     @include flex(row, space-between, center);
@@ -86,11 +81,9 @@
       @include page-title;
       text-align: left;
       margin: 0;
-      font-size: clamp(1.75rem, 4vw, 3.75rem);
 
       @media (min-width: $breakpoint-md) {
         text-align: center;
-        font-size: clamp(2rem, 4vw, 3.75rem);
       }
     }
 
@@ -163,7 +156,6 @@
 
   .text-content {
     @include flex(column, flex-start, flex-start);
-    gap: clamp(1.5rem, 3vw, 2.5rem);
     flex: 1;
     max-width: 600px;
 
@@ -177,15 +169,37 @@
     }
 
     .description {
-      @include flex(column, flex-start, flex-start);
-      gap: $spacing-md;
-
       p {
         font-family: "Open Sans", sans-serif;
         font-size: clamp(1rem, 1.8vw, 1.1875rem);
         line-height: 1.6;
         color: $text-color;
         margin: 0;
+        
+        &:not(:last-child) {
+          margin-bottom: $spacing-md;
+        }
+      }
+    }
+
+    .email-info {
+      margin-top: $spacing-md;
+      
+      p {
+        font-family: "Open Sans", sans-serif;
+        font-size: clamp(1rem, 1.8vw, 1.1875rem);
+        color: $text-color;
+        margin: 0;
+      }
+
+      a {
+        color: $accent-color;
+        text-decoration: none;
+        font-weight: 500;
+
+        &:hover {
+          text-decoration: underline;
+        }
       }
     }
   }
@@ -200,32 +214,107 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
-      display: block; // Removes extra space below image
+      display: block;
     }
   }
 }
 
 .action-section {
-  @include flex(row, flex-start, center);
+  @include flex(column, center, center);
   margin-top: clamp(1rem, 2vw, 2rem);
   width: 100%;
   gap: $spacing-md;
 
-  .btn {
-    padding: clamp(0.75rem, 1.5vw, 1rem) clamp(1rem, 2vw, 2rem);
-    font-size: clamp(1rem, 1.8vw, 1.25rem);
-    min-width: 200px;
-    max-width: 400px;
+  .dropdown-container {
+    position: relative;
+    display: flex;
+    justify-content: center;
     width: 100%;
+  }
 
-    @media (max-width: $breakpoint-sm) {
-      min-width: auto;
-      width: 90%;
+  .dropdown-arrow {
+    font-size: 0.8rem;
+    margin-left: 0.5rem;
+    transition: transform 0.3s;
+    display: inline-block;
+
+    &.open {
+      transform: rotate(180deg);
     }
   }
 
-  .create-button {
-    @include flex(row, center, center);
+  .dropdown-menu {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    left: 50%;
+    transform: translateX(-50%);
+    background: white;
+    border-radius: 0.625rem;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    min-width: 320px;
+    z-index: 100;
+    animation: slideDown 0.3s ease;
+    overflow: hidden;
+
+    .dropdown-item {
+      width: 100%;
+      padding: 1rem 1.5rem;
+      border: none;
+      background: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      transition: background 0.3s;
+      text-align: left;
+
+      &:not(:last-child) {
+        border-bottom: 1px solid #f0f0f0;
+      }
+
+      &:hover {
+        background: #f8f9fa;
+      }
+
+      .icon {
+        font-size: 2rem;
+        flex-shrink: 0;
+      }
+
+      .item-content {
+        flex: 1;
+
+        strong {
+          display: block;
+          color: $primary-color;
+          font-size: 1rem;
+          margin-bottom: 0.25rem;
+          font-family: "Open Sans", sans-serif;
+        }
+
+        small {
+          display: block;
+          color: #999;
+          font-size: 0.85rem;
+          font-family: "Open Sans", sans-serif;
+        }
+      }
+    }
+  }
+
+  .success-message {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: #e8f5e9;
+    border-left: 4px solid #4caf50;
+    border-radius: 4px;
+    color: #2e7d32;
+    text-align: center;
+    animation: slideIn 0.3s ease;
+    font-family: "Open Sans", sans-serif;
+  }
+
+  .btn {
     background-color: $accent-color;
     gap: $spacing-sm;
 
@@ -242,42 +331,43 @@
       opacity: 0.5;
       cursor: not-allowed;
       pointer-events: none;
+
+      &:hover {
+        background-color: $accent-color;
+        transform: none;
+      }
     }
   }
 }
 
-.back-button {
-  position: absolute;
-  top: 5.3125rem;
-  left: 2rem;
-  width: 2.3125rem;
-  height: 2.3125rem;
-  border: none;
-  background: none;
-  cursor: pointer;
-  padding: 0;
-
-  img {
-    width: 2rem;
-    height: 2rem;
+// ANIMATIONS
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-10px);
   }
-
-  &:hover {
-    opacity: 0.8;
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
   }
 }
 
-.back-link {
-  display: inline-flex;
-  align-items: center;
-  cursor: pointer;
-  transition: opacity 0.3s ease;
-
-  &:hover {
-    opacity: 0.7;
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
   }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 
-  img {
-    display: block;
+// Responsive
+@media (max-width: 768px) {
+  .action-section {
+    .dropdown-menu {
+      min-width: 280px;
+    }
   }
 }
