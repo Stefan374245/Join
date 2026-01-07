@@ -45,6 +45,12 @@ Thumbs.db
 .env
 .env.local
 
+# Firebase environment files with real credentials
+# Use environment.ts and environment.prod.ts with mock data
+# Copy from .env.example and add your real credentials locally
+src/environments/environment.local.ts
+src/environments/environment.prod.local.ts
+
 # MCP Server Config (contains sensitive tokens)
 mcp.config.json
 
