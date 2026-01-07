@@ -1,0 +1,8 @@
+# Keine Credentials oder sensible Daten committen
+*credentials*.json
+*.env
+.env.*
+
+# Backup-Dateien ignorieren
+*.backup
+*.bak
