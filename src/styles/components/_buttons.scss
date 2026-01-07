@@ -1,5 +1,3 @@
-// ========== Modular Button System ==========
-// Base button with shared properties
 .btn {
   @include flex(row, center, center);
   gap: 10px;
@@ -31,7 +29,6 @@
   }
 }
 
-// ========== Color Variants ==========
 .btn-primary {
   background-color: $primary-color;
   color: white;
@@ -113,7 +110,6 @@
   }
 }
 
-// ========== Style Variants ==========
 .btn-text {
   background: none;
   color: $primary-color;
@@ -141,7 +137,6 @@
   }
 }
 
-// ========== Size Variants ==========
 .btn-sm {
   padding: 12px 16px;
   font-size: 16px;
@@ -180,7 +175,6 @@
   }
 }
 
-// ========== Special Purpose Buttons ==========
 .btn-icon {
   @include flex(row, center, center);
   gap: 16px;
@@ -220,7 +214,6 @@
   }
 }
 
-// ========== Button Groups & Containers ==========
 .form-actions {
   @include flex(row, flex-end, center);
   gap: 32px;
@@ -239,7 +232,6 @@
   }
 }
 
-// ========== Utility Classes ==========
 .required-label {
   position: relative;
   width: fit-content;
@@ -252,8 +244,6 @@
   }
 }
 
-// ========== Legacy Compatibility (Specific Names) ==========
-// These can be removed once all components are migrated
 .btn-add-task {
   @extend .btn;
   @extend .btn-primary;

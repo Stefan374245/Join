@@ -47,7 +47,6 @@
   }
 }
 
-// Generate user color classes
 @mixin generate-user-colors() {
   @each $name, $color in $user-colors {
     .userColor-#{$name} {
@@ -56,7 +55,6 @@
   }
 }
 
-// Apply user color directly
 @mixin user-color($color-name) {
   @if map-has-key($user-colors, $color-name) {
     background-color: map-get($user-colors, $color-name);
@@ -65,7 +63,6 @@
   }
 }
 
-// Priority indicator mixin
 @mixin priority-indicator($priority: "low") {
   @if $priority == "low" {
     background-color: $priority-color-low;
@@ -76,24 +73,21 @@
   }
 }
 
-// Main content layout with sidebar and header offset
 @mixin main-content-layout {
   margin-left: calc(
     $sidebar-width + $content-offset-left
-  ); // 200px + 96px = 296px
-  margin-top: calc($header-height + $content-offset-top); // 90px + 20px = 110px
+  );
+  margin-top: calc($header-height + $content-offset-top);
   padding: $spacing-xl;
   min-height: calc(100vh - $header-height - $content-offset-top);
 }
 
-// Page content layout for components inside router-outlet
 @mixin page-content-layout {
   padding: $spacing-xl;
   width: 100%;
   box-sizing: border-box;
 }
 
-// Page with centered content
 @mixin page-content-centered {
   @include page-content-layout;
   display: flex;
@@ -101,22 +95,20 @@
   align-items: center;
 }
 
-// Content that sits directly at sidebar (no left margin)
 @mixin content-at-sidebar {
-  margin-left: $sidebar-width; // Only sidebar width, no offset
+  margin-left: $sidebar-width;
   margin-top: calc($header-height + $content-offset-top);
   padding: $spacing-xl;
   min-height: calc(100vh - $header-height - $content-offset-top);
 }
 
-// Page title spacing
 @mixin page-title {
-  font-size: 3.8125rem; // 61px
+  font-size: 3.8125rem;
   font-weight: 700;
   color: $primary-color;
   margin: 0 0 $spacing-xl 0;
 
   @media (max-width: 650px) {
-    font-size: 2.9375rem; // 47px
+    font-size: 2.9375rem;
   }
 }

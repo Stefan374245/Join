@@ -9,10 +9,10 @@
         <span>{{ task.category }}</span>
       </div>
       <div class="ai-generated" *ngIf="task.aiGenerated">
-        <img src="/assets/images/note_ki.svg" alt="AI Generated Note" />
+        <img src="assets/images/note_ki.svg" alt="AI Generated Note" />
       </div>
       <button class="close-btn" (click)="onClose()" aria-label="Close">
-        <img src="/assets/images/close.svg" alt="Close" />
+        <img src="assets/images/close.svg" alt="Close" />
       </button>
     </div>
 
@@ -74,7 +74,7 @@
           <span class="detail-label">Assigned To:</span>
           <div class="assignee-list">
             <div *ngIf="contactsLoading" class="loading-spinner">
-              <img src="/assets/images/loading.svg" alt="Loading..." />
+              <img src="assets/images/loading.svg" alt="Loading..." />
             </div>
 
             <div *ngIf="!contactsLoading">
@@ -140,12 +140,12 @@
         class="btn btn-text delete-btn"
         (click)="showDeleteConfirmation()"
       >
-        <img src="/assets/images/subtaskBin.svg" alt="Delete" />
+        <img src="assets/images/subtaskBin.svg" alt="Delete" />
         <span>Delete</span>
       </button>
       <div class="action-separator"></div>
       <button class="btn btn-text edit-btn" (click)="onEdit()">
-        <img src="/assets/images/edit-2.svg" alt="Edit" />
+        <img src="assets/images/edit-2.svg" alt="Edit" />
         <span>Edit</span>
       </button>
     </div>

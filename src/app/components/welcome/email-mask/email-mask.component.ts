@@ -1,5 +1,5 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
@@ -39,6 +39,7 @@ export class EmailMaskComponent implements OnInit, OnDestroy {
   private readonly fb = inject(FormBuilder);
   private readonly http = inject(HttpClient);
   private readonly router = inject(Router);
+  private readonly location = inject(Location);
   private readonly dailyLimitService = inject(DailyLimitService);
   private readonly toastService = inject(ToastService);
   private readonly destroy$ = new Subject<void>();
@@ -246,7 +247,7 @@ export class EmailMaskComponent implements OnInit, OnDestroy {
   }
 
   goBack(): void {
-    this.router.navigate(['/feature-request']);
+    this.location.back();
   }
 
   ngOnDestroy(): void {

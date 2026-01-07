@@ -30,7 +30,6 @@ export class HeaderComponent {
     this.authService.logout().subscribe({
       next: () => {
         this.showUserMenu = false;
-        this.router.navigate(['/login']);
       },
       error: (error) => {
         console.error('Logout error:', error);

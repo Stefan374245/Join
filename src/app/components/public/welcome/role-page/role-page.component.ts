@@ -85,7 +85,7 @@ export class RolePageComponent implements OnInit {
         limitDescription: 'Need more? No worries — you can still send emails, but our team will review them manually instead of using AI to create tickets.'
       },
       'feature-request': {
-        title: 'Welcome',
+        title: 'Request',
         subtitle: 'Your request will be sent directly to our team',
         description: [
           'Your request will be sent directly to our team via email.',
@@ -148,6 +148,22 @@ export class RolePageComponent implements OnInit {
     this.showDropdown = false;
   }
 
+  openEmailLink() {
+    console.log('🔍 openEmailLink() called');
+    this.router.navigate(['/emailmask']);
+  }
+
+  openGmailCompose() {
+    const toEmail = 'requests@stefan-helldobler.de';
+    const subject = '[Feature Request] New Request';
+    const body = `Hello Team,\n\nI would like to submit a feature request.\n\nBest regards`;
+    
+    const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${toEmail}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    window.open(gmailUrl, '_blank');
+    
+    this.closeDropdown();
+  }
+
   async openMailtoVariant() {
     if (this.isLimitReached) {
       this.toastService.showDailyLimitReached(this.maxRequests);
@@ -196,8 +212,8 @@ Best regards
 
     const mailtoLink = `mailto:${toEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     
-    // Use window.open to trigger email client selection
-    window.open(mailtoLink, '_self');
+    // Use window.location.href (works better than window.open)
+    window.location.href = mailtoLink;
 
     this.submitSuccess = true;
 

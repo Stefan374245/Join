@@ -61,9 +61,9 @@ export class LoginComponent implements OnInit {
 
   getPasswordIcon(): string {
     if (!this.passwordFocused && !this.password) {
-      return '/assets/images/lock.svg';
+      return 'assets/images/lock.svg';
     }
-    return this.showPassword ? '/assets/images/visibilityon.svg' : '/assets/images/visibilityoff.svg';
+    return this.showPassword ? 'assets/images/visibilityon.svg' : 'assets/images/visibilityoff.svg';
   }
 
   validateForm(): boolean {

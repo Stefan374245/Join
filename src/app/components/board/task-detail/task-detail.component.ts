@@ -146,21 +146,21 @@ export class TaskDetailComponent implements OnInit {
   }
 
   getPriorityIcon(priority: string): string {
-    return `/assets/images/${priority.toLowerCase()}.svg`;
+    return `assets/images/${priority.toLowerCase()}.svg`;
   }
 
   getCreatorIcon(): string {
     if (this.task.creatorType === 'external' || this.task.source === 'email') {
-      return '/assets/images/creator-external.svg';
+      return 'assets/images/creator-external.svg';
     }
-    return '/assets/images/team.svg';
+    return 'assets/images/team.svg';
   }
 
   getCreatorContentIcon(): string {
     if (this.task.source === 'email' || this.task.creatorType === 'external') {
-      return '/assets/images/card_email.svg';
+      return 'assets/images/card_email.svg';
     }
-    return '/assets/images/creator-profil.svg';
+    return 'assets/images/creator-profil.svg';
   }
 
   getCreatorContentText(): string {

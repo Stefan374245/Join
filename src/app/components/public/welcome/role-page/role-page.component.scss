@@ -68,6 +68,7 @@
   max-width: 1000px;
   margin: 0 auto;
   padding: clamp(2rem, 4vw, 3.5rem) $spacing-md;
+  gap: 1rem;
 
   .title-section {
     @include flex(row, space-between, center);
@@ -161,24 +162,21 @@
 
     h2 {
       font-family: "Open Sans", sans-serif;
-      font-size: clamp(1.5rem, 2.5vw, 1.75rem);
+      font-size: clamp(1.3rem, 2.5vw, 1.6rem);
       font-weight: 400;
       color: $text-color;
       margin: 0;
       line-height: 1.3;
+      margin-bottom: 12px;
     }
 
     .description {
       p {
         font-family: "Open Sans", sans-serif;
         font-size: clamp(1rem, 1.8vw, 1.1875rem);
-        line-height: 1.6;
+        line-height: 1.2;
         color: $text-color;
         margin: 0;
-        
-        &:not(:last-child) {
-          margin-bottom: $spacing-md;
-        }
       }
     }
 
@@ -209,6 +207,16 @@
     height: 17.5rem;
     border-radius: $border-radius;
     overflow: hidden;
+
+    @media (max-width: $breakpoint-md) {
+      width: clamp(16rem, 50vw, 20rem);
+      height: clamp(10rem, 30vw, 13rem);
+    }
+
+    @media (max-width: $breakpoint-sm) {
+      width: clamp(14rem, 60vw, 18rem);
+      height: clamp(9rem, 35vw, 12rem);
+    }
 
     img {
       width: 100%;
@@ -255,6 +263,17 @@
     z-index: 100;
     animation: slideDown 0.3s ease;
     overflow: hidden;
+
+    @media (max-width: $breakpoint-sm) {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      min-width: 85vw;
+      max-width: 90vw;
+      animation: popupFadeIn 0.3s ease;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
 
     .dropdown-item {
       width: 100%;
@@ -349,6 +368,17 @@
   to {
     opacity: 1;
     transform: translateX(-50%) translateY(0);
+  }
+}
+
+@keyframes popupFadeIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
   }
 }
 

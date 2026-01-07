@@ -1,6 +1,6 @@
 <main class="role-page">
   <header class="header">
-    <img src="/assets/images/joinlogodark.svg" alt="Join Logo" class="logo" />
+    <img src="assets/images/joinlogodark.svg" alt="Join Logo" class="logo" />
   </header>
 
   <div class="desktop-header">
@@ -9,7 +9,7 @@
       class="back-link-desktop"
       aria-label="Back to welcome page"
     >
-      <img src="/assets/images/arrowbackblue.svg" alt="arrow-back" />
+      <img src="assets/images/arrowbackblue.svg" alt="arrow-back" />
     </a>
     
     @if (config.showRequestLimit) {
@@ -33,7 +33,7 @@
         class="back-link-mobile"
         aria-label="Back to welcome page"
       >
-        <img src="/assets/images/arrow-left-line.svg" alt="arrow-back" />
+        <img src="assets/images/arrow-left-line.svg" alt="arrow-back" />
       </a>
     </div>
 
@@ -73,7 +73,7 @@
 
         @if (config.email) {
           <div class="email-info">
-            <p>Email: <a [href]="'mailto:' + config.email">{{ config.email }}</a></p>
+            <p>Email: <a (click)="openGmailCompose()" style="cursor: pointer;">{{ config.email }}</a></p>
           </div>
         }
       </div>
@@ -102,12 +102,12 @@
             <div class="dropdown-menu">
               <button
                 class="dropdown-item"
-                (click)="openMailtoVariant()"
+                (click)="openGmailCompose()"
                 type="button">
-                <span class="icon">📧</span>
+                <span class="icon">✉️</span>
                 <div class="item-content">
-                  <strong>Send via Email Client</strong>
-                  <small>Opens your default email program</small>
+                  <strong>Gmail / Web Email</strong>
+                  <small>Opens in new tab (Gmail, GMX, etc.)</small>
                 </div>
               </button>
 
@@ -142,7 +142,7 @@
         >
           {{ config.buttonText }}
           <img
-            src="/assets/images/check.svg"
+            src="assets/images/check.svg"
             alt=""
             aria-hidden="true"
             class="check-icon"

@@ -29,6 +29,22 @@
   animation: slideInFromRight 0.2s ease-out;
   overflow: auto;
   scrollbar-width: none;
+
+  @media (max-width: 500px) {
+    width: calc(100% - 32px);
+    max-width: calc(100% - 32px);
+    max-height: 85vh;
+    padding: 32px 24px;
+    margin: 16px;
+    border-radius: 20px;
+  }
+
+  @media (max-width: 400px) {
+    width: calc(100% - 24px);
+    max-width: calc(100% - 24px);
+    padding: 24px 16px;
+    margin: 12px;
+  }
 }
 
 .confirm-dialog-overlay {

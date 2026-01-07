@@ -3,7 +3,7 @@
   <div class="detail-header">
     <h1>Contacts</h1>
     <button class="back-btn" (click)="goBack()">
-      <img src="/assets/images/arrow-left-line.svg" alt="Back" />
+      <img src="assets/images/arrow-left-line.svg" alt="Back" />
     </button>
   </div>
 
@@ -44,17 +44,17 @@
   <!-- Floating Action Button -->
   <div class="mobile-action-menu" (clickOutside)="closeActionMenu()">
     <button class="fab-button" (click)="toggleActionMenu()">
-      <img src="/assets/images/more_vert.svg" alt="More" />
+      <img src="assets/images/more_vert.svg" alt="More" />
     </button>
 
     <!-- Action Popup -->
     <div class="action-popup" *ngIf="showActionMenu">
       <button class="popup-item" (click)="editContact()">
-        <img src="/assets/images/edit-2.svg" alt="Edit" />
+        <img src="assets/images/edit-2.svg" alt="Edit" />
         <span>Edit</span>
       </button>
       <button class="popup-item" (click)="deleteContact()">
-        <img src="/assets/images/delete.svg" alt="Delete" />
+        <img src="assets/images/delete.svg" alt="Delete" />
         <span>Delete</span>
       </button>
     </div>

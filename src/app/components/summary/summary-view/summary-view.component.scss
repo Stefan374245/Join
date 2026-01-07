@@ -20,7 +20,7 @@
 }
 
 .main-summary {
-  @include page-layout-standard; // ✅ 96px left Desktop, responsive padding
+  @include page-layout-standard;
   background-color: $background-color;
   max-width: 100%;
 

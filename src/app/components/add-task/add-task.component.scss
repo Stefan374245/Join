@@ -11,22 +11,11 @@
 @import "./styles/subtasks";
 @import "./styles/responsive";
 
-/**
- * 🎯 Add Task Component
- * Layout: page-layout-standard (5rem top Desktop, 3rem Mobile + 96px left Desktop)
- * Overlay Mode: Eigenes Padding-System (.task-edit-overlay)
- */
 
-// ========================================
-// Container: Standard Page Layout
-// ========================================
 .add-task-container {
-  @include page-layout-standard; // ✅ 5rem top Desktop, 3rem Mobile + 96px left Desktop
+  @include page-layout-standard;
 }
 
-// ========================================
-// Header Section
-// ========================================
 .add-task-header {
   flex-shrink: 0;
   margin-bottom: 2rem;
@@ -41,9 +30,6 @@
   }
 }
 
-// ========================================
-// Component-Specific Helpers
-// ========================================
 .subtask-input-wrapper {
   position: relative;
 }

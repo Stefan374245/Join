@@ -9,6 +9,29 @@
   @include flex(row, space-between, center);
   text-align: center;
   margin-bottom: 16px;
+
+  @media (max-width: 420px) {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto auto;
+    gap: 8px;
+    align-items: start;
+
+    .task-category {
+      grid-column: 1;
+      grid-row: 1;
+    }
+
+    .ai-generated {
+      grid-column: 1;
+      grid-row: 2;
+    }
+
+    .close-btn {
+      grid-column: 2;
+      grid-row: 1;
+    }
+  }
 }
 
 .task-content {
@@ -183,11 +206,11 @@
       flex-shrink: 0;
 
       &.checkbox-unchecked {
-        background-image: url("/assets/images/checkboxfalseblack.svg");
+        background-image: url("/join-issuecollector/assets/images/checkboxfalseblack.svg");
       }
 
       &.checkbox-checked {
-        background-image: url("/assets/images/checkboxtrueblack.svg");
+        background-image: url("/join-issuecollector/assets/images/checkboxtrueblack.svg");
       }
     }
 
@@ -241,6 +264,10 @@
   gap: $border-radius;
   padding-top: 2rem;
 
+  @media (max-width: 420px) {
+    justify-content: center;
+  }
+
   .action-separator {
     width: 1px;
     height: 24px;
@@ -248,33 +275,161 @@
   }
 }
 
-@media (max-width: $breakpoint-md) {
-  .task-card-overlay {
-    width: 100%;
-    max-width: 100%;
-    padding: $spacing-xl * 1.6 $spacing-lg * 1.6;
-    border-radius: $spacing-lg * 1.33;
+@media (max-width: 500px) {
+  .task-header {
+    margin-bottom: 12px;
 
-    .task-content {
-      .task-title {
-        font-size: 36px;
-      }
-
-      .task-description {
-        font-size: 16px;
+    .task-category {
+      span {
+        font-size: 14px;
+        padding: 4px 16px;
       }
     }
 
-    .task-details {
-      .detail-row {
-        font-size: $font-size-base;
-        flex-direction: column;
-        align-items: flex-start;
-        gap: $border-radius;
+    .close-btn {
+      width: 32px;
+      height: 32px;
 
-        .detail-label {
-          min-width: auto;
+      img {
+        width: 20px;
+        height: 20px;
+      }
+    }
+  }
+
+  .task-content {
+    gap: 16px;
+
+    .task-title {
+      font-size: 24px;
+      line-height: 1.3;
+    }
+
+    .task-description {
+      font-size: 14px;
+      line-height: 1.5;
+    }
+  }
+
+  .creator-section {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+
+    .detail-label {
+      font-size: 16px;
+    }
+
+    .creator-info {
+      flex-wrap: wrap;
+      gap: 8px;
+
+      .creator-badge {
+        padding: 4px 12px;
+        font-size: 12px;
+
+        .creator-icon {
+          width: 14px;
+          height: 14px;
         }
+      }
+
+      .creator-content {
+        margin-left: 0;
+        font-size: 12px;
+      }
+
+      .creator-name {
+        font-size: 14px;
+        width: 100%;
+      }
+    }
+  }
+
+  .task-details {
+    gap: 12px;
+
+    .detail-row {
+      font-size: 16px;
+
+      .detail-label {
+        min-width: auto;
+        font-size: 16px;
+      }
+
+      .detail-value {
+        font-size: 16px;
+      }
+
+      .task-priority {
+        span {
+          font-size: 14px;
+        }
+
+        img {
+          width: 18px;
+          height: 18px;
+        }
+      }
+
+      &.assigned-to {
+        .assignee-list {
+          padding-left: 0;
+          gap: 4px;
+
+          .assignee-item {
+            gap: 10px;
+            padding: 4px 0;
+
+            .assignee-avatar {
+              width: 35px;
+              height: 35px;
+              font-size: 13px;
+            }
+
+            .assignee-name {
+              font-size: 14px;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .subtasks-section {
+    gap: 12px;
+
+    .detail-label {
+      font-size: 16px;
+    }
+
+    .subtask-checkbox-container {
+      gap: 8px;
+      padding: 6px 8px;
+
+      .subtask-checkbox-icon {
+        width: 20px;
+        height: 20px;
+      }
+
+      .subtask-title {
+        font-size: 14px;
+        line-height: 1.4;
+      }
+    }
+  }
+
+  .task-actions {
+    padding-top: 16px;
+    gap: 8px;
+
+    .btn {
+      font-size: 14px;
+      padding: 8px 12px;
+
+      img {
+        width: 18px;
+        height: 18px;
       }
     }
   }
