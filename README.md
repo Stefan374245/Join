@@ -4,7 +4,7 @@
 
 ## 🚀 Live App
 
-**Frontend**: https://[deine-hostinger-url]  
+**Frontend**: https://[(https://stefan-helldobler.de/join-issuecollector)]  
 **AI Workflow (n8n)**: https://n8n-production-04d3.up.railway.app  
 **Feature Request E-Mail**: requests@stefan-helldobler.de
 
@@ -82,17 +82,6 @@ User sendet Request (Web-Formular oder E-Mail)
 
 ### Option 1: Über die Web-App (Empfohlen)
 
-1. **Öffne die Live-URL** in deinem Browser
-2. **Ohne Login:**
-   - Navigiere zu "Help" → Feature Request Formular
-   - Fülle aus:
-     - Typ: Feature / Bug / Question / Improvement
-     - Titel: "Deine Feature-Idee"
-     - Beschreibung: "Detaillierte Beschreibung..."
-     - Deine E-Mail: "test@example.com"
-   - Klick "Submit"
-   - ✅ Task wird automatisch erstellt
-
 3. **Mit Login:**
    - Registriere Test-Account ODER nutze Guest-Login
    - Navigiere zum Board
@@ -138,36 +127,6 @@ Invoke-RestMethod -Uri "https://n8n-production-04d3.up.railway.app/webhook/featu
 
 **Erwartetes Ergebnis:** Task wird sofort erstellt, Bestätigungs-E-Mail innerhalb 10 Sekunden
 
-## 📊 Ergebnisse überprüfen
-
-### 1. Firebase Console
-1. Öffne [Firebase Console](https://console.firebase.google.com)
-2. Projekt: `join-angular-based`
-3. Firestore Database → Collection `tasks`
-4. Neuer Task mit:
-   - `status: "triage"`
-   - `aiGenerated: true`
-   - `source: "webhook"` oder `"email"`
-   - `subtasks: [{...}, {...}]`
-5. Collection `daily_limits` → Counter erhöht
-
-### 2. E-Mail Postfach
-- Check Postfach der angegebenen E-Mail
-- Bestätigung von `requests@stefan-helldobler.de`
-- Enthält: Task-Titel, Beschreibung, generierte Subtasks
-
-### 3. n8n Workflow Logs (Advanced)
-- Öffne https://n8n-production-04d3.up.railway.app
-- Login erforderlich
-- "Executions" → Letzte Ausführung ansehen
-- Jeder Node zeigt Input/Output
-
-### 4. Angular App
-- Reload der App
-- Board → "Triage" Spalte
-- Task ist sichtbar
-- Click → Details mit AI-Subtasks
-
 ## 📧 E-Mail Integration Details
 
 ### Resend API (Ausgehend)
@@ -184,7 +143,7 @@ Invoke-RestMethod -Uri "https://n8n-production-04d3.up.railway.app/webhook/featu
 - **Check-Intervall**: Alle 1-2 Minuten
 - **Parsing**: Automatisch Betreff + Body + Absender
 
-## 🔒 Firebase Backend
+## 🔒 Firebase
 
 ### Collections
 
