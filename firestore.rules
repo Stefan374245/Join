@@ -3,6 +3,19 @@ service cloud.firestore {
   match /databases/{database}/documents {
     
     // ========================================
+    // DAILY LIMITS COLLECTION
+    // Stores daily request counters for n8n workflow
+    // ========================================
+    match /daily_limits/{date} {
+      // Public read access (for stakeholder UI to show live stats)
+      allow read: if true;
+      
+      // Public write access (for n8n workflow to increment counter)
+      // TEMPORARY: Switch to Service Account for production
+      allow write: if true;
+    }
+    
+    // ========================================
     // USERS COLLECTION
     // Stores both registered users and contacts
     // ========================================
@@ -13,13 +26,13 @@ service cloud.firestore {
       // Allow authenticated users to create new contacts
       allow create: if request.auth != null;
       
-      // Allow users to update their own profile or contacts they created
-      allow update: if request.auth != null && 
-                     (request.auth.uid == userId || request.auth.uid == resource.data.userId);
+      // Allow authenticated users to update any contact
+      // (Contacts are shared resources in the app)
+      allow update: if request.auth != null;
       
-      // Allow users to delete their own profile or contacts they created
-      allow delete: if request.auth != null && 
-                     (request.auth.uid == userId || request.auth.uid == resource.data.userId);
+      // Allow authenticated users to delete any contact
+      // (Contacts are shared resources in the app)
+      allow delete: if request.auth != null;
     }
     
     // ========================================
