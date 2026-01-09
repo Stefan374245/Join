@@ -1,16 +1,13 @@
-// Firebase configuration
-// TODO: Replace with your actual Firebase config from Firebase Console
-// Get your config from: https://console.firebase.google.com/project/YOUR_PROJECT/settings/general
 
 export const environment = {
   production: false,
   firebase: {
-    apiKey: 'YOUR_FIREBASE_API_KEY',
-    authDomain: 'your-project-id.firebaseapp.com',
-    projectId: 'your-project-id',
-    storageBucket: 'your-project-id.firebasestorage.app',
-    messagingSenderId: 'YOUR_MESSAGING_SENDER_ID',
-    appId: 'YOUR_APP_ID',
+    apiKey: 'AIzaSyDuNwKIQS6t30zB8gLq8GiS6_cmevp3jLU',
+    authDomain: 'join-angular-based.firebaseapp.com',
+    projectId: 'join-angular-based',
+    storageBucket: 'join-angular-based.firebasestorage.app',
+    messagingSenderId: '997212360363',
+    appId: '1:997212360363:web:4790443452314fafd971ee',
   },
-  n8nWebhookUrl: 'http://localhost:5678/webhook/feature-request',
+  n8nWebhookUrl: 'https://n8n-production-04d3.up.railway.app/webhook/feature-request',
 };

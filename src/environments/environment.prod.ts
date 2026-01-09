@@ -1,16 +1,13 @@
-// Production Firebase configuration
-// TODO: Replace with your actual Firebase config from Firebase Console
-// IMPORTANT: Do NOT commit your real API keys to GitHub!
 
 export const environment = {
   production: true,
   firebase: {
-    apiKey: 'YOUR_FIREBASE_API_KEY',
-    authDomain: 'your-project-id.firebaseapp.com',
-    projectId: 'your-project-id',
-    storageBucket: 'your-project-id.firebasestorage.app',
-    messagingSenderId: 'YOUR_MESSAGING_SENDER_ID',
-    appId: 'YOUR_APP_ID',
+    apiKey: 'AIzaSyDuNwKIQS6t30zB8gLq8GiS6_cmevp3jLU',
+    authDomain: 'join-angular-based.firebaseapp.com',
+    projectId: 'join-angular-based',
+    storageBucket: 'join-angular-based.firebasestorage.app',
+    messagingSenderId: '997212360363',
+    appId: '1:997212360363:web:4790443452314fafd971ee',
   },
-  n8nWebhookUrl: 'https://your-n8n-domain.com/webhook/feature-request',
+  n8nWebhookUrl: 'https://n8n-production-04d3.up.railway.app/webhook/feature-request',
 };
