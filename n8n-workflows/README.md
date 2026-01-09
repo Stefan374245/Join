@@ -1,59 +1,111 @@
-# N8N Workflows
+# N8N Workflow - Feature Request Collector
 
-Dieses Verzeichnis enthält die N8N Workflow-Definitionen für die automatische Verarbeitung von eingehenden E-Mails.
+## 🚀 Was wurde implementiert
 
-## Workflows
+Ein **Railway-gehosteter n8n Workflow**, der Feature Requests auf **zwei Wegen** empfängt:
+1. **Webhook** (von Angular App)
+2. **IMAP Email** (direkt per E-Mail an requests@stefan-helldobler.de)
 
-### Email to Kanban Task Converter
-**Datei**: `email-to-task-converter.json`
+Der Workflow analysiert Requests mit **Google Gemini AI**, speichert sie in **Firebase Firestore** und versendet Bestätigungs-E-Mails via **Resend REST API**.
 
-Dieser Workflow wandelt eingehende E-Mails automatisch in Tasks um und fügt sie in die Firebase-Datenbank ein.
+**Railway App**: https://n8n-production-04d3.up.railway.app  
+**Webhook**: https://n8n-production-04d3.up.railway.app/webhook/feature-request  
+**E-Mail**: requests@stefan-helldobler.de
 
-**Funktionsweise:**
-1. Überwacht eingehende E-Mails an `requests@stefan-helldobler.de`
-2. Extrahiert Informationen aus der E-Mail (Betreff, Text, Absender)
-3. Erstellt automatisch ein Task-Objekt mit:
-   - Titel aus Betreff
-   - Beschreibung aus E-Mail-Text
-   - Priorität und Deadline (AI-generiert)
-   - Markierung als `source: 'email'` und `creatorType: 'external'`
-4. Speichert den Task in Firebase Firestore
+## ✅ Features
 
-**Daily Limit**: 10 automatische Konvertierungen pro Tag
+- ✅ **Dual Input**: Webhook (Angular App) + IMAP (E-Mail)
+- ✅ **AI-Analyse**: Google Gemini generiert Subtasks, Priorität, Deadline
+- ✅ **Firebase Integration**: Automatisches Speichern in Firestore
+- ✅ **Resend E-Mail**: Bestätigungen von requests@stefan-helldobler.de
+- ✅ **Daily Limit**: 10 Requests/Tag mit Firebase Counter
+- ✅ **Railway Hosting**: 24/7 verfügbar, HTTPS, automatische Deployments
 
-## Workflow importieren
 
-1. Öffnen Sie N8N
-2. Klicken Sie auf "Workflows" → "Import from File"
-3. Wählen Sie die entsprechende JSON-Datei aus
-4. Passen Sie die Credentials an:
-   - E-Mail-Provider (Gmail, IMAP, etc.)
-   - Firebase Service Account
-5. Aktivieren Sie den Workflow
+## 🧪 Workflow testen
 
-## Konfiguration anpassen
+### Option 1: Direkter Webhook-Test
+```powershell
+$body = @{
+    type = "feature"
+    title = "Test Feature Request vom Tutor"
+    description = "Dies ist ein Test des n8n Workflows"
+    userEmail = "tutor@example.com"
+    userName = "Tutor"
+} | ConvertTo-Json
 
-### E-Mail-Empfänger ändern
-Im ersten Node (Email Trigger) die Empfänger-E-Mail anpassen.
+Invoke-RestMethod -Uri "https://n8n-production-04d3.up.railway.app/webhook/feature-request" -Method POST -Body $body -ContentType "application/json"
+```
 
-### Firebase-Verbindung
-1. Erstellen Sie einen Firebase Service Account
-2. Laden Sie die JSON-Credentials herunter
-3. Fügen Sie die Credentials in N8N hinzu (Settings → Credentials)
-4. Verknüpfen Sie die Credentials mit dem Firebase-Node
+**Was passiert:**
+1. ✅ Railway n8n empfängt POST Request
+2. ✅ AI analysiert und generiert Subtasks
+3. ✅ Task wird in Firebase gespeichert
+4. ✅ Bestätigungs-E-Mail via Resend API gesendet
+5. ✅ Daily Limit Counter +1
 
-### Daily Limit anpassen
-Im Workflow-Node "Check Daily Limit" die Zahl `10` anpassen.
+### Option 2: Per E-Mail (IMAP Trigger)
+Sende eine E-Mail an: **requests@stefan-helldobler.de**
 
-## Voraussetzungen
+Betreff: `[Feature] Deine Anfrage`  
+Text: `Beschreibung der Feature Request`
 
-- N8N Installation (Self-hosted oder Cloud)
-- Firebase Projekt mit Firestore
-- E-Mail-Provider mit API-Zugang (Gmail, IMAP, etc.)
-- Webhook oder E-Mail-Trigger eingerichtet
+**Was passiert:**
+1. ✅ IMAP Trigger in n8n erkennt neue E-Mail
+2. ✅ Workflow extrahiert Betreff + Text
+3. ✅ Gleicher Ablauf wie Webhook (AI → Firebase → E-Mail)
 
-## Hinweise
+### Option 3: Über Angular App
+1. Öffne die Hostinger-gehostete App (https://stefan-helldobler.de/join-issuecollector/)
+2. Navigiere zu "Help" → Feature Request Formular
+3. Fülle Formular aus und sende ab
+4. Frontend sendet POST an Railway Webhook
 
-- Die JSON-Dateien enthalten KEINE sensiblen Credentials
-- Credentials müssen nach dem Import manuell in N8N konfiguriert werden
-- Testen Sie den Workflow zunächst mit Test-E-Mails
+## 📊 Ergebnisse überprüfen
+
+### E-Mail Postfach
+- Check Postfach von `tutor@example.com`
+- Bestätigungs-E-Mail von `requests@stefan-helldobler.de`
+
+
+## 📧 E-Mail Integration (Resend + IMAP)
+
+### Resend API (Ausgehende E-Mails)
+- **Provider**: Resend (https://resend.com)
+- **Domain**: stefan-helldobler.de (verifiziert mit DKIM/SPF)
+- **Absender**: requests@stefan-helldobler.de
+- **Methode**: REST API via HTTP Request Nodes
+- **Warum kein SMTP?**: Railway blockiert Ports 465/587 → Umstieg auf REST API
+
+### IMAP (Eingehende E-Mails)
+- **E-Mail**: requests@stefan-helldobler.de
+- **Trigger**: IMAP Email Read Node in n8n
+- **Funktion**: Empfängt Feature Requests direkt per E-Mail
+- **Parsing**: Extrahiert Betreff, Text und Absender automatisch
+
+## ☁️ Railway Hosting
+
+**URL**: https://n8n-production-04d3.up.railway.app
+
+- ✅ 24/7 Uptime
+- ✅ Automatische HTTPS
+- ✅ Environment Variables für Credentials
+- ✅ Git-basierte Deployments
+- ✅ Logs und Monitoring im Dashboard
+- ⚠️ Ports 465/587 blockiert → Resend REST API statt SMTP
+
+## 🔒 Firebase Security Rules
+
+Die Rules erlauben:
+- Authenticated Users: voller Zugriff auf tasks/users
+- Public Write: n8n kann Tasks mit `aiGenerated: true` erstellen
+- Public Read/Write: `daily_limits` Collection für Counter
+
+## ⚙️ Technischer Stack
+
+- **n8n**: Workflow Engine (Railway)
+- **Firebase**: Firestore Database (Backend only)
+- **Resend**: Transactional Email API
+- **Angular**: Frontend App (Hostinger via FileZilla FTP)
+- **Railway**: Cloud Hosting für n8n
+- **Hostinger**: Web Hosting für Angular App
