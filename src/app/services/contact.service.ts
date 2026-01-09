@@ -194,13 +194,45 @@ export class ContactService {
   }
 
   /**
-   * Löscht einen Benutzer aus Firestore
+   * Löscht einen Benutzer aus Firestore und entfernt ihn aus allen Tasks
    * @param {string} userId - Die ID des zu löschenden Benutzers
    * @returns {Observable<void>} Observable des Löschvorgangs
    */
   deleteUser(userId: string): Observable<void> {
     const userDoc = doc(this.firestore, 'users', userId);
-    const promise = deleteDoc(userDoc);
+    
+    const promise = (async () => {
+      await this.removeUserFromAllTasks(userId);
+      
+      await deleteDoc(userDoc);
+    })();
+    
     return from(promise);
+  }
+
+  /**
+   * Entfernt einen User aus dem assignedTo Array aller Tasks
+   * @private
+   * @param {string} userId - Die ID des zu entfernenden Users
+   * @returns {Promise<void>}
+   */
+  private async removeUserFromAllTasks(userId: string): Promise<void> {
+    const tasksCol = collection(this.firestore, 'tasks');
+    const snapshot = await getDocs(tasksCol);
+    
+    const updatePromises = snapshot.docs
+      .filter(doc => {
+        const assignedTo = doc.data()['assignedTo'] || [];
+        return Array.isArray(assignedTo) && assignedTo.includes(userId);
+      })
+      .map(doc => {
+        const currentAssignedTo = doc.data()['assignedTo'] || [];
+        const updatedAssignedTo = currentAssignedTo.filter((id: string) => id !== userId);
+        
+        const taskDoc = doc.ref;
+        return setDoc(taskDoc, { assignedTo: updatedAssignedTo }, { merge: true });
+      });
+    
+    await Promise.all(updatePromises);
   }
 }
