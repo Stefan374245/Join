@@ -1,253 +1,317 @@
-# Join - Task Management Platform
+# Join - Kanban Project Management Tool
 
-<p align="center">
-  <img src="https://img.shields.io/badge/Angular-19.2-red?style=for-the-badge&logo=angular" alt="Angular 19.2">
-  <img src="https://img.shields.io/badge/Firebase-12.5-orange?style=for-the-badge&logo=firebase" alt="Firebase">
-  <img src="https://img.shields.io/badge/TypeScript-5.x-blue?style=for-the-badge&logo=typescript" alt="TypeScript">
-</p>
+**Angular-basiertes Kanban Board mit AI-gesteuertem Feature Request Collector**
 
-**Join** ist eine moderne, kollaborative Task-Management-Plattform entwickelt mit Angular 19. Die Anwendung kombiniert ein intuitives Kanban-Board mit intelligenter Email-Integration, um Teams und externe Stakeholder nahtlos zusammenzuarbeiten zu lassen.
+## 🚀 Live App
 
-> 🎯 **Besonderheit**: Automatischer Email-basierter Issue-Kollektor für reibungslose Kommunikation mit externen Stakeholdern
+**Frontend**: https://[deine-hostinger-url]  
+**AI Workflow (n8n)**: https://n8n-production-04d3.up.railway.app  
+**Feature Request E-Mail**: requests@stefan-helldobler.de
 
-## 🚀 Demo-Nutzung
+## 📋 Was ist Join?
 
-### Schnellstart - Anwendung testen
+Join ist eine Kanban-basierte Task-Management-Plattform mit einem besonderen Feature: **Externe Stakeholder können Feature Requests per E-Mail oder Webformular einreichen**, ohne sich registrieren zu müssen. Ein AI-gesteuerter Workflow analysiert die Requests automatisch und erstellt Tasks im System.
 
-Sie können Join sofort ausprobieren:
+### 🎯 Kern-Features
 
-1. **Öffentlicher Zugang** (ohne Login):
-   - Navigieren Sie zur Welcome-Seite
-   - Wählen Sie "Stakeholder" um den Issue-Kollektor zu testen
-   - Erstellen Sie ein Demo-Feature-Request per E-Mail
+- **📊 Kanban Board**: Drag & Drop Tasks zwischen 5 Status-Spalten (Triage, To-Do, In Progress, Await Feedback, Done)
+- **✅ Subtasks**: Detaillierte Aufgaben mit AI-generierten Subtasks
+- **👥 Kontakte**: Team-Mitglieder verwalten und Tasks zuweisen
+- **🎯 Prioritäten**: High, Medium, Low mit visueller Kennzeichnung
+- **📧 Feature Request Collector**: Externe können Requests per E-Mail oder Formular senden
+- **🤖 AI-Integration**: Google Gemini analysiert Requests und generiert Subtasks
+- **🔥 Firebase Backend**: Echtzeit-Synchronisation aller Tasks und Kontakte
 
-2. **Mit Account** (vollständiger Zugriff):
-   ```bash
-   # Demo-Zugangsdaten
-   Email: demo@join.com
-   Passwort: demo123
-   ```
-   - Zugriff auf Task Board mit Drag & Drop
-   - Erstellen und verwalten Sie Tasks
-   - Fügen Sie Kontakte hinzu
-   - Testen Sie alle Features
+## 🔄 Wie funktioniert der Feature Request Workflow?
 
-3. **Lokale Installation**:
-   ```bash
-   git clone https://github.com/IHR-USERNAME/angular-based-join.git
-   cd angular-based-join
-   npm install
-   ng serve
-   ```
-   Öffnen Sie `http://localhost:4200/` im Browser
+### Übersicht
 
-### Was können Sie testen?
-
-- ✅ **Task Board**: Drag & Drop Tasks zwischen Status-Spalten
-- ✅ **Task-Erstellung**: Neue Tasks mit Priorität, Deadline und Subtasks anlegen
-- ✅ **Kontakte**: Team-Mitglieder verwalten und Tasks zuweisen
-- ✅ **Email Issue-Kollektor**: Feature-Requests per E-Mail einreichen (als Stakeholder)
-- ✅ **Responsive Design**: Testen auf verschiedenen Geräten
-
-## ✨ Features
-
-### 📋 Core Features
-
-- **🎯 Kanban Board**: Drag & Drop Interface mit 5 Status-Spalten (Triage, To-Do, In Progress, Await Feedback, Done)
-- **✓ Subtasks**: Detaillierte Aufgabenunterteilung mit Fortschrittsanzeige
-- **👥 Kontaktverwaltung**: Zentrale Verwaltung von Team-Mitgliedern mit Avatar-Generierung
-- **⚡ Priorisierung**: Visuell unterscheidbare Prioritätsstufen (Low, Medium, High)
-- **🔥 Firebase Backend**: Echtzeit-Synchronisation und sichere Authentifizierung
-- *📧 Email Issue-Kollektor
-
-Die Plattform bietet einen innovativen Issue-Kollektor, der es externen Stakeholdern ermöglicht, Feature-Requests oder Tickets per E-Mail einzureichen. Diese werden automatisch verarbeitet und ins System übernommen.
-
-**Problem gelöst**: Externe Stakeholder können Anfragen stellen, ohne sich registrieren oder in komplexe Tools einarbeiten zu müss
-
-- **Angular 19.2**: Moderne Standalone Components & Signals
-- **TypeScript**: Typ-sichere Entwicklung
-- **SCSS**: Modulares Styling mit Mixins und Variables
-- **Responsive Design**: Optimiert für Desktop, Tablet und Mobile
-- **Firebase Integration**: Firestore Database + Authentication
-
-## 📧 Email Issue-Kollektor
-
-Die Plattform bietet einen innovativen Issue-Kollektor, der es externen Stakeholdern ermöglicht, Feature-Requests oder Tickets per E-Mail einzureichen. Diese werden automatisch verarbeitet und ins System übernommen.
-
-**Problem gelöst**: Externe Stakeholder können Anfragen stellen, ohne sich registrieren oder in komplexe Tools einarbeiten zu müssen.
-
-### Automatisierung mit N8N
-
-Die E-Mail-zu-Task-Konvertierung wird durch einen N8N Workflow automatisiert:
-
-📁 **Workflow-Dateien**: [`n8n-workflows/`](./n8n-workflows/)
-
-Der N8N Workflow überwacht eingehende E-Mails und erstellt automatisch Tasks in Firebase. Eine vollständige Anleitung zum Import und zur Konfiguration finden Sie im [N8N Workflows README](./n8n-workflows/README.md).
-
-### Wie funktioniert es?
-
-1. **Stakeholder-Zugang**: Externe Nutzer können über die öffentliche Welcome-Seite auf den Issue-Kollektor zugreifen
-2. **E-Mail-Erstellung**: Eine vorgefertigte E-Mail-Vorlage wird generiert
-3. **Automatische Verarbeitung**: Eingehende E-Mails werden automatisch als Tasks mit Priorität und Deadline ins System übernommen
-4. **Daily Limit**: Pro Tag können 10 automatische Tickets erstellt werden (danach manuelle Review)
-
-### Issue-Kollektor nutzen
-
-**Für Stakeholder:**
-- Besuche die Welcome-Seite der Anwendung
-- Wähle "Stakeholder" als Rolle
-- Nutze den "Send Request"-Button um eine E-Mail zu erstellen
-- Die E-Mail wird an `requests@stefan-helldobler.de` gesendet
-
-**Für Entwickler - Anpassungen:**
-
-Die Issue-Kollektor-Konfiguration befindet sich in:
-- `src/app/components/public/welcome/role-page/role-page.component.ts`
-
-Dort können Sie anpassen:
-```typescript
-// E-Mail-Empfänger ändern
-email: 'your-email@example.com'
-
-// Daily Limit anpassen
-dailyLimit: 10  // Standard: 10 Requests pro Tag
-
-// E-Mail-Template anpassen
-// Siehe Methode: composeGmailMessage()
+```
+User sendet Request (Web-Formular oder E-Mail)
+            ↓
+    [Railway n8n Workflow]
+            ↓
+    Parse & Validate Daten
+            ↓
+    Check Daily Limit (max 10/Tag)
+            ↓
+    Google Gemini AI Analyse
+            ↓
+    Task in Firebase erstellen
+            ↓
+    Bestätigungs-E-Mail senden
+            ↓
+    ✅ Task erscheint im Board
 ```
 
-**Task-Eigenschaften vom Issue-Kollektor:**
-```typescript
+### Schritt-für-Schritt
+
+**1. Input (Dual-System)**
+- **Webformular**: User füllt Formular auf Help-Seite aus → POST an n8n Webhook
+- **E-Mail**: User sendet E-Mail an requests@stefan-helldobler.de → IMAP Trigger in n8n
+
+**2. Parsing & Validation**
+- Extrahiert: Typ (Feature/Bug/Question), Titel, Beschreibung, User-E-Mail
+- Bereinigt Text (entfernt Signaturen, Grüße, unnötige Formatierung)
+
+**3. Daily Limit Check**
+- Firebase Collection `daily_limits` mit globalem Tages-Counter
+- Maximum: 10 Requests pro Tag
+- Bei Überschreitung: Limit-Warnung per E-Mail
+
+**4. AI-Analyse (Google Gemini)**
+- Eingabe: Bereinigte Beschreibung
+- AI generiert: 2-3 konkrete Subtasks
+- Beispiel: "User Login" → Subtasks: ["Erstelle Login-Formular", "Implementiere JWT-Auth", "Error Handling"]
+
+**5. Firebase Integration**
+- Task wird in `tasks` Collection gespeichert
+- Status: "triage" (zur Review durch Team)
+- Eigenschaften: Priorität (low/medium/high), Kategorie (User Story/Technical Task), Deadline (AI-berechnet)
+
+**6. E-Mail Bestätigung**
+- Resend API sendet Bestätigung an User
+- Von: requests@stefan-helldobler.de
+- Inhalt: Task-Details, Subtasks, Tracking-Info
+
+**7. Board Update**
+- Task erscheint sofort im Board (Echtzeit via Firebase)
+- Team kann Task bearbeiten, priorisieren, zuweisen
+
+## 🧪 App testen
+
+### Option 1: Über die Web-App (Empfohlen)
+
+1. **Öffne die Live-URL** in deinem Browser
+2. **Ohne Login:**
+   - Navigiere zu "Help" → Feature Request Formular
+   - Fülle aus:
+     - Typ: Feature / Bug / Question / Improvement
+     - Titel: "Deine Feature-Idee"
+     - Beschreibung: "Detaillierte Beschreibung..."
+     - Deine E-Mail: "test@example.com"
+   - Klick "Submit"
+   - ✅ Task wird automatisch erstellt
+
+3. **Mit Login:**
+   - Registriere Test-Account ODER nutze Guest-Login
+   - Navigiere zum Board
+   - ✅ Sieh den neu erstellten Task in "Triage" Spalte
+   - Teste Drag & Drop zwischen Spalten
+   - Click auf Task → Details mit Subtasks ansehen
+
+### Option 2: Per E-Mail (IMAP Trigger)
+
+**Sende E-Mail an**: requests@stefan-helldobler.de
+
+**Format:**
+```
+Betreff: [Feature] Deine Feature-Idee
+Text: 
+Ich hätte gerne eine Funktion zum...
+Bitte implementiert das.
+
+Viele Grüße
+Dein Name
+```
+
+**Was passiert:**
+1. ✅ IMAP Trigger in n8n erkennt neue E-Mail (kann 1-2 Min dauern)
+2. ✅ Workflow extrahiert Betreff + Text
+3. ✅ Google Gemini AI analysiert Content
+4. ✅ Task wird in Firebase erstellt
+5. ✅ Du erhältst Bestätigungs-E-Mail
+
+### Option 3: Direkter Webhook-Test (PowerShell)
+
+```powershell
+$body = @{
+    type = "feature"
+    title = "Test Feature Request"
+    description = "Dies ist ein Test des Workflows"
+    userEmail = "test@example.com"
+    userName = "Test User"
+} | ConvertTo-Json
+
+Invoke-RestMethod -Uri "https://n8n-production-04d3.up.railway.app/webhook/feature-request" -Method POST -Body $body -ContentType "application/json"
+```
+
+**Erwartetes Ergebnis:** Task wird sofort erstellt, Bestätigungs-E-Mail innerhalb 10 Sekunden
+
+## 📊 Ergebnisse überprüfen
+
+### 1. Firebase Console
+1. Öffne [Firebase Console](https://console.firebase.google.com)
+2. Projekt: `join-angular-based`
+3. Firestore Database → Collection `tasks`
+4. Neuer Task mit:
+   - `status: "triage"`
+   - `aiGenerated: true`
+   - `source: "webhook"` oder `"email"`
+   - `subtasks: [{...}, {...}]`
+5. Collection `daily_limits` → Counter erhöht
+
+### 2. E-Mail Postfach
+- Check Postfach der angegebenen E-Mail
+- Bestätigung von `requests@stefan-helldobler.de`
+- Enthält: Task-Titel, Beschreibung, generierte Subtasks
+
+### 3. n8n Workflow Logs (Advanced)
+- Öffne https://n8n-production-04d3.up.railway.app
+- Login erforderlich
+- "Executions" → Letzte Ausführung ansehen
+- Jeder Node zeigt Input/Output
+
+### 4. Angular App
+- Reload der App
+- Board → "Triage" Spalte
+- Task ist sichtbar
+- Click → Details mit AI-Subtasks
+
+## 📧 E-Mail Integration Details
+
+### Resend API (Ausgehend)
+- **Provider**: Resend (https://resend.com)
+- **Domain**: stefan-helldobler.de (DKIM/SPF verifiziert)
+- **Methode**: REST API (kein SMTP, da Railway Ports 465/587 blockiert)
+- **Nodes**: 2x HTTP Request Nodes in n8n
+  - Success Confirmation (nach Task-Erstellung)
+  - Limit Email (bei Daily Limit erreicht)
+
+### IMAP (Eingehend)
+- **E-Mail**: requests@stefan-helldobler.de
+- **Trigger**: Email Read IMAP Node in n8n
+- **Check-Intervall**: Alle 1-2 Minuten
+- **Parsing**: Automatisch Betreff + Body + Absender
+
+## 🔒 Firebase Backend
+
+### Collections
+
+**tasks**: Alle Kanban Tasks
+```javascript
 {
-  source: 'email',           // Markierung als Email-Request
-  creatorType: 'external',   // Externer Ersteller
-  creatorEmail: '...',       // E-Mail des Stakeholders
-  aiGenerated: true          // Optional: AI-generierte Tasks
+  id: "auto-generated-id",
+  title: "Feature Request Title",
+  description: "Detaillierte Beschreibung...",
+  status: "triage|todo|in-progress|await-feedback|done",
+  priority: "low|medium|high",
+  category: "User Story|Technical Task",
+  dueDate: "2026-01-16T10:00:00Z",
+  subtasks: [
+    {id: "subtask_1", title: "Erstelle UI", completed: false},
+    {id: "subtask_2", title: "Backend Logic", completed: false}
+  ],
+  creatorEmail: "user@example.com",
+  creatorName: "User Name",
+  aiGenerated: true,
+  source: "webhook|email",
+  createdAt: "2026-01-09T15:30:00Z"
 }
 ```
 
-## Installation & Setup
-
-### Voraussetzungen
-
-- Node.js (empfohlen: LTS Version)
-- Angular CLI (`npm install -g @angular/cli`)
-- Firebase Account (für Backend-Services)
-
-### Projekt einrichten
-
-1. Repository klonen und Dependencies installieren:
-```bash
-git clone https://github.com/IHR-USERNAME/angular-based-join.git
-cd angular-based-join
-npm install
+**users**: Authentifizierte User + Kontakte
+```javascript
+{
+  id: "user-id-or-email",
+  email: "user@example.com",
+  firstName: "Max",
+  lastName: "Mustermann",
+  color: "#FF7A00",  // Auto-generiert
+  initials: "MM"
+}
 ```
 
-2. **Firebase-Konfiguration einrichten** (WICHTIG):
-   
-   Die Environment-Dateien im Repository enthalten Mock-Daten. Für die lokale Entwicklung wurden bereits echte Credentials in `.local.ts` Dateien gespeichert (werden von Git ignoriert).
-   
-   **Für neue Entwickler:**
-   - Kopieren Sie Ihre Firebase-Config aus [Firebase Console](https://console.firebase.google.com)
-   - Ersetzen Sie die Werte in `src/environments/environment.local.ts` (Development)
-   - Ersetzen Sie die Werte in `src/environments/environment.prod.local.ts` (Production)
-   
-   **Angular ist bereits konfiguriert**, diese lokalen Dateien automatisch zu verwenden:
-   - `ng serve` → nutzt `environment.local.ts`
-   - `ng build --configuration production` → nutzt `environment.prod.local.ts`
-   
-   ⚠️ **WICHTIG**: Die `.local.ts` Dateien sind in `.gitignore` und werden NICHT committet!
-
-3. Development Server starten:
-```bash
-ng serve
+**daily_limits**: Request Counter
+```javascript
+{
+  id: "global_2026-01-09",
+  count: 7,
+  dailyLimit: 10,
+  lastUpdated: "2026-01-09T15:30:00Z",
+  lastRequestTitle: "Feature XYZ"
+}
 ```
 
-Die Anwendung läuft unter `http://localhost:4200/`
+### Security Rules
 
-## Wichtige Anpassungen
+Siehe `firestore.rules`:
 
-### Firebase-Konfiguration
+- **Authenticated Users**: Voller Zugriff auf tasks/users (CRUD)
+- **Public Write**: n8n kann Tasks mit `aiGenerated: true` erstellen
+- **Public Read/Write**: daily_limits Collection für Counter
 
-Bearbeiten Sie `src/environments/environment.ts` und `environment.prod.ts`:
-```typescript
-export const environment = {
-  production: false,
-  firebase: {
-    apiKey: "IHR_API_KEY",
-    authDomain: "ihr-projekt.firebaseapp.com",
-    projectId: "ihr-projekt-id",
-    // ...
-  }
-};
-```
+## 🛠️ Technologie-Stack
 
-### Styling anpassen
+| Komponente | Technologie | Zweck |
+|------------|-------------|-------|
+| **Frontend** | Angular 19 (Standalone) | UI, Routing, State Management |
+| **Backend** | Firebase Firestore | NoSQL Database, Echtzeit-Sync |
+| **Auth** | Firebase Authentication | User Login, Guards |
+| **AI** | Google Gemini | Subtask-Generierung, Analyse |
+| **Workflow** | n8n (Railway) | Automation Engine |
+| **E-Mail (Out)** | Resend API | Transactional Emails |
+| **E-Mail (In)** | IMAP | Request-Empfang |
+| **Hosting** | Hostinger | Static Hosting via FTP |
 
-Zentrale Styles befinden sich in:
-- `src/styles/_variables.scss` - Farben, Schriftarten, Abstände
-- `src/styles/components/_buttons.scss` - Button-Styles
-- `src/styles/_mixins.scss` - Wiederverwendbare Style-Mixins
-
-### Routen konfigurieren
-
-Haupt-Routing in `src/app/app.routes.ts`:
-```typescript
-// Neue Route hinzufügen
-{ path: 'my-feature', component: MyFeatureComponent }
-```
-
-## Build für Produktion
-
-```bash
-ng build --configuration production
-```
-
-Build-Artefakte werden im `dist/` Verzeichnis gespeichert und sind optimiert für Deployment.## Projektstruktur
+## 📁 Projekt-Struktur
 
 ```
-src📸 Screenshots
+src/app/
+├── components/
+│   ├── board/
+│   │   ├── board-view/          # Kanban Board mit Drag & Drop
+│   │   └── task-detail/         # Task-Detail Modal
+│   ├── contacts/
+│   │   ├── contacts-list/       # Kontakt-Übersicht
+│   │   ├── contact-dialog/      # Erstellen/Bearbeiten
+│   │   └── contact-detail/      # Detail-Ansicht
+│   ├── help/                    # Feature Request Formular
+│   ├── summary/                 # Dashboard
+│   └── public/welcome/          # Landing Page für Stakeholder
+├── services/
+│   ├── task.service.ts          # Task CRUD (Firebase)
+│   ├── contact.service.ts       # Kontakte (Firebase)
+│   ├── auth.service.ts          # Authentication
+│   └── toast.service.ts         # Notifications
+├── models/
+│   ├── task.interface.ts        # Task Type
+│   └── contact.interface.ts     # Contact Type
+└── guards/
+    └── auth.guard.ts            # Route Protection
 
-_Fügen Sie hier Screenshots Ihrer Anwendung ein:_
-- Task Board Ansicht
-- Task Detail Dialog
-- Kontakte Übersicht
-- Email Issue-Kollektor Flow
+n8n-workflows/
+└── Email to Kanban Task Converter with AI Analysis.json
+```
 
-## 🤝 Contributing
+## 🚨 Bekannte Einschränkungen
 
-Beiträge sind willkommen! So können Sie helfen:
+- **Daily Limit**: Max 10 Feature Requests/Tag (Counter in Firebase)
+- **IMAP Delay**: E-Mail-Trigger kann 1-2 Minuten dauern (nicht Echtzeit)
+- **SMTP blockiert**: Railway blockiert Ports → Resend REST API statt SMTP
+- **AI-Fehler**: Bei Gemini-Fehler werden Tasks ohne Subtasks erstellt (Fallback)
 
-1. Forken Sie das Projekt
-2. Erstellen Sie einen Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Committen Sie Ihre Änderungen (`git commit -m 'Add some AmazingFeature'`)
-4. Pushen Sie zum Branch (`git push origin feature/AmazingFeature`)
-5. Öffnen Sie einen Pull Request
+## 📚 Weitere Dokumentation
 
-## 📝 Lizenz
+- **[N8N Workflow Details](./n8n-workflows/README.md)**: Komplette Workflow-Dokumentation
+- **[Routing Guide](./ROUTING_INTEGRATION_GUIDE.md)**: Angular Routing Setup
+- **[Migration Plan](./MIGRATION_STEP_BY_STEP_PLAN.md)**: Architektur-Änderungen
 
-Dieses Projekt ist für Bildungszwecke und persönliche Nutzung erstellt.
+## 💡 FAQ
 
-## 🔗 Weitere Ressourcen
+**Q: Warum erscheint mein Task nicht sofort?**  
+A: Bei E-Mail-Requests: IMAP Check alle 1-2 Min. Bei Webhook: Sofort, aber App-Reload nötig.
 
-- [Angular CLI Dokumentation](https://angular.dev/tools/cli)
-- [Angular Firebase Integration](https://github.com/angular/angularfire)
-- [Firebase Dokumentation](https://firebase.google.com/docs)
+**Q: Kann ich mehr als 10 Requests/Tag senden?**  
+A: Nein, Daily Limit ist hardcoded. Du erhältst eine Limit-E-Mail.
+
+**Q: Werden Subtasks immer generiert?**  
+A: Nein, bei AI-Fehler oder zu kurzer Beschreibung: Task ohne Subtasks.
+
+**Q: Kann ich den Workflow selbst hosten?**  
+A: Ja, siehe `n8n-workflows/README.md` für Import-Anleitung.
 
 ---
 
-**Entwickelt mit ❤️ und Angular**
-
-Haben Sie Fragen? [Erstellen Sie ein Issue](https://github.com/IHR-USERNAME/angular-based-join/issue
-│   └── public/         # Öffentliche Bereiche (inkl. Issue-Kollektor)
-├── services/           # Business Logic & API Calls
-├── models/             # TypeScript Interfaces
-├── guards/             # Route Guards
-└── layout/             # Layout-Komponenten (Header, Sidebar)
-```
-
-## Weitere Ressourcen
-
-- [Angular CLI Dokumentation](https://angular.dev/tools/cli)
-- [Angular Firebase Integration](https://github.com/angular/angularfire)
-- [Firebase Dokumentation](https://firebase.google.com/docs)
+**Entwickelt mit ❤️ und Angular**  
+Bei Fragen: Check n8n Workflow Logs oder Firebase Console
