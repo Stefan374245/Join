@@ -65,12 +65,10 @@ export class RolePageComponent implements OnInit {
       this.loadDailyLimit();
     });
 
-    // Aktualisiere bei jeder Navigation zur Stakeholder-Seite
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
     ).subscribe((event: NavigationEnd) => {
       if (event.url.includes('/role/stakeholder')) {
-        // Force refresh der Limit-Daten
         this.loadDailyLimit(true);
       }
     });
@@ -117,8 +115,6 @@ export class RolePageComponent implements OnInit {
       this.requestsUsed = limitInfo.currentCount;
       this.maxRequests = limitInfo.maxLimit;
       this.isLimitReached = limitInfo.isLimitReached;
-
-      console.log('📊 Daily Limit loaded:', limitInfo);
 
       if (this.isLimitReached) {
         this.toastService.showDailyLimitReached(this.maxRequests);
@@ -223,7 +219,6 @@ Best regards
     this.submitSuccess = true;
 
     setTimeout(async () => {
-      // Force refresh um die neueste Anzahl zu bekommen
       await this.loadDailyLimit(true);
       this.toastService.showSuccess(
         'Email opened! Your request will be processed shortly.'
@@ -268,7 +263,6 @@ Best regards
     this.submitSuccess = false;
 
     try {
-      console.log('📤 Sende Request an n8n...');
 
       const response = await this.http.post<any>(environment.n8nWebhookUrl, {
         type: this.requestType,
@@ -283,7 +277,6 @@ Best regards
 
       this.submitSuccess = true;
 
-      // Force refresh um die neueste Anzahl zu bekommen
       await this.loadDailyLimit(true);
 
       const remaining = this.maxRequests - this.requestsUsed;

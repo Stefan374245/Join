@@ -1,76 +1,108 @@
+@import "../../../../styles/variables";
+@import "../../../../styles/mixins";
+@import "../../../../styles/components/buttons";
+
 .welcome-page {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 2rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  width: 100vw;
+  height: 100vh;
+  display: grid;
+  place-items: center;
+  background-color: $primary-color;
+  padding: $spacing-md;
+  overflow: auto;
 
-  .header {
-    position: absolute;
-    top: 2rem;
-    left: 2rem;
+  .welcome-card {
+    position: relative;
+    @include flex(column, center, center);
+    padding: clamp(2rem, 5vw, 3.5rem) clamp(2rem, 5vw, 4.5rem);
+    gap: clamp(2rem, 4vw, 3.5rem);
+    width: min(90%, 49.3125rem);
+    background: $white;
+    box-shadow: 0 0 0.625rem 0.1875rem rgba(0, 0, 0, 0.08);
+    border-radius: 1.875rem;
 
-    .logo {
-      height: 60px;
-    }
-  }
+    .welcome-content {
+      @include flex(column, start, center);
+      gap: 3rem;
+      width: 100%;
+      max-width: 40.3125rem;
 
-  .content {
-    text-align: center;
-    max-width: 600px;
+      .welcome-header {
+        @include flex(column, center, center);
+        position: relative;
+        cursor: default;
 
-    h1 {
-      font-size: 3rem;
-      margin-bottom: 1rem;
-    }
-
-    .subtitle {
-      font-size: 1.5rem;
-      margin-bottom: 3rem;
-      opacity: 0.9;
-    }
-
-    .action-section {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-
-      .btn {
-        padding: 1rem 2rem;
-        font-size: 1.1rem;
-        border-radius: 8px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-
-        &.btn-primary {
-          background: white;
-          color: #667eea;
-          border: none;
-
-          &:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-          }
-        }
-
-        &.btn-secondary {
-          background: transparent;
-          color: white;
-          border: 2px solid white;
-
-          &:hover {
-            background: rgba(255, 255, 255, 0.1);
-          }
+        &::after {
+          content: "";
+          position: absolute;
+          bottom: 0px;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 120px;
+          height: 3px;
+          background-color: $accent-color;
         }
       }
 
-      .auth-links {
-        display: flex;
-        gap: 1rem;
-        margin-top: 1rem;
+      .welcome-text {
+        font-size: clamp(1rem, 2vw, 1.125rem);
+        color: $primary-color;
+        text-align: center;
+      }
+
+      .options-container {
+        @include flex(row, flex-start, center);
+        gap: clamp(1.5rem, 4vw, 4rem);
+        width: 100%;
+
+        @media (max-width: 600px) {
+          flex-direction: column;
+          gap: 3.5rem;
+        }
+
+        .option-group {
+          @include flex(column, flex-start, flex-start);
+          gap: 1.5rem;
+          @media (max-width: 600px) {
+            width: 100%;
+            align-items: center;
+            text-align: center;
+          }
+
+          .option-header {
+            @include flex(row, center, center);
+            gap: 0.5rem;
+
+            .option-icon {
+              width: 1.5rem;
+              height: 1.5rem;
+              object-fit: contain;
+            }
+
+            span {
+              font-family: "Open Sans", sans-serif;
+              font-weight: 400;
+              font-size: clamp(1rem, 2vw, 1.125rem);
+              line-height: 120%;
+              color: $primary-color;
+            }
+          }
+
+        
+          .btn {
+            width: 100%;
+            max-width: 200px;
+            font-size: clamp(1rem, 1.5vw, 1.125rem);
+
+            a {
+              text-decoration: none;
+            }
+            
+            @media (max-width: 600px) {
+              max-width: none;
+            }
+          }
+        }
       }
     }
   }

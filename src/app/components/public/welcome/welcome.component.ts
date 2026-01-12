@@ -1,26 +1,22 @@
 import { Component } from '@angular/core';
-import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { Router, RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-welcome',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterLink],
   templateUrl: './welcome.component.html',
   styleUrls: ['./welcome.component.scss']
 })
 export class WelcomeComponent {
   constructor(private router: Router) {}
 
-  navigateToStakeholder() {
-    this.router.navigate(['/role/stakeholder']);
-  }
-
   navigateToLogin() {
     this.router.navigate(['/login']);
   }
 
-  navigateToSignup() {
-    this.router.navigate(['/signup']);
+  createRequest() {
+    this.router.navigate(['/role/feature-request']);
   }
 }
