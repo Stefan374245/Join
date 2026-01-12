@@ -190,10 +190,11 @@
         margin: 0;
       }
 
-      a {
+      .email-link {
         color: $accent-color;
         text-decoration: none;
         font-weight: 500;
+        cursor: pointer;
 
         &:hover {
           text-decoration: underline;

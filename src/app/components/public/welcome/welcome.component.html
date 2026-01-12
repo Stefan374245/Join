@@ -1,0 +1,25 @@
+<main class="welcome-page">
+  <header class="header">
+    <img src="assets/images/joinlogodark.svg" alt="Join Logo" class="logo" />
+  </header>
+
+  <article class="content">
+    <h1>Welcome to Join</h1>
+    <p class="subtitle">Task management made easy</p>
+
+    <section class="action-section">
+      <button class="btn btn-primary" (click)="navigateToStakeholder()">
+        Get Started
+      </button>
+      
+      <div class="auth-links">
+        <button class="btn btn-secondary" (click)="navigateToLogin()">
+          Login
+        </button>
+        <button class="btn btn-secondary" (click)="navigateToSignup()">
+          Sign Up
+        </button>
+      </div>
+    </section>
+  </article>
+</main>

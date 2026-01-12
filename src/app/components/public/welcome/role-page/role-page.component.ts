@@ -1,7 +1,8 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule, NavigationEnd } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { filter } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import { DailyLimitService } from '../../../../services/daily-limit.service';
 import { ToastService } from '../../../../services/toast.service';
@@ -32,18 +33,15 @@ export class RolePageComponent implements OnInit {
   pageType: 'stakeholder' | 'feature-request' = 'stakeholder';
   config!: PageConfig;
   
-  // Request Limit Daten
   requestsUsed = 0;
   maxRequests = 10;
   isLimitReached = false;
   isLoading = true;
   
-  // Dropdown state
   showDropdown = false;
   submitSuccess = false;
   submitError = '';
   
-  // Feature request form fields
   requestType: 'feature' | 'bug' | 'question' = 'feature';
   requestTitle = '';
   requestDescription = '';
@@ -61,11 +59,20 @@ export class RolePageComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    // Subscribe to route params to react to navigation changes
     this.route.params.subscribe(params => {
       this.pageType = params['type'];
       this.loadConfig();
       this.loadDailyLimit();
+    });
+
+    // Aktualisiere bei jeder Navigation zur Stakeholder-Seite
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe((event: NavigationEnd) => {
+      if (event.url.includes('/role/stakeholder')) {
+        // Force refresh der Limit-Daten
+        this.loadDailyLimit(true);
+      }
     });
   }
 
@@ -104,9 +111,9 @@ export class RolePageComponent implements OnInit {
     this.config = configs[this.pageType];
   }
 
-  private async loadDailyLimit() {
+  private async loadDailyLimit(forceRefresh = false) {
     try {
-      const limitInfo = await this.dailyLimitService.fetchDailyLimit();
+      const limitInfo = await this.dailyLimitService.fetchDailyLimit(forceRefresh);
       this.requestsUsed = limitInfo.currentCount;
       this.maxRequests = limitInfo.maxLimit;
       this.isLimitReached = limitInfo.isLimitReached;
@@ -132,7 +139,6 @@ export class RolePageComponent implements OnInit {
       return;
     }
     
-    // For feature-request, toggle dropdown instead of navigating
     if (this.pageType === 'feature-request') {
       this.toggleDropdown();
     } else {
@@ -212,13 +218,13 @@ Best regards
 
     const mailtoLink = `mailto:${toEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     
-    // Use window.location.href (works better than window.open)
     window.location.href = mailtoLink;
 
     this.submitSuccess = true;
 
     setTimeout(async () => {
-      await this.loadDailyLimit();
+      // Force refresh um die neueste Anzahl zu bekommen
+      await this.loadDailyLimit(true);
       this.toastService.showSuccess(
         'Email opened! Your request will be processed shortly.'
       );
@@ -277,7 +283,8 @@ Best regards
 
       this.submitSuccess = true;
 
-      await this.loadDailyLimit();
+      // Force refresh um die neueste Anzahl zu bekommen
+      await this.loadDailyLimit(true);
 
       const remaining = this.maxRequests - this.requestsUsed;
       this.toastService.showRequestSuccess(remaining);
