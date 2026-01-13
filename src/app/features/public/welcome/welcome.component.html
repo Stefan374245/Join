@@ -1,0 +1,35 @@
+<main class="welcome-page">
+  <article class="welcome-card">
+    <div class="welcome-content">
+      <header class="welcome-header">
+        <h1>Welcome</h1>
+      </header>
+
+      <p class="welcome-text">
+        Pick the option that suits your role: create a request as a stakeholder or log in if you're part of the team.
+      </p>
+
+      <section class="options-container">
+        <div class="option-group">
+          <header class="option-header">
+            <img src="assets/images/work.svg" alt="Stakeholder icon" class="option-icon">
+            <span>Are you a stakeholder?</span>
+          </header>
+          <button routerLink="/role/stakeholder" class="btn btn-primary" aria-label="Create a new request">
+            Create Request
+          </button>
+        </div>
+
+        <div class="option-group">
+          <header class="option-header">
+            <img src="assets/images/team.svg" alt="Team member icon" class="option-icon">
+            <span>Are you a team member?</span>
+          </header>
+          <button routerLink="/login" class="btn btn-secondary" aria-label="Team member login">
+            Member log in
+          </button>
+        </div>
+      </section>
+    </div>
+  </article>
+</main>

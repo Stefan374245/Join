@@ -1,0 +1,155 @@
+<main class="role-page">
+  <header class="header">
+    <img src="assets/images/joinlogodark.svg" alt="Join Logo" class="logo" />
+  </header>
+
+  <div class="desktop-header">
+    <a
+      routerLink="/welcome"
+      class="back-link-desktop"
+      aria-label="Back to welcome page"
+    >
+      <img src="assets/images/arrowbackblue.svg" alt="arrow-back" />
+    </a>
+    
+    @if (config.showRequestLimit) {
+      <nav class="request-today-desktop">
+        <span class="count" [class.limit-reached]="isLimitReached">
+          @if (isLoading) {
+            <span>Loading...</span>
+          } @else {
+            <span>{{ requestsUsed }} of {{ maxRequests }} requests used today</span>
+          }
+        </span>
+      </nav>
+    }
+  </div>
+
+  <article class="content">
+    <div class="title-section">
+      <h1>{{ config.title }}</h1>
+      <a
+        routerLink="/welcome"
+        class="back-link-mobile"
+        aria-label="Back to welcome page"
+      >
+        <img src="assets/images/arrow-left-line.svg" alt="arrow-back" />
+      </a>
+    </div>
+
+    @if (config.showRequestLimit) {
+      <nav class="request-today-mobile">
+        <span class="count" [class.limit-reached]="isLimitReached">
+          @if (isLoading) {
+            <span>Loading...</span>
+          } @else {
+            <span>{{ requestsUsed }} of {{ maxRequests }} requests used today</span>
+          }
+        </span>
+      </nav>
+    }
+
+    @if (isLimitReached && config.showRequestLimit) {
+      <div class="limit-banner">
+        The daily {{ maxRequests }}-request limit has been reached!
+      </div>
+    }
+
+    <section class="info-section">
+      <div class="text-content">
+        <h2>{{ config.subtitle }}</h2>
+
+        @if (isLimitReached && config.limitDescription) {
+          <div class="description limit-description">
+            <p>{{ config.limitDescription }}</p>
+          </div>
+        } @else {
+          <div class="description">
+            @for (paragraph of config.description; track paragraph) {
+              <p>{{ paragraph }}</p>
+            }
+          </div>
+        }
+
+        @if (config.email) {
+          <div class="email-info">
+            <p>Email: <a (click)="openGmailCompose()" class="email-link">{{ config.email }}</a></p>
+          </div>
+        }
+      </div>
+
+      <figure class="image-container">
+        <img
+          [src]="config.imagePath"
+          [alt]="config.title + ' process'"
+          title="process"
+        />
+      </figure>
+    </section>
+
+    <section class="action-section">
+      @if (pageType === 'feature-request') {
+        <div class="dropdown-container" (clickOutside)="closeDropdown()">
+          <button
+            class="btn btn-primary create-button"
+            (click)="toggleDropdown()"
+            type="button">
+            {{ config.buttonText }}
+            <span class="dropdown-arrow" [class.open]="showDropdown">▼</span>
+          </button>
+
+          @if (showDropdown) {
+            <div class="dropdown-menu">
+              <button
+                class="dropdown-item"
+                (click)="openGmailCompose()"
+                type="button">
+                <span class="icon">✉️</span>
+                <div class="item-content">
+                  <strong>Gmail / Web Email</strong>
+                  <small>Opens in new tab (Gmail, GMX, etc.)</small>
+                </div>
+              </button>
+
+              <button
+                class="dropdown-item"
+                (click)="openWebFormVariant()"
+                type="button">
+                <span class="icon">📝</span>
+                <div class="item-content">
+                  <strong>Submit via Form</strong>
+                  <small>Fill out a form directly on our website</small>
+                </div>
+              </button>
+            </div>
+          }
+        </div>
+
+        @if (submitSuccess) {
+          <div class="success-message">
+            ✅ Email client opened successfully!
+          </div>
+        }
+      } @else {
+        <button
+          [disabled]="isLimitReached && config.showRequestLimit"
+          class="btn btn-primary create-button"
+          [class.disabled]="isLimitReached && config.showRequestLimit"
+          [attr.aria-label]="
+            (isLimitReached && config.showRequestLimit) ? 'Daily limit reached' : config.buttonText
+          "
+          (click)="onButtonClick($event)"
+        >
+          {{ config.buttonText }}
+          <img
+            src="assets/images/check.svg"
+            alt=""
+            aria-hidden="true"
+            class="check-icon"
+          />
+        </button>
+      }
+    </section>
+  </article>
+  <app-footer-auth />
+</main>

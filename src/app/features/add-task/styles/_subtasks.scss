@@ -1,0 +1,21 @@
+@import "../../../../styles/mixins";
+
+.subtask-actions {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  @include flex(row, flex-start, center);
+  gap: 8px;
+}
+
+.subtask-icon {
+  width: 22px;
+  height: 22px;
+  cursor: pointer;
+  transition: transform 0.3s ease-in-out;
+
+  &:hover {
+    transform: scale(1.1);
+  }
+}

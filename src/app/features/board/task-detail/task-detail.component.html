@@ -1,0 +1,167 @@
+<div
+  class="task-overlay"
+  *ngIf="isVisible && task"
+  (click)="onOverlayClick($event)"
+>
+  <div class="task-card-overlay" (click)="$event.stopPropagation()">
+    <div class="task-header">
+      <div class="task-category" [ngClass]="getCategoryClass(task.category)">
+        <span>{{ task.category }}</span>
+      </div>
+      <div class="ai-generated" *ngIf="task.aiGenerated">
+        <img src="assets/images/note_ki.svg" alt="AI Generated Note" />
+      </div>
+      <button class="close-btn" (click)="onClose()" aria-label="Close">
+        <img src="assets/images/close.svg" alt="Close" />
+      </button>
+    </div>
+
+    <div class="task-content">
+      <h2 class="task-title">{{ task.title }}</h2>
+
+      <p class="task-description">{{ task.description }}</p>
+
+      <div
+        class="creator-section"
+        *ngIf="
+          task.source ||
+          task.creatorType ||
+          task.creatorName ||
+          task.creatorEmail
+        "
+      >
+        <span class="detail-label">Creator:</span>
+        <div class="creator-info">
+          <span class="creator-badge" [ngClass]="getCreatorBadgeClass()">
+            <img
+              [src]="getCreatorIcon()"
+              alt="Creator type"
+              class="creator-icon"
+            />
+            {{ getCreatorBadgeText() }}
+          </span>
+          <span class="creator-name">{{ getCreatorDisplayName() }}</span>
+          <span class="creator-content" [ngClass]="getCreatorContentClass()">
+            <img
+              [src]="getCreatorContentIcon()"
+              alt="Creator type"
+              class="creator-icon"
+            />
+            {{ getCreatorContentText() }}
+          </span>
+        </div>
+      </div>
+
+      <div class="task-details">
+        <div class="detail-row">
+          <span class="detail-label">Due date:</span>
+          <span class="detail-value">{{ formatDate(task.dueDate) }}</span>
+        </div>
+
+        <div class="detail-row">
+          <span class="detail-label">Priority:</span>
+          <div class="task-priority" [ngClass]="'priority-' + task.priority">
+            <span>{{ task.priority | titlecase }}</span>
+            <img
+              [src]="getPriorityIcon(task.priority)"
+              [alt]="task.priority + ' priority'"
+              title="priority icon"
+            />
+          </div>
+        </div>
+
+        <div class="detail-row assigned-to">
+          <span class="detail-label">Assigned To:</span>
+          <div class="assignee-list">
+            <div *ngIf="contactsLoading" class="loading-spinner">
+              <img src="assets/images/loading.svg" alt="Loading..." />
+            </div>
+
+            <div *ngIf="!contactsLoading">
+              <div
+                class="assignee-item"
+                *ngFor="let userId of task.assignedTo.slice(0, 3)"
+              >
+                <div
+                  class="assignee-avatar"
+                  [style.background-color]="getContactColor(userId)"
+                >
+                  {{ getContactInitials(userId) }}
+                </div>
+                <span class="assignee-name">{{
+                  getContactFullName(userId)
+                }}</span>
+              </div>
+
+              <div
+                class="assignee-item more-users"
+                *ngIf="task.assignedTo.length > 3"
+              >
+                <div class="assignee-avatar more-avatar">
+                  +{{ task.assignedTo.length - 3 }}
+                </div>
+                <span class="assignee-name"
+                  >{{ task.assignedTo.length - 3 }} more</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="subtasks-section"
+        *ngIf="task.subtasks && task.subtasks.length > 0"
+      >
+        <span class="detail-label">Subtasks</span>
+        <div class="subtask-list">
+          <div
+            class="subtask-checkbox-container"
+            *ngFor="let subtask of task.subtasks; let i = index"
+            (click)="toggleSubtask(subtask.id)"
+          >
+            <div
+              class="subtask-checkbox-icon"
+              [ngClass]="
+                subtask.completed ? 'checkbox-checked' : 'checkbox-unchecked'
+              "
+              [title]="
+                subtask.completed ? 'Mark as incomplete' : 'Mark as complete'
+              "
+            ></div>
+            <p class="subtask-title">{{ subtask.title }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="task-actions">
+      <button
+        class="btn btn-text delete-btn"
+        (click)="showDeleteConfirmation()"
+      >
+        <img src="assets/images/subtaskBin.svg" alt="Delete" />
+        <span>Delete</span>
+      </button>
+      <div class="action-separator"></div>
+      <button class="btn btn-text edit-btn" (click)="onEdit()">
+        <img src="assets/images/edit-2.svg" alt="Edit" />
+        <span>Edit</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<div
+  class="confirm-dialog-overlay"
+  *ngIf="showDeleteConfirm"
+  (click)="cancelDelete()"
+>
+  <div class="confirm-dialog" (click)="$event.stopPropagation()">
+    <h3>Delete permanently?</h3>
+    <div class="confirm-buttons">
+      <button class="btn btn-secondary" (click)="cancelDelete()">Cancel</button>
+      <button class="btn btn-danger" (click)="confirmDelete()">Delete</button>
+    </div>
+  </div>
+</div>

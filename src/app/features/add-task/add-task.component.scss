@@ -1,0 +1,60 @@
+@import "../../../styles/variables";
+@import "../../../styles/mixins";
+@import "../../../styles/page-layouts";
+@import "../../../styles/scrollbar";
+@import "../../../styles/components/animations";
+@import "../../../styles/components/buttons";
+@import "./styles/overlay";
+@import "./styles/form-elements";
+@import "./styles/dropdowns";
+@import "./styles/priority-buttons";
+@import "./styles/subtasks";
+@import "./styles/responsive";
+
+
+.add-task-container {
+  @include page-layout-standard;
+}
+
+.add-task-header {
+  flex-shrink: 0;
+  margin-bottom: 2rem;
+
+  @media (max-width: $breakpoint-md) {
+    margin-bottom: 1.5rem;
+  }
+
+  .page-title {
+    @include page-title;
+    margin: 0;
+  }
+}
+
+.subtask-input-wrapper {
+  position: relative;
+}
+
+.subtask-input {
+  padding-right: 40px;
+}
+
+.subtask-add-icon-absolute {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  z-index: 2;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
