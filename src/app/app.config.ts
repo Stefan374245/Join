@@ -6,7 +6,7 @@ import { provideFirestore, getFirestore } from '@angular/fire/firestore';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideHttpClient, withFetch } from '@angular/common/http'; // 👈 HINZUFÜGEN!
 import { environment } from '../environments/environment';
-import { ToastService } from './services/toast.service';
+import { ToastService } from './core/services/toast.service';
 
 import { routes } from './app.routes';
 
