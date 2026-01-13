@@ -74,96 +74,12 @@
             <p *ngIf="!tasksLoading">No tasks in triage</p>
           </div>
 
-          <article
-            class="task-card"
+          <app-task-card
             *ngFor="let task of triageTasks"
-            cdkDrag
-            [cdkDragData]="task"
-            [cdkDragStartDelay]="80"
-            [attr.data-task-id]="task.id"
-            (click)="openTaskDetail(task)"
-          >
-            <div class="drag-placeholder" *cdkDragPlaceholder></div>
-
-            <span
-              class="task-category"
-              [ngClass]="getCategoryClass(task.category)"
-            >
-              {{ task.category }}
-            </span>
-            <h3 class="task-title">{{ task.title }}</h3>
-            <p class="task-description">
-              {{ getShortDescription(task.description) }}
-            </p>
-
-            <div
-              class="task-progress"
-              title="Subtask progress"
-              aria-label="Subtask progress"
-              *ngIf="task.subtasks && task.subtasks.length > 0"
-              [ngClass]="{
-                'all-completed': areAllSubtasksCompleted(task),
-                'has-incomplete': hasIncompleteSubtasks(task)
-              }"
-              role="progressbar"
-              [attr.aria-valuenow]="getSubtaskProgress(task)"
-              aria-valuemin="0"
-              aria-valuemax="100"
-              [attr.aria-label]="
-                getCompletedSubtasks(task) +
-                ' of ' +
-                task.subtasks.length +
-                ' subtasks completed'
-              "
-            >
-              <div class="progress-bar">
-                <div
-                  class="progress-fill"
-                  [style.width.%]="getSubtaskProgress(task)"
-                ></div>
-              </div>
-              <span class="progress-text">
-                {{ getCompletedSubtasks(task) }}/{{ task.subtasks.length }}
-                Subtasks
-              </span>
-            </div>
-
-            <footer class="task-footer">
-              <div
-                class="task-assignees"
-                role="list"
-                aria-label="Assigned contacts"
-              >
-                <div
-                  class="assignee-avatar"
-                  *ngFor="let userId of task.assignedTo.slice(0, 3)"
-                  [style.background-color]="getContactColor(userId)"
-                  role="listitem"
-                  [attr.aria-label]="getContactInitials(userId)"
-                >
-                  {{ getContactInitials(userId) }}
-                </div>
-                <div
-                  class="assignee-avatar more"
-                  *ngIf="task.assignedTo.length > 3"
-                  role="listitem"
-                >
-                  +{{ task.assignedTo.length - 3 }}
-                </div>
-              </div>
-              <div
-                class="task-priority"
-                [ngClass]="'priority-' + task.priority"
-                [attr.aria-label]="task.priority + ' priority'"
-              >
-                <img
-                  [src]="getPriorityIcon(task.priority)"
-                  [alt]="task.priority + ' priority'"
-                  title="priority"
-                />
-              </div>
-            </footer>
-          </article>
+            [task]="task"
+            [contacts]="contacts"
+            (taskClicked)="openTaskDetail($event)"
+          ></app-task-card>
         </div>
       </section>
 
@@ -197,96 +113,12 @@
             <p *ngIf="!tasksLoading">No tasks To do</p>
           </div>
 
-          <article
-            class="task-card"
+          <app-task-card
             *ngFor="let task of todoTasks"
-            cdkDrag
-            [cdkDragData]="task"
-            [cdkDragStartDelay]="80"
-            [attr.data-task-id]="task.id"
-            (click)="openTaskDetail(task)"
-          >
-            <div class="drag-placeholder" *cdkDragPlaceholder></div>
-
-            <span
-              class="task-category"
-              [ngClass]="getCategoryClass(task.category)"
-            >
-              {{ task.category }}
-            </span>
-            <h3 class="task-title">{{ task.title }}</h3>
-            <p class="task-description">
-              {{ getShortDescription(task.description) }}
-            </p>
-
-            <div
-              class="task-progress"
-              title="Subtask progress"
-              aria-label="Subtask progress"
-              *ngIf="task.subtasks && task.subtasks.length > 0"
-              [ngClass]="{
-                'all-completed': areAllSubtasksCompleted(task),
-                'has-incomplete': hasIncompleteSubtasks(task)
-              }"
-              role="progressbar"
-              [attr.aria-valuenow]="getSubtaskProgress(task)"
-              aria-valuemin="0"
-              aria-valuemax="100"
-              [attr.aria-label]="
-                getCompletedSubtasks(task) +
-                ' of ' +
-                task.subtasks.length +
-                ' subtasks completed'
-              "
-            >
-              <div class="progress-bar">
-                <div
-                  class="progress-fill"
-                  [style.width.%]="getSubtaskProgress(task)"
-                ></div>
-              </div>
-              <span class="progress-text">
-                {{ getCompletedSubtasks(task) }}/{{ task.subtasks.length }}
-                Subtasks
-              </span>
-            </div>
-
-            <footer class="task-footer">
-              <div
-                class="task-assignees"
-                role="list"
-                aria-label="Assigned contacts"
-              >
-                <div
-                  class="assignee-avatar"
-                  *ngFor="let userId of task.assignedTo.slice(0, 3)"
-                  [style.background-color]="getContactColor(userId)"
-                  role="listitem"
-                  [attr.aria-label]="getContactInitials(userId)"
-                >
-                  {{ getContactInitials(userId) }}
-                </div>
-                <div
-                  class="assignee-avatar more"
-                  *ngIf="task.assignedTo.length > 3"
-                  role="listitem"
-                >
-                  +{{ task.assignedTo.length - 3 }}
-                </div>
-              </div>
-              <div
-                class="task-priority"
-                [ngClass]="'priority-' + task.priority"
-                [attr.aria-label]="task.priority + ' priority'"
-              >
-                <img
-                  [src]="getPriorityIcon(task.priority)"
-                  [alt]="task.priority + ' priority'"
-                  title="priority"
-                />
-              </div>
-            </footer>
-          </article>
+            [task]="task"
+            [contacts]="contacts"
+            (taskClicked)="openTaskDetail($event)"
+          ></app-task-card>
         </div>
       </section>
 
@@ -325,96 +157,12 @@
             <p *ngIf="!tasksLoading">No tasks in progress</p>
           </div>
 
-          <article
-            class="task-card"
+          <app-task-card
             *ngFor="let task of inProgressTasks"
-            cdkDrag
-            [cdkDragData]="task"
-            [cdkDragStartDelay]="80"
-            [attr.data-task-id]="task.id"
-            (click)="openTaskDetail(task)"
-          >
-            <div class="drag-placeholder" *cdkDragPlaceholder></div>
-
-            <span
-              class="task-category"
-              [ngClass]="getCategoryClass(task.category)"
-            >
-              {{ task.category }}
-            </span>
-            <h3 class="task-title">{{ task.title }}</h3>
-            <p class="task-description">
-              {{ getShortDescription(task.description) }}
-            </p>
-
-            <div
-              class="task-progress"
-              title="Subtask progress"
-              aria-label="Subtask progress"
-              *ngIf="task.subtasks && task.subtasks.length > 0"
-              [ngClass]="{
-                'all-completed': areAllSubtasksCompleted(task),
-                'has-incomplete': hasIncompleteSubtasks(task)
-              }"
-              role="progressbar"
-              [attr.aria-valuenow]="getSubtaskProgress(task)"
-              aria-valuemin="0"
-              aria-valuemax="100"
-              [attr.aria-label]="
-                getCompletedSubtasks(task) +
-                ' of ' +
-                task.subtasks.length +
-                ' subtasks completed'
-              "
-            >
-              <div class="progress-bar">
-                <div
-                  class="progress-fill"
-                  [style.width.%]="getSubtaskProgress(task)"
-                ></div>
-              </div>
-              <span class="progress-text">
-                {{ getCompletedSubtasks(task) }}/{{ task.subtasks.length }}
-                Subtasks
-              </span>
-            </div>
-
-            <footer class="task-footer">
-              <div
-                class="task-assignees"
-                role="list"
-                aria-label="Assigned contacts"
-              >
-                <div
-                  class="assignee-avatar"
-                  *ngFor="let userId of task.assignedTo.slice(0, 3)"
-                  [style.background-color]="getContactColor(userId)"
-                  role="listitem"
-                  [attr.aria-label]="getContactInitials(userId)"
-                >
-                  {{ getContactInitials(userId) }}
-                </div>
-                <div
-                  class="assignee-avatar more"
-                  *ngIf="task.assignedTo.length > 3"
-                  role="listitem"
-                >
-                  +{{ task.assignedTo.length - 3 }}
-                </div>
-              </div>
-              <div
-                class="task-priority"
-                [ngClass]="'priority-' + task.priority"
-                [attr.aria-label]="task.priority + ' priority'"
-              >
-                <img
-                  [src]="getPriorityIcon(task.priority)"
-                  [alt]="task.priority + ' priority'"
-                  title="priority"
-                />
-              </div>
-            </footer>
-          </article>
+            [task]="task"
+            [contacts]="contacts"
+            (taskClicked)="openTaskDetail($event)"
+          ></app-task-card>
         </div>
       </section>
 
@@ -455,96 +203,12 @@
             <p *ngIf="!tasksLoading">No tasks awaiting feedback</p>
           </div>
 
-          <article
-            class="task-card"
+          <app-task-card
             *ngFor="let task of awaitFeedbackTasks"
-            cdkDrag
-            [cdkDragData]="task"
-            [cdkDragStartDelay]="80"
-            [attr.data-task-id]="task.id"
-            (click)="openTaskDetail(task)"
-          >
-            <div class="drag-placeholder" *cdkDragPlaceholder></div>
-
-            <span
-              class="task-category"
-              [ngClass]="getCategoryClass(task.category)"
-            >
-              {{ task.category }}
-            </span>
-            <h3 class="task-title">{{ task.title }}</h3>
-            <p class="task-description">
-              {{ getShortDescription(task.description) }}
-            </p>
-
-            <div
-              class="task-progress"
-              title="Subtask progress"
-              aria-label="Subtask progress"
-              *ngIf="task.subtasks && task.subtasks.length > 0"
-              [ngClass]="{
-                'all-completed': areAllSubtasksCompleted(task),
-                'has-incomplete': hasIncompleteSubtasks(task)
-              }"
-              role="progressbar"
-              [attr.aria-valuenow]="getSubtaskProgress(task)"
-              aria-valuemin="0"
-              aria-valuemax="100"
-              [attr.aria-label]="
-                getCompletedSubtasks(task) +
-                ' of ' +
-                task.subtasks.length +
-                ' subtasks completed'
-              "
-            >
-              <div class="progress-bar">
-                <div
-                  class="progress-fill"
-                  [style.width.%]="getSubtaskProgress(task)"
-                ></div>
-              </div>
-              <span class="progress-text">
-                {{ getCompletedSubtasks(task) }}/{{ task.subtasks.length }}
-                Subtasks
-              </span>
-            </div>
-
-            <footer class="task-footer">
-              <div
-                class="task-assignees"
-                role="list"
-                aria-label="Assigned contacts"
-              >
-                <div
-                  class="assignee-avatar"
-                  *ngFor="let userId of task.assignedTo.slice(0, 3)"
-                  [style.background-color]="getContactColor(userId)"
-                  role="listitem"
-                  [attr.aria-label]="getContactInitials(userId)"
-                >
-                  {{ getContactInitials(userId) }}
-                </div>
-                <div
-                  class="assignee-avatar more"
-                  *ngIf="task.assignedTo.length > 3"
-                  role="listitem"
-                >
-                  +{{ task.assignedTo.length - 3 }}
-                </div>
-              </div>
-              <div
-                class="task-priority"
-                [ngClass]="'priority-' + task.priority"
-                [attr.aria-label]="task.priority + ' priority'"
-              >
-                <img
-                  [src]="getPriorityIcon(task.priority)"
-                  [alt]="task.priority + ' priority'"
-                  title="priority"
-                />
-              </div>
-            </footer>
-          </article>
+            [task]="task"
+            [contacts]="contacts"
+            (taskClicked)="openTaskDetail($event)"
+          ></app-task-card>
         </div>
       </section>
 
@@ -579,96 +243,12 @@
             <p *ngIf="!tasksLoading">No tasks done</p>
           </div>
 
-          <article
-            class="task-card"
+          <app-task-card
             *ngFor="let task of doneTasks"
-            cdkDrag
-            [cdkDragData]="task"
-            [cdkDragStartDelay]="80"
-            [attr.data-task-id]="task.id"
-            (click)="openTaskDetail(task)"
-          >
-            <div class="drag-placeholder" *cdkDragPlaceholder></div>
-
-            <span
-              class="task-category"
-              [ngClass]="getCategoryClass(task.category)"
-            >
-              {{ task.category }}
-            </span>
-            <h3 class="task-title">{{ task.title }}</h3>
-            <p class="task-description">
-              {{ getShortDescription(task.description) }}
-            </p>
-
-            <div
-              class="task-progress"
-              title="Subtask progress"
-              aria-label="Subtask progress"
-              *ngIf="task.subtasks && task.subtasks.length > 0"
-              [ngClass]="{
-                'all-completed': areAllSubtasksCompleted(task),
-                'has-incomplete': hasIncompleteSubtasks(task)
-              }"
-              role="progressbar"
-              [attr.aria-valuenow]="getSubtaskProgress(task)"
-              aria-valuemin="0"
-              aria-valuemax="100"
-              [attr.aria-label]="
-                getCompletedSubtasks(task) +
-                ' of ' +
-                task.subtasks.length +
-                ' subtasks completed'
-              "
-            >
-              <div class="progress-bar">
-                <div
-                  class="progress-fill"
-                  [style.width.%]="getSubtaskProgress(task)"
-                ></div>
-              </div>
-              <span class="progress-text">
-                {{ getCompletedSubtasks(task) }}/{{ task.subtasks.length }}
-                Subtasks
-              </span>
-            </div>
-
-            <footer class="task-footer">
-              <div
-                class="task-assignees"
-                role="list"
-                aria-label="Assigned contacts"
-              >
-                <div
-                  class="assignee-avatar"
-                  *ngFor="let userId of task.assignedTo.slice(0, 3)"
-                  [style.background-color]="getContactColor(userId)"
-                  role="listitem"
-                  [attr.aria-label]="getContactInitials(userId)"
-                >
-                  {{ getContactInitials(userId) }}
-                </div>
-                <div
-                  class="assignee-avatar more"
-                  *ngIf="task.assignedTo.length > 3"
-                  role="listitem"
-                >
-                  +{{ task.assignedTo.length - 3 }}
-                </div>
-              </div>
-              <div
-                class="task-priority"
-                [ngClass]="'priority-' + task.priority"
-                [attr.aria-label]="task.priority + ' priority'"
-              >
-                <img
-                  [src]="getPriorityIcon(task.priority)"
-                  [alt]="task.priority + ' priority'"
-                  title="priority"
-                />
-              </div>
-            </footer>
-          </article>
+            [task]="task"
+            [contacts]="contacts"
+            (taskClicked)="openTaskDetail($event)"
+          ></app-task-card>
         </div>
       </section>
     </section>
