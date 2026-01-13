@@ -1,5 +1,4 @@
 <div class="contact-detail-page" *ngIf="contact">
-  <!-- Header -->
   <div class="detail-header">
     <h1>Contacts</h1>
     <button class="back-btn" (click)="goBack()">
@@ -7,13 +6,11 @@
     </button>
   </div>
 
-  <!-- Subheader -->
   <div class="detail-subheader">
     <p>Better with a team</p>
   </div>
   <div class="separator"></div>
 
-  <!-- Contact Info -->
   <div class="contact-info">
     <div class="contact-avatar">
       <span class="avatar-large" [style.background-color]="contact.color">
@@ -26,7 +23,6 @@
     </div>
   </div>
 
-  <!-- Contact Details -->
   <div class="contact-details">
     <h3>Contact Information</h3>
 
@@ -41,13 +37,11 @@
     </div>
   </div>
 
-  <!-- Floating Action Button -->
   <div class="mobile-action-menu" (clickOutside)="closeActionMenu()">
     <button class="fab-button" (click)="toggleActionMenu()">
       <img src="assets/images/more_vert.svg" alt="More" />
     </button>
 
-    <!-- Action Popup -->
     <div class="action-popup" *ngIf="showActionMenu">
       <button class="popup-item" (click)="editContact()">
         <img src="assets/images/edit-2.svg" alt="Edit" />
@@ -60,7 +54,6 @@
     </div>
   </div>
 
-  <!-- Contact Dialog -->
   <app-contact-dialog
     *ngIf="showDialog"
     [mode]="dialogMode"

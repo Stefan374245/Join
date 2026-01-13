@@ -1,10 +1,10 @@
 import { Routes } from '@angular/router';
-import { LoginComponent } from './components/auth/login/login.component';
-import { SignupComponent } from './components/auth/signup/signup.component';
+import { LoginComponent } from './auth/login/login.component';
+import { SignupComponent } from './auth/signup/signup.component';
 import { WelcomeComponent } from './components/public/welcome/welcome.component';
 import { RolePageComponent } from './components/public/welcome/role-page/role-page.component';
 import { EmailMaskComponent } from './components/public/welcome/email-mask/email-mask.component';
-import { LogoAnimationComponent } from './components/auth/logo-animation/logo-animation.component';
+import { LogoAnimationComponent } from './auth/logo-animation/logo-animation.component';
 import { AddTaskComponent } from './components/add-task/add-task.component';
 import { BoardViewComponent } from './components/board/board-view/board-view.component';
 import { ContactsListComponent } from './components/contacts/contacts-list/contacts-list.component';
