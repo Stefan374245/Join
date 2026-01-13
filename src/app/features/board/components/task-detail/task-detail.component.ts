@@ -1,11 +1,11 @@
 import { Component, Input, Output, EventEmitter, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
-import { Task } from '../../../core/models/task.interface';
-import { Contact } from '../../../core/models/contact.interface';
-import { TaskService } from '../../../core/services/task.service';
-import { ContactService } from '../../../core/services/contact.service';
-import { ToastService } from '../../../core/services/toast.service';
+import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
+import { Task } from '../../../../core/models/task.interface';
+import { Contact } from '../../../../core/models/contact.interface';
+import { TaskService } from '../../../../core/services/task.service';
+import { ContactService } from '../../../../core/services/contact.service';
+import { ToastService } from '../../../../core/services/toast.service';
 
 @Component({
   selector: 'app-task-detail',

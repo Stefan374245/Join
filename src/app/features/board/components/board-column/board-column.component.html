@@ -1,0 +1,38 @@
+<section class="board-column" [attr.aria-labelledby]="columnId + '-heading'">
+  <header class="column-header">
+    <h2 class="column-title" [id]="columnId + '-heading'">{{ title }}</h2>
+    <button
+      class="btn-add-column-task"
+      (click)="onAddTaskClick()"
+      (mouseenter)="onAddButtonHover($event, true)"
+      (mouseleave)="onAddButtonHover($event, false)"
+      [attr.aria-label]="'Add task to ' + title"
+    >
+      <img
+        src="assets/images/taskPlus.svg"
+        alt="Add task"
+        title="Add task"
+        role="presentation"
+      />
+    </button>
+  </header>
+
+  <div
+    class="column-content"
+    cdkDropList
+    [cdkDropListData]="tasks"
+    [id]="columnId + '-list'"
+    (cdkDropListDropped)="onTaskDrop($event)"
+  >
+    <div class="no-tasks" *ngIf="tasks.length === 0" role="status">
+      <p *ngIf="!loading">No tasks {{ title.toLowerCase() }}</p>
+    </div>
+
+    <app-task-card
+      *ngFor="let task of tasks"
+      [task]="task"
+      [contacts]="contacts"
+      (taskClicked)="onTaskClick($event)"
+    ></app-task-card>
+  </div>
+</section>

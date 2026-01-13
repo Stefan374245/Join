@@ -1,8 +1,8 @@
 import { Component, Input, Output, EventEmitter, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DragDropModule } from '@angular/cdk/drag-drop';
-import { Task } from '../../../core/models/task.interface';
-import { Contact } from '../../../core/models/contact.interface';
+import { Task } from '../../../../core/models/task.interface';
+import { Contact } from '../../../../core/models/contact.interface';
 
 @Component({
   selector: 'app-task-card',

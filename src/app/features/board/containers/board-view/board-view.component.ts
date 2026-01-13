@@ -15,17 +15,24 @@ import {
   DragDropModule,
   CdkDropList,
 } from '@angular/cdk/drag-drop';
-import { TaskService } from '../../../core/services/task.service';
-import { ContactService } from '../../../core/services/contact.service';
-import { ToastService } from '../../../core/services/toast.service';
-import { Task } from '../../../core/models/task.interface';
-import { Contact } from '../../../core/models/contact.interface';
+import { TaskService } from '../../../../core/services/task.service';
+import { ContactService } from '../../../../core/services/contact.service';
+import { ToastService } from '../../../../core/services/toast.service';
+import { Task } from '../../../../core/models/task.interface';
+import { Contact } from '../../../../core/models/contact.interface';
 import { Observable, map } from 'rxjs';
-import { TaskDetailComponent } from '../task-detail/task-detail.component';
-import { AddTaskComponent } from '../../add-task/add-task.component';
-import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
-import { ClickOutsideDirective } from '../../../shared/directives/click-outside.directive';
-import { TaskCardComponent } from '../task-card/task-card.component';
+import { TaskDetailComponent } from '../../components/task-detail/task-detail.component';
+import { AddTaskComponent } from '../../../add-task/add-task.component';
+import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
+import { ClickOutsideDirective } from '../../../../shared/directives/click-outside.directive';
+import { TaskCardComponent } from '../../components/task-card/task-card.component';
+import { BoardColumnComponent } from '../../components/board-column/board-column.component';
+
+interface BoardColumn {
+  id: string;
+  title: string;
+  getTasks: () => Task[];
+}
 
 @Component({
   selector: 'app-board-view',
@@ -38,13 +45,13 @@ import { TaskCardComponent } from '../task-card/task-card.component';
     AddTaskComponent,
     LoadingSpinnerComponent,
     ClickOutsideDirective,
-    TaskCardComponent,
+    BoardColumnComponent,
   ],
   templateUrl: './board-view.component.html',
   styleUrl: './board-view.component.scss',
 })
 export class BoardViewComponent implements OnInit, AfterViewInit, OnDestroy {
-  @ViewChildren(CdkDropList) dropLists!: QueryList<CdkDropList>;
+  @ViewChildren(BoardColumnComponent) boardColumns!: QueryList<BoardColumnComponent>;
 
   private taskService = inject(TaskService);
   private contactService = inject(ContactService);
@@ -78,6 +85,15 @@ export class BoardViewComponent implements OnInit, AfterViewInit, OnDestroy {
   private autoScrollInterval: any = null;
   private readonly scrollSpeed = 20;
   private readonly scrollThreshold = 100;
+
+  // Column configuration
+  columns: BoardColumn[] = [
+    { id: 'triage', title: 'Triage', getTasks: () => this.triageTasks },
+    { id: 'todo', title: 'To do', getTasks: () => this.todoTasks },
+    { id: 'in-progress', title: 'In progress', getTasks: () => this.inProgressTasks },
+    { id: 'await-feedback', title: 'Await feedback', getTasks: () => this.awaitFeedbackTasks },
+    { id: 'done', title: 'Done', getTasks: () => this.doneTasks },
+  ];
 
   ngOnInit(): void {
     this.loadTasks();
@@ -179,13 +195,19 @@ export class BoardViewComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private connectDropLists(): void {
     setTimeout(() => {
-      if (this.dropLists && this.dropLists.length > 0) {
-        const allDropListIds = this.dropLists.map((list) => list.id);
-        this.dropLists.forEach((dropList) => {
-          dropList.connectedTo = this.dropLists.filter(
-            (list) => list.id !== dropList.id
-          );
-        });
+      if (this.boardColumns && this.boardColumns.length > 0) {
+        const allDropLists = this.boardColumns.map(col => col.dropList).filter(list => !!list);
+        
+        if (allDropLists.length > 0) {
+          this.boardColumns.forEach((column) => {
+            if (column.dropList) {
+              column.dropList.connectedTo = allDropLists.filter(
+                (list) => list.id !== column.dropList.id
+              );
+            }
+          });
+          console.log('✅ Connected drop lists:', allDropLists.map(l => l.id));
+        }
       }
     }, 0);
   }
@@ -218,16 +240,20 @@ export class BoardViewComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngAfterViewInit(): void {
     setTimeout(() => {
-      const allDropListIds = this.dropLists.map((list) => list.id);
-      console.log('🎯 Connecting drop lists:', allDropListIds);
+      if (this.boardColumns && this.boardColumns.length > 0) {
+        const allDropLists = this.boardColumns.map(col => col.dropList).filter(list => !!list);
+        console.log('🎯 Connecting drop lists:', allDropLists.map(l => l.id));
 
-      this.dropLists.forEach((dropList) => {
-        dropList.connectedTo = this.dropLists.filter(
-          (list) => list.id !== dropList.id
-        );
-      });
+        this.boardColumns.forEach((column) => {
+          if (column.dropList) {
+            column.dropList.connectedTo = allDropLists.filter(
+              (list) => list.id !== column.dropList.id
+            );
+          }
+        });
 
-      console.log('✅ All drop lists connected');
+        console.log('✅ All drop lists connected');
+      }
     }, 0);
   }
 
@@ -279,14 +305,15 @@ export class BoardViewComponent implements OnInit, AfterViewInit, OnDestroy {
 
   onTaskDrop(
     event: CdkDragDrop<Task[]>,
-    targetStatus: 'triage' | 'todo' | 'in-progress' | 'await-feedback' | 'done'
+    targetStatus: string
   ): void {
     const task = event.item.data as Task;
-    this.logDropEvent(task, event, targetStatus);
-    if (task.status === targetStatus) return this.logNoUpdate();
+    const status = targetStatus as 'triage' | 'todo' | 'in-progress' | 'await-feedback' | 'done';
+    this.logDropEvent(task, event, status);
+    if (task.status === status) return this.logNoUpdate();
     const oldStatus = task.status;
-    this.updateLocalTaskStatus(task.id, targetStatus);
-    this.taskService.updateTaskStatus(task.id, targetStatus).subscribe({
+    this.updateLocalTaskStatus(task.id, status);
+    this.taskService.updateTaskStatus(task.id, status).subscribe({
       next: () => setTimeout(() => this.scrollToTask(task.id), 400),
       error: () => this.revertLocalTaskStatus(task.id, oldStatus),
     });
