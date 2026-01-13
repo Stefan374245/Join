@@ -2,9 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { AuthService } from '../../services/auth.service';
+import { AuthService } from '../../core/services/auth.service';
 import { ToastComponent } from '../../shared/components/toast/toast.component';
-import { ToastService } from '../../services/toast.service';
+import { ToastService } from '../../core/services/toast.service';
 import { FooterAuthComponent } from '../../shared/components/footer-auth/footer-auth.component';
 
 @Component({
