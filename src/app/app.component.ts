@@ -19,9 +19,9 @@ export class AppComponent {
       const isAuthPage = url.startsWith('/login') ||
                          url.startsWith('/signup') ||
                          url.startsWith('/logo-animation') ||
-                         url.startsWith('/welcome') ||
-                         url.startsWith('/role/') ||
-                         url.startsWith('/emailmask') ||
+                         url.startsWith('/hero') ||
+                         url.startsWith('/request') ||
+                         url.startsWith('/email-form') ||
                          url.startsWith('/legal-notice') ||
                          url.startsWith('/privacy-policy') ||
                          url.startsWith('/help');
