@@ -7,14 +7,13 @@ import { ToastService } from '../../../core/services/toast.service';
 import { Contact } from '../../../core/models/contact.interface';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { ContactDialogComponent } from '../contact-dialog/contact-dialog.component';
-import { ClickOutsideDirective } from '../../../shared/directives/click-outside.directive';
 
 type Grouped = { letter: string; items: Contact[] }[];
 
 @Component({
   selector: 'app-contacts-list',
   standalone: true,
-  imports: [CommonModule, RouterLink, ContactDialogComponent, ClickOutsideDirective],
+  imports: [CommonModule, RouterLink, ContactDialogComponent],
   templateUrl: './contacts-list.component.html',
   styleUrl: './contacts-list.component.scss'
 })
