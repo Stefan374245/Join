@@ -5,7 +5,7 @@ import { HeroComponent } from './features/landing/hero/hero.component';
 import { RequestFormComponent } from './features/landing/hero/request/request-form.component';
 import { EmailFormComponent } from './features/landing/hero/email-form/email-form.component';
 import { LogoAnimationComponent } from './auth/logo-animation/logo-animation.component';
-import { AddTaskComponent } from './features/add-task/add-task.component';
+import { AddTaskViewComponent } from './features/add-task/presentational/add-task-view/add-task-view.component';
 import { BoardViewComponent } from './features/board/presentational/board-view/board-view.component';
 import { ContactsListComponent } from './features/contacts/contacts-list/contacts-list.component';
 import { ContactDetailComponent } from './features/contacts/contact-detail/contact-detail.component';
@@ -56,7 +56,7 @@ export const routes: Routes = [
   },
   {
     path: 'add-task',
-    component: AddTaskComponent,
+    component: AddTaskViewComponent,
     canActivate: [authGuard]
   },
   {
