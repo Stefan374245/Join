@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, ViewEncapsulation, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, input, output, ViewEncapsulation, viewChild, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DragDropModule, CdkDragDrop, CdkDropList } from '@angular/cdk/drag-drop';
 import { Task } from '../../../../core/models/task.interface';
@@ -14,32 +14,32 @@ import { TaskCardComponent } from '../task-card/task-card.component';
   encapsulation: ViewEncapsulation.None,
 })
 export class BoardColumnComponent implements AfterViewInit {
-  @ViewChild(CdkDropList) dropList!: CdkDropList;
+  dropList = viewChild.required<CdkDropList>(CdkDropList);
   
-  @Input({ required: true }) columnId!: string;
-  @Input({ required: true }) title!: string;
-  @Input({ required: true }) tasks: Task[] = [];
-  @Input({ required: true }) contacts: Contact[] = [];
-  @Input() loading: boolean = false;
-  @Input() connectedDropLists: CdkDropList[] = [];
+  columnId = input.required<string>();
+  title = input.required<string>();
+  tasks = input.required<Task[]>();
+  contacts = input.required<Contact[]>();
+  loading = input<boolean>(false);
+  connectedDropLists = input<CdkDropList[]>([]);
   
-  @Output() taskDropped = new EventEmitter<{ event: CdkDragDrop<Task[]>, status: string }>();
-  @Output() addTaskClicked = new EventEmitter<string>();
-  @Output() taskClicked = new EventEmitter<Task>();
-  @Output() addButtonHover = new EventEmitter<{ event: MouseEvent, isHover: boolean }>();
+  taskDropped = output<{ event: CdkDragDrop<Task[]>, status: string }>();
+  addTaskClicked = output<string>();
+  taskClicked = output<Task>();
+  addButtonHover = output<{ event: MouseEvent, isHover: boolean }>();
 
   ngAfterViewInit(): void {
-    if (this.dropList && this.connectedDropLists.length > 0) {
-      this.dropList.connectedTo = this.connectedDropLists;
+    if (this.dropList() && this.connectedDropLists().length > 0) {
+      this.dropList()!.connectedTo = this.connectedDropLists();
     }
   }
 
   onTaskDrop(event: CdkDragDrop<Task[]>): void {
-    this.taskDropped.emit({ event, status: this.columnId });
+    this.taskDropped.emit({ event, status: this.columnId() });
   }
 
   onAddTaskClick(): void {
-    this.addTaskClicked.emit(this.columnId);
+    this.addTaskClicked.emit(this.columnId());
   }
 
   onTaskClick(task: Task): void {
