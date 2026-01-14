@@ -42,7 +42,7 @@ export class LogoAnimationComponent implements OnInit {
     setTimeout(() => {
       this.animationState = 'final';
       this.animationComplete.emit();
-      this.router.navigate(['/welcome']);
+      this.router.navigate(['/hero']);
     }, 2500);
   }
 
