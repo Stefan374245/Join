@@ -1,9 +1,9 @@
 import { Routes } from '@angular/router';
 import { LoginComponent } from './auth/login/login.component';
 import { SignupComponent } from './auth/signup/signup.component';
-import { WelcomeComponent } from './features/public/welcome/welcome.component';
-import { RolePageComponent } from './features/public/welcome/role-page/role-page.component';
-import { EmailMaskComponent } from './features/public/welcome/email-mask/email-mask.component';
+import { HeroComponent } from './features/landing/hero/hero.component';
+import { RequestFormComponent } from './features/landing/hero/request/request-form.component';
+import { EmailFormComponent } from './features/landing/hero/email-form/email-form.component';
 import { LogoAnimationComponent } from './auth/logo-animation/logo-animation.component';
 import { AddTaskComponent } from './features/add-task/add-task.component';
 import { BoardViewComponent } from './features/board/containers/board-view/board-view.component';
@@ -23,8 +23,8 @@ export const routes: Routes = [
     canActivate: [guestGuard]
   },
   {
-    path: 'welcome',
-    component: WelcomeComponent,
+    path: 'hero',
+    component: HeroComponent,
     canActivate: [guestGuard]
   },
   {
@@ -37,12 +37,17 @@ export const routes: Routes = [
     component: SignupComponent
   },
   {
-    path: 'role/:type',
-    component: RolePageComponent
+    path: 'request/:type',
+    component: RequestFormComponent
   },
   {
-    path: 'emailmask',
-    component: EmailMaskComponent
+    path: 'request',
+    redirectTo: '/request/stakeholder',
+    pathMatch: 'full'
+  },
+  {
+    path: 'email-form',
+    component: EmailFormComponent
   },
   {
     path: 'board',
