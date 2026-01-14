@@ -1,14 +1,14 @@
 <app-toast></app-toast>
-<ul class="subtasks-list" *ngIf="subtasks.length > 0" role="list" aria-label="Subtasks">
-  <li *ngFor="let subtask of visibleSubtasks" class="subtask-item" role="listitem">
-    <span class="subtask-text" *ngIf="editingSubtaskId !== subtask.id">{{ subtask.title }}</span>
+<ul class="subtasks-list" *ngIf="subtasks().length > 0" role="list" aria-label="Subtasks">
+  <li *ngFor="let subtask of visibleSubtasks()" class="subtask-item" role="listitem">
+    <span class="subtask-text" *ngIf="editingSubtaskId() !== subtask.id">{{ subtask.title }}</span>
 
-    <div class="subtask-edit-wrapper" *ngIf="editingSubtaskId === subtask.id">
+    <div class="subtask-edit-wrapper" *ngIf="editingSubtaskId() === subtask.id">
       <input
         type="text"
         class="subtask-edit-input"
-        [(ngModel)]="subtaskEditInput"
-        [ngModelOptions]="{standalone: true}"
+        [value]="editInputValue()"
+        (input)="editInputValue.set($any($event.target).value); subtaskEditInputChange.emit($any($event.target).value)"
         placeholder="Edit subtask"
         (keydown.enter)="onUpdate(); $event.preventDefault()"
         (keydown.escape)="onCancelEdit()"
@@ -36,7 +36,7 @@
       </div>
     </div>
 
-    <div class="subtask-item-actions" *ngIf="editingSubtaskId !== subtask.id">
+    <div class="subtask-actions" *ngIf="editingSubtaskId() !== subtask.id">
       <img
         src="assets/images/edit-2.svg"
         alt="Edit subtask"
@@ -54,14 +54,14 @@
         tabindex="0" />
     </div>
   </li>
-  <li *ngIf="remainingSubtasksCount > 0"
+  <li *ngIf="remainingSubtasksCount() > 0"
       class="subtask-item remaining-count"
       role="listitem"
       (click)="toggleDropdown()"
       (clickOutside)="closeDropdown()"
-      [class.active]="isDropdownOpen">
+      [class.active]="isDropdownOpen()">
     <div class="remaining-count-content">
-      <span class="subtask-text">+{{ remainingSubtasksCount }} more</span>
+      <span class="subtask-text">+{{ remainingSubtasksCount() }} more</span>
       <img src="assets/images/arrow_drop_down.svg"
            alt="Show more subtasks"
            class="dropdown-icon"
@@ -69,19 +69,19 @@
            tabindex="0"/>
     </div>
 
-    <div class="subtasks-dropdown" *ngIf="isDropdownOpen">
+    <div class="subtasks-dropdown" *ngIf="isDropdownOpen()">
       <ul class="dropdown-list" role="list">
-        <li *ngFor="let subtask of remainingSubtasks"
+        <li *ngFor="let subtask of remainingSubtasks()"
             class="dropdown-item"
             role="listitem">
-          <span class="subtask-text" *ngIf="editingSubtaskId !== subtask.id">{{ subtask.title }}</span>
+          <span class="subtask-text" *ngIf="editingSubtaskId() !== subtask.id">{{ subtask.title }}</span>
 
-          <div class="subtask-edit-wrapper" *ngIf="editingSubtaskId === subtask.id">
+          <div class="subtask-edit-wrapper" *ngIf="editingSubtaskId() === subtask.id">
               <input
               type="text"
               class="subtask-edit-input"
-              [(ngModel)]="subtaskEditInput"
-              [ngModelOptions]="{standalone: true}"
+              [value]="editInputValue()"
+              (input)="editInputValue.set($any($event.target).value); subtaskEditInputChange.emit($any($event.target).value)"
               placeholder="Edit subtask"
               (keydown.enter)="onUpdate(); $event.preventDefault()"
               (keydown.escape)="onCancelEdit()"
@@ -108,7 +108,7 @@
                 tabindex="0" />
             </div>
           </div>
-          <div class="subtask-item-actions" *ngIf="editingSubtaskId !== subtask.id">
+          <div class="subtask-item-actions" *ngIf="editingSubtaskId() !== subtask.id">
             <img src="assets/images/edit-2.svg"
                  alt="Edit subtask"
                  class="subtask-action-icon"
