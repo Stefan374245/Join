@@ -71,21 +71,21 @@
 </div>
 
 <div *ngIf="showEditOverlay && taskToEdit" (clickOutside)="closeEditOverlay()">
-  <app-add-task
+  <app-add-task-view
     [isOverlay]="true"
     [taskToEdit]="taskToEdit"
     (close)="closeEditOverlay()"
     (taskSaved)="onTaskSaved($event)"
   >
-  </app-add-task>
+  </app-add-task-view>
 </div>
 
 <div *ngIf="showAddTaskOverlay" (clickOutside)="closeAddTaskOverlay()">
-  <app-add-task
+  <app-add-task-view
     [isOverlay]="true"
     [initialStatus]="addTaskStatus"
     (close)="closeAddTaskOverlay()"
     (taskSaved)="onTaskCreated($event)"
   >
-  </app-add-task>
+  </app-add-task-view>
 </div>

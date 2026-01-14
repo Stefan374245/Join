@@ -380,7 +380,7 @@ export class TaskService {
   addTask(task: Task): Observable<void> {
     const taskDoc = doc(this.firestore, 'tasks', task.id);
 
-    const taskData = {
+    const taskData: any = {
       title: task.title,
       description: task.description,
       category: task.category,
@@ -394,10 +394,16 @@ export class TaskService {
       createdBy: this.auth.currentUser?.uid || 'anonymous',
       source: task.source || 'member',
       creatorType: task.creatorType || 'member',
-      creatorName: task.creatorName || undefined,
-      creatorEmail: task.creatorEmail || undefined,
       aiGenerated: task.aiGenerated || false
     };
+
+    // Only add optional fields if they have values
+    if (task.creatorName) {
+      taskData.creatorName = task.creatorName;
+    }
+    if (task.creatorEmail) {
+      taskData.creatorEmail = task.creatorEmail;
+    }
 
     const promise = setDoc(taskDoc, taskData).then(() => {
     });

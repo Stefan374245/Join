@@ -21,7 +21,7 @@ import { Task } from '../../../../core/models/task.interface';
 import { Contact } from '../../../../core/models/contact.interface';
 import { Observable, map } from 'rxjs';
 import { TaskDetailComponent } from '../../components/task-detail/task-detail.component';
-import { AddTaskComponent } from '../../../add-task/add-task.component';
+import { AddTaskViewComponent } from '../../../add-task/presentational/add-task-view/add-task-view.component';
 import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
 import { ClickOutsideDirective } from '../../../../shared/directives/click-outside.directive';
 import { BoardColumnComponent } from '../../components/board-column/board-column.component';
@@ -40,7 +40,7 @@ interface BoardColumn {
     FormsModule,
     DragDropModule,
     TaskDetailComponent,
-    AddTaskComponent,
+    AddTaskViewComponent,
     LoadingSpinnerComponent,
     ClickOutsideDirective,
     BoardColumnComponent,
