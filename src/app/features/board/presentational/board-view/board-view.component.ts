@@ -24,7 +24,6 @@ import { TaskDetailComponent } from '../../components/task-detail/task-detail.co
 import { AddTaskComponent } from '../../../add-task/add-task.component';
 import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
 import { ClickOutsideDirective } from '../../../../shared/directives/click-outside.directive';
-import { TaskCardComponent } from '../../components/task-card/task-card.component';
 import { BoardColumnComponent } from '../../components/board-column/board-column.component';
 
 interface BoardColumn {
