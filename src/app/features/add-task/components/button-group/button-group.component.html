@@ -1,0 +1,36 @@
+<fieldset class="form-group" [class.has-label]="hasLabel()">
+  @if (hasLabel()) {
+    <legend class="form-label">{{ label() }}</legend>
+  }
+  
+  <div class="button-group" role="group" [attr.aria-label]="ariaLabel()">
+    @for (button of buttons(); track trackBy($index, button)) {
+      <button
+        type="button"
+        [class]="getButtonClasses(button)"
+        [attr.aria-pressed]="isSelected(button.value)"
+        [attr.aria-label]="button.ariaLabel || button.label"
+        [disabled]="button.disabled"
+        (click)="selectButton(button)"
+      >
+        @if (hasIcon(button, 'left')) {
+          <img
+            [src]="getIconPath(button, 'left')"
+            [alt]="button.iconLeftAlt || ''"
+            class="button-icon button-icon-left"
+            role="presentation"
+          />
+        }
+        <span class="button-label">{{ button.label }}</span>
+        @if (hasIcon(button, 'right')) {
+          <img
+            [src]="getIconPath(button, 'right')"
+            [alt]="button.iconRightAlt || ''"
+            class="button-icon button-icon-right"
+            role="presentation"
+          />
+        }
+      </button>
+    }
+  </div>
+</fieldset>

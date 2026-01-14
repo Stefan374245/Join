@@ -1,0 +1,401 @@
+@import "../../../../../styles/variables";
+@import "../../../../../styles/mixins";
+
+.subtask-input-wrapper {
+  position: relative;
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+.subtask-input {
+  width: 100%;
+  height: 48px;
+  padding: 12px 48px 12px 16px;
+  border: 1px solid #d1d1d1;
+  border-radius: 10px;
+  font-size: 20px;
+  font-family: "Inter", sans-serif;
+  outline: none;
+  transition: all 0.2s ease;
+
+  &:focus {
+    border-color: $accent-color;
+  }
+
+  &::placeholder {
+    color: #d1d1d1;
+  }
+
+  &:disabled {
+    background: #f6f7f8;
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+}
+
+.subtask-add-button {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  @include flex(row, center, center);
+  padding: 0;
+  transition: transform 0.2s ease;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-50%) scale(1.1);
+  }
+
+  &:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+
+  .add-icon {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+.subtask-input-wrapper .subtask-actions {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  z-index: 2;
+  opacity: 1;
+}
+
+.subtask-icon-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px;
+  @include flex(row, center, center);
+  transition: transform 0.2s ease;
+
+  &:hover:not(:disabled) {
+    transform: scale(1.1);
+  }
+
+  &:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+}
+
+.subtask-icon {
+  width: 22px;
+  height: 22px;
+}
+
+.subtask-divider {
+  width: 1px;
+  height: 22px;
+  background: #e0e0e0;
+  margin: 0;
+}
+
+.subtasks-list {
+  margin-top: 0.25rem;
+  list-style: none;
+  border: 1px solid #d1d1d1;
+  border-radius: 10px;
+  overflow-y: auto;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  padding: 0;
+  max-height: 200px;
+  background: white;
+}
+
+.subtask-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 4px 4px 24px;
+  border-radius: 4px;
+  background: transparent;
+  transition: all 0.2s ease;
+
+  &::before {
+    content: "•";
+    position: absolute;
+    left: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 24px;
+    color: black;
+    transition: color 0.2s ease;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: $accent-color;
+    transition: width 0.3s ease;
+  }
+
+  &:hover {
+    .subtask-text {
+      color: black;
+    }
+    &::before {
+      color: $accent-color;
+    }
+    &::after {
+      width: 100%;
+    }
+  }
+}
+
+.subtask-text {
+  flex: 1;
+  font-size: 15px;
+  padding: 4px;
+  color: $primary-color;
+}
+
+
+.subtask-item .subtask-actions {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.subtask-item:hover .subtask-actions {
+  opacity: 1;
+}
+
+.subtask-item-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 4px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.subtask-item:hover .subtask-item-actions {
+  opacity: 1;
+}
+
+.dropdown-item:hover .subtask-item-actions {
+  opacity: 1;
+}
+
+.subtask-action-icon {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: scale(1.1);
+  }
+}
+
+.vertical-line-subtask {
+  width: 1px;
+  height: 18px;
+  background: $background-color;
+  margin: 0;
+}
+
+.subtask-edit-wrapper {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  position: relative;
+  padding-left: 20px;
+}
+
+.subtask-edit-input {
+  flex: 1;
+  font-size: 15px;
+  padding: 8px 40px 8px 8px;
+  border: none;
+  transition: box-shadow 0.2s ease;
+  background: transparent;
+  outline: none;
+
+  &:focus {
+    box-shadow: 0 0 0 2px rgba($accent-color, 0.2);
+  }
+}
+
+.subtask-edit-actions {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.subtask-edit-icon {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: scale(1.1);
+  }
+}
+
+.subtask-edit-divider {
+  width: 1px;
+  height: 18px;
+  background: #e0e0e0;
+  margin: 0 4px;
+}
+
+.remaining-count {
+  color: $accent-color;
+  cursor: pointer;
+  position: relative;
+
+  &:hover,
+  &.active {
+    .subtask-action-icon {
+      opacity: 1;
+    }
+  }
+
+  &::before {
+    content: "•";
+    position: absolute;
+    left: 8px;
+    color: black;
+  }
+
+  .remaining-count-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    margin-right: 12px;
+  }
+
+  .dropdown-icon {
+    width: 10px;
+    height: 10px;
+    transition: transform 0.2s ease;
+    cursor: pointer;
+
+    .remaining-count.active & {
+      transform: rotate(180deg);
+    }
+  }
+}
+
+.subtasks-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border-radius: 4px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  margin-top: 4px;
+  padding: 8px 0;
+}
+
+.dropdown-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  transition: all 0.2s ease;
+  position: relative;
+  color: $primary-color;
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: $accent-color;
+    transition: width 0.3s ease;
+  }
+
+  &:hover {
+    color: $accent-color;
+
+    &::after {
+      width: 100%;
+    }
+  }
+
+  .subtask-item-actions {
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  &:hover .subtask-item-actions {
+    opacity: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .subtask-input {
+    font-size: 18px;
+    height: 44px;
+  }
+
+  .subtask-text {
+    font-size: 14px;
+  }
+
+  .subtask-edit-input {
+    font-size: 14px;
+  }
+}
+
+@media (prefers-contrast: high) {
+  .subtask-input,
+  .subtasks-list {
+    border-width: 2px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .subtask-item,
+  .subtask-action-icon,
+  .subtask-add-button {
+    transition: none;
+  }
+
+  .subtask-item::after {
+    transition: none;
+  }
+}

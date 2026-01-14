@@ -1,0 +1,52 @@
+@if (items().length > 0) {
+  <div 
+    class="badge-list" 
+    role="list" 
+    [attr.aria-label]="ariaLabel()"
+    [class.badge-list-horizontal]="layout() === 'horizontal'"
+    [class.badge-list-vertical]="layout() === 'vertical'"
+  >
+    @for (item of displayedItems(); track trackBy($index, item)) {
+      <div
+        class="badge"
+        [class]="getBadgeClasses(item)"
+        [style.background-color]="item.color"
+        [style.color]="item.textColor"
+        [attr.aria-label]="item.ariaLabel || item.label"
+        role="listitem"
+      >
+        @if (item.icon) {
+          <img
+            [src]="item.icon"
+            [alt]="item.iconAlt || ''"
+            class="badge-icon"
+            role="presentation"
+          />
+        } @else {
+          <span class="badge-label">{{ getInitials(item.label) }}</span>
+        }
+        
+        @if (removable() && !item.nonRemovable) {
+          <img
+            [src]="removeIcon()"
+            alt="Remove"
+            class="badge-remove"
+            (click)="remove(item.id)"
+            role="button"
+            tabindex="0"
+            [attr.aria-label]="'Remove ' + item.label"
+          />
+        }
+      </div>
+    }
+    @if (hasMore()) {
+      <div
+        class="badge badge-more"
+        [attr.aria-label]="remainingCount() + ' more items'"
+        role="listitem"
+      >
+        +{{ remainingCount() }}
+      </div>
+    }
+  </div>
+}

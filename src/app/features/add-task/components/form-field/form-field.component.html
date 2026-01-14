@@ -1,0 +1,76 @@
+<fieldset class="form-group">
+  <label [for]="id()" class="form-label">
+    {{ label() }}
+    @if (required()) {
+      <span class="required" aria-label="required">*</span>
+    }
+  </label>
+  
+  @if (type() === 'textarea') {
+    <textarea
+      [id]="id()"
+      [formControl]="control()"
+      [placeholder]="placeholder()"
+      [rows]="rows()"
+      [maxlength]="maxLength()"
+      [ngClass]="inputClasses()"
+      [attr.aria-invalid]="hasError()"
+      [attr.aria-required]="required()"
+      [attr.aria-describedby]="ariaDescribedby()"
+      [attr.spellcheck]="spellcheck()"
+    ></textarea>
+  }
+  
+  @else if (type() === 'date') {
+    <div class="input-wrapper">
+      <input
+        type="date"
+        [id]="id()"
+        [formControl]="control()"
+        [min]="min()"
+        [max]="max()"
+        [ngClass]="inputClasses()"
+        [attr.aria-invalid]="hasError()"
+        [attr.aria-required]="required()"
+        [attr.aria-describedby]="ariaDescribedby()"
+      />
+    </div>
+  }
+  
+  @else {
+    <input
+      [type]="type()"
+      [id]="id()"
+      [formControl]="control()"
+      [placeholder]="placeholder()"
+      [min]="type() === 'number' ? min() : undefined"
+      [max]="type() === 'number' ? max() : undefined"
+      [maxlength]="maxLength()"
+      [ngClass]="inputClasses()"
+      [attr.aria-invalid]="hasError()"
+      [attr.aria-required]="required()"
+      [attr.aria-describedby]="ariaDescribedby()"
+      [attr.spellcheck]="type() === 'text' ? spellcheck() : undefined"
+    />
+  }
+  
+  @if (hasError() && displayErrorMessage()) {
+    <span 
+      [id]="id() + '-error'" 
+      class="error-message" 
+      role="alert"
+      aria-live="polite"
+    >
+      {{ displayErrorMessage() }}
+    </span>
+  }
+  
+  @if (hint() && !hasError()) {
+    <span 
+      [id]="id() + '-hint'" 
+      class="form-hint"
+    >
+      {{ hint() }}
+    </span>
+  }
+</fieldset>

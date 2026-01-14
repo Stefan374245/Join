@@ -1,0 +1,113 @@
+@import '../../../../../styles/variables';
+@import '../../../../../styles/mixins';
+
+fieldset.form-group {
+  border: none;
+  padding: 0;
+  margin: 0 0 8px 0;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.form-label {
+  display: flex;
+  margin-bottom: 8px;
+  font-size: 20px;
+  font-weight: 400;
+  color: #2a3647;
+}
+
+.button-group {
+  @include flex(row, flex-start, center);
+  padding: 0;
+  gap: 12px;
+  width: 100%;
+  height: auto;
+  margin-bottom: 17px;
+}
+
+.button-group-item {
+  @include flex(row, center, center);
+  padding: 12px 8px;
+  gap: 6px;
+  flex: 1;
+  min-width: 90px;
+  max-width: 136px;
+  height: 48px;
+  background: #ffffff;
+  box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  border: none;
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 120%;
+  color: #000000;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  .button-icon {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+  }
+
+  .button-label {
+  }
+
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    
+    &:hover {
+      transform: none;
+      box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.1);
+    }
+  }
+}
+
+.button-group-item.active {
+  color: white;
+
+  img {
+    filter: brightness(0) invert(1);
+  }
+}
+
+.priority-btn {
+
+}
+
+.priority-btn.priority-btn-urgent.active {
+  background: #ff3d00;
+  color: white;
+
+  img {
+    filter: brightness(0) invert(1);
+  }
+}
+
+.priority-btn.priority-btn-medium.active {
+  background: #ffa800;
+  color: white;
+
+  img {
+    filter: brightness(0) invert(1);
+  }
+}
+
+.priority-btn.priority-btn-low.active {
+  background: #7ae229;
+  color: white;
+
+  img {
+    filter: brightness(0) invert(1);
+  }
+}

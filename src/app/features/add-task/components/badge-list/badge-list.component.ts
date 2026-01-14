@@ -1,0 +1,73 @@
+import { Component, ChangeDetectionStrategy, input, output, computed } from '@angular/core';
+import { CommonModule } from '@angular/common';
+
+/**
+ * Interface für Badge Items
+ * Verwendet für Contact Badges, Category Tags, Skill Badges, etc.
+ */
+export interface BadgeItem {
+  id: string;
+  label: string;
+  color?: string;
+  textColor?: string;
+  icon?: string;
+  iconAlt?: string;
+  cssClass?: string;
+  ariaLabel?: string;
+  nonRemovable?: boolean;
+}
+
+@Component({
+  selector: 'app-badge-list',
+  standalone: true,
+  imports: [CommonModule],
+  templateUrl: './badge-list.component.html',
+  styleUrl: './badge-list.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
+})
+export class BadgeListComponent {
+  items = input<BadgeItem[]>([]);
+  maxVisible = input<number | null>(null); // null = alle anzeigen
+  removable = input<boolean>(true);
+  removeIcon = input<string>('assets/images/close.svg');
+  ariaLabel = input<string>('Items');
+  layout = input<'horizontal' | 'vertical'>('horizontal');
+  
+  itemRemove = output<string>();
+  
+  displayedItems = computed(() => {
+    const max = this.maxVisible();
+    return max ? this.items().slice(0, max) : this.items();
+  });
+  
+  remainingCount = computed(() => {
+    const max = this.maxVisible();
+    return max ? Math.max(0, this.items().length - max) : 0;
+  });
+  
+  hasMore = computed(() => this.remainingCount() > 0);
+  
+  remove(itemId: string): void {
+    this.itemRemove.emit(itemId);
+  }
+  
+  trackBy(index: number, item: BadgeItem): string {
+    return item.id;
+  }
+  
+  getBadgeClasses(item: BadgeItem): string {
+    return item.cssClass || '';
+  }
+  
+
+  getInitials(label: string): string {
+    if (!label) return '';
+    
+    const parts = label.trim().split(' ');
+    if (parts.length === 1) {
+      return parts[0].substring(0, 2).toUpperCase();
+    }
+    
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  }
+}
