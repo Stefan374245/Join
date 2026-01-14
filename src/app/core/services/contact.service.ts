@@ -1,22 +1,12 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, signal, computed } from '@angular/core';
 import { Firestore, collection, getDocs, doc, setDoc, deleteDoc, query, where } from '@angular/fire/firestore';
 import { Auth } from '@angular/fire/auth';
 import { Observable, from, combineLatest } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { toObservable } from '@angular/core/rxjs-interop';
 
 import { Contact } from '../models/contact.interface';
 
-/**
- * Service für die Verwaltung von Kontakten/Benutzern
- * 
- * Dieser Service verwaltet alle kontaktbezogenen Operationen:
- * - Laden und Abrufen von Benutzern aus Firestore
- * - Erstellen und Aktualisieren von Kontakten
- * - Löschen von Benutzern
- * - Automatische Farbgenerierung für Benutzer-Avatare
- * 
- * @class ContactService
- */
 @Injectable({
   providedIn: 'root'
 })
@@ -24,74 +14,153 @@ export class ContactService {
   private firestore = inject(Firestore);
   private auth = inject(Auth);
 
-  constructor() { }
+  private contactsSignal = signal<Contact[]>([]);
+  
+  private loadingSignal = signal<boolean>(false);
+  
+  private errorSignal = signal<string | null>(null);
+
+  public readonly contacts = this.contactsSignal.asReadonly();
+  public readonly loading = this.loadingSignal.asReadonly();
+  public readonly error = this.errorSignal.asReadonly();
+
+  public readonly sortedContacts = computed(() => 
+    [...this.contacts()].sort((a, b) =>
+      `${a.firstName} ${a.lastName}`.localeCompare(
+        `${b.firstName} ${b.lastName}`,
+        undefined,
+        { sensitivity: 'base' }
+      )
+    )
+  );
+
+  public readonly contactCount = computed(() => this.contacts().length);
+
+  public readonly contactsByInitial = computed(() => {
+    const grouped = new Map<string, Contact[]>();
+    this.sortedContacts().forEach(contact => {
+      const initial = contact.firstName.charAt(0).toUpperCase();
+      if (!grouped.has(initial)) {
+        grouped.set(initial, []);
+      }
+      grouped.get(initial)!.push(contact);
+    });
+    return grouped;
+  });
+
+  constructor() {}
 
   /**
-   * Lädt alle Kontakte aus Firestore
+   * Lädt alle Kontakte aus Firestore (Async mit Signal-Update)
    * Sortiert die Kontakte alphabetisch nach Namen
-   * @returns {Observable<Contact[]>} Observable mit allen Kontakten
+   * @returns {Promise<Contact[]>} Promise mit allen Kontakten
    */
-  loadAll(): Observable<Contact[]> {
-    const usersCol = collection(this.firestore, 'users');
+  async loadContactsAsync(): Promise<Contact[]> {
+    this.loadingSignal.set(true);
+    this.errorSignal.set(null);
 
-    const p = getDocs(usersCol)
-      .then((snapshot) => {
-        const result: Contact[] = snapshot.docs.map((doc) => {
-          const data = doc.data();
-          const email = data['email'] || '';
+    try {
+      const usersCol = collection(this.firestore, 'users');
+      const snapshot = await getDocs(usersCol);
 
-          let firstName = data['firstName'] || '';
-          let lastName = data['lastName'] || '';
+      const result: Contact[] = snapshot.docs.map((doc) => {
+        const data = doc.data();
+        const email = data['email'] || '';
 
-          if (!firstName && !lastName && data['displayName']) {
-            const nameParts = data['displayName'].split(' ');
-            firstName = nameParts[0] || '';
-            lastName = nameParts.slice(1).join(' ') || '';
-          }
+        let firstName = data['firstName'] || '';
+        let lastName = data['lastName'] || '';
 
-          const fullName = `${firstName} ${lastName}`.trim();
+        if (!firstName && !lastName && data['displayName']) {
+          const nameParts = data['displayName'].split(' ');
+          firstName = nameParts[0] || '';
+          lastName = nameParts.slice(1).join(' ') || '';
+        }
 
-          const initials = data['initials'] || (fullName
-            ? fullName.split(' ').map((s: string) => s[0]).slice(0, 2).join('').toUpperCase()
-            : email.substring(0, 2).toUpperCase());
+        const fullName = `${firstName} ${lastName}`.trim();
 
-          const color = data['color'] || this.generateColorFromEmail(email);
+        const initials = data['initials'] || (fullName
+          ? fullName.split(' ').map((s: string) => s[0]).slice(0, 2).join('').toUpperCase()
+          : email.substring(0, 2).toUpperCase());
 
-          return {
-            id: doc.id,
-            firstName: firstName,
-            lastName: lastName,
-            email: email,
-            phone: data['phone'] || '',
-            color: color,
-            initials: initials
-          } as Contact;
-        });
+        const color = data['color'] || this.generateColorFromEmail(email);
 
-        result.sort((a, b) =>
-          (a.firstName + ' ' + a.lastName).localeCompare(
-            b.firstName + ' ' + b.lastName,
-            undefined,
-            { sensitivity: 'base' }
-          )
-        );
-
-        return result;
-      })
-      .catch((err) => {
-        return [];
+        return {
+          id: doc.id,
+          firstName: firstName,
+          lastName: lastName,
+          email: email,
+          phone: data['phone'] || '',
+          color: color,
+          initials: initials
+        } as Contact;
       });
 
-    return from(p);
+      result.sort((a, b) =>
+        (a.firstName + ' ' + a.lastName).localeCompare(
+          b.firstName + ' ' + b.lastName,
+          undefined,
+          { sensitivity: 'base' }
+        )
+      );
+
+      this.contactsSignal.set(result);
+      this.loadingSignal.set(false);
+      return result;
+    } catch (err) {
+      this.errorSignal.set('Failed to load contacts');
+      this.loadingSignal.set(false);
+      return [];
+    }
   }
 
   /**
-   * Gibt alle Kontakte zurück
-   * Alias für loadAll()
+   * Lädt alle Kontakte aus Firestore (Legacy Observable-Methode)
    * @returns {Observable<Contact[]>} Observable mit allen Kontakten
+   * @deprecated Use loadContactsAsync() or contacts signal instead
+   */
+  loadAll(): Observable<Contact[]> {
+    return from(this.loadContactsAsync());
+  }
+
+  /**
+   * Gibt alle Kontakte zurück (Legacy Observable-Methode)
+   * @returns {Observable<Contact[]>} Observable mit allen Kontakten
+   * @deprecated Use loadContactsAsync() or contacts signal instead
    */
   getContacts(): Observable<Contact[]> {
-    return this.loadAll();
+    return from(this.loadContactsAsync());
+  }
+
+  /**
+   * Signal-basierte Suche nach Kontakt per E-Mail
+   * @param {string} email - Die zu suchende E-Mail-Adresse
+   * @returns {Contact | undefined} Der Kontakt oder undefined
+   */
+  findContactByEmail(email: string): Contact | undefined {
+    return this.contacts().find(c => c.email === email);
+  }
+
+  /**
+   * Signal-basierte Suche nach Kontakt per ID
+   * @param {string} id - Die zu suchende ID
+   * @returns {Contact | undefined} Der Kontakt oder undefined
+   */
+  findContactById(id: string): Contact | undefined {
+    return this.contacts().find(c => c.id === id);
+  }
+
+  /**
+   * Signal-basierte Suche mit Suchbegriff
+   * @param {string} searchTerm - Der Suchbegriff
+   * @returns {Contact[]} Gefilterte Kontakte
+   */
+  searchContacts(searchTerm: string): Contact[] {
+    const term = searchTerm.toLowerCase();
+    return this.contacts().filter(contact =>
+      `${contact.firstName} ${contact.lastName} ${contact.email}`
+        .toLowerCase()
+        .includes(term)
+    );
   }
 
   /**
@@ -147,7 +216,7 @@ export class ContactService {
   }
 
   /**
-   * Speichert einen Kontakt in Firestore
+   * Speichert einen Kontakt in Firestore und aktualisiert den lokalen Cache
    * Erstellt oder aktualisiert ein vollständiges Kontaktdokument
    * @param {Contact} contact - Der zu speichernde Kontakt
    * @returns {Observable<void>} Observable des Speichervorgangs
@@ -166,13 +235,15 @@ export class ContactService {
       initials: contact.initials,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
+    }).then(() => {
+      this.loadContactsAsync();
     });
 
     return from(promise);
   }
 
   /**
-   * Aktualisiert einen bestehenden Benutzer in Firestore
+   * Aktualisiert einen bestehenden Benutzer in Firestore und den lokalen Cache
    * Aktualisiert automatisch den displayName wenn firstName oder lastName geändert werden
    * @param {string} userId - Die Benutzer-ID
    * @param {Partial<Contact>} data - Die zu aktualisierenden Daten
@@ -189,12 +260,15 @@ export class ContactService {
       updateData.displayName = `${data.firstName || ''} ${data.lastName || ''}`.trim();
     }
 
-    const promise = setDoc(userDoc, updateData, { merge: true });
+    const promise = setDoc(userDoc, updateData, { merge: true }).then(() => {
+      this.loadContactsAsync();
+    });
+
     return from(promise);
   }
 
   /**
-   * Löscht einen Benutzer aus Firestore und entfernt ihn aus allen Tasks
+   * Löscht einen Benutzer aus Firestore, entfernt ihn aus allen Tasks und aktualisiert den Cache
    * @param {string} userId - Die ID des zu löschenden Benutzers
    * @returns {Observable<void>} Observable des Löschvorgangs
    */
@@ -205,6 +279,8 @@ export class ContactService {
       await this.removeUserFromAllTasks(userId);
       
       await deleteDoc(userDoc);
+      
+      await this.loadContactsAsync();
     })();
     
     return from(promise);
