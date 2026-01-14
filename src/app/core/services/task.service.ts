@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, signal, computed, effect } from '@angular/core';
 import {
   Firestore,
   collection,
@@ -17,10 +17,11 @@ import {
 import { Auth, authState } from '@angular/fire/auth';
 import { Observable, from, BehaviorSubject, of } from 'rxjs';
 import { map, catchError, tap } from 'rxjs/operators';
+import { toSignal, toObservable } from '@angular/core/rxjs-interop';
 import { Task, Subtask } from '../models/task.interface';
 
 /**
- * Service zur Verwaltung von Aufgaben (Tasks)
+ * Service zur Verwaltung von Aufgaben (Tasks) - Signal-basiert
  * 
  * Dieser Service verwaltet alle aufgabenbezogenen Operationen:
  * - Echtzeit-Synchronisation mit Firestore
@@ -28,6 +29,8 @@ import { Task, Subtask } from '../models/task.interface';
  * - Verwaltung von Subtasks
  * - Status-Übergänge und Filterung
  * - Statistiken und Analysen
+ * 
+ * Migration zu Angular 19 Signals für reaktive Task-Verwaltung.
  * 
  * @class TaskService
  */
@@ -37,16 +40,68 @@ import { Task, Subtask } from '../models/task.interface';
 export class TaskService {
   private firestore = inject(Firestore);
   private auth = inject(Auth);
-  /** BehaviorSubject für die aktuelle Task-Liste */
+  
+  /** Signal für die aktuelle Task-Liste */
+  private tasksSignal = signal<Task[]>([]);
+  
+  /** Signal für Loading-State */
+  private loadingSignal = signal<boolean>(false);
+  
+  /** Signal für Error-State */
+  private errorSignal = signal<string | null>(null);
+  
+  /** Public readonly Signals */
+  public readonly tasks = this.tasksSignal.asReadonly();
+  public readonly loading = this.loadingSignal.asReadonly();
+  public readonly error = this.errorSignal.asReadonly();
+  
+  /** Computed Signals für Filterung & Statistiken */
+  public readonly tasksByStatus = computed(() => {
+    const allTasks = this.tasks();
+    return {
+      triage: allTasks.filter(t => t.status === 'triage'),
+      todo: allTasks.filter(t => t.status === 'todo'),
+      inProgress: allTasks.filter(t => t.status === 'in-progress'),
+      awaitFeedback: allTasks.filter(t => t.status === 'await-feedback'),
+      done: allTasks.filter(t => t.status === 'done')
+    };
+  });
+  
+  public readonly urgentTasks = computed(() => 
+    this.tasks().filter(t => t.priority === 'high' && t.status !== 'done')
+  );
+  
+  public readonly taskStats = computed(() => ({
+    total: this.tasks().length,
+    triage: this.tasksByStatus().triage.length,
+    todo: this.tasksByStatus().todo.length,
+    inProgress: this.tasksByStatus().inProgress.length,
+    awaitFeedback: this.tasksByStatus().awaitFeedback.length,
+    done: this.tasksByStatus().done.length,
+    urgent: this.urgentTasks().length
+  }));
+  
+  public readonly nextUrgentDeadline = computed(() => {
+    const urgent = this.urgentTasks()
+      .sort((a, b) => a.dueDate.getTime() - b.dueDate.getTime());
+    return urgent.length > 0 ? urgent[0].dueDate : null;
+  });
+  
+  /** Observable für Backwards Compatibility */
+  public readonly tasks$ = toObservable(this.tasks);
+  
+  /** Legacy BehaviorSubject für alte Code-Teile */
   private tasksSubject = new BehaviorSubject<Task[]>([]);
-  /** Observable Stream aller Tasks */
-  public tasks$ = this.tasksSubject.asObservable();
+  
   /** Referenz zum Snapshot-Listener */
   private unsubscribe: (() => void) | null = null;
 
   constructor() {
-    // Warte auf Auth-State-Änderungen, bevor Tasks geladen werden
-    authState(this.auth).subscribe(user => {
+    // Effect für Auth-State-Änderungen
+    const authStateSignal = toSignal(authState(this.auth), { initialValue: null });
+    
+    effect(() => {
+      const user = authStateSignal();
       if (user) {
         this.initializeTasksListener();
       } else {
@@ -55,6 +110,7 @@ export class TaskService {
           this.unsubscribe();
           this.unsubscribe = null;
         }
+        this.tasksSignal.set([]);
         this.tasksSubject.next([]);
       }
     });
@@ -70,6 +126,8 @@ export class TaskService {
     if (this.unsubscribe) {
       this.unsubscribe();
     }
+
+    this.loadingSignal.set(true);
 
     try {
       const tasksCol = collection(this.firestore, 'tasks');
@@ -87,13 +145,23 @@ export class TaskService {
             return dateB - dateA;
           });
 
+          // Signal & BehaviorSubject aktualisieren (für Backwards Compatibility)
+          this.tasksSignal.set(tasks);
           this.tasksSubject.next(tasks);
+          this.loadingSignal.set(false);
+          this.errorSignal.set(null);
         },
         (error) => {
+          this.errorSignal.set('Failed to load tasks');
+          this.loadingSignal.set(false);
+          this.tasksSignal.set([]);
           this.tasksSubject.next([]);
         }
       );
     } catch (error) {
+      this.errorSignal.set('Failed to initialize tasks listener');
+      this.loadingSignal.set(false);
+      this.tasksSignal.set([]);
       this.tasksSubject.next([]);
     }
   }
@@ -212,17 +280,28 @@ export class TaskService {
   }
 
   /**
-   * Gibt ein Observable aller Tasks zurück
+   * Gibt ein Observable aller Tasks zurück (Legacy-Methode)
    * @returns {Observable<Task[]>} Observable Stream aller Tasks
+   * @deprecated Use tasks signal instead
    */
   getTasks(): Observable<Task[]> {
     return this.tasks$;
   }
 
   /**
-   * Sucht einen Task anhand der ID
+   * Signal-basierte Suche nach Task per ID
+   * @param {string} taskId - Die Task-ID
+   * @returns {Task | undefined} Der Task oder undefined
+   */
+  findTaskById(taskId: string): Task | undefined {
+    return this.tasks().find(task => task.id === taskId);
+  }
+
+  /**
+   * Sucht einen Task anhand der ID (Legacy Observable-Methode)
    * @param {string} taskId - Die Task-ID
    * @returns {Observable<Task | undefined>} Observable mit dem Task oder undefined
+   * @deprecated Use findTaskById() or tasks signal instead
    */
   getTaskById(taskId: string): Observable<Task | undefined> {
     return this.tasks$.pipe(
@@ -231,9 +310,10 @@ export class TaskService {
   }
 
   /**
-   * Filtert Tasks nach Status
+   * Filtert Tasks nach Status (Legacy Observable-Methode)
    * @param {('todo'|'in-progress'|'done')} status - Der gewünschte Status
    * @returns {Observable<Task[]>} Observable mit gefilterten Tasks
+   * @deprecated Use tasksByStatus signal instead
    */
   getTasksByStatus(status: 'todo' | 'in-progress' | 'done'): Observable<Task[]> {
     return this.tasks$.pipe(
@@ -242,8 +322,9 @@ export class TaskService {
   }
 
   /**
-   * Gibt alle Tasks mit hoher Priorität zurück
+   * Gibt alle Tasks mit hoher Priorität zurück (Legacy Observable-Methode)
    * @returns {Observable<Task[]>} Observable mit dringenden Tasks
+   * @deprecated Use urgentTasks signal instead
    */
   getUrgentTasks(): Observable<Task[]> {
     return this.tasks$.pipe(
@@ -252,8 +333,9 @@ export class TaskService {
   }
 
   /**
-   * Gibt Statistiken über Tasks zurück
+   * Gibt Statistiken über Tasks zurück (Legacy Observable-Methode)
    * @returns {Observable<Object>} Observable mit Task-Statistiken (total, todo, inProgress, done, urgent)
+   * @deprecated Use taskStats signal instead
    */
   getTaskStats(): Observable<{
     total: number;
@@ -274,8 +356,9 @@ export class TaskService {
   }
 
   /**
-   * Gibt den nächsten dringenden Termin zurück
+   * Gibt den nächsten dringenden Termin zurück (Legacy Observable-Methode)
    * @returns {Observable<Date | null>} Observable mit dem nächsten Deadline oder null
+   * @deprecated Use nextUrgentDeadline signal instead
    */
   getNextUrgentDeadline(): Observable<Date | null> {
     return this.tasks$.pipe(
