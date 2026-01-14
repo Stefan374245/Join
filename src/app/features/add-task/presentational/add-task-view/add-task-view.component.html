@@ -1,0 +1,156 @@
+<!-- Main Wrapper with conditional classes -->
+<div [class.task-edit-overlay]="isOverlay()"
+     [class.add-task-container]="!isOverlay()"
+     (click)="isOverlay() ? onOverlayClick($event) : null"
+     role="dialog"
+     [attr.aria-modal]="isOverlay()"
+     [attr.aria-labelledby]="isEditMode() ? 'edit-task-title' : 'add-task-title'">
+
+  <article [class.task-edit-card]="isOverlay()"
+       (click)="isOverlay() ? $event.stopPropagation() : null">
+
+    <button *ngIf="isOverlay()" class="close-btn" (click)="onClose()" aria-label="Close dialog">
+      <img src="assets/images/close.svg" alt="" role="presentation" />
+    </button>
+
+    <header [class.edit-header]="isOverlay()" [class.add-task-header]="!isOverlay()">
+      <h1 [class.edit-title]="isOverlay()"
+          [class.page-title]="!isOverlay()"
+          [id]="isEditMode() ? 'edit-task-title' : 'add-task-title'">
+        {{ isEditMode() ? 'Edit Task' : 'Add Task' }}
+      </h1>
+    </header>
+
+    <main class="form-wrapper">
+      <form [formGroup]="taskForm" class="add-task-form" (ngSubmit)="onSubmit()">
+        <section class="form-column form-column-left">
+          <div class="form-row">
+            <app-form-field
+              id="title"
+              label="Title"
+              type="text"
+              [control]="getControl('title')"
+              placeholder="Enter a title"
+              [required]="true"
+              errorMessage="Title is required"
+            />
+          </div>
+
+          <div class="form-row">
+            <app-form-field
+              id="description"
+              label="Description"
+              type="textarea"
+              [control]="getControl('description')"
+              placeholder="Enter a Description"
+              [rows]="4"
+            />
+          </div>
+
+          <div class="form-row">
+            <app-form-field
+              id="dueDate"
+              label="Due date"
+              type="date"
+              [control]="getControl('dueDate')"
+              [min]="minDate()"
+              [required]="true"
+              errorMessage="Due date is required"
+            />
+          </div>
+        </section>
+
+        <hr class="separator" aria-hidden="true" />
+
+      <section class="form-column form-column-right">
+        <div class="form-section">
+          <label class="section-label">Priority</label>
+          <app-button-group
+            [buttons]="priorityButtons"
+            [selectedValue]="selectedPriority()"
+            (valueChange)="onPriorityChange($event)"
+          />
+        </div>
+
+        <div class="form-section">
+          <label class="section-label">Assigned to</label>
+          <app-dropdown
+            id="contacts"
+            [items]="availableContacts()"
+            [selectedIds]="selectedContactIds()"
+            placeholder="Select contacts to assign"
+            [searchable]="true"
+            [multiple]="true"
+            (selectionChange)="onContactSelection($event)"
+          />
+          
+          @if (selectedContactIds().length > 0) {
+            <app-badge-list
+              [items]="selectedContactBadges()"
+              [maxVisible]="5"
+              [layout]="'horizontal'"
+              (itemRemove)="onRemoveBadge($event)"
+            />
+          }
+        </div>
+
+        <div class="form-section">
+          <label class="section-label" [class.required]="true">
+            Category
+            <span class="required-indicator">*</span>
+          </label>
+          <app-dropdown
+            id="category"
+            [items]="categoryItems()"
+            [selectedIds]="selectedCategory() ? [selectedCategory()] : []"
+            placeholder="Select task category"
+            [searchable]="false"
+            [multiple]="false"
+            (selectionChange)="onCategorySelection($event)"
+          />
+        </div>
+
+        <div class="form-section">
+          <label class="section-label">Subtasks</label>
+          <app-subtask-management
+            [subtasks]="subtasks()"
+            [editingSubtaskId]="editingSubtaskId()"
+            [subtaskEditInput]="subtaskEditInput()"
+            (addSubtask)="onAddSubtask($event)"
+            (editSubtask)="onEditSubtask($event)"
+            (updateSubtask)="onUpdateSubtask()"
+            (cancelEditSubtask)="onCancelEditSubtask()"
+            (deleteSubtask)="onDeleteSubtask($event)"
+            (subtaskEditInputChange)="onSubtaskEditInputChange($event)"
+          />
+        </div>
+      </section>
+    </form>
+
+    <p class="required-label">
+      <span aria-hidden="true">*</span>This field is required
+    </p>
+
+    <footer class="form-actions">
+      <button 
+        type="button" 
+        class="btn btn-secondary"
+        (click)="onClearForm()"
+      >
+        Clear
+        <img src="assets/images/close.svg" alt="" role="presentation" />
+      </button>
+
+      <button 
+        type="submit" 
+        class="btn btn-primary"
+        [disabled]="!isFormValid()"
+        (click)="onSubmit()"
+      >
+        {{ isEditMode() ? 'Update Task' : 'Create Task' }}
+        <img src="assets/images/check.svg" alt="" role="presentation" />
+      </button>
+    </footer>
+  </main>
+  </article>
+</div>

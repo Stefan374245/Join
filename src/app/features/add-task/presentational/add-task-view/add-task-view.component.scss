@@ -1,0 +1,296 @@
+@import '../../../../../styles/variables';
+@import '../../../../../styles/mixins';
+@import '../../../../../styles/page-layouts';
+@import '../../../../../styles/scrollbar';
+
+.task-edit-overlay {
+  @include flex(row, center, center);
+  position: fixed;
+  top: 0;
+  left: $sidebar-width;
+  width: calc(100% - #{$sidebar-width});
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.1);
+  z-index: 250;
+  padding: 20px;
+  overflow: auto;
+
+  @media (max-width: $breakpoint-lg-xl) {
+    left: 80px;
+    width: calc(100% - 80px);
+  }
+
+  @media (max-width: $breakpoint-lg) {
+    left: 0;
+    width: 100%;
+    bottom: 80px;
+  }
+}
+
+.task-edit-card {
+  position: relative;
+  width: 1116px;
+  max-width: 95%;
+  max-height: 90vh;
+  background: $white;
+  box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 30px;
+  padding: 48px 40px;
+  animation: slideInFromRight 0.3s ease-out;
+  overflow: auto;
+  @include flex(column, flex-start, stretch);
+  gap: 24px;
+
+  @include hide-scrollbar;
+
+  .close-btn {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    z-index: 260;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    
+    &:hover {
+      background: rgba(0, 0, 0, 0.1);
+    }
+    
+    img {
+      width: 20px;
+      height: 20px;
+    }
+  }
+
+  .edit-header {
+    margin-bottom: 1rem;
+
+    .edit-title {
+      font-size: 2rem;
+      font-weight: 700;
+      color: $primary-color;
+      margin: 0;
+    }
+  }
+
+  .form-wrapper {
+    flex: 1;
+    overflow: visible;
+    background: transparent;
+    padding: 0;
+    box-shadow: none;
+    border-radius: 0;
+  }
+
+  .add-task-form {
+    gap: 2rem;
+  }
+}
+
+@keyframes slideInFromRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.add-task-container {
+  @include page-layout-standard;
+}
+
+.add-task-header {
+  flex-shrink: 0;
+  margin-bottom: 2rem;
+
+  @media (max-width: $breakpoint-md) {
+    margin-bottom: 1.5rem;
+  }
+
+  .page-title {
+    @include page-title;
+    margin: 0;
+  }
+}
+
+.form-wrapper {
+  @include flex(column, flex-start, stretch);
+  max-width: 850px;
+  width: 100%;
+}
+
+.add-task-form {
+  @include flex(row, flex-start, stretch);
+  gap: 20px;
+  flex: 1;
+  margin-bottom: 0;
+}
+
+.form-column {
+  width: 50%;
+  @include flex(column, flex-start, stretch);
+  gap: 8px;
+  
+  @media (max-width: $breakpoint-md) {
+    width: 100%;
+  }
+}
+
+.form-row {
+  @include flex(column, flex-start, stretch);
+  margin-bottom: 8px;
+}
+
+.form-section {
+  @include flex(column, flex-start, stretch);
+  position: relative;
+  margin-bottom: 8px;
+}
+
+.separator {
+  width: 1px;
+  background-color: #d1d1d1;
+  align-self: stretch;
+  border: none;
+  margin: 0;
+  
+  @media (max-width: $breakpoint-md) {
+    display: none;
+  }
+}
+
+.section-label {
+  display: flex;
+  margin-bottom: 8px;
+  font-size: 20px;
+  font-weight: 400;
+  color: #2a3647;
+
+  &.required::after {
+    content: '';
+    color: #ff3d00;
+    margin-left: 4px;
+  }
+}
+
+.required-indicator {
+  color: #ff3d00;
+  font-weight: bold;
+}
+
+.required-label {
+  @include flex(row, flex-start, center);
+  gap: 4px;
+  font-size: 14px;
+  color: #2a3647;
+  margin-top: 16px;
+  margin-bottom: 8px;
+}
+
+.form-actions {
+  @include flex(row, flex-end, center);
+  gap: 16px;
+  margin-top: 24px;
+  width: 100%;
+  
+  @media (max-width: $breakpoint-md) {
+    flex-direction: row;
+    gap: 12px;
+  }
+}
+
+.btn {
+  @include flex(row, center, center);
+  gap: 8px;
+  padding: 18px 10px;
+  border: none;
+  border-radius: 10px;
+  font-size: 21px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.125s ease-in-out;
+  font-family: 'Inter', sans-serif;
+  min-width: 110px;
+  
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  &:hover:not(:disabled) {
+    transform: scale(1.05);
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.15);
+  }
+  
+  img, svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.btn-secondary {
+  background-color: transparent;
+  color: #2a3647;
+  border: 1px solid #2a3647;
+  
+  &:hover:not(:disabled) {
+    background-color: #f0f0f0;
+  }
+}
+
+.btn-primary {
+  background-color: #2a3647;
+  color: white;
+  
+  &:hover:not(:disabled) {
+    background-color: #29abe2;
+  }
+}
+
+@media (max-width: $breakpoint-lg) {
+  .form-wrapper {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: $breakpoint-md) {
+  .add-task-form {
+    flex-direction: column;
+    gap: 24px;
+  }
+  
+  .form-column {
+    width: 100%;
+  }
+  
+  .form-actions {
+    flex-direction: row;
+    gap: 12px;
+  }
+  
+  .btn {
+    font-size: 18px;
+    padding: 14px 8px;
+    min-width: 90px;
+  }
+}
+
+@media (max-width: 480px) {
+  .section-label {
+    font-size: 18px;
+  }
+  
+  .btn {
+    font-size: 16px;
+    padding: 12px 8px;
+  }
+  
+  .add-task-header .page-title {
+    font-size: 28px;
+  }
+}
