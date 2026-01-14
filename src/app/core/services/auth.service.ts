@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, signal, computed, effect } from '@angular/core';
 import {
   Auth,
   createUserWithEmailAndPassword,
@@ -15,32 +15,18 @@ import { Firestore, doc, setDoc, getDoc } from '@angular/fire/firestore';
 import { Observable, from } from 'rxjs';
 import { catchError, switchMap, map } from 'rxjs/operators';
 import { Router } from '@angular/router';
+import { toSignal, toObservable } from '@angular/core/rxjs-interop';
 
 /**
  * Interface für Registrierungsdaten
  * @interface SignupData
  */
 export interface SignupData {
-  /** Vollständiger Name des Benutzers */
   name: string;
-  /** E-Mail-Adresse des Benutzers */
   email: string;
-  /** Passwort für das Konto */
   password: string;
 }
 
-/**
- * Service für die Authentifizierung und Benutzerverwaltung
- * 
- * Dieser Service verwaltet alle authentifizierungsbezogenen Operationen:
- * - Benutzerregistrierung und -anmeldung
- * - Google OAuth-Integration
- * - Gast-Login-Funktionalität
- * - Benutzerprofilverwaltung
- * - Firestore-Synchronisation von Benutzerdaten
- * 
- * @class AuthService
- */
 @Injectable({
   providedIn: 'root'
 })
@@ -49,11 +35,32 @@ export class AuthService {
   private firestore = inject(Firestore);
   private router = inject(Router);
 
-  /** Observable Stream des aktuellen Authentifizierungsstatus */
-  user$: Observable<User | null> = authState(this.auth);
+  private userSignal = toSignal(authState(this.auth), { initialValue: null });
+
+  public readonly currentUserSignal = this.userSignal;
+
+  user$: Observable<User | null> = toObservable(this.userSignal);
+
+  public readonly isAuthenticated = computed(() => this.userSignal() !== null);
+
+  public readonly userDisplayName = computed(() => 
+    this.userSignal()?.displayName ?? null
+  );
+
+  public readonly userEmail = computed(() => 
+    this.userSignal()?.email ?? null
+  );
+
+  public readonly isGuestUser = computed(() => 
+    this.userSignal()?.email === 'guest@join.com'
+  );
+
+  public readonly userId = computed(() => 
+    this.userSignal()?.uid ?? null
+  );
 
   /**
-   * Gibt den aktuell angemeldeten Benutzer zurück
+   * Gibt den aktuell angemeldeten Benutzer zurück (Legacy-Support)
    * @returns {User | null} Der aktuelle Benutzer oder null
    */
   get currentUser(): User | null {
@@ -182,7 +189,6 @@ export class AuthService {
 
     return this.login(guestEmail, guestPassword).pipe(
       catchError((error) => {
-        // Wenn Guest-User nicht existiert, erstellen wir ihn automatisch
         if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
           console.log('🔧 Guest user does not exist. Creating guest account...');
           
@@ -196,7 +202,6 @@ export class AuthService {
               return this.login(guestEmail, guestPassword);
             }),
             catchError((signupError) => {
-              // Falls der Guest-User bereits existiert aber Passwort falsch ist
               if (signupError.code === 'auth/email-already-in-use') {
                 console.error('❌ Guest account exists but wrong password. Please check credentials.');
               }
@@ -240,40 +245,45 @@ export class AuthService {
   }
 
   /**
-   * Überprüft, ob ein Benutzer angemeldet ist
+   * Überprüft, ob ein Benutzer angemeldet ist (Legacy-Methode)
    * @returns {boolean} True wenn angemeldet, sonst false
+   * @deprecated Use isAuthenticated signal instead
    */
-  isAuthenticated(): boolean {
+  isAuthenticatedLegacy(): boolean {
     return this.currentUser !== null;
   }
 
   /**
-   * Gibt den Anzeigenamen des aktuellen Benutzers zurück
+   * Gibt den Anzeigenamen des aktuellen Benutzers zurück (Legacy-Methode)
    * @returns {string | null} Anzeigename oder null
+   * @deprecated Use userDisplayName signal instead
    */
   getUserDisplayName(): string | null {
     return this.currentUser?.displayName || null;
   }
 
   /**
-   * Gibt die E-Mail-Adresse des aktuellen Benutzers zurück
+   * Gibt die E-Mail-Adresse des aktuellen Benutzers zurück (Legacy-Methode)
    * @returns {string | null} E-Mail-Adresse oder null
+   * @deprecated Use userEmail signal instead
    */
   getUserEmail(): string | null {
     return this.currentUser?.email || null;
   }
 
   /**
-   * Prüft, ob der aktuelle Benutzer ein Gast ist
+   * Prüft, ob der aktuelle Benutzer ein Gast ist (Legacy-Methode)
    * @returns {boolean} True wenn Gast, sonst false
+   * @deprecated Use isGuestUser signal instead
    */
-  isGuestUser(): boolean {
+  isGuestUserLegacy(): boolean {
     return this.currentUser?.email === 'guest@join.com';
   }
 
   /**
    * Gibt ein Observable zurück, das prüft ob der Benutzer ein Gast ist
    * @returns {Observable<boolean>} Observable mit Gast-Status
+   * @deprecated Use isGuestUser signal instead
    */
   isGuestUser$(): Observable<boolean> {
     return this.user$.pipe(
