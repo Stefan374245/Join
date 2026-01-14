@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, ViewEncapsulation } from '@angular/core';
+import { Component, input, output, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { Task } from '../../../../core/models/task.interface';
@@ -13,12 +13,12 @@ import { Contact } from '../../../../core/models/contact.interface';
   encapsulation: ViewEncapsulation.None,
 })
 export class TaskCardComponent {
-  @Input({ required: true }) task!: Task;
-  @Input({ required: true }) contacts: Contact[] = [];
-  @Output() taskClicked = new EventEmitter<Task>();
+  task = input.required<Task>();
+  contacts = input.required<Contact[]>();
+  taskClicked = output<Task>();
 
   onTaskClick(): void {
-    this.taskClicked.emit(this.task);
+    this.taskClicked.emit(this.task());
   }
 
   getCategoryClass(category: string): string {
@@ -55,12 +55,12 @@ export class TaskCardComponent {
   }
 
   getContactColor(userId: string): string {
-    const contact = this.contacts.find((c) => c.id === userId);
+    const contact = this.contacts().find((c) => c.id === userId);
     return contact?.color || '#29abe2';
   }
 
   getContactInitials(userId: string): string {
-    const contact = this.contacts.find((c) => c.id === userId);
+    const contact = this.contacts().find((c) => c.id === userId);
     return contact?.initials || '??';
   }
 
