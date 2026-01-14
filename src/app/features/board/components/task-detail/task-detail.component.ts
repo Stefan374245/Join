@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, inject, OnInit } from '@angular/core';
+import { Component, input, output, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
 import { Task } from '../../../../core/models/task.interface';
@@ -16,11 +16,11 @@ import { ToastService } from '../../../../core/services/toast.service';
 })
 export class TaskDetailComponent implements OnInit {
   contactsLoading: boolean = true;
-  @Input() task!: Task;
-  @Input() isVisible: boolean = false;
-  @Output() close = new EventEmitter<void>();
-  @Output() edit = new EventEmitter<Task>();
-  @Output() delete = new EventEmitter<string>();
+  task = input.required<Task>();
+  isVisible = input<boolean>(false);
+  close = output<void>();
+  edit = output<Task>();
+  delete = output<string>();
 
   private taskService = inject(TaskService);
   private contactService = inject(ContactService);
@@ -60,7 +60,7 @@ export class TaskDetailComponent implements OnInit {
   }
 
   onEdit(): void {
-    this.edit.emit(this.task);
+    this.edit.emit(this.task());
   }
 
   showDeleteConfirmation(): void {
@@ -72,8 +72,8 @@ export class TaskDetailComponent implements OnInit {
   }
 
   confirmDelete(): void {
-    this.toastService.showTaskDeleted(this.task.title);
-    this.delete.emit(this.task.id);
+    this.toastService.showTaskDeleted(this.task().title);
+    this.delete.emit(this.task().id);
     this.showDeleteConfirm = false;
     this.onClose();
   }
@@ -86,12 +86,12 @@ export class TaskDetailComponent implements OnInit {
     }
     this.lastToggleTime = now;
 
-    if (!this.task.subtasks) {
+    if (!this.task().subtasks) {
       console.error('❌ Component: No subtasks found');
       return;
     }
 
-    const subtask = this.task.subtasks.find(st => st.id === subtaskId);
+    const subtask = this.task().subtasks.find(st => st.id === subtaskId);
     if (!subtask) {
       console.error('❌ Component: Subtask not found:', subtaskId);
       return;
@@ -104,7 +104,7 @@ export class TaskDetailComponent implements OnInit {
     subtask.completed = newState;
     console.log('🖼️ Component: UI updated immediately to:', subtask.completed);
 
-    this.taskService.updateSubtaskCompletion(this.task.id, subtaskId, newState).subscribe({
+    this.taskService.updateSubtaskCompletion(this.task().id, subtaskId, newState).subscribe({
       next: () => {
         console.log('✅ Component: Firestore sync completed with state:', newState);
       },
@@ -150,55 +150,58 @@ export class TaskDetailComponent implements OnInit {
   }
 
   getCreatorIcon(): string {
-    if (this.task.creatorType === 'external' || this.task.source === 'email') {
+    if (this.task().creatorType === 'external' || this.task().source === 'email') {
       return 'assets/images/creator-external.svg';
     }
     return 'assets/images/team.svg';
   }
 
   getCreatorContentIcon(): string {
-    if (this.task.source === 'email' || this.task.creatorType === 'external') {
+    if (this.task().source === 'email' || this.task().creatorType === 'external') {
       return 'assets/images/card_email.svg';
     }
     return 'assets/images/creator-profil.svg';
   }
 
   getCreatorContentText(): string {
-    if (this.task.source === 'email' || this.task.creatorType === 'external') {
+    if (this.task().source === 'email' || this.task().creatorType === 'external') {
       return 'E-mail';
     }
     return 'Profil';
   }
 
   getCreatorContentClass(): string {
-    if (this.task.source === 'email' || this.task.creatorType === 'external') {
+    if (this.task().source === 'email' || this.task().creatorType === 'external') {
       return 'content-external';
     }
     return 'content-member';
   }
 
   getCreatorBadgeClass(): string {
-    if (this.task.creatorType === 'external' || this.task.source === 'email') {
+    if (this.task().creatorType === 'external' || this.task().source === 'email') {
       return 'badge-external';
     }
     return 'badge-member';
   }
 
   getCreatorBadgeText(): string {
-    if (this.task.creatorType === 'external' || this.task.source === 'email') {
+    if (this.task().creatorType === 'external' || this.task().source === 'email') {
       return 'Extern';
     }
     return 'Member';
   }
 
   getCreatorDisplayName(): string {
-    if (this.task.creatorName) {
-      return this.task.creatorName;
+    const task = this.task();
+    const creatorName = task.creatorName;
+    if (creatorName) {
+      return creatorName;
     }
-    if (this.task.creatorEmail) {
-      return this.task.creatorEmail;
+    const creatorEmail = task.creatorEmail;
+    if (creatorEmail) {
+      return creatorEmail;
     }
-    if (this.task.source === 'member' || this.task.creatorType === 'member') {
+    if (task.source === 'member' || task.creatorType === 'member') {
       return 'Member';
     }
     return 'Unknown';

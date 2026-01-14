@@ -2,8 +2,7 @@ import {
   Component,
   OnInit,
   inject,
-  ViewChildren,
-  QueryList,
+  viewChildren,
   AfterViewInit,
   OnDestroy,
 } from '@angular/core';
@@ -51,7 +50,7 @@ interface BoardColumn {
   styleUrl: './board-view.component.scss',
 })
 export class BoardViewComponent implements OnInit, AfterViewInit, OnDestroy {
-  @ViewChildren(BoardColumnComponent) boardColumns!: QueryList<BoardColumnComponent>;
+  boardColumns = viewChildren(BoardColumnComponent);
 
   private taskService = inject(TaskService);
   private contactService = inject(ContactService);
@@ -188,14 +187,14 @@ export class BoardViewComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private connectDropLists(): void {
     setTimeout(() => {
-      if (this.boardColumns && this.boardColumns.length > 0) {
-        const allDropLists = this.boardColumns.map(col => col.dropList).filter(list => !!list);
+      if (this.boardColumns() && this.boardColumns().length > 0) {
+        const allDropLists = this.boardColumns().map(col => col.dropList()).filter(list => !!list);
         
         if (allDropLists.length > 0) {
-          this.boardColumns.forEach((column) => {
-            if (column.dropList) {
-              column.dropList.connectedTo = allDropLists.filter(
-                (list) => list.id !== column.dropList.id
+          this.boardColumns().forEach((column) => {
+            if (column.dropList()) {
+              column.dropList()!.connectedTo = allDropLists.filter(
+                (list) => list!.id !== column.dropList()!.id
               );
             }
           });
@@ -233,14 +232,14 @@ export class BoardViewComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngAfterViewInit(): void {
     setTimeout(() => {
-      if (this.boardColumns && this.boardColumns.length > 0) {
-        const allDropLists = this.boardColumns.map(col => col.dropList).filter(list => !!list);
-        console.log('🎯 Connecting drop lists:', allDropLists.map(l => l.id));
+      if (this.boardColumns() && this.boardColumns().length > 0) {
+        const allDropLists = this.boardColumns().map(col => col.dropList()).filter(list => !!list);
+        console.log('🎯 Connecting drop lists:', allDropLists.map(l => l!.id));
 
-        this.boardColumns.forEach((column) => {
-          if (column.dropList) {
-            column.dropList.connectedTo = allDropLists.filter(
-              (list) => list.id !== column.dropList.id
+        this.boardColumns().forEach((column) => {
+          if (column.dropList()) {
+            column.dropList()!.connectedTo = allDropLists.filter(
+              (list) => list!.id !== column.dropList()!.id
             );
           }
         });

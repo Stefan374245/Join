@@ -1,14 +1,14 @@
 <div
   class="task-overlay"
-  *ngIf="isVisible && task"
+  *ngIf="isVisible() && task()"
   (click)="onOverlayClick($event)"
 >
   <div class="task-card-overlay" (click)="$event.stopPropagation()">
     <div class="task-header">
-      <div class="task-category" [ngClass]="getCategoryClass(task.category)">
-        <span>{{ task.category }}</span>
+      <div class="task-category" [ngClass]="getCategoryClass(task().category)">
+        <span>{{ task().category }}</span>
       </div>
-      <div class="ai-generated" *ngIf="task.aiGenerated">
+      <div class="ai-generated" *ngIf="task().aiGenerated">
         <img src="assets/images/note_ki.svg" alt="AI Generated Note" />
       </div>
       <button class="close-btn" (click)="onClose()" aria-label="Close">
@@ -17,17 +17,16 @@
     </div>
 
     <div class="task-content">
-      <h2 class="task-title">{{ task.title }}</h2>
-
-      <p class="task-description">{{ task.description }}</p>
+      <h2 class="task-title">{{ task().title }}</h2>
+      <p class="task-description">{{ task().description }}</p>
 
       <div
         class="creator-section"
         *ngIf="
-          task.source ||
-          task.creatorType ||
-          task.creatorName ||
-          task.creatorEmail
+          task().source ||
+          task().creatorType ||
+          task().creatorName ||
+          task().creatorEmail
         "
       >
         <span class="detail-label">Creator:</span>
@@ -55,16 +54,16 @@
       <div class="task-details">
         <div class="detail-row">
           <span class="detail-label">Due date:</span>
-          <span class="detail-value">{{ formatDate(task.dueDate) }}</span>
+          <span class="detail-value">{{ formatDate(task().dueDate) }}</span>
         </div>
 
         <div class="detail-row">
           <span class="detail-label">Priority:</span>
-          <div class="task-priority" [ngClass]="'priority-' + task.priority">
-            <span>{{ task.priority | titlecase }}</span>
+          <div class="task-priority" [ngClass]="'priority-' + task().priority">
+            <span>{{ task().priority | titlecase }}</span>
             <img
-              [src]="getPriorityIcon(task.priority)"
-              [alt]="task.priority + ' priority'"
+              [src]="getPriorityIcon(task().priority)"
+              [alt]="task().priority + ' priority'"
               title="priority icon"
             />
           </div>
@@ -80,7 +79,7 @@
             <div *ngIf="!contactsLoading">
               <div
                 class="assignee-item"
-                *ngFor="let userId of task.assignedTo.slice(0, 3)"
+                *ngFor="let userId of task().assignedTo.slice(0, 3)"
               >
                 <div
                   class="assignee-avatar"
@@ -95,13 +94,13 @@
 
               <div
                 class="assignee-item more-users"
-                *ngIf="task.assignedTo.length > 3"
+                *ngIf="task().assignedTo.length > 3"
               >
                 <div class="assignee-avatar more-avatar">
-                  +{{ task.assignedTo.length - 3 }}
+                  +{{ task().assignedTo.length - 3 }}
                 </div>
                 <span class="assignee-name"
-                  >{{ task.assignedTo.length - 3 }} more</span
+                  >{{ task().assignedTo.length - 3 }} more</span
                 >
               </div>
             </div>
@@ -111,13 +110,13 @@
 
       <div
         class="subtasks-section"
-        *ngIf="task.subtasks && task.subtasks.length > 0"
+        *ngIf="task().subtasks && task().subtasks.length > 0"
       >
         <span class="detail-label">Subtasks</span>
         <div class="subtask-list">
           <div
             class="subtask-checkbox-container"
-            *ngFor="let subtask of task.subtasks; let i = index"
+            *ngFor="let subtask of task().subtasks; let i = index"
             (click)="toggleSubtask(subtask.id)"
           >
             <div
