@@ -70,6 +70,7 @@ ROUTE_LAYOUT_MAPPING.md
 ROUTING_INTEGRATION_GUIDE.md
 FINAL_PREFLIGHT_CHECK.md
 SIGNALS_GUIDE.md
+SIGNAL_MIGRATION_PLAN.md
 
 # Firebase Service Account Key (NEVER commit!)
 firebase-service-account.json
