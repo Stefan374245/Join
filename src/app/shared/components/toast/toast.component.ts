@@ -1,16 +1,15 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { animate, style, transition, trigger } from '@angular/animations';
 import { ToastService } from '../../../core/services/toast.service';
-import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-toast',
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="toast-container" *ngIf="showToast" [@toastAnimation]>
-      <div class="toast-message">{{ message }}</div>
+    <div class="toast-container" *ngIf="showToast()" [@toastAnimation]>
+      <div class="toast-message">{{ message() }}</div>
     </div>
   `,
   styles: [`
@@ -45,25 +44,11 @@ import { Subscription } from 'rxjs';
     ])
   ]
 })
-export class ToastComponent implements OnInit, OnDestroy {
-  showToast = false;
-  message = '';
-  private subscription?: Subscription;
+export class ToastComponent {
+  /** Computed Signals für direkte Anbindung an Service */
+  showToast = computed(() => this.toastService.toast().show);
+  message = computed(() => this.toastService.toast().message);
+  type = computed(() => this.toastService.toast().type);
 
   constructor(private toastService: ToastService) {}
-
-  ngOnInit() {
-    this.subscription = this.toastService.toastState$.subscribe(
-      ({ show, message }) => {
-        this.message = message;
-        this.showToast = show;
-      }
-    );
-  }
-
-  ngOnDestroy() {
-    if (this.subscription) {
-      this.subscription.unsubscribe();
-    }
-  }
 }

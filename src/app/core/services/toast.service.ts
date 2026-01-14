@@ -1,5 +1,5 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { Injectable, signal, computed } from '@angular/core';
+import { toObservable } from '@angular/core/rxjs-interop';
 
 /**
  * Toast-Nachrichtentypen
@@ -21,12 +21,14 @@ interface ToastState {
 }
 
 /**
- * Service zur Verwaltung von Toast-Benachrichtigungen
+ * Service zur Verwaltung von Toast-Benachrichtigungen (Signal-basiert)
  * 
  * Dieser Service bietet Methoden zum Anzeigen verschiedener Arten von Benachrichtigungen:
  * - Info-, Success-, Error- und Warning-Toasts
  * - Spezielle Toasts für Daily Limits
  * - Task-bezogene Benachrichtigungen
+ * 
+ * Migration zu Angular 19 Signals für bessere Performance und reaktive Updates.
  * 
  * @class ToastService
  */
@@ -34,14 +36,31 @@ interface ToastState {
   providedIn: 'root'
 })
 export class ToastService {
-  /** BehaviorSubject für den Toast-Status */
-  private toastState = new BehaviorSubject<ToastState>({
+  /** Signal für den Toast-Status */
+  private toastSignal = signal<ToastState>({
     show: false,
     message: '',
     type: 'info'
   });
-  /** Observable Stream des Toast-Status */
-  toastState$ = this.toastState.asObservable();
+
+  /** Public readonly Signal für den Toast-State */
+  public readonly toast = this.toastSignal.asReadonly();
+
+  /** Computed Signal für CSS-Klassen */
+  public readonly toastClasses = computed(() => {
+    const state = this.toast();
+    return {
+      'toast-visible': state.show,
+      'toast-hidden': !state.show,
+      [`toast-${state.type}`]: true
+    };
+  });
+
+  /** Computed Signal für Visibility */
+  public readonly isVisible = computed(() => this.toast().show);
+
+  /** Observable für Backwards Compatibility (falls andere Services noch Observable erwarten) */
+  public readonly toastState$ = toObservable(this.toast);
 
   /**
    * Zeigt einen Toast mit der angegebenen Nachricht und dem Typ an
@@ -51,7 +70,7 @@ export class ToastService {
    * @returns {void}
    */
   showToast(message: string, type: ToastType = 'info', duration: number = 3000): void {
-    this.toastState.next({ show: true, message, type });
+    this.toastSignal.set({ show: true, message, type });
 
     setTimeout(() => {
       this.hideToast();
@@ -242,10 +261,9 @@ export class ToastService {
    * @returns {void}
    */
   hideToast(): void {
-    this.toastState.next({
-      show: false,
-      message: '',
-      type: 'info'
-    });
+    this.toastSignal.update(state => ({
+      ...state,
+      show: false
+    }));
   }
 }
