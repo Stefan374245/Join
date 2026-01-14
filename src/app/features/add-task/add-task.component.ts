@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter, ViewChild, ElementRef, AfterViewChecked } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, ViewChild, ElementRef, AfterViewChecked, signal, computed, effect, input, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SubtaskListComponent } from './subtask-list/subtask-list.component';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
@@ -16,35 +16,59 @@ import { ClickOutsideDirective } from '../../shared/directives/click-outside.dir
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, FormsModule, SubtaskListComponent, ClickOutsideDirective],
   templateUrl: './add-task.component.html',
-  styleUrl: './add-task.component.scss'
+  styleUrl: './add-task.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AddTaskComponent implements OnInit, AfterViewChecked {
-  @Input() isOverlay: boolean = false;
-  @Input() taskToEdit: Task | null = null;
-  @Input() initialStatus: 'triage' | 'todo' | 'in-progress' | 'await-feedback' | 'done' = 'todo';
+  // ✅ Signal Inputs (Angular 17.1+)
+  isOverlay = input<boolean>(false);
+  taskToEdit = input<Task | null>(null);
+  initialStatus = input<'triage' | 'todo' | 'in-progress' | 'await-feedback' | 'done'>('todo');
+  
   @Output() close = new EventEmitter<void>();
   @Output() taskSaved = new EventEmitter<Task>();
   @ViewChild('editInput') editInput?: ElementRef<HTMLInputElement>;
 
   taskForm!: FormGroup;
-  subtaskInput: string = '';
-  subtaskEditInput: string = '';
-  subtasks: Subtask[] = [];
-  editingSubtaskId: string | null = null;
-  subtaskInputFocused: boolean = false;
+  
+  subtaskInput = signal('');
+  subtaskEditInput = signal('');
+  subtasks = signal<Subtask[]>([]);
+  editingSubtaskId = signal<string | null>(null);
+  subtaskInputFocused = signal(false);
 
-  selectedPriority: 'low' | 'medium' | 'high' = 'medium';
-  selectedContacts: Contact[] = [];
-  selectedCategory: string = '';
+  selectedPriority = signal<'low' | 'medium' | 'high'>('medium');
+  selectedContacts = signal<Contact[]>([]);
+  selectedCategory = signal('');
 
-  availableContacts: Contact[] = [];
+  showContactDropdown = signal(false);
+  showCategoryDropdown = signal(false);
+  contactSearchQuery = signal('');
+
+  isEditMode = signal(false);
+  minDate = signal(this.formatDateForInput(new Date()));
+  
   categories: string[] = ['Technical Task', 'User Story'];
-
-  showContactDropdown: boolean = false;
-  showCategoryDropdown: boolean = false;
-
-  isEditMode: boolean = false;
-  minDate: string = '';
+  
+  displayedContacts = computed(() => {
+    const query = this.contactSearchQuery().toLowerCase();
+    const contacts = this.contactService.contacts();
+    return contacts.filter(contact =>
+      `${contact.firstName} ${contact.lastName}`.toLowerCase().includes(query)
+    );
+  });
+  
+  displayedContactsList = computed(() => this.selectedContacts().slice(0, 3));
+  remainingContactsCount = computed(() => Math.max(0, this.selectedContacts().length - 3));
+  hasMoreContacts = computed(() => this.selectedContacts().length > 3);
+  
+  isFormValid = computed(() => {
+    return this.taskForm.valid && 
+           this.selectedCategory() !== '';
+  });
+  
+  subtaskCount = computed(() => this.subtasks().length);
+  canAddMoreSubtasks = computed(() => this.subtaskCount() < 5);
 
   constructor(
     private fb: FormBuilder,
@@ -54,36 +78,38 @@ export class AddTaskComponent implements OnInit, AfterViewChecked {
     private router: Router,
     private toastService: ToastService
   ) {}
+  
+  // ✅ Getter für Kontakte aus Service
+  get availableContacts() {
+    return this.contactService.contacts;
+  }
 
   ngOnInit(): void {
-    this.setMinDate();
     this.initForm();
+    
+    this.contactService.loadContactsAsync();
 
-    if (this.taskToEdit) {
-      this.isEditMode = true;
-      this.loadContactsAndPopulateForm(this.taskToEdit);
-    } else {
-      this.loadContacts();
+    const task = this.taskToEdit();
+    if (task) {
+      this.isEditMode.set(true);
+      this.loadContactsAndPopulateForm(task);
     }
   }
 
   ngAfterViewChecked(): void {
-    if (this.editingSubtaskId && this.editInput) {
+    if (this.editingSubtaskId() && this.editInput) {
       this.editInput.nativeElement.focus();
     }
   }
 
-  private loadContactsAndPopulateForm(task: Task): void {
-    this.contactService.getContacts().subscribe({
-      next: (contacts: Contact[]) => {
-        this.availableContacts = contacts;
-        console.log('📋 Contacts loaded:', contacts.length);
-        this.populateFormWithTask(task);
-      },
-      error: (error: any) => {
-        console.error('❌ Error loading contacts:', error);
-      }
-    });
+  private async loadContactsAndPopulateForm(task: Task): Promise<void> {
+    try {
+      await this.contactService.loadContactsAsync();
+      console.log('📋 Contacts loaded:', this.availableContacts().length);
+      this.populateFormWithTask(task);
+    } catch (error) {
+      console.error('❌ Error loading contacts:', error);
+    }
   }
 
   private populateFormWithTask(task: Task): void {
@@ -94,11 +120,11 @@ export class AddTaskComponent implements OnInit, AfterViewChecked {
       category: task.category
     });
 
-    this.selectedPriority = task.priority;
-    this.selectedCategory = task.category;
-    this.subtasks = task.subtasks ? [...task.subtasks] : [];
-    this.selectedContacts = this.availableContacts.filter(c =>
-      task.assignedTo.includes(c.id)
+    this.selectedPriority.set(task.priority);
+    this.selectedCategory.set(task.category);
+    this.subtasks.set(task.subtasks ? [...task.subtasks] : []);
+    this.selectedContacts.set(
+      this.availableContacts().filter(c => task.assignedTo.includes(c.id))
     );
   }
 
@@ -110,10 +136,6 @@ export class AddTaskComponent implements OnInit, AfterViewChecked {
     return `${year}-${month}-${day}`;
   }
 
-  private setMinDate(): void {
-    this.minDate = this.formatDateForInput(new Date());
-  }
-
   private initForm(): void {
     this.taskForm = this.fb.group({
       title: ['', [Validators.required, Validators.minLength(3)]],
@@ -123,128 +145,123 @@ export class AddTaskComponent implements OnInit, AfterViewChecked {
     });
   }
 
-  private loadContacts(): void {
-    this.contactService.getContacts().subscribe({
-      next: (contacts: Contact[]) => {
-        this.availableContacts = contacts;
-      },
-      error: (error: any) => {
-        console.error('Error loading contacts:', error);
-      }
-    });
-  }
-
   selectPriority(priority: 'low' | 'medium' | 'high'): void {
-    this.selectedPriority = priority;
+    this.selectedPriority.set(priority);
   }
 
   toggleContactDropdown(): void {
-    this.showContactDropdown = !this.showContactDropdown;
-    if (this.showContactDropdown) {
-      this.showCategoryDropdown = false;
+    this.showContactDropdown.update((show: boolean) => !show);
+    if (this.showContactDropdown()) {
+      this.showCategoryDropdown.set(false);
     }
   }
 
   selectContact(contact: Contact): void {
-    const index = this.selectedContacts.findIndex(c => c.id === contact.id);
+    const currentContacts = this.selectedContacts();
+    const index = currentContacts.findIndex(c => c.id === contact.id);
     if (index === -1) {
-      this.selectedContacts.push(contact);
+      this.selectedContacts.set([...currentContacts, contact]);
     } else {
-      this.selectedContacts.splice(index, 1);
+      this.selectedContacts.set(currentContacts.filter((_, i) => i !== index));
     }
   }
 
   isContactSelected(contact: Contact): boolean {
-    return this.selectedContacts.some(c => c.id === contact.id);
+    return this.selectedContacts().some(c => c.id === contact.id);
   }
 
   removeContact(contactId: string): void {
-    this.selectedContacts = this.selectedContacts.filter(c => c.id !== contactId);
+    this.selectedContacts.update(contacts => 
+      contacts.filter(c => c.id !== contactId)
+    );
   }
 
   closeContactDropdown(): void {
-    this.showContactDropdown = false;
+    this.showContactDropdown.set(false);
   }
 
   closeCategoryDropdown(): void {
-    this.showCategoryDropdown = false;
+    this.showCategoryDropdown.set(false);
   }
 
   toggleCategoryDropdown(): void {
-    this.showCategoryDropdown = !this.showCategoryDropdown;
-    if (this.showCategoryDropdown) {
-      this.showContactDropdown = false;
+    this.showCategoryDropdown.update((show: boolean) => !show);
+    if (this.showCategoryDropdown()) {
+      this.showContactDropdown.set(false);
     }
   }
 
   selectCategory(category: string): void {
-    this.selectedCategory = category;
+    this.selectedCategory.set(category);
     this.taskForm.patchValue({ category });
-    this.showCategoryDropdown = false;
+    this.showCategoryDropdown.set(false);
   }
 
   addSubtask(): void {
-    if (this.subtaskInput.trim()) {
-      if (this.subtasks.length >= 5) {
+    const input = this.subtaskInput().trim();
+    if (input) {
+      if (!this.canAddMoreSubtasks()) {
         this.toastService.showToast('Maximum of 5 subtasks allowed');
         return;
       }
       const newSubtask: Subtask = {
         id: this.generateId(),
-        title: this.subtaskInput.trim(),
+        title: input,
         completed: false
       };
-      this.subtasks.push(newSubtask);
-      this.subtaskInput = '';
-      this.subtaskInputFocused = false;
+      this.subtasks.update(tasks => [...tasks, newSubtask]);
+      this.subtaskInput.set('');
+      this.subtaskInputFocused.set(false);
     }
   }
 
   clearSubtaskInput(): void {
-    this.subtaskInput = '';
-    this.editingSubtaskId = null;
+    this.subtaskInput.set('');
+    this.editingSubtaskId.set(null);
   }
 
   onSubtaskInputFocus(): void {
-    this.subtaskInputFocused = true;
+    this.subtaskInputFocused.set(true);
   }
 
   onSubtaskInputBlur(): void {
     setTimeout(() => {
-      if (!this.subtaskInput.trim() && !this.editingSubtaskId) {
-        this.subtaskInputFocused = false;
+      if (!this.subtaskInput().trim() && !this.editingSubtaskId()) {
+        this.subtaskInputFocused.set(false);
       }
     }, 200);
   }
 
   editSubtask(subtask: Subtask): void {
-    this.editingSubtaskId = subtask.id;
-    this.subtaskEditInput = subtask.title;
+    this.editingSubtaskId.set(subtask.id);
+    this.subtaskEditInput.set(subtask.title);
   }
 
   updateSubtask(): void {
-    if (this.editingSubtaskId && this.subtaskEditInput.trim()) {
-      const subtask = this.subtasks.find(s => s.id === this.editingSubtaskId);
-      if (subtask) {
-        subtask.title = this.subtaskEditInput.trim();
-      }
-      this.editingSubtaskId = null;
-      this.subtaskEditInput = '';
+    const editId = this.editingSubtaskId();
+    const editText = this.subtaskEditInput().trim();
+    
+    if (editId && editText) {
+      this.subtasks.update(tasks =>
+        tasks.map(s => s.id === editId ? { ...s, title: editText } : s)
+      );
+      this.editingSubtaskId.set(null);
+      this.subtaskEditInput.set('');
     }
   }
 
   cancelEditSubtask(): void {
-    this.editingSubtaskId = null;
-    this.subtaskEditInput = '';
+    this.editingSubtaskId.set(null);
+    this.subtaskEditInput.set('');
   }
 
   deleteSubtask(subtaskId: string): void {
-    this.subtasks = this.subtasks.filter(s => s.id !== subtaskId);
+    this.subtasks.update(tasks => tasks.filter(s => s.id !== subtaskId));
   }
 
   onSubmit(): void {
     if (this.taskForm.valid) {
-      if (this.isEditMode && this.taskToEdit) {
+      if (this.isEditMode() && this.taskToEdit()) {
         this.updateTask();
       } else {
         this.createTask();
@@ -261,12 +278,12 @@ export class AddTaskComponent implements OnInit, AfterViewChecked {
       id: this.generateId(),
       title: this.taskForm.value.title,
       description: this.taskForm.value.description || '',
-      category: this.selectedCategory,
-      assignedTo: this.selectedContacts.map(c => c.id),
+      category: this.selectedCategory(),
+      assignedTo: this.selectedContacts().map(c => c.id),
       dueDate: new Date(this.taskForm.value.dueDate),
-      priority: this.selectedPriority,
-      status: this.initialStatus,
-      subtasks: this.subtasks,
+      priority: this.selectedPriority(),
+      status: this.initialStatus(),
+      subtasks: this.subtasks(),
       source: 'member',
       creatorType: 'member',
       creatorName: currentUser?.displayName || undefined,
@@ -279,7 +296,7 @@ export class AddTaskComponent implements OnInit, AfterViewChecked {
       next: () => {
         console.log('✅ Task created successfully');
         this.toastService.showTaskCreated(newTask.title);
-        if (this.isOverlay) {
+        if (this.isOverlay()) {
           this.taskSaved.emit(newTask);
           this.onClose();
         } else {
@@ -294,25 +311,26 @@ export class AddTaskComponent implements OnInit, AfterViewChecked {
   }
 
   private updateTask(): void {
-    if (!this.taskToEdit) return;
+    const task = this.taskToEdit();
+    if (!task) return;
 
     const updatedTask: Partial<Task> = {
       title: this.taskForm.value.title,
       description: this.taskForm.value.description || '',
-      category: this.selectedCategory,
-      assignedTo: this.selectedContacts.map(c => c.id),
+      category: this.selectedCategory(),
+      assignedTo: this.selectedContacts().map(c => c.id),
       dueDate: new Date(this.taskForm.value.dueDate),
-      priority: this.selectedPriority,
-      subtasks: this.subtasks,
+      priority: this.selectedPriority(),
+      subtasks: this.subtasks(),
       updatedAt: new Date()
     };
 
-    this.taskService.updateTask(this.taskToEdit.id, updatedTask).subscribe({
+    this.taskService.updateTask(task.id, updatedTask).subscribe({
       next: () => {
         console.log('✅ Task updated successfully');
         this.toastService.showTaskUpdated(updatedTask.title!);
-        const fullTask: Task = { ...this.taskToEdit!, ...updatedTask };
-        if (this.isOverlay) {
+        const fullTask: Task = { ...this.taskToEdit()!, ...updatedTask };
+        if (this.isOverlay()) {
           this.taskSaved.emit(fullTask);
           this.onClose();
         } else {
@@ -338,11 +356,11 @@ export class AddTaskComponent implements OnInit, AfterViewChecked {
 
   clearForm(): void {
     this.taskForm.reset();
-    this.subtasks = [];
-    this.selectedContacts = [];
-    this.selectedCategory = '';
-    this.selectedPriority = 'medium';
-    this.subtaskInput = '';
+    this.subtasks.set([]);
+    this.selectedContacts.set([]);
+    this.selectedCategory.set('');
+    this.selectedPriority.set('medium');
+    this.subtaskInput.set('');
   }
 
   private markFormAsTouched(): void {
@@ -357,18 +375,6 @@ export class AddTaskComponent implements OnInit, AfterViewChecked {
 
   get f() {
     return this.taskForm.controls;
-  }
-
-  getDisplayedContacts(): Contact[] {
-    return this.selectedContacts.slice(0, 3);
-  }
-
-  getRemainingContactsCount(): number {
-    return Math.max(0, this.selectedContacts.length - 3);
-  }
-
-  hasMoreContacts(): boolean {
-    return this.selectedContacts.length > 3;
   }
 }
 

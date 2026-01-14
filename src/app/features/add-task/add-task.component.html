@@ -1,23 +1,23 @@
 <!-- Main Wrapper with conditional classes -->
-<div [class.task-edit-overlay]="isOverlay"
-     [class.add-task-container]="!isOverlay"
-     (click)="isOverlay ? onOverlayClick($event) : null"
+<div [class.task-edit-overlay]="isOverlay()"
+     [class.add-task-container]="!isOverlay()"
+     (click)="isOverlay() ? onOverlayClick($event) : null"
      role="dialog"
-     [attr.aria-modal]="isOverlay"
-     [attr.aria-labelledby]="isEditMode ? 'edit-task-title' : 'add-task-title'">
+     [attr.aria-modal]="isOverlay()"
+     [attr.aria-labelledby]="isEditMode() ? 'edit-task-title' : 'add-task-title'">
 
-  <article [class.task-edit-card]="isOverlay"
-       (click)="isOverlay ? $event.stopPropagation() : null">
+  <article [class.task-edit-card]="isOverlay()"
+       (click)="isOverlay() ? $event.stopPropagation() : null">
 
-    <button *ngIf="isOverlay" class="close-btn" (click)="onClose()" aria-label="Close dialog">
+    <button *ngIf="isOverlay()" class="close-btn" (click)="onClose()" aria-label="Close dialog">
       <img src="assets/images/close.svg" alt="" role="presentation" />
     </button>
 
-    <header [class.edit-header]="isOverlay" [class.add-task-header]="!isOverlay">
-      <h1 [class.edit-title]="isOverlay"
-          [class.page-title]="!isOverlay"
-          [id]="isEditMode ? 'edit-task-title' : 'add-task-title'">
-        {{ isEditMode ? 'Edit Task' : 'Add Task' }}
+    <header [class.edit-header]="isOverlay()" [class.add-task-header]="!isOverlay()">
+      <h1 [class.edit-title]="isOverlay()"
+          [class.page-title]="!isOverlay()"
+          [id]="isEditMode() ? 'edit-task-title' : 'add-task-title'">
+        {{ isEditMode() ? 'Edit Task' : 'Add Task' }}
       </h1>
     </header>
 
@@ -73,7 +73,7 @@
               formControlName="dueDate"
               class="form-input"
               [class.error]="f['dueDate'].touched && f['dueDate'].errors"
-              [min]="minDate"
+              [min]="minDate()"
               placeholder="dd/mm/yyyy"
               aria-required="true"
               [attr.aria-invalid]="f['dueDate'].touched && f['dueDate'].errors"
@@ -101,14 +101,14 @@
               [ngClass]="{
                 'priority-btn': true,
                 'priority-btn-urgent': true,
-                'priority-btn-active': selectedPriority === 'high'
+                'priority-btn-active': selectedPriority() === 'high'
               }"
               (click)="selectPriority('high')"
-              [attr.aria-pressed]="selectedPriority === 'high'"
+              [attr.aria-pressed]="selectedPriority() === 'high'"
               aria-label="Set priority to urgent">
               <span>Urgent</span>
               <img
-                [src]="selectedPriority === 'high' ? 'assets/images/urgentwhite.svg' : 'assets/images/urgent.svg'"
+                [src]="selectedPriority() === 'high' ? 'assets/images/urgentwhite.svg' : 'assets/images/urgent.svg'"
                 alt=""
                 role="presentation" />
             </button>
@@ -117,14 +117,14 @@
               [ngClass]="{
                 'priority-btn': true,
                 'priority-btn-medium': true,
-                'priority-btn-active': selectedPriority === 'medium'
+                'priority-btn-active': selectedPriority() === 'medium'
               }"
               (click)="selectPriority('medium')"
-              [attr.aria-pressed]="selectedPriority === 'medium'"
+              [attr.aria-pressed]="selectedPriority() === 'medium'"
               aria-label="Set priority to medium">
               <span>Medium</span>
               <img
-                [src]="selectedPriority === 'medium' ? 'assets/images/mediumwhite.svg' : 'assets/images/medium.svg'"
+                [src]="selectedPriority() === 'medium' ? 'assets/images/mediumwhite.svg' : 'assets/images/medium.svg'"
                 alt=""
                 role="presentation" />
             </button>
@@ -133,14 +133,14 @@
               [ngClass]="{
                 'priority-btn': true,
                 'priority-btn-low': true,
-                'priority-btn-active': selectedPriority === 'low'
+                'priority-btn-active': selectedPriority() === 'low'
               }"
               (click)="selectPriority('low')"
-              [attr.aria-pressed]="selectedPriority === 'low'"
+              [attr.aria-pressed]="selectedPriority() === 'low'"
               aria-label="Set priority to low">
               <span>Low</span>
               <img
-                [src]="selectedPriority === 'low' ? 'assets/images/lowwhite.svg' : 'assets/images/low.svg'"
+                [src]="selectedPriority() === 'low' ? 'assets/images/lowwhite.svg' : 'assets/images/low.svg'"
                 alt=""
                 role="presentation" />
             </button>
@@ -154,21 +154,21 @@
               type="text"
               id="assignedTo"
               class="form-input"
-              [placeholder]="selectedContacts.length > 0 ? selectedContacts.length + ' contact(s) selected' : 'Select contacts to assign'"
+              [placeholder]="selectedContacts().length > 0 ? selectedContacts().length + ' contact(s) selected' : 'Select contacts to assign'"
               readonly
               aria-haspopup="listbox"
-              [attr.aria-expanded]="showContactDropdown"
+              [attr.aria-expanded]="showContactDropdown()"
               aria-label="Assigned contacts"
             />
             <img src="assets/images/arrow_drop_down.svg" alt="" class="dropdown-icon" role="presentation" />
           </div>
 
           <ul class="dropdown-menu"
-              *ngIf="showContactDropdown"
+              *ngIf="showContactDropdown()"
               role="listbox"
               aria-label="Contact selection">
             <li
-              *ngFor="let contact of availableContacts"
+              *ngFor="let contact of displayedContacts()"
               class="dropdown-item"
               [class.selected]="isContactSelected(contact)"
               (click)="selectContact(contact)"
@@ -192,11 +192,11 @@
           </ul>
 
           <div class="selected-contacts"
-               *ngIf="selectedContacts.length > 0"
+               *ngIf="selectedContacts().length > 0"
                role="list"
                aria-label="Selected contacts">
             <div
-              *ngFor="let contact of getDisplayedContacts()"
+              *ngFor="let contact of displayedContactsList()"
               class="contact-badge"
               [style.background-color]="contact.color"
               role="listitem"
@@ -214,8 +214,8 @@
               *ngIf="hasMoreContacts()"
               class="contact-badge more-badge"
               role="listitem"
-              [attr.aria-label]="getRemainingContactsCount() + ' more contacts'">
-              +{{ getRemainingContactsCount() }}
+              [attr.aria-label]="remainingContactsCount() + ' more contacts'">
+              +{{ remainingContactsCount() }}
             </div>
           </div>
         </fieldset>
@@ -230,11 +230,11 @@
               id="category"
               class="form-input"
               [class.error]="f['category'].touched && f['category'].errors"
-              [placeholder]="selectedCategory || 'Select task category'"
+              [placeholder]="selectedCategory() || 'Select task category'"
               readonly
               aria-required="true"
               aria-haspopup="listbox"
-              [attr.aria-expanded]="showCategoryDropdown"
+              [attr.aria-expanded]="showCategoryDropdown()"
               [attr.aria-invalid]="f['category'].touched && f['category'].errors"
               [attr.aria-describedby]="f['category'].touched && f['category'].errors ? 'category-error' : null"
               aria-label="Task category"
@@ -243,7 +243,7 @@
           </div>
 
           <ul class="dropdown-menu"
-              *ngIf="showCategoryDropdown"
+              *ngIf="showCategoryDropdown()"
               role="listbox"
               aria-label="Category selection">
             <li
@@ -251,7 +251,7 @@
               class="dropdown-item"
               (click)="selectCategory(category)"
               role="option"
-              [attr.aria-selected]="selectedCategory === category"
+              [attr.aria-selected]="selectedCategory() === category"
               tabindex="0">
               <span>{{ category }}</span>
             </li>
@@ -272,18 +272,18 @@
               type="text"
               id="subtask"
               class="form-input subtask-input"
-              [(ngModel)]="subtaskInput"
-              [ngModelOptions]="{standalone: true}"
+              [value]="subtaskInput()"
+              (input)="subtaskInput.set($any($event.target).value)"
               placeholder="Add new subtask"
               (focus)="onSubtaskInputFocus()"
               (blur)="onSubtaskInputBlur()"
-              (keydown.enter)="editingSubtaskId ? updateSubtask() : addSubtask(); $event.preventDefault()"
+              (keydown.enter)="editingSubtaskId() ? updateSubtask() : addSubtask(); $event.preventDefault()"
               maxlength="35"
               aria-label="Subtask input"
               #subtaskInputRef
             />
             <img
-              *ngIf="!subtaskInputFocused && !subtaskInput"
+              *ngIf="!subtaskInputFocused() && !subtaskInput()"
               src="assets/images/addDark.svg"
               alt="Add subtask"
               class="subtask-add-icon-absolute"
@@ -291,7 +291,7 @@
               tabindex="0"
               role="button"
             />
-            <div class="subtask-actions" *ngIf="subtaskInputFocused || subtaskInput">
+            <div class="subtask-actions" *ngIf="subtaskInputFocused() || subtaskInput()">
               <img
                 src="assets/images/close.svg"
                 alt="Clear subtask input"
@@ -302,9 +302,9 @@
               <div class="subtask-divider" aria-hidden="true"></div>
               <img
                 src="assets/images/checkDark.svg"
-                [attr.alt]="editingSubtaskId ? 'Update subtask' : 'Add subtask'"
+                [attr.alt]="editingSubtaskId() ? 'Update subtask' : 'Add subtask'"
                 class="subtask-icon subtask-add"
-                (click)="editingSubtaskId ? updateSubtask() : addSubtask()"
+                (click)="editingSubtaskId() ? updateSubtask() : addSubtask()"
                 role="button"
                 tabindex="0"
                 alt="checkicon" />
@@ -312,9 +312,10 @@
           </div>
 
           <app-subtask-list
-            [subtasks]="subtasks"
-            [editingSubtaskId]="editingSubtaskId"
-            [subtaskEditInput]="subtaskEditInput"
+            [subtasks]="subtasks()"
+            [editingSubtaskId]="editingSubtaskId()"
+            [subtaskEditInput]="subtaskEditInput()"
+            (subtaskEditInputChange)="subtaskEditInput.set($event)"
             (editSubtask)="editSubtask($event)"
             (deleteSubtask)="deleteSubtask($event)"
             (updateSubtask)="updateSubtask()"
@@ -338,8 +339,8 @@
               class="btn btn-primary"
               [disabled]="taskForm.invalid"
               (click)="onSubmit()"
-              [attr.aria-label]="isEditMode ? 'Update task' : 'Create task'">
-        {{ isEditMode ? 'Update Task' : 'Create Task' }}
+              [attr.aria-label]="isEditMode() ? 'Update task' : 'Create task'">
+        {{ isEditMode() ? 'Update Task' : 'Create Task' }}
         <img src="assets/images/check.svg" alt="" role="presentation" />
       </button>
     </footer>
