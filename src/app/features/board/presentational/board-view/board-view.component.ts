@@ -81,12 +81,10 @@ export class BoardViewComponent implements OnInit, AfterViewInit, OnDestroy {
   addTaskStatus: 'triage' | 'todo' | 'in-progress' | 'await-feedback' | 'done' =
     'todo';
 
-  // Auto-scroll properties for drag and drop
   private autoScrollInterval: any = null;
   private readonly scrollSpeed = 20;
   private readonly scrollThreshold = 100;
 
-  // Column configuration
   columns: BoardColumn[] = [
     { id: 'triage', title: 'Triage', getTasks: () => this.triageTasks },
     { id: 'todo', title: 'To do', getTasks: () => this.todoTasks },
@@ -106,7 +104,6 @@ export class BoardViewComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private initAutoScroll(): void {
-    // Listen to drag events for auto-scrolling
     document.addEventListener('dragover', this.handleDragOver.bind(this), { passive: false });
     document.addEventListener('touchmove', this.handleTouchMove.bind(this), { passive: false });
   }
@@ -127,24 +124,20 @@ export class BoardViewComponent implements OnInit, AfterViewInit, OnDestroy {
     
     if (!container) return;
 
-    // Check if near bottom of viewport
     if (clientY > viewportHeight - this.scrollThreshold) {
       this.startAutoScroll('down', container);
     }
-    // Check if near top of viewport
     else if (clientY < this.scrollThreshold) {
       this.startAutoScroll('up', container);
     }
-    // Stop scrolling if in middle area
     else {
       this.stopAutoScroll();
     }
   }
 
   private startAutoScroll(direction: 'up' | 'down', container: Element): void {
-    // Clear existing interval
     if (this.autoScrollInterval) {
-      return; // Already scrolling
+      return;
     }
 
     this.autoScrollInterval = setInterval(() => {
@@ -153,7 +146,7 @@ export class BoardViewComponent implements OnInit, AfterViewInit, OnDestroy {
       } else {
         container.scrollTop -= this.scrollSpeed;
       }
-    }, 16); // ~60fps
+    }, 16);
   }
 
   private stopAutoScroll(): void {
@@ -355,10 +348,8 @@ export class BoardViewComponent implements OnInit, AfterViewInit, OnDestroy {
   private scrollToTask(taskId: string): void {
     const taskElement = document.querySelector(`[data-task-id="${taskId}"]`) as HTMLElement;
     if (taskElement) {
-      // Finde die parent column-content
       const columnContent = taskElement.closest('.column-content');
       if (columnContent) {
-        // Scroll nur innerhalb der Column, nicht den gesamten Viewport
         const elementRect = taskElement.getBoundingClientRect();
         const containerRect = columnContent.getBoundingClientRect();
         
@@ -369,7 +360,6 @@ export class BoardViewComponent implements OnInit, AfterViewInit, OnDestroy {
           });
         }
         
-        // Visuelle Highlight-Animation
         setTimeout(() => {
           taskElement.classList.add('task-just-dropped');
           setTimeout(() => {

@@ -6,7 +6,7 @@ import { RequestFormComponent } from './features/landing/hero/request/request-fo
 import { EmailFormComponent } from './features/landing/hero/email-form/email-form.component';
 import { LogoAnimationComponent } from './auth/logo-animation/logo-animation.component';
 import { AddTaskComponent } from './features/add-task/add-task.component';
-import { BoardViewComponent } from './features/board/containers/board-view/board-view.component';
+import { BoardViewComponent } from './features/board/presentational/board-view/board-view.component';
 import { ContactsListComponent } from './features/contacts/contacts-list/contacts-list.component';
 import { ContactDetailComponent } from './features/contacts/contact-detail/contact-detail.component';
 import { SummaryViewComponent } from './features/summary/summary-view/summary-view.component';

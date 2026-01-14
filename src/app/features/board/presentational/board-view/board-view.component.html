@@ -59,7 +59,6 @@
   </ng-container>
 </main>
 
-<!-- Task Detail Overlay -->
 <div *ngIf="selectedTask" (clickOutside)="closeTaskDetail()">
   <app-task-detail
     [task]="selectedTask"
@@ -71,7 +70,6 @@
   </app-task-detail>
 </div>
 
-<!-- Task Edit Overlay -->
 <div *ngIf="showEditOverlay && taskToEdit" (clickOutside)="closeEditOverlay()">
   <app-add-task
     [isOverlay]="true"
@@ -82,7 +80,6 @@
   </app-add-task>
 </div>
 
-<!-- Add Task Overlay -->
 <div *ngIf="showAddTaskOverlay" (clickOutside)="closeAddTaskOverlay()">
   <app-add-task
     [isOverlay]="true"
