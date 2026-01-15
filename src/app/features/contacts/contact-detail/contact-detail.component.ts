@@ -8,6 +8,9 @@ import { Contact } from '../../../core/models/contact.interface';
 import { ContactDialogComponent } from '../contact-dialog/contact-dialog.component';
 import { ClickOutsideDirective } from '../../../shared/directives/click-outside.directive';
 
+/**
+ * Contact detail view component with edit/delete actions
+ */
 @Component({
   selector: 'app-contact-detail',
   standalone: true,
@@ -27,6 +30,9 @@ export class ContactDetailComponent implements OnInit {
   showDialog = false;
   dialogMode: 'add' | 'edit' = 'edit';
 
+  /**
+   * Component initialization - loads contact from route parameter
+   */
   ngOnInit(): void {
     const email = this.route.snapshot.paramMap.get('email');
     if (email) {
@@ -34,6 +40,10 @@ export class ContactDetailComponent implements OnInit {
     }
   }
 
+  /**
+   * Loads contact by email address
+   * @param email - Contact email to load
+   */
   private loadContact(email: string) {
     this.contactService.loadAll().subscribe({
       next: (contacts) => {
@@ -49,18 +59,30 @@ export class ContactDetailComponent implements OnInit {
     });
   }
 
+  /**
+   * Navigates back to contacts list
+   */
   goBack() {
     this.router.navigate(['/contacts']);
   }
 
+  /**
+   * Toggles action menu visibility
+   */
   toggleActionMenu() {
     this.showActionMenu = !this.showActionMenu;
   }
 
+  /**
+   * Closes action menu
+   */
   closeActionMenu() {
     this.showActionMenu = false;
   }
 
+  /**
+   * Opens edit dialog for current contact
+   */
   editContact() {
     if (this.authService.isGuestUser()) {
       this.toastService.showGuestCannotAddContacts();
@@ -72,6 +94,9 @@ export class ContactDetailComponent implements OnInit {
     this.showDialog = true;
   }
 
+  /**
+   * Deletes current contact after confirmation
+   */
   async deleteContact() {
     if (this.authService.isGuestUser()) {
       this.toastService.showGuestCannotAddContacts();
@@ -94,10 +119,17 @@ export class ContactDetailComponent implements OnInit {
     this.showActionMenu = false;
   }
 
+  /**
+   * Closes contact dialog
+   */
   closeDialog() {
     this.showDialog = false;
   }
 
+  /**
+   * Saves updated contact data
+   * @param updatedContact - Contact with updated data
+   */
   async saveContact(updatedContact: Contact) {
     if (!updatedContact.id) return;
 
@@ -116,6 +148,10 @@ export class ContactDetailComponent implements OnInit {
     }
   }
 
+  /**
+   * Handles contact deletion by navigating back
+   * @param email - Deleted contact email
+   */
   handleDelete(email: string) {
     this.router.navigate(['/contacts']);
   }

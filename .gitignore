@@ -79,3 +79,9 @@ firebase-service-account.json
 # N8N Configuration (contains API keys)
 n8n-config.json
 n8n-credentials.json
+
+# Documentation folder (internal development documentation)
+/docs
+
+# Angular concepts documentation (internal development reference)
+**/ANGULAR_CONCEPTS_*.md

@@ -8,8 +8,14 @@ import { Contact } from '../../../core/models/contact.interface';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { ContactDialogComponent } from '../contact-dialog/contact-dialog.component';
 
+/**
+ * Grouped contacts by alphabetical letter
+ */
 type Grouped = { letter: string; items: Contact[] }[];
 
+/**
+ * Contacts list view with search, selection and CRUD operations
+ */
 @Component({
   selector: 'app-contacts-list',
   standalone: true,
@@ -38,12 +44,18 @@ export class ContactsListComponent implements OnInit {
   showDeleteConfirm = false;
   contactToDelete: Contact | null = null;
 
+  /**
+   * Component initialization - loads contacts and sets up responsive behavior
+   */
   ngOnInit(): void {
     this.load();
     // this.checkAutoSelect(); // Deaktiviert: Kein Auto-Select beim Laden
     this.onResize();
   }
 
+  /**
+   * Loads all contacts from service and groups them alphabetically
+   */
   async load() {
     console.log('🔄 Starting to load contacts...');
     this.contactService.loadAll().subscribe({
@@ -62,6 +74,10 @@ export class ContactsListComponent implements OnInit {
     });
   }
 
+  /**
+   * Groups contacts by first letter of name
+   * @param list - Array of contacts to group
+   */
   private group(list: Contact[]) {
     const groupedRecord: Record<string, Contact[]> = {};
     list.forEach(u => {
@@ -75,6 +91,11 @@ export class ContactsListComponent implements OnInit {
     this.grouped$.next(grouped);
   }
 
+  /**
+   * Selects a contact and updates localStorage
+   * @param contact - Contact to select
+   * @param event - Optional click event
+   */
   select(contact: Contact, event?: Event) {
     if (window.innerWidth >= 900) {
       if (event) {
@@ -86,6 +107,9 @@ export class ContactsListComponent implements OnInit {
     localStorage.setItem('lastEditedContact', contact.email);
   }
 
+  /**
+   * Opens dialog to add new contact (blocked for guest users)
+   */
   addContact() {
     if (this.authService.isGuestUser()) {
       this.toastService.showGuestCannotAddContacts();
@@ -96,6 +120,10 @@ export class ContactsListComponent implements OnInit {
     this.showDialog = true;
   }
 
+  /**
+   * Opens dialog to edit existing contact (blocked for guest users)
+   * @param contact - Contact to edit
+   */
   editContact(contact: Contact) {
     if (this.authService.isGuestUser()) {
       this.toastService.showGuestCannotAddContacts();
@@ -106,11 +134,18 @@ export class ContactsListComponent implements OnInit {
     this.showDialog = true;
   }
 
+  /**
+   * Closes contact dialog and resets state
+   */
   closeDialog() {
     this.showDialog = false;
     this.dialogContact = null;
   }
 
+  /**
+   * Saves contact (add or update) and handles own profile updates
+   * @param contact - Contact data to save
+   */
   async saveContact(contact: Contact) {
     try {
       if (this.dialogMode === 'add') {
@@ -155,6 +190,10 @@ export class ContactsListComponent implements OnInit {
     }
   }
 
+  /**
+   * Shows delete confirmation dialog (blocked for guest users)
+   * @param contact - Contact to delete
+   */
   showDeleteConfirmation(contact: Contact) {
     if (this.authService.isGuestUser()) {
       this.toastService.showGuestCannotAddContacts();
@@ -164,11 +203,17 @@ export class ContactsListComponent implements OnInit {
     this.showDeleteConfirm = true;
   }
 
+  /**
+   * Cancels delete operation and closes confirmation dialog
+   */
   cancelDelete() {
     this.showDeleteConfirm = false;
     this.contactToDelete = null;
   }
 
+  /**
+   * Confirms and executes contact deletion
+   */
   async confirmDelete() {
     if (!this.contactToDelete) return;
 
@@ -197,11 +242,17 @@ export class ContactsListComponent implements OnInit {
     }
   }
 
+  /**
+   * Clears current selection and removes from localStorage
+   */
   clearSelection() {
     this.selected = null;
     localStorage.removeItem('selectedContactEmail');
   }
 
+  /**
+   * Automatically selects last edited contact from localStorage
+   */
   checkAutoSelect() {
     const last = localStorage.getItem('lastEditedContact') || localStorage.getItem('selectedContactEmail');
     if (!last) return;
@@ -210,6 +261,10 @@ export class ContactsListComponent implements OnInit {
     });
   }
 
+  /**
+   * Checks if selected contact is the user's own profile
+   * @returns True if selected contact matches current user email
+   */
   get isOwnProfile(): boolean {
     if (!this.selected || !this.authService.currentUser) {
       return false;
@@ -217,6 +272,9 @@ export class ContactsListComponent implements OnInit {
     return this.selected.email === this.authService.currentUser.email;
   }
 
+  /**
+   * Handles window resize for responsive layout
+   */
   @HostListener('window:resize')
   onResize() {
     const w = window.innerWidth;

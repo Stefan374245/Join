@@ -6,7 +6,7 @@ import { ToastComponent } from '../../../../shared/components/toast/toast.compon
 import { ClickOutsideDirective } from '../../../../shared/directives/click-outside.directive';
 
 /**
- * Subtask Interface
+ * Subtask data interface
  */
 export interface Subtask {
     id: string;
@@ -15,29 +15,7 @@ export interface Subtask {
 }
 
 /**
- * Subtask Management Component
- * 
- * Domain-specific component for managing subtasks in AddTask form.
- * Combines subtask input field with subtask list display and editing.
- * 
- * @example
- * ```html
- * <app-subtask-management
- *   [subtasks]="subtasks()"
- *   (addSubtask)="onAddSubtask($event)"
- *   (editSubtask)="onEditSubtask($event)"
- *   (updateSubtask)="onUpdateSubtask()"
- *   (deleteSubtask)="onDeleteSubtask($event)"
- * />
- * ```
- * 
- * @features
- * - Add new subtasks with input field
- * - Display up to 5 subtasks (max limit)
- * - Edit existing subtasks inline
- * - Delete subtasks
- * - Collapsible dropdown for more than 2 subtasks
- * - Keyboard shortcuts (Enter to save, Escape to cancel)
+ * Subtask management component with add, edit, delete and overflow handling
  */
 @Component({
     selector: 'app-subtask-management',
@@ -80,7 +58,7 @@ export class SubtaskManagementComponent {
     readonly MAX_SUBTASKS = 5;
 
     /**
-     * First 2 subtasks (always visible)
+     * First 2 subtasks that are always visible
      */
     visibleSubtasks = computed(() => {
         const tasks = this.subtasks();
@@ -91,26 +69,26 @@ export class SubtaskManagementComponent {
     });
 
     /**
-     * Remaining subtasks (hidden in dropdown)
+     * Subtasks hidden in dropdown after first 2
      */
     remainingSubtasks = computed(() => {
         return this.subtasks().slice(2);
     });
 
     /**
-     * Count of remaining subtasks
+     * Count of hidden subtasks for display
      */
     remainingSubtasksCount = computed(() => {
         return Math.max(0, this.subtasks().length - 2);
     });
 
     /**
-     * Whether more subtasks can be added
+     * Whether more subtasks can be added (max 5)
      */
     canAddMore = computed(() => this.subtasks().length < this.MAX_SUBTASKS);
     
     /**
-     * Placeholder text for input field
+     * Dynamic placeholder text based on current state
      */
     inputPlaceholder = computed(() => {
         const count = this.subtasks().length;
@@ -120,7 +98,7 @@ export class SubtaskManagementComponent {
     });
     
     /**
-     * Whether input field is currently focused
+     * Input focus state for UI styling
      */
     isInputFocused = computed(() => this.inputFocused());
 
@@ -131,7 +109,7 @@ export class SubtaskManagementComponent {
     }
 
     /**
-     * Handle add subtask button click
+     * Handles adding new subtask with validation
      */
     onAddSubtask(): void {
         const input = this.subtaskInputControl().value?.trim();
@@ -156,7 +134,8 @@ export class SubtaskManagementComponent {
     }
 
     /**
-     * Handle Enter key in add input
+     * Handles Enter key press in add input field
+     * @param event - Keyboard event
      */
     onAddInputKeydown(event: KeyboardEvent): void {
         if (event.key === 'Enter') {
@@ -166,7 +145,7 @@ export class SubtaskManagementComponent {
     }
     
     /**
-     * Handle input focus
+     * Handles input field focus event
      */
     onAddInputFocus(): void {
         console.log('Input focused!');
@@ -174,7 +153,7 @@ export class SubtaskManagementComponent {
     }
     
     /**
-     * Handle input blur
+     * Handles input field blur event with delay
      */
     onAddInputBlur(): void {
         console.log('Input blurred!');
@@ -184,7 +163,7 @@ export class SubtaskManagementComponent {
     }
     
     /**
-     * Clear input field
+     * Clears input field and refocuses
      */
     onClearInput(): void {
         this.subtaskInputControl().reset();
@@ -194,7 +173,8 @@ export class SubtaskManagementComponent {
     }
 
     /**
-     * Start editing a subtask
+     * Initiates subtask editing mode
+     * @param subtask - Subtask to edit
      */
     onEdit(subtask: Subtask): void {
         this.editSubtask.emit(subtask);
@@ -206,21 +186,22 @@ export class SubtaskManagementComponent {
     }
 
     /**
-     * Update edited subtask
+     * Confirms subtask update
      */
     onUpdate(): void {
         this.updateSubtask.emit();
     }
 
     /**
-     * Cancel editing
+     * Cancels subtask editing
      */
     onCancelEdit(): void {
         this.cancelEditSubtask.emit();
     }
 
     /**
-     * Handle input blur during editing
+     * Handles input blur during editing with focus check
+     * @param event - Focus event
      */
     onInputBlur(event: FocusEvent): void {
         const relatedTarget = event.relatedTarget as HTMLElement;
@@ -232,21 +213,22 @@ export class SubtaskManagementComponent {
     }
 
     /**
-     * Delete a subtask
+     * Deletes specified subtask
+     * @param id - Subtask ID to delete
      */
     onDelete(id: string): void {
         this.deleteSubtask.emit(id);
     }
 
     /**
-     * Toggle dropdown for remaining subtasks
+     * Toggles dropdown visibility for overflow subtasks
      */
     toggleDropdown(): void {
         this.isDropdownOpen.update(open => !open);
     }
 
     /**
-     * Close dropdown
+     * Closes subtask overflow dropdown
      */
     closeDropdown(): void {
         this.isDropdownOpen.set(false);

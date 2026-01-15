@@ -7,6 +7,9 @@ import { toObservable } from '@angular/core/rxjs-interop';
 
 import { Contact } from '../models/contact.interface';
 
+/**
+ * Signal-based contact management service with Firestore synchronization
+ */
 @Injectable({
   providedIn: 'root'
 })
@@ -51,9 +54,8 @@ export class ContactService {
   constructor() {}
 
   /**
-   * Lädt alle Kontakte aus Firestore (Async mit Signal-Update)
-   * Sortiert die Kontakte alphabetisch nach Namen
-   * @returns {Promise<Contact[]>} Promise mit allen Kontakten
+   * Loads all contacts from Firestore and updates signals
+   * @returns Promise with all contacts
    */
   async loadContactsAsync(): Promise<Contact[]> {
     this.loadingSignal.set(true);
@@ -114,8 +116,8 @@ export class ContactService {
   }
 
   /**
-   * Lädt alle Kontakte aus Firestore (Legacy Observable-Methode)
-   * @returns {Observable<Contact[]>} Observable mit allen Kontakten
+   * Loads all contacts using Observable
+   * @returns Observable with all contacts
    * @deprecated Use loadContactsAsync() or contacts signal instead
    */
   loadAll(): Observable<Contact[]> {
@@ -123,8 +125,8 @@ export class ContactService {
   }
 
   /**
-   * Gibt alle Kontakte zurück (Legacy Observable-Methode)
-   * @returns {Observable<Contact[]>} Observable mit allen Kontakten
+   * Returns all contacts using Observable
+   * @returns Observable with all contacts
    * @deprecated Use loadContactsAsync() or contacts signal instead
    */
   getContacts(): Observable<Contact[]> {
@@ -132,27 +134,27 @@ export class ContactService {
   }
 
   /**
-   * Signal-basierte Suche nach Kontakt per E-Mail
-   * @param {string} email - Die zu suchende E-Mail-Adresse
-   * @returns {Contact | undefined} Der Kontakt oder undefined
+   * Finds contact by email using signals
+   * @param email - The email address to search for
+   * @returns Contact or undefined
    */
   findContactByEmail(email: string): Contact | undefined {
     return this.contacts().find(c => c.email === email);
   }
 
   /**
-   * Signal-basierte Suche nach Kontakt per ID
-   * @param {string} id - Die zu suchende ID
-   * @returns {Contact | undefined} Der Kontakt oder undefined
+   * Finds contact by ID using signals
+   * @param id - The ID to search for
+   * @returns Contact or undefined
    */
   findContactById(id: string): Contact | undefined {
     return this.contacts().find(c => c.id === id);
   }
 
   /**
-   * Signal-basierte Suche mit Suchbegriff
-   * @param {string} searchTerm - Der Suchbegriff
-   * @returns {Contact[]} Gefilterte Kontakte
+   * Searches contacts by search term using signals
+   * @param searchTerm - The search term
+   * @returns Filtered contacts
    */
   searchContacts(searchTerm: string): Contact[] {
     const term = searchTerm.toLowerCase();
@@ -164,10 +166,9 @@ export class ContactService {
   }
 
   /**
-   * Generiert eine konsistente Farbe basierend auf der E-Mail-Adresse
-   * @private
-   * @param {string} email - Die E-Mail-Adresse
-   * @returns {string} Hexadezimaler Farbcode
+   * Generates consistent color based on email address
+   * @param email - The email address
+   * @returns Hexadecimal color code
    */
   private generateColorFromEmail(email: string): string {
     const colors = [
@@ -182,9 +183,9 @@ export class ContactService {
   }
 
   /**
-   * Sucht einen Kontakt anhand der E-Mail-Adresse
-   * @param {string} email - Die zu suchende E-Mail-Adresse
-   * @returns {Observable<Contact | null>} Observable mit dem Kontakt oder null
+   * Finds contact by email using Observable
+   * @param email - The email address to search for
+   * @returns Observable with contact or null
    */
   getByEmail(email: string): Observable<Contact | null> {
     return this.loadAll().pipe(
@@ -193,13 +194,10 @@ export class ContactService {
   }
 
   /**
-   * Speichert einen neuen Benutzer in Firestore
-   * @param {string} userId - Die eindeutige Benutzer-ID
-   * @param {Object} userData - Die Benutzerdaten
-   * @param {string} userData.displayName - Anzeigename des Benutzers
-   * @param {string} userData.email - E-Mail-Adresse des Benutzers
-   * @param {string} [userData.color] - Optionale Farbe für den Avatar
-   * @returns {Observable<void>} Observable des Speichervorgangs
+   * Saves new user to Firestore
+   * @param userId - The unique user ID
+   * @param userData - The user data
+   * @returns Observable of the save operation
    */
   saveUser(userId: string, userData: { displayName: string; email: string; color?: string }): Observable<void> {
     const userDoc = doc(this.firestore, 'users', userId);
@@ -216,10 +214,9 @@ export class ContactService {
   }
 
   /**
-   * Speichert einen Kontakt in Firestore und aktualisiert den lokalen Cache
-   * Erstellt oder aktualisiert ein vollständiges Kontaktdokument
-   * @param {Contact} contact - Der zu speichernde Kontakt
-   * @returns {Observable<void>} Observable des Speichervorgangs
+   * Saves contact to Firestore and updates local cache
+   * @param contact - The contact to save
+   * @returns Observable of the save operation
    */
   saveContact(contact: Contact): Observable<void> {
     const contactDoc = doc(this.firestore, 'users', contact.id);
@@ -243,11 +240,10 @@ export class ContactService {
   }
 
   /**
-   * Aktualisiert einen bestehenden Benutzer in Firestore und den lokalen Cache
-   * Aktualisiert automatisch den displayName wenn firstName oder lastName geändert werden
-   * @param {string} userId - Die Benutzer-ID
-   * @param {Partial<Contact>} data - Die zu aktualisierenden Daten
-   * @returns {Observable<void>} Observable des Aktualisierungsvorgangs
+   * Updates existing user in Firestore and local cache
+   * @param userId - The user ID
+   * @param data - The data to update
+   * @returns Observable of the update operation
    */
   updateUser(userId: string, data: Partial<Contact>): Observable<void> {
     const userDoc = doc(this.firestore, 'users', userId);
@@ -268,9 +264,9 @@ export class ContactService {
   }
 
   /**
-   * Löscht einen Benutzer aus Firestore, entfernt ihn aus allen Tasks und aktualisiert den Cache
-   * @param {string} userId - Die ID des zu löschenden Benutzers
-   * @returns {Observable<void>} Observable des Löschvorgangs
+   * Deletes user from Firestore and removes from all tasks
+   * @param userId - The ID of the user to delete
+   * @returns Observable of the delete operation
    */
   deleteUser(userId: string): Observable<void> {
     const userDoc = doc(this.firestore, 'users', userId);
@@ -287,10 +283,9 @@ export class ContactService {
   }
 
   /**
-   * Entfernt einen User aus dem assignedTo Array aller Tasks
-   * @private
-   * @param {string} userId - Die ID des zu entfernenden Users
-   * @returns {Promise<void>}
+   * Removes user from assignedTo array of all tasks
+   * @param userId - The ID of the user to remove
+   * @returns Promise
    */
   private async removeUserFromAllTasks(userId: string): Promise<void> {
     const tasksCol = collection(this.firestore, 'tasks');

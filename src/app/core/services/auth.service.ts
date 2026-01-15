@@ -1,4 +1,4 @@
-import { Injectable, inject, signal, computed, effect } from '@angular/core';
+import { Injectable, inject, signal, computed, effect } from "@angular/core";
 import {
   Auth,
   createUserWithEmailAndPassword,
@@ -9,139 +9,176 @@ import {
   updateProfile,
   User,
   UserCredential,
-  authState
-} from '@angular/fire/auth';
-import { Firestore, doc, setDoc, getDoc } from '@angular/fire/firestore';
-import { Observable, from } from 'rxjs';
-import { catchError, switchMap, map } from 'rxjs/operators';
-import { Router } from '@angular/router';
-import { toSignal, toObservable } from '@angular/core/rxjs-interop';
+  authState,
+} from "@angular/fire/auth";
+import { Firestore, doc, setDoc, getDoc } from "@angular/fire/firestore";
+import { Observable, from } from "rxjs";
+import { catchError, switchMap, map } from "rxjs/operators";
+import { Router } from "@angular/router";
+import { toSignal, toObservable } from "@angular/core/rxjs-interop";
 
 /**
- * Interface für Registrierungsdaten
- * @interface SignupData
+ * Interface for user registration data
  */
 export interface SignupData {
+  /** Full display name of the user */
   name: string;
+  /** Email address for authentication */
   email: string;
+  /** Password for account security */
   password: string;
 }
 
+/**
+ * Authentication service using Firebase Auth with Angular Signals
+ * 
+ * Provides user registration, login, logout and reactive state management
+ */
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root",
 })
 export class AuthService {
+  /** Firebase Authentication instance */
   private auth = inject(Auth);
+  
+  /** Firestore database instance */
   private firestore = inject(Firestore);
+  
+  /** Angular Router instance */
   private router = inject(Router);
 
+  /** Private signal containing current Firebase User state */
   private userSignal = toSignal(authState(this.auth), { initialValue: null });
 
+  /** Public readonly signal exposing current user state */
   public readonly currentUserSignal = this.userSignal;
 
+  /** Observable version of user signal for backward compatibility */
   user$: Observable<User | null> = toObservable(this.userSignal);
 
+  /** Computed signal indicating whether user is authenticated */
   public readonly isAuthenticated = computed(() => this.userSignal() !== null);
 
-  public readonly userDisplayName = computed(() => 
-    this.userSignal()?.displayName ?? null
+  /** Computed signal containing current user's display name */
+  public readonly userDisplayName = computed(
+    () => this.userSignal()?.displayName ?? null
   );
 
-  public readonly userEmail = computed(() => 
-    this.userSignal()?.email ?? null
+  /** Computed signal containing current user's email address */
+  public readonly userEmail = computed(() => this.userSignal()?.email ?? null);
+
+  /** Computed signal indicating whether current user is a guest */
+  public readonly isGuestUser = computed(
+    () => this.userSignal()?.email === "guest@join.com"
   );
 
-  public readonly isGuestUser = computed(() => 
-    this.userSignal()?.email === 'guest@join.com'
-  );
-
-  public readonly userId = computed(() => 
-    this.userSignal()?.uid ?? null
-  );
+  /** Computed signal containing current user's unique identifier */
+  public readonly userId = computed(() => this.userSignal()?.uid ?? null);
 
   /**
-   * Gibt den aktuell angemeldeten Benutzer zurück (Legacy-Support)
-   * @returns {User | null} Der aktuelle Benutzer oder null
+   * Gets currently authenticated user from Firebase Auth (Legacy support)
+   * @returns Current Firebase User object or null
+   * @deprecated Use currentUserSignal for reactive programming
    */
   get currentUser(): User | null {
     return this.auth.currentUser;
   }
 
   /**
-   * Generiert eine konsistente Farbe basierend auf der E-Mail-Adresse
+   * Generates consistent color based on email address
+   * @param email - User's email address
+   * @returns Hexadecimal color code
    * @private
-   * @param {string} email - Die E-Mail-Adresse des Benutzers
-   * @returns {string} Hexadezimaler Farbcode
    */
   private generateColorFromEmail(email: string): string {
     const colors = [
-      '#FF7A00', '#FF5EB3', '#6E52FF', '#9327FF', '#00BEE8',
-      '#1FD7C1', '#FF745E', '#FFA35E', '#FC71FF', '#FFC701',
-      '#0038FF', '#C3FF2B', '#FFE62B', '#FF4646', '#FFBB2B'
+      "#FF7A00",
+      "#FF5EB3",
+      "#6E52FF",
+      "#9327FF",
+      "#00BEE8",
+      "#1FD7C1",
+      "#FF745E",
+      "#FFA35E",
+      "#FC71FF",
+      "#FFC701",
+      "#0038FF",
+      "#C3FF2B",
+      "#FFE62B",
+      "#FF4646",
+      "#FFBB2B",
     ];
 
-    const hash = email.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    const hash = email
+      .split("")
+      .reduce((acc, char) => acc + char.charCodeAt(0), 0);
     const colorIndex = hash % colors.length;
     return colors[colorIndex];
   }
 
   /**
-   * Speichert Benutzerdaten in Firestore
+   * Saves user data to Firestore
+   * @param user - Firebase Auth user object
+   * @param displayName - User's display name
+   * @returns Promise that resolves when user data is saved
    * @private
-   * @param {User} user - Firebase Auth Benutzerobjekt
-   * @param {string} displayName - Anzeigename des Benutzers
-   * @returns {Promise<void>}
    */
-  private async saveUserToFirestore(user: User, displayName: string): Promise<void> {
-    const userDoc = doc(this.firestore, 'users', user.uid);
-    const color = this.generateColorFromEmail(user.email || '');
+  private async saveUserToFirestore(
+    user: User,
+    displayName: string
+  ): Promise<void> {
+    const userDoc = doc(this.firestore, "users", user.uid);
+    const color = this.generateColorFromEmail(user.email || "");
 
-    const nameParts = displayName.split(' ');
-    const firstName = nameParts[0] || '';
-    const lastName = nameParts.slice(1).join(' ') || '';
+    const nameParts = displayName.split(" ");
+    const firstName = nameParts[0] || "";
+    const lastName = nameParts.slice(1).join(" ") || "";
 
     const initials = displayName
-      ? displayName.split(' ').map((s: string) => s[0]).slice(0, 2).join('').toUpperCase()
-      : (user.email?.substring(0, 2).toUpperCase() || 'U');
+      ? displayName
+          .split(" ")
+          .map((s: string) => s[0])
+          .slice(0, 2)
+          .join("")
+          .toUpperCase()
+      : user.email?.substring(0, 2).toUpperCase() || "U";
 
     await setDoc(userDoc, {
       firstName: firstName,
       lastName: lastName,
       displayName: displayName,
       email: user.email,
-      phone: '',
+      phone: "",
       color: color,
       initials: initials,
       createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date().toISOString(),
     });
   }
 
   /**
-   * Stellt sicher, dass der Benutzer in Firestore existiert
-   * Erstellt ein Benutzerdokument, falls es noch nicht existiert
+   * Ensures user exists in Firestore, creates document if not exists
+   * @param user - Firebase Auth user object
+   * @returns Promise that resolves when check is complete
    * @private
-   * @param {User} user - Firebase Auth Benutzerobjekt
-   * @returns {Promise<void>}
    */
   private async ensureUserInFirestore(user: User): Promise<void> {
     try {
-      const userDoc = doc(this.firestore, 'users', user.uid);
+      const userDoc = doc(this.firestore, "users", user.uid);
       const userSnapshot = await getDoc(userDoc);
 
       if (!userSnapshot.exists()) {
-        const displayName = user.displayName || user.email?.split('@')[0] || 'User';
+        const displayName =
+          user.displayName || user.email?.split("@")[0] || "User";
         await this.saveUserToFirestore(user, displayName);
       }
-    } catch (error) {
-    }
+    } catch (error) {}
   }
 
   /**
-   * Registriert einen neuen Benutzer mit E-Mail und Passwort
-   * Erstellt automatisch ein Firestore-Dokument mit Benutzerdaten
-   * @param {SignupData} data - Registrierungsdaten (Name, E-Mail, Passwort)
-   * @returns {Observable<UserCredential>} Observable mit den Benutzer-Credentials
+   * Registers new user with email and password
+   * @param data - Registration data (name, email, password)
+   * @returns Observable with user credentials
    */
   signup(data: SignupData): Observable<UserCredential> {
     const promise = createUserWithEmailAndPassword(
@@ -151,7 +188,7 @@ export class AuthService {
     ).then(async (userCredential) => {
       if (userCredential.user) {
         await updateProfile(userCredential.user, {
-          displayName: data.name
+          displayName: data.name,
         });
 
         await this.saveUserToFirestore(userCredential.user, data.name);
@@ -163,47 +200,53 @@ export class AuthService {
   }
 
   /**
-   * Meldet einen Benutzer mit E-Mail und Passwort an
-   * Stellt sicher, dass der Benutzer in Firestore existiert
-   * @param {string} email - E-Mail-Adresse des Benutzers
-   * @param {string} password - Passwort des Benutzers
-   * @returns {Observable<UserCredential>} Observable mit den Benutzer-Credentials
+   * Logs in user with email and password
+   * @param email - User's email address
+   * @param password - User's password
+   * @returns Observable with user credentials
    */
   login(email: string, password: string): Observable<UserCredential> {
-    const promise = signInWithEmailAndPassword(this.auth, email, password)
-      .then(async (userCredential) => {
+    const promise = signInWithEmailAndPassword(this.auth, email, password).then(
+      async (userCredential) => {
         await this.ensureUserInFirestore(userCredential.user);
         return userCredential;
-      });
+      }
+    );
     return from(promise);
   }
 
   /**
-   * Meldet den Benutzer als Gast an
-   * Erstellt automatisch einen Gast-Account, falls dieser nicht existiert
-   * @returns {Observable<UserCredential>} Observable mit den Gast-Credentials
+   * Logs in as guest user, creates guest account if not exists
+   * @returns Observable with guest user credentials
    */
   guestLogin(): Observable<UserCredential> {
-    const guestEmail = 'guest@join.com';
-    const guestPassword = 'GuestJoin2024!';
+    const guestEmail = "guest@join.com";
+    const guestPassword = "GuestJoin2024!";
 
     return this.login(guestEmail, guestPassword).pipe(
       catchError((error) => {
-        if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
-          console.log('🔧 Guest user does not exist. Creating guest account...');
-          
+        if (
+          error.code === "auth/user-not-found" ||
+          error.code === "auth/invalid-credential"
+        ) {
+          console.log(
+            "🔧 Guest user does not exist. Creating guest account..."
+          );
+
           return this.signup({
-            name: 'Guest User',
+            name: "Guest User",
             email: guestEmail,
-            password: guestPassword
+            password: guestPassword,
           }).pipe(
             switchMap(() => {
-              console.log('✅ Guest account created successfully');
+              console.log("✅ Guest account created successfully");
               return this.login(guestEmail, guestPassword);
             }),
             catchError((signupError) => {
-              if (signupError.code === 'auth/email-already-in-use') {
-                console.error('❌ Guest account exists but wrong password. Please check credentials.');
+              if (signupError.code === "auth/email-already-in-use") {
+                console.error(
+                  "❌ Guest account exists but wrong password. Please check credentials."
+                );
               }
               throw signupError;
             })
@@ -215,38 +258,39 @@ export class AuthService {
   }
 
   /**
-   * Meldet den Benutzer über Google OAuth an
-   * Erstellt automatisch ein Firestore-Dokument, falls noch nicht vorhanden
-   * @returns {Observable<UserCredential>} Observable mit den Google-Credentials
+   * Signs in user with Google OAuth
+   * @returns Observable with Google OAuth credentials
    */
   signInWithGoogle(): Observable<UserCredential> {
     const provider = new GoogleAuthProvider();
     provider.setCustomParameters({
-      prompt: 'select_account'
+      prompt: "select_account",
     });
 
-    const promise = signInWithPopup(this.auth, provider).then(async (userCredential) => {
-      await this.ensureUserInFirestore(userCredential.user);
-      return userCredential;
-    });
+    const promise = signInWithPopup(this.auth, provider).then(
+      async (userCredential) => {
+        await this.ensureUserInFirestore(userCredential.user);
+        return userCredential;
+      }
+    );
 
     return from(promise);
   }
 
   /**
-   * Meldet den aktuellen Benutzer ab und navigiert zur Logo-Animation
-   * @returns {Observable<void>} Observable des Logout-Vorgangs
+   * Logs out current user and navigates to logo animation
+   * @returns Observable of logout operation
    */
   logout(): Observable<void> {
     const promise = signOut(this.auth).then(() => {
-      this.router.navigate(['/logo-animation']);
+      this.router.navigate(["/logo-animation"]);
     });
     return from(promise);
   }
 
   /**
-   * Überprüft, ob ein Benutzer angemeldet ist (Legacy-Methode)
-   * @returns {boolean} True wenn angemeldet, sonst false
+   * Checks if user is authenticated (Legacy method)
+   * @returns True if authenticated, false otherwise
    * @deprecated Use isAuthenticated signal instead
    */
   isAuthenticatedLegacy(): boolean {
@@ -254,8 +298,8 @@ export class AuthService {
   }
 
   /**
-   * Gibt den Anzeigenamen des aktuellen Benutzers zurück (Legacy-Methode)
-   * @returns {string | null} Anzeigename oder null
+   * Gets current user's display name (Legacy method)
+   * @returns Display name or null
    * @deprecated Use userDisplayName signal instead
    */
   getUserDisplayName(): string | null {
@@ -263,8 +307,8 @@ export class AuthService {
   }
 
   /**
-   * Gibt die E-Mail-Adresse des aktuellen Benutzers zurück (Legacy-Methode)
-   * @returns {string | null} E-Mail-Adresse oder null
+   * Gets current user's email address (Legacy method)
+   * @returns Email address or null
    * @deprecated Use userEmail signal instead
    */
   getUserEmail(): string | null {
@@ -272,44 +316,42 @@ export class AuthService {
   }
 
   /**
-   * Prüft, ob der aktuelle Benutzer ein Gast ist (Legacy-Methode)
-   * @returns {boolean} True wenn Gast, sonst false
+   * Checks if current user is guest (Legacy method)
+   * @returns True if guest, false otherwise
    * @deprecated Use isGuestUser signal instead
    */
   isGuestUserLegacy(): boolean {
-    return this.currentUser?.email === 'guest@join.com';
+    return this.currentUser?.email === "guest@join.com";
   }
 
   /**
-   * Gibt ein Observable zurück, das prüft ob der Benutzer ein Gast ist
-   * @returns {Observable<boolean>} Observable mit Gast-Status
+   * Returns Observable that checks if user is guest
+   * @returns Observable with guest status
    * @deprecated Use isGuestUser signal instead
    */
   isGuestUser$(): Observable<boolean> {
-    return this.user$.pipe(
-      map(user => user?.email === 'guest@join.com')
-    );
+    return this.user$.pipe(map((user) => user?.email === "guest@join.com"));
   }
 
   /**
-   * Aktualisiert den Anzeigenamen des aktuellen Benutzers
-   * @param {string} displayName - Neuer Anzeigename
-   * @returns {Promise<void>}
-   * @throws {Error} Wenn kein Benutzer angemeldet ist
+   * Updates display name of current user
+   * @param displayName - New display name
+   * @returns Promise that resolves when update is complete
+   * @throws Error if no user is logged in
    */
   async updateDisplayName(displayName: string): Promise<void> {
     if (!this.currentUser) {
-      throw new Error('No user is currently logged in');
+      throw new Error("No user is currently logged in");
     }
 
     try {
       await updateProfile(this.currentUser, {
-        displayName: displayName
+        displayName: displayName,
       });
 
-      console.log('✅ Display name updated successfully in Auth');
+      console.log("✅ Display name updated successfully in Auth");
     } catch (error) {
-      console.error('❌ Error updating display name:', error);
+      console.error("❌ Error updating display name:", error);
       throw error;
     }
   }

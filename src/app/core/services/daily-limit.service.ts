@@ -2,33 +2,17 @@ import { Injectable, inject } from '@angular/core';
 import { Firestore, doc, getDoc } from '@angular/fire/firestore';
 import { BehaviorSubject, Observable } from 'rxjs';
 
-/**
- * Interface für Informationen über das tägliche Limit
- * @interface DailyLimitInfo
- */
+
 export interface DailyLimitInfo {
-  /** Aktuelle Anzahl der Anfragen heute */
   currentCount: number;
-  /** Maximales Limit pro Tag */
   maxLimit: number;
-  /** Verbleibende Anfragen heute */
   remainingRequests: number;
-  /** Datum im ISO-Format (YYYY-MM-DD) */
   date: string;
-  /** Gibt an, ob das Limit erreicht wurde */
   isLimitReached: boolean;
 }
 
 /**
- * Service zur Verwaltung von täglichen Anfrage-Limits
- * 
- * Dieser Service verwaltet und überwacht das tägliche Limit für Anfragen:
- * - Abrufen der aktuellen Limit-Informationen aus Firestore
- * - Caching zur Reduzierung von Firestore-Anfragen
- * - Überwachung ob das Tageslimit erreicht wurde
- * - Bereitstellung von Limit-Informationen als Observable
- * 
- * @class DailyLimitService
+ * Service for managing daily request limits with Firestore integration
  */
 @Injectable({
   providedIn: 'root'
@@ -36,7 +20,6 @@ export interface DailyLimitInfo {
 export class DailyLimitService {
   private firestore = inject(Firestore);
 
-  /** BehaviorSubject für Limit-Informationen */
   private limitInfo$ = new BehaviorSubject<DailyLimitInfo>({
     currentCount: 0,
     maxLimit: 10,
@@ -45,32 +28,29 @@ export class DailyLimitService {
     isLimitReached: false
   });
 
-  /** Zeitstempel des letzten Firestore-Abrufs */
   private lastFetchTime = 0;
-  /** Cache-Dauer in Millisekunden (30 Sekunden) */
   private cacheDuration = 30000;
 
   /**
-   * Gibt ein Observable der Limit-Informationen zurück
-   * @returns {Observable<DailyLimitInfo>} Observable Stream der Limit-Informationen
+   * Returns Observable of limit information
+   * @returns Observable stream of limit information
    */
   getLimitInfo(): Observable<DailyLimitInfo> {
     return this.limitInfo$.asObservable();
   }
 
   /**
-   * Gibt die aktuellen Limit-Informationen synchron zurück
-   * @returns {DailyLimitInfo} Aktueller Wert der Limit-Informationen
+   * Returns current limit information synchronously
+   * @returns Current limit information value
    */
   getCurrentLimitInfo(): DailyLimitInfo {
     return this.limitInfo$.value;
   }
 
   /**
-   * Ruft die täglichen Limit-Informationen aus Firestore ab
-   * Verwendet gecachte Daten wenn verfügbar und nicht abgelaufen
-   * @param {boolean} [forceRefresh=false] - Erzwingt einen neuen Firestore-Abruf
-   * @returns {Promise<DailyLimitInfo>} Promise mit den Limit-Informationen
+   * Fetches daily limit information from Firestore with caching
+   * @param forceRefresh - Forces new Firestore fetch
+   * @returns Promise with limit information
    */
   async fetchDailyLimit(forceRefresh = false): Promise<DailyLimitInfo> {
     const now = Date.now();
@@ -93,19 +73,17 @@ export class DailyLimitService {
   }
 
   /**
-   * Gibt das heutige Datum im ISO-Format zurück
-   * @private
-   * @returns {string} Datum im Format YYYY-MM-DD
+   * Returns today's date in ISO format
+   * @returns Date in YYYY-MM-DD format
    */
   private getTodayDate(): string {
     return new Date().toISOString().split('T')[0];
   }
 
   /**
-   * Ruft den aktuellen Zähler aus Firestore ab
-   * @private
-   * @param {string} date - Datum im Format YYYY-MM-DD
-   * @returns {Promise<number>} Promise mit dem aktuellen Zähler
+   * Fetches current count from Firestore
+   * @param date - Date in YYYY-MM-DD format
+   * @returns Promise with current count
    */
   private async fetchCountFromFirestore(date: string): Promise<number> {
     const docId = `global_${date}`;
@@ -120,11 +98,10 @@ export class DailyLimitService {
   }
 
   /**
-   * Erstellt ein DailyLimitInfo-Objekt aus den Daten
-   * @private
-   * @param {number} currentCount - Aktuelle Anzahl der Anfragen
-   * @param {string} date - Datum im Format YYYY-MM-DD
-   * @returns {DailyLimitInfo} Vollständiges Limit-Informations-Objekt
+   * Creates DailyLimitInfo object from data
+   * @param currentCount - Current number of requests
+   * @param date - Date in YYYY-MM-DD format
+   * @returns Complete limit information object
    */
   private createLimitInfo(currentCount: number, date: string): DailyLimitInfo {
     const maxLimit = 10;
@@ -138,11 +115,9 @@ export class DailyLimitService {
   }
 
   /**
-   * Aktualisiert den internen State mit neuen Limit-Informationen
-   * @private
-   * @param {DailyLimitInfo} limitInfo - Die neuen Limit-Informationen
-   * @param {number} timestamp - Zeitstempel des Updates
-   * @returns {void}
+   * Updates internal state with new limit information
+   * @param limitInfo - The new limit information
+   * @param timestamp - Timestamp of the update
    */
   private updateLimitState(limitInfo: DailyLimitInfo, timestamp: number): void {
     this.limitInfo$.next(limitInfo);
@@ -150,10 +125,8 @@ export class DailyLimitService {
   }
 
   /**
-   * Gibt Standard-Limit-Informationen zurück
-   * Wird bei Fehlern oder als Fallback verwendet
-   * @private
-   * @returns {DailyLimitInfo} Standard-Limit-Informationen
+   * Returns default limit information for errors or fallback
+   * @returns Default limit information
    */
   private getDefaultLimitInfo(): DailyLimitInfo {
     return {
@@ -166,8 +139,7 @@ export class DailyLimitService {
   }
 
   /**
-   * Invalidiert den Cache und erzwingt einen neuen Abruf beim nächsten Aufruf
-   * @returns {void}
+   * Invalidates cache and forces new fetch on next call
    */
   invalidateCache(): void {
     this.lastFetchTime = 0;

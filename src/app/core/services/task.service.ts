@@ -21,19 +21,9 @@ import { toSignal, toObservable } from '@angular/core/rxjs-interop';
 import { Task, Subtask } from '../models/task.interface';
 
 /**
- * Service zur Verwaltung von Aufgaben (Tasks) - Signal-basiert
- * 
- * Dieser Service verwaltet alle aufgabenbezogenen Operationen:
- * - Echtzeit-Synchronisation mit Firestore
- * - CRUD-Operationen für Tasks
- * - Verwaltung von Subtasks
- * - Status-Übergänge und Filterung
- * - Statistiken und Analysen
- * 
- * Migration zu Angular 19 Signals für reaktive Task-Verwaltung.
- * 
- * @class TaskService
+ * Signal-based task management service with real-time Firestore synchronization
  */
+
 @Injectable({
   providedIn: 'root'
 })
@@ -117,9 +107,7 @@ export class TaskService {
   }
 
   /**
-   * Initialisiert den Firestore-Listener für Echtzeit-Updates
-   * @private
-   * @returns {void}
+   * Initializes real-time Firestore listener for task updates
    */
   private initializeTasksListener(): void {
     // Wenn bereits ein Listener aktiv ist, stoppe ihn
@@ -167,11 +155,9 @@ export class TaskService {
   }
 
   /**
-   * Mappt Firestore-Daten zu einem Task-Objekt
-   * Behandelt verschiedene Status-Formate und konvertiert Datumsfelder
-   * @private
-   * @param {any} data - Rohdaten aus Firestore
-   * @returns {Task} Gemapptes Task-Objekt
+   * Maps Firestore data to Task object with status normalization
+   * @param data - Raw Firestore data
+   * @returns Mapped task object
    */
   private mapFirestoreTask(data: any): Task {
     let status: 'triage' | 'todo' | 'in-progress' | 'await-feedback' | 'done' = 'todo';
@@ -226,10 +212,9 @@ export class TaskService {
   }
 
   /**
-   * Mappt Subtask-Daten aus Firestore
-   * @private
-   * @param {any} subtasks - Rohdaten der Subtasks
-   * @returns {Subtask[]} Array von gemappten Subtasks
+   * Maps Firestore subtask data to Subtask array
+   * @param subtasks - Raw subtask data
+   * @returns Array of mapped subtasks
    */
   private mapSubtasks(subtasks: any): Subtask[] {
     if (!subtasks || !Array.isArray(subtasks)) {
@@ -244,10 +229,9 @@ export class TaskService {
   }
 
   /**
-   * Konvertiert verschiedene Timestamp-Formate zu einem Date-Objekt
-   * @private
-   * @param {any} timestamp - Timestamp in verschiedenen Formaten
-   * @returns {Date} JavaScript Date-Objekt
+   * Converts various timestamp formats to Date object
+   * @param timestamp - Timestamp in various formats
+   * @returns JavaScript Date object
    */
   private convertToDate(timestamp: any): Date {
     if (!timestamp) {
@@ -270,18 +254,17 @@ export class TaskService {
   }
 
   /**
-   * Konvertiert ein Date-Objekt zu einem Firestore Timestamp
-   * @private
-   * @param {Date} date - JavaScript Date-Objekt
-   * @returns {Timestamp} Firestore Timestamp
+   * Converts Date object to Firestore Timestamp
+   * @param date - JavaScript Date object
+   * @returns Firestore Timestamp
    */
   private convertToTimestamp(date: Date): Timestamp {
     return Timestamp.fromDate(date);
   }
 
   /**
-   * Gibt ein Observable aller Tasks zurück (Legacy-Methode)
-   * @returns {Observable<Task[]>} Observable Stream aller Tasks
+   * Returns Observable of all tasks
+   * @returns Observable stream of all tasks
    * @deprecated Use tasks signal instead
    */
   getTasks(): Observable<Task[]> {
@@ -289,18 +272,18 @@ export class TaskService {
   }
 
   /**
-   * Signal-basierte Suche nach Task per ID
-   * @param {string} taskId - Die Task-ID
-   * @returns {Task | undefined} Der Task oder undefined
+   * Finds task by ID using signals
+   * @param taskId - The task ID
+   * @returns Task or undefined
    */
   findTaskById(taskId: string): Task | undefined {
     return this.tasks().find(task => task.id === taskId);
   }
 
   /**
-   * Sucht einen Task anhand der ID (Legacy Observable-Methode)
-   * @param {string} taskId - Die Task-ID
-   * @returns {Observable<Task | undefined>} Observable mit dem Task oder undefined
+   * Finds task by ID using Observable
+   * @param taskId - The task ID
+   * @returns Observable with task or undefined
    * @deprecated Use findTaskById() or tasks signal instead
    */
   getTaskById(taskId: string): Observable<Task | undefined> {
@@ -310,9 +293,9 @@ export class TaskService {
   }
 
   /**
-   * Filtert Tasks nach Status (Legacy Observable-Methode)
-   * @param {('todo'|'in-progress'|'done')} status - Der gewünschte Status
-   * @returns {Observable<Task[]>} Observable mit gefilterten Tasks
+   * Filters tasks by status using Observable
+   * @param status - The desired status
+   * @returns Observable with filtered tasks
    * @deprecated Use tasksByStatus signal instead
    */
   getTasksByStatus(status: 'todo' | 'in-progress' | 'done'): Observable<Task[]> {
@@ -322,8 +305,8 @@ export class TaskService {
   }
 
   /**
-   * Gibt alle Tasks mit hoher Priorität zurück (Legacy Observable-Methode)
-   * @returns {Observable<Task[]>} Observable mit dringenden Tasks
+   * Returns high priority tasks using Observable
+   * @returns Observable with urgent tasks
    * @deprecated Use urgentTasks signal instead
    */
   getUrgentTasks(): Observable<Task[]> {
@@ -333,8 +316,8 @@ export class TaskService {
   }
 
   /**
-   * Gibt Statistiken über Tasks zurück (Legacy Observable-Methode)
-   * @returns {Observable<Object>} Observable mit Task-Statistiken (total, todo, inProgress, done, urgent)
+   * Returns task statistics using Observable
+   * @returns Observable with task statistics
    * @deprecated Use taskStats signal instead
    */
   getTaskStats(): Observable<{
@@ -356,8 +339,8 @@ export class TaskService {
   }
 
   /**
-   * Gibt den nächsten dringenden Termin zurück (Legacy Observable-Methode)
-   * @returns {Observable<Date | null>} Observable mit dem nächsten Deadline oder null
+   * Returns next urgent deadline using Observable
+   * @returns Observable with next deadline or null
    * @deprecated Use nextUrgentDeadline signal instead
    */
   getNextUrgentDeadline(): Observable<Date | null> {
@@ -373,9 +356,9 @@ export class TaskService {
   }
 
   /**
-   * Fügt einen neuen Task zu Firestore hinzu
-   * @param {Task} task - Der hinzuzufügende Task
-   * @returns {Observable<void>} Observable des Hinzufügevorgangs
+   * Adds new task to Firestore
+   * @param task - The task to add
+   * @returns Observable of the add operation
    */
   addTask(task: Task): Observable<void> {
     const taskDoc = doc(this.firestore, 'tasks', task.id);
@@ -412,10 +395,9 @@ export class TaskService {
   }
 
   /**
-   * Bereitet Subtasks für Firestore vor
-   * @private
-   * @param {Subtask[]} subtasks - Array von Subtasks
-   * @returns {any[]} Array von Firestore-kompatiblen Subtask-Objekten
+   * Prepares subtasks for Firestore storage
+   * @param subtasks - Array of subtasks
+   * @returns Array of Firestore-compatible subtask objects
    */
   private prepareSubtasks(subtasks: Subtask[]): any[] {
     if (!subtasks || subtasks.length === 0) {
@@ -430,10 +412,10 @@ export class TaskService {
   }
 
   /**
-   * Aktualisiert einen bestehenden Task
-   * @param {string} taskId - Die Task-ID
-   * @param {Partial<Task>} updates - Die zu aktualisierenden Felder
-   * @returns {Observable<void>} Observable des Aktualisierungsvorgangs
+   * Updates existing task in Firestore
+   * @param taskId - The task ID
+   * @param updates - The fields to update
+   * @returns Observable of the update operation
    */
   updateTask(taskId: string, updates: Partial<Task>): Observable<void> {
     const taskDoc = doc(this.firestore, 'tasks', taskId);
@@ -458,9 +440,9 @@ export class TaskService {
   }
 
   /**
-   * Löscht einen Task aus Firestore
-   * @param {string} taskId - Die ID des zu löschenden Tasks
-   * @returns {Observable<void>} Observable des Löschvorgangs
+   * Deletes task from Firestore
+   * @param taskId - The ID of the task to delete
+   * @returns Observable of the delete operation
    */
   deleteTask(taskId: string): Observable<void> {
     const taskDoc = doc(this.firestore, 'tasks', taskId);
@@ -471,21 +453,21 @@ export class TaskService {
   }
 
   /**
-   * Aktualisiert den Status eines Tasks
-   * @param {string} taskId - Die Task-ID
-   * @param {('triage'|'todo'|'in-progress'|'await-feedback'|'done')} status - Der neue Status
-   * @returns {Observable<void>} Observable des Status-Updates
+   * Updates task status
+   * @param taskId - The task ID
+   * @param status - The new status
+   * @returns Observable of the status update
    */
   updateTaskStatus(taskId: string, status: 'triage' | 'todo' | 'in-progress' | 'await-feedback' | 'done'): Observable<void> {
     return this.updateTask(taskId, { status });
   }
 
   /**
-   * Aktualisiert den Erledigungs-Status eines Subtasks
-   * @param {string} taskId - Die Task-ID
-   * @param {string} subtaskId - Die Subtask-ID
-   * @param {boolean} completed - Erledigungs-Status
-   * @returns {Observable<void>} Observable des Updates
+   * Updates subtask completion status
+   * @param taskId - The task ID
+   * @param subtaskId - The subtask ID
+   * @param completed - Completion status
+   * @returns Observable of the update
    */
   updateSubtaskCompletion(taskId: string, subtaskId: string, completed: boolean): Observable<void> {
     const tasks = this.tasksSubject.value;
@@ -514,10 +496,10 @@ export class TaskService {
   }
 
   /**
-   * Schaltet den Erledigungs-Status eines Subtasks um
-   * @param {string} taskId - Die Task-ID
-   * @param {string} subtaskId - Die Subtask-ID
-   * @returns {Observable<void>} Observable des Toggle-Vorgangs
+   * Toggles subtask completion status
+   * @param taskId - The task ID
+   * @param subtaskId - The subtask ID
+   * @returns Observable of the toggle operation
    */
   toggleSubtask(taskId: string, subtaskId: string): Observable<void> {
     const tasks = this.tasksSubject.value;
@@ -542,10 +524,10 @@ export class TaskService {
   }
 
   /**
-   * Fügt einen neuen Subtask zu einem Task hinzu
-   * @param {string} taskId - Die Task-ID
-   * @param {Subtask} subtask - Der hinzuzufügende Subtask
-   * @returns {Observable<void>} Observable des Hinzufügevorgangs
+   * Adds new subtask to existing task
+   * @param taskId - The task ID
+   * @param subtask - The subtask to add
+   * @returns Observable of the add operation
    */
   addSubtaskToTask(taskId: string, subtask: Subtask): Observable<void> {
     return new Observable(observer => {
@@ -566,10 +548,10 @@ export class TaskService {
   }
 
   /**
-   * Entfernt einen Subtask von einem Task
-   * @param {string} taskId - Die Task-ID
-   * @param {string} subtaskId - Die ID des zu entfernenden Subtasks
-   * @returns {Observable<void>} Observable des Entfernungsvorgangs
+   * Removes subtask from task
+   * @param taskId - The task ID
+   * @param subtaskId - The ID of the subtask to remove
+   * @returns Observable of the remove operation
    */
   removeSubtaskFromTask(taskId: string, subtaskId: string): Observable<void> {
     return new Observable(observer => {

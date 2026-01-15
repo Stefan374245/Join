@@ -6,6 +6,9 @@ import { AuthService } from '../../../core/services/auth.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { Contact } from '../../../core/models/contact.interface';
 
+/**
+ * Modal dialog for adding/editing contacts with form validation
+ */
 @Component({
   selector: 'app-contact-dialog',
   standalone: true,
@@ -29,6 +32,9 @@ export class ContactDialogComponent implements OnInit {
   isSubmitting = false;
   errorMessage = '';
 
+  /**
+   * Component initialization - sets up form and populates in edit mode
+   */
   ngOnInit(): void {
     this.initForm();
     if (this.mode === 'edit' && this.contact) {
@@ -36,6 +42,9 @@ export class ContactDialogComponent implements OnInit {
     }
   }
 
+  /**
+   * Initializes reactive form with validation rules
+   */
   initForm(): void {
     this.contactForm = this.fb.group({
       firstName: ['', [Validators.required, Validators.minLength(2)]],
@@ -45,6 +54,9 @@ export class ContactDialogComponent implements OnInit {
     });
   }
 
+  /**
+   * Populates form with existing contact data in edit mode
+   */
   populateForm(): void {
     if (this.contact) {
       this.contactForm.patchValue({
@@ -56,18 +68,34 @@ export class ContactDialogComponent implements OnInit {
     }
   }
 
+  /**
+   * Returns form validation status
+   * @returns True if form is valid
+   */
   get isFormValid(): boolean {
     return this.contactForm.valid;
   }
 
+  /**
+   * Returns dialog title based on mode
+   * @returns Dialog title string
+   */
   get title(): string {
     return this.mode === 'add' ? 'Add contact' : 'Edit contact';
   }
 
+  /**
+   * Returns submit button text based on mode
+   * @returns Button text string
+   */
   get submitButtonText(): string {
     return this.mode === 'add' ? 'Create contact' : 'Save';
   }
 
+  /**
+   * Generates avatar initials from first and last name
+   * @returns Two-letter initials string
+   */
   get avatarInitials(): string {
     const firstName = this.contactForm.get('firstName')?.value || '';
     const lastName = this.contactForm.get('lastName')?.value || '';
@@ -79,6 +107,10 @@ export class ContactDialogComponent implements OnInit {
     return `${firstInitial}${lastInitial}`;
   }
 
+  /**
+   * Returns avatar color - existing color in edit mode, default in add mode
+   * @returns Hexadecimal color string
+   */
   get avatarColor(): string {
     if (this.mode === 'edit' && this.contact) {
       return this.contact.color;
@@ -86,16 +118,25 @@ export class ContactDialogComponent implements OnInit {
     return '#D1D1D1';
   }
 
+  /**
+   * Emits close event to parent component
+   */
   onClose(): void {
     this.close.emit();
   }
 
+  /**
+   * Emits delete event with contact email
+   */
   onDelete(): void {
     if (this.contact?.email) {
       this.delete.emit(this.contact.email);
     }
   }
 
+  /**
+   * Handles form submission for add/edit operations
+   */
   async onSubmit(): Promise<void> {
     if (!this.isFormValid || this.isSubmitting) return;
 
@@ -147,6 +188,11 @@ export class ContactDialogComponent implements OnInit {
     }
   }
 
+  /**
+   * Generates consistent color from email address
+   * @param email - Email address
+   * @returns Hexadecimal color code
+   */
   private generateColorFromEmail(email: string): string {
     const colors = [
       '#FF7A00', '#FF5EB3', '#6E52FF', '#9327FF', '#00BEE8',
@@ -159,6 +205,11 @@ export class ContactDialogComponent implements OnInit {
     return colors[colorIndex];
   }
 
+  /**
+   * Returns validation error message for form field
+   * @param fieldName - Name of the form field
+   * @returns Error message string
+   */
   getFieldError(fieldName: string): string {
     const field = this.contactForm.get(fieldName);
     if (!field || !field.touched || !field.errors) return '';

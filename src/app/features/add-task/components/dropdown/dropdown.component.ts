@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ClickOutsideDirective } from '../../../../shared/directives/click-outside.directive';
 
 /**
- * Interface for dropdown items
+ * Dropdown item interface
  */
 export interface DropdownItem {
   id: string;
@@ -15,37 +15,7 @@ export interface DropdownItem {
 }
 
 /**
- * Generic Dropdown Component
- * 
- * A reusable dropdown component with search, keyboard navigation, and accessibility support.
- * Used for Contacts (Assigned To) and Categories dropdowns.
- * 
- * @example
- * ```html
- * <app-dropdown
- *   [items]="contacts()"
- *   [placeholder]="'Select contact'"
- *   [searchable]="true"
- *   [multiple]="true"
- *   (selectionChange)="onContactSelect($event)">
- *   
- *   <!-- Custom item template -->
- *   <ng-template #itemTemplate let-item>
- *     <div class="contact-item">
- *       <div class="initials">{{ getInitials(item.label) }}</div>
- *       <span>{{ item.label }}</span>
- *     </div>
- *   </ng-template>
- * </app-dropdown>
- * ```
- * 
- * @features
- * - Single and multi-select modes
- * - Search/filter functionality
- * - Keyboard navigation (Arrow keys, Enter, Escape)
- * - Click outside to close
- * - Accessibility (ARIA attributes, screen reader support)
- * - Custom item templates via content projection
+ * Reusable dropdown component with search, keyboard navigation and accessibility
  */
 @Component({
   selector: 'app-dropdown',
@@ -56,10 +26,6 @@ export interface DropdownItem {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DropdownComponent {
-  // ============================================
-  // INPUTS
-  // ============================================
-  
   /** Unique identifier for the dropdown */
   id = input.required<string>();
   
@@ -87,10 +53,6 @@ export class DropdownComponent {
   /** Maximum height of dropdown menu */
   maxHeight = input<string>('300px');
   
-  // ============================================
-  // OUTPUTS
-  // ============================================
-  
   /** Emits when selection changes */
   selectionChange = output<string[]>();
   
@@ -99,10 +61,6 @@ export class DropdownComponent {
   
   /** Emits when dropdown closes */
   closed = output<void>();
-  
-  // ============================================
-  // STATE
-  // ============================================
   
   /** Whether dropdown is open */
   isOpen = signal<boolean>(false);
@@ -113,12 +71,8 @@ export class DropdownComponent {
   /** Currently focused item index (for keyboard navigation) */
   focusedIndex = signal<number>(-1);
   
-  // ============================================
-  // COMPUTED PROPERTIES
-  // ============================================
-  
   /**
-   * Filtered items based on search query
+   * Items filtered by search query
    */
   filteredItems = computed(() => {
     const query = this.searchQuery().toLowerCase().trim();
@@ -130,7 +84,7 @@ export class DropdownComponent {
   });
   
   /**
-   * Selected items (full objects)
+   * Currently selected items as full objects
    */
   selectedItems = computed(() => {
     const ids = this.selectedIds();
@@ -138,7 +92,7 @@ export class DropdownComponent {
   });
   
   /**
-   * Display text in the trigger button
+   * Display text for the trigger button
    */
   displayText = computed(() => {
     const selected = this.selectedItems();
@@ -148,7 +102,7 @@ export class DropdownComponent {
   });
   
   /**
-   * Check if an item is selected
+   * Checks if an item is selected by ID
    */
   isSelected = computed(() => {
     const ids = this.selectedIds();
@@ -156,12 +110,12 @@ export class DropdownComponent {
   });
   
   /**
-   * Check if dropdown has any selected items
+   * Whether dropdown has any selections
    */
   hasSelection = computed(() => this.selectedIds().length > 0);
   
   /**
-   * ARIA attributes for dropdown button
+   * ARIA expanded state
    */
   ariaExpanded = computed(() => this.isOpen());
   
@@ -172,10 +126,9 @@ export class DropdownComponent {
     return item ? `${this.id()}-item-${item.id}` : undefined;
   });
   
-  // ============================================
-  // EFFECTS
-  // ============================================
-  
+  /**
+   * Effects
+   */
   constructor() {
     // Reset focused index when filtered items change
     effect(() => {
@@ -189,7 +142,7 @@ export class DropdownComponent {
   // ============================================
   
   /**
-   * Toggle dropdown open/close
+   * Toggles dropdown open/close state
    */
   toggleDropdown(): void {
     if (this.disabled()) return;
@@ -197,6 +150,9 @@ export class DropdownComponent {
     if (this.isOpen()) {
       this.closeDropdown();
     } else {
+      /**
+       * Opens the dropdown
+       */
       this.openDropdown();
     }
   }
@@ -225,6 +181,10 @@ export class DropdownComponent {
   /**
    * Select an item
    */
+  /**
+   * Handles item selection in single/multi-select modes
+   * @param item - The item to select
+   */
   selectItem(item: DropdownItem): void {
     if (item.disabled) return;
     
@@ -247,7 +207,8 @@ export class DropdownComponent {
   }
   
   /**
-   * Clear all selections
+   * Clears all selections
+   * @param event - Optional click event
    */
   clearSelection(event?: Event): void {
     event?.stopPropagation();
@@ -255,7 +216,8 @@ export class DropdownComponent {
   }
   
   /**
-   * Handle keyboard navigation
+   * Handles keyboard navigation and interactions
+   * @param event - Keyboard event
    */
   onKeyDown(event: KeyboardEvent): void {
     if (!this.isOpen()) {
@@ -305,7 +267,7 @@ export class DropdownComponent {
   }
   
   /**
-   * Handle click outside to close dropdown
+   * Handles click outside to close dropdown
    */
   onClickOutside(): void {
     if (this.isOpen()) {
@@ -315,13 +277,18 @@ export class DropdownComponent {
   
   /**
    * Track by function for ngFor optimization
+   * @param index - Array index
+   * @param item - Dropdown item
+   * @returns Item ID
    */
   trackByItemId(index: number, item: DropdownItem): string {
     return item.id;
   }
   
   /**
-   * Get initials from name (e.g., "John Doe" => "JD")
+   * Generates initials from name string
+   * @param name - Full name string
+   * @returns Two-letter initials
    */
   getInitials(name: string): string {
     if (!name) return '';
@@ -335,14 +302,18 @@ export class DropdownComponent {
   }
   
   /**
-   * Check if item has color property (for contact avatars)
+   * Checks if item has color property for avatar styling
+   * @param item - Dropdown item
+   * @returns True if item has color
    */
   hasColor(item: DropdownItem): boolean {
     return !!item['color'];
   }
   
   /**
-   * Get color from item
+   * Gets color from item with fallback
+   * @param item - Dropdown item
+   * @returns Color hex code
    */
   getColor(item: DropdownItem): string {
     return item['color'] || '#29ABE2';

@@ -2,7 +2,7 @@ import { Component, ChangeDetectionStrategy, input, output, computed } from '@an
 import { CommonModule } from '@angular/common';
 
 /**
- * Interface für Button-Konfiguration
+ * Button configuration interface for toggle button groups
  */
 export interface ButtonConfig {
   value: string | number;
@@ -19,41 +19,7 @@ export interface ButtonConfig {
 }
 
 /**
- * Generischer ButtonGroupComponent
- * 
- * Ersetzt:
- * - PrioritySelectorComponent
- * - TabNavigationComponent
- * - FilterButtonsComponent
- * - ToggleGroupComponent
- * 
- * Features:
- * - Gruppe von Toggle-Buttons (nur einer kann aktiv sein)
- * - Konfigurierbar via ButtonConfig Interface
- * - Icons optional (left/right)
- * - Active/Inactive States mit Icon-Tausch
- * - Disabled State
- * - Accessibility (ARIA, keyboard nav)
- * 
- * @example
- * // Priority Buttons
- * <app-button-group
- *   label="Priority"
- *   ariaLabel="Select task priority"
- *   [selectedValue]="selectedPriority()"
- *   [buttons]="priorityButtons"
- *   (valueChange)="selectPriority($event)"
- * />
- * 
- * @example
- * // Tab Navigation
- * <app-button-group
- *   ariaLabel="View selection"
- *   [selectedValue]="currentView()"
- *   [buttons]="viewButtons"
- *   [showIcons]="false"
- *   (valueChange)="changeView($event)"
- * />
+ * Generic button group component for priority selection, tabs, filters and toggles
  */
 @Component({
   selector: 'app-button-group',
@@ -74,27 +40,46 @@ export class ButtonGroupComponent {
   // Output
   valueChange = output<string | number>();
   
-  // Computed
+  /**
+   * Whether label should be displayed
+   */
   hasLabel = computed(() => this.label().trim().length > 0);
   
-  // Methods
+  /**
+   * Handles button selection and emits value change
+   * @param button - Button configuration that was selected
+   */
   selectButton(button: ButtonConfig): void {
     if (!button.disabled) {
+      // Emit button value to parent component
       this.valueChange.emit(button.value);
     }
   }
   
+  /**
+   * Checks if button is currently selected
+   * @param value - Button value to check
+   * @returns True if button is selected
+   */
   isSelected(value: string | number): boolean {
+    // Compare with currently selected value
     return this.selectedValue() === value;
   }
   
+  /**
+   * Generates CSS classes for button styling
+   * @param button - Button configuration
+   * @returns Space-separated CSS classes
+   */
   getButtonClasses(button: ButtonConfig): string {
     const classes = ['button-group-item'];
     
+    // Add custom CSS class if provided
     if (button.cssClass) {
       classes.push(button.cssClass);
     }
     
+    // Add active class if button is selected
     if (this.isSelected(button.value)) {
       classes.push('active');
     }
@@ -102,15 +87,23 @@ export class ButtonGroupComponent {
     return classes.join(' ');
   }
   
+  /**
+   * Gets icon path based on button state and position
+   * @param button - Button configuration
+   * @param position - Icon position (left or right)
+   * @returns Icon path or empty string
+   */
   getIconPath(button: ButtonConfig, position: 'left' | 'right'): string {
     const isActive = this.isSelected(button.value);
     
     if (position === 'left') {
+      // Use active icon if button is selected and active icon exists
       const icon = isActive && button.iconLeftActive 
         ? button.iconLeftActive 
         : button.iconLeft;
       return icon || '';
     } else {
+      // Same logic for right icon
       const icon = isActive && button.iconRightActive 
         ? button.iconRightActive 
         : button.iconRight;
@@ -118,15 +111,29 @@ export class ButtonGroupComponent {
     }
   }
   
+  /**
+   * Checks if button has icon at specified position
+   * @param button - Button configuration
+   * @param position - Icon position to check
+   * @returns True if icon exists and icons are enabled
+   */
   hasIcon(button: ButtonConfig, position: 'left' | 'right'): boolean {
     if (!this.showIcons()) return false;
     
+    // Check if icon exists for the specified position
     return position === 'left' 
       ? !!(button.iconLeft || button.iconLeftActive)
       : !!(button.iconRight || button.iconRightActive);
   }
   
+  /**
+   * TrackBy function for ngFor optimization
+   * @param index - Array index
+   * @param button - Button configuration
+   * @returns Button value for tracking
+   */
   trackBy(index: number, button: ButtonConfig): string | number {
+    // Use button value as unique identifier
     return button.value;
   }
 }
