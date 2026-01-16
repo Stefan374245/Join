@@ -1,4 +1,4 @@
-<main class="main-summary" [class.guest-mode]="isGuest$ | async">
+<main class="main-summary" [class.guest-mode]="isGuest()">
   <summary id="summaryContent">
     <header class="summary-header">
       <h1>Join 360</h1>
@@ -31,8 +31,8 @@
               />
             </div>
             <div class="card-content">
-              <h4 [attr.aria-label]="(doneTasks$ | async) + ' tasks done'">
-                {{ doneTasks$ | async }}
+              <h4 [attr.aria-label]="taskStats().done + ' tasks done'">
+                {{ taskStats().done }}
               </h4>
               <p id="done-label">Done</p>
             </div>
@@ -58,9 +58,9 @@
               />
             </div>
             <div class="card-content">
-              <h4 [attr.aria-label]="(todoTasks$ | async) + ' tasks to do'">
-                {{ todoTasks$ | async }}
-              </h4>
+              <h3 [attr.aria-label]="taskStats().todo + ' tasks to do'">
+                {{ taskStats().todo }}
+              </h3>
               <p id="todo-label">To-do</p>
             </div>
           </article>
@@ -82,9 +82,9 @@
               </div>
               <div class="urgent-info">
                 <h3
-                  [attr.aria-label]="(urgentTasks$ | async) + ' urgent tasks'"
+                  [attr.aria-label]="taskStats().urgent + ' urgent tasks'"
                 >
-                  {{ urgentTasks$ | async }}
+                  {{ taskStats().urgent }}
                 </h3>
                 <p id="urgent-label">Urgent</p>
               </div>
@@ -93,8 +93,8 @@
             <div class="urgent-right">
               <time
                 class="deadline-date"
-                [attr.datetime]="formattedDeadline$ | async"
-                >{{ formattedDeadline$ | async }}</time
+                [attr.datetime]="formattedDeadline()"
+                >{{ formattedDeadline() }}</time
               >
               <p class="deadline-label">Upcoming Deadline</p>
             </div>
@@ -108,10 +108,10 @@
             <div class="email-content">
               <h4
                 [attr.aria-label]="
-                  (emailRequestsTasks$ | async) + ' email requests'
+                  emailRequestsTasks() + ' email requests'
                 "
               >
-                {{ emailRequestsTasks$ | async }}
+                {{ emailRequestsTasks() }}
               </h4>
               <p id="email-label">Email<br />requests</p>
             </div>
@@ -125,8 +125,8 @@
             (click)="navigateToBoard()"
           >
             <div class="stat-content">
-              <h3 [attr.aria-label]="(totalTasks$ | async) + ' total tasks'">
-                {{ totalTasks$ | async }}
+              <h3 [attr.aria-label]="taskStats().total + ' total tasks'">
+                {{ taskStats().total }}
               </h3>
               <p id="total-tasks-label">Tasks In<br />Board</p>
             </div>
@@ -140,10 +140,10 @@
             <div class="stat-content">
               <h3
                 [attr.aria-label]="
-                  (inProgressTasks$ | async) + ' tasks in progress'
+                  taskStats().inProgress + ' tasks in progress'
                 "
               >
-                {{ inProgressTasks$ | async }}
+                {{ taskStats().inProgress }}
               </h3>
               <p id="progress-tasks-label">Tasks In<br />Progress</p>
             </div>
@@ -157,10 +157,10 @@
             <div class="stat-content">
               <h3
                 [attr.aria-label]="
-                  (awaitingFeedbackTasks$ | async) + ' tasks awaiting feedback'
+                  awaitingFeedbackTasks() + ' tasks awaiting feedback'
                 "
               >
-                {{ awaitingFeedbackTasks$ | async }}
+                {{ awaitingFeedbackTasks() }}
               </h3>
               <p id="awaiting-label">Awaiting<br />Feedback</p>
             </div>
@@ -170,11 +170,11 @@
 
       <aside
         class="greeting-card"
-        *ngIf="!(isGuest$ | async)"
+        *ngIf="!isGuest()"
         aria-label="User greeting"
       >
         <h2 id="greeting">{{ greeting }}</h2>
-        <h3 id="userName">{{ userName$ | async }}</h3>
+        <h3 id="userName">{{ userName() || 'User' }}</h3>
       </aside>
     </div>
   </summary>

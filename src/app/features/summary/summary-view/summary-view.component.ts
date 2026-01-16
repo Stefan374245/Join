@@ -1,9 +1,8 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { TaskService } from '../../../core/services/task.service';
-import { Observable, map, combineLatest } from 'rxjs';
 
 @Component({
   selector: 'app-summary-view',
@@ -17,71 +16,32 @@ export class SummaryViewComponent implements OnInit {
   private taskService = inject(TaskService);
   private router = inject(Router);
 
-  isGuest$: Observable<boolean>;
-  userName$: Observable<string>;
-  greeting: string = '';
+  // Use AuthService signals instead of Observables
+  isGuest = this.authService.isGuestUser;
+  userName = this.authService.userDisplayName;
+  
+  greeting = '';
 
-  totalTasks$: Observable<number>;
-  todoTasks$: Observable<number>;
-  inProgressTasks$: Observable<number>;
-  doneTasks$: Observable<number>;
-  urgentTasks$: Observable<number>;
-  emailRequestsTasks$: Observable<number>;
-  awaitingFeedbackTasks$: Observable<number>;
-  nextUrgentDeadline$: Observable<Date | null>;
-  formattedDeadline$: Observable<string>;
+  // Use TaskService signals directly
+  taskStats = this.taskService.taskStats;
+  nextUrgentDeadline = this.taskService.nextUrgentDeadline;
+  
+  formattedDeadline = computed(() => {
+    const deadline = this.nextUrgentDeadline();
+    return deadline ? this.formatDate(deadline) : '';
+  });
+  
+  emailRequestsTasks = computed(() => 
+    this.taskService.tasks().filter(task => task.source === 'email').length
+  );
+  
+  awaitingFeedbackTasks = computed(() => 
+    this.taskService.tasksByStatus().awaitFeedback.length
+  );
 
   constructor() {
-    this.isGuest$ = this.authService.user$.pipe(
-      map(user => user?.email === 'guest@join.com' || !user)
-    );
-
-    this.userName$ = this.authService.user$.pipe(
-      map(user => user?.displayName || 'User')
-    );
-
-    this.totalTasks$ = this.taskService.getTasks().pipe(
-      map(tasks => tasks.length)
-    );
-
-    this.todoTasks$ = this.taskService.getTasksByStatus('todo').pipe(
-      map(tasks => tasks.length)
-    );
-
-    this.inProgressTasks$ = this.taskService.getTasksByStatus('in-progress').pipe(
-      map(tasks => tasks.length)
-    );
-
-    this.doneTasks$ = this.taskService.getTasksByStatus('done').pipe(
-      map(tasks => tasks.length)
-    );
-
-    this.urgentTasks$ = this.taskService.getUrgentTasks().pipe(
-      map(tasks => tasks.length)
-    );
-
-    this.emailRequestsTasks$ = this.taskService.getTasks().pipe(
-      map(tasks => tasks.filter(t => t.aiGenerated === true).length)
-    );
-
-    this.awaitingFeedbackTasks$ = this.taskService.getTasks().pipe(
-      map(tasks => tasks.filter(t => t.status === 'await-feedback').length)
-    );
-
-    this.nextUrgentDeadline$ = this.taskService.getNextUrgentDeadline();
-
-    this.formattedDeadline$ = this.nextUrgentDeadline$.pipe(
-      map(deadline => {
-        if (!deadline) return 'No urgent deadlines';
-
-        const options: Intl.DateTimeFormatOptions = {
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric'
-        };
-        return deadline.toLocaleDateString('en-US', options);
-      })
-    );
+    // Set greeting based on time of day
+    this.setGreeting();
   }
 
   ngOnInit(): void {
@@ -90,6 +50,17 @@ export class SummaryViewComponent implements OnInit {
 
   navigateToBoard(): void {
     this.router.navigate(['/board']);
+  }
+
+  private formatDate(deadline: Date): string {
+    if (!deadline) return 'No urgent deadlines';
+    
+    const options: Intl.DateTimeFormatOptions = {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    };
+    return deadline.toLocaleDateString('en-US', options);
   }
 
   private setGreeting(): void {
