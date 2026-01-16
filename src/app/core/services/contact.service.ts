@@ -48,10 +48,22 @@ export class ContactService {
       }
       grouped.get(initial)!.push(contact);
     });
-    return grouped;
+    
+    // Convert Map to array format for template compatibility
+    return Array.from(grouped.entries())
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([letter, contacts]) => ({
+        letter,
+        items: contacts
+      }));
   });
 
-  constructor() {}
+  constructor() {
+    // Automatically load contacts when service is instantiated
+    this.loadContactsAsync().catch(error => {
+      console.warn('❌ ContactService: Initial contact loading failed:', error);
+    });
+  }
 
   /**
    * Loads all contacts from Firestore and updates signals
@@ -87,7 +99,8 @@ export class ContactService {
         const color = data['color'] || this.generateColorFromEmail(email);
 
         return {
-          id: doc.id,
+          id: doc.id, // This should be the Firebase Auth UID
+          authUid: doc.id, // Same as id since docs are stored with user.uid as doc ID
           firstName: firstName,
           lastName: lastName,
           email: email,
@@ -109,6 +122,7 @@ export class ContactService {
       this.loadingSignal.set(false);
       return result;
     } catch (err) {
+      console.error('❌ ContactService: Error loading contacts:', err);
       this.errorSignal.set('Failed to load contacts');
       this.loadingSignal.set(false);
       return [];
@@ -131,6 +145,22 @@ export class ContactService {
    */
   getContacts(): Observable<Contact[]> {
     return from(this.loadContactsAsync());
+  }
+
+  /**
+   * Finds contact by ID or authUid
+   * @param idOrAuthUid - Contact ID or Firebase Auth UID
+   * @returns Contact if found, undefined otherwise
+   */
+  findContactByIdOrAuthUid(idOrAuthUid: string): Contact | undefined {
+    const contacts = this.contacts();
+    // First try exact ID match
+    let contact = contacts.find(c => c.id === idOrAuthUid);
+    // If not found, try authUid match
+    if (!contact) {
+      contact = contacts.find(c => c.authUid === idOrAuthUid);
+    }
+    return contact;
   }
 
   /**
@@ -194,6 +224,31 @@ export class ContactService {
   }
 
   /**
+   * Saves new contact to Firestore
+   * @param contact - The contact to save
+   * @returns Promise of the save operation
+   */
+  async saveContact(contact: Contact): Promise<void> {
+    const userDoc = doc(this.firestore, 'users', contact.id);
+
+    const contactData = {
+      firstName: contact.firstName,
+      lastName: contact.lastName,
+      displayName: `${contact.firstName} ${contact.lastName}`.trim(),
+      email: contact.email,
+      phone: contact.phone || '',
+      color: contact.color,
+      initials: contact.initials,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+
+    await setDoc(userDoc, contactData);
+    // Refresh contacts after save
+    await this.loadContactsAsync();
+  }
+
+  /**
    * Saves new user to Firestore
    * @param userId - The unique user ID
    * @param userData - The user data
@@ -214,38 +269,12 @@ export class ContactService {
   }
 
   /**
-   * Saves contact to Firestore and updates local cache
-   * @param contact - The contact to save
-   * @returns Observable of the save operation
-   */
-  saveContact(contact: Contact): Observable<void> {
-    const contactDoc = doc(this.firestore, 'users', contact.id);
-    const color = contact.color || this.generateColorFromEmail(contact.email);
-
-    const promise = setDoc(contactDoc, {
-      firstName: contact.firstName,
-      lastName: contact.lastName,
-      displayName: `${contact.firstName} ${contact.lastName}`,
-      email: contact.email,
-      phone: contact.phone || '',
-      color: color,
-      initials: contact.initials,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    }).then(() => {
-      this.loadContactsAsync();
-    });
-
-    return from(promise);
-  }
-
-  /**
    * Updates existing user in Firestore and local cache
    * @param userId - The user ID
    * @param data - The data to update
-   * @returns Observable of the update operation
+   * @returns Promise of the update operation
    */
-  updateUser(userId: string, data: Partial<Contact>): Observable<void> {
+  async updateUser(userId: string, data: Partial<Contact>): Promise<void> {
     const userDoc = doc(this.firestore, 'users', userId);
     const updateData: any = {
       ...data,
@@ -256,30 +285,27 @@ export class ContactService {
       updateData.displayName = `${data.firstName || ''} ${data.lastName || ''}`.trim();
     }
 
-    const promise = setDoc(userDoc, updateData, { merge: true }).then(() => {
-      this.loadContactsAsync();
-    });
-
-    return from(promise);
+    await setDoc(userDoc, updateData, { merge: true });
+    // Refresh contacts after update
+    await this.loadContactsAsync();
   }
 
   /**
    * Deletes user from Firestore and removes from all tasks
    * @param userId - The ID of the user to delete
-   * @returns Observable of the delete operation
+   * @returns Promise of the delete operation
    */
-  deleteUser(userId: string): Observable<void> {
+  async deleteUser(userId: string): Promise<void> {
     const userDoc = doc(this.firestore, 'users', userId);
     
-    const promise = (async () => {
-      await this.removeUserFromAllTasks(userId);
-      
-      await deleteDoc(userDoc);
-      
-      await this.loadContactsAsync();
-    })();
+    // Remove user from all tasks first
+    await this.removeUserFromAllTasks(userId);
     
-    return from(promise);
+    // Delete user document
+    await deleteDoc(userDoc);
+    
+    // Refresh contacts after deletion
+    await this.loadContactsAsync();
   }
 
   /**
@@ -292,11 +318,11 @@ export class ContactService {
     const snapshot = await getDocs(tasksCol);
     
     const updatePromises = snapshot.docs
-      .filter(doc => {
+      .filter((doc: any) => {
         const assignedTo = doc.data()['assignedTo'] || [];
         return Array.isArray(assignedTo) && assignedTo.includes(userId);
       })
-      .map(doc => {
+      .map((doc: any) => {
         const currentAssignedTo = doc.data()['assignedTo'] || [];
         const updatedAssignedTo = currentAssignedTo.filter((id: string) => id !== userId);
         

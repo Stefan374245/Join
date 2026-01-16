@@ -15,7 +15,7 @@ import {
   onSnapshot
 } from '@angular/fire/firestore';
 import { Auth, authState } from '@angular/fire/auth';
-import { Observable, from, BehaviorSubject, of } from 'rxjs';
+import { Observable, from, of, throwError } from 'rxjs';
 import { map, catchError, tap } from 'rxjs/operators';
 import { toSignal, toObservable } from '@angular/core/rxjs-interop';
 import { Task, Subtask } from '../models/task.interface';
@@ -30,22 +30,29 @@ import { Task, Subtask } from '../models/task.interface';
 export class TaskService {
   private firestore = inject(Firestore);
   private auth = inject(Auth);
-  
-  /** Signal für die aktuelle Task-Liste */
   private tasksSignal = signal<Task[]>([]);
-  
-  /** Signal für Loading-State */
   private loadingSignal = signal<boolean>(false);
-  
-  /** Signal für Error-State */
   private errorSignal = signal<string | null>(null);
+  private searchQuerySignal = signal<string>('');
   
-  /** Public readonly Signals */
   public readonly tasks = this.tasksSignal.asReadonly();
   public readonly loading = this.loadingSignal.asReadonly();
   public readonly error = this.errorSignal.asReadonly();
+  public readonly searchQuery = this.searchQuerySignal.asReadonly();
   
-  /** Computed Signals für Filterung & Statistiken */
+  public readonly filteredTasks = computed(() => {
+    const allTasks = this.tasks();
+    const query = this.searchQuerySignal().toLowerCase().trim();
+    
+    if (!query) return allTasks;
+    
+    return allTasks.filter(task =>
+      task.title.toLowerCase().includes(query) ||
+      task.description.toLowerCase().includes(query) ||
+      task.category.toLowerCase().includes(query)
+    );
+  });
+  
   public readonly tasksByStatus = computed(() => {
     const allTasks = this.tasks();
     return {
@@ -54,6 +61,18 @@ export class TaskService {
       inProgress: allTasks.filter(t => t.status === 'in-progress'),
       awaitFeedback: allTasks.filter(t => t.status === 'await-feedback'),
       done: allTasks.filter(t => t.status === 'done')
+    };
+  });
+  
+  // Computed filtered tasks by status
+  public readonly filteredTasksByStatus = computed(() => {
+    const filtered = this.filteredTasks();
+    return {
+      triage: filtered.filter(t => t.status === 'triage'),
+      todo: filtered.filter(t => t.status === 'todo'),
+      inProgress: filtered.filter(t => t.status === 'in-progress'),
+      awaitFeedback: filtered.filter(t => t.status === 'await-feedback'),
+      done: filtered.filter(t => t.status === 'done')
     };
   });
   
@@ -80,9 +99,6 @@ export class TaskService {
   /** Observable für Backwards Compatibility */
   public readonly tasks$ = toObservable(this.tasks);
   
-  /** Legacy BehaviorSubject für alte Code-Teile */
-  private tasksSubject = new BehaviorSubject<Task[]>([]);
-  
   /** Referenz zum Snapshot-Listener */
   private unsubscribe: (() => void) | null = null;
 
@@ -101,7 +117,6 @@ export class TaskService {
           this.unsubscribe = null;
         }
         this.tasksSignal.set([]);
-        this.tasksSubject.next([]);
       }
     });
   }
@@ -133,9 +148,8 @@ export class TaskService {
             return dateB - dateA;
           });
 
-          // Signal & BehaviorSubject aktualisieren (für Backwards Compatibility)
+          // Signal aktualisieren 
           this.tasksSignal.set(tasks);
-          this.tasksSubject.next(tasks);
           this.loadingSignal.set(false);
           this.errorSignal.set(null);
         },
@@ -143,14 +157,12 @@ export class TaskService {
           this.errorSignal.set('Failed to load tasks');
           this.loadingSignal.set(false);
           this.tasksSignal.set([]);
-          this.tasksSubject.next([]);
         }
       );
     } catch (error) {
       this.errorSignal.set('Failed to initialize tasks listener');
       this.loadingSignal.set(false);
       this.tasksSignal.set([]);
-      this.tasksSubject.next([]);
     }
   }
 
@@ -262,105 +274,84 @@ export class TaskService {
     return Timestamp.fromDate(date);
   }
 
+
   /**
-   * Returns Observable of all tasks
-   * @returns Observable stream of all tasks
-   * @deprecated Use tasks signal instead
+   * Gets a single task by ID using signals
+   * @param id - The task ID to search for
+   * @returns The task if found, undefined otherwise
    */
-  getTasks(): Observable<Task[]> {
-    return this.tasks$;
+  findTaskById(id: string): Task | undefined {
+    return this.tasksSignal().find(task => task.id === id);
+  }
+
+
+
+  /**
+   * Sets the search query for filtering tasks
+   * @param query - The search query string
+   */
+  setSearchQuery(query: string): void {
+    this.searchQuerySignal.set(query);
   }
 
   /**
-   * Finds task by ID using signals
+   * Clears the current search query
+   */
+  clearSearch(): void {
+    this.searchQuerySignal.set('');
+  }
+
+  /**
+   * Updates task status with optimistic UI updates
    * @param taskId - The task ID
-   * @returns Task or undefined
+   * @param newStatus - The new status
+   * @returns Promise of the update operation
    */
-  findTaskById(taskId: string): Task | undefined {
-    return this.tasks().find(task => task.id === taskId);
-  }
+  async updateTaskStatusOptimistic(taskId: string, newStatus: Task['status']): Promise<void> {
+    // Find the task
+    const currentTasks = this.tasksSignal();
+    const taskIndex = currentTasks.findIndex(t => t.id === taskId);
+    
+    if (taskIndex === -1) {
+      throw new Error('Task not found');
+    }
 
-  /**
-   * Finds task by ID using Observable
-   * @param taskId - The task ID
-   * @returns Observable with task or undefined
-   * @deprecated Use findTaskById() or tasks signal instead
-   */
-  getTaskById(taskId: string): Observable<Task | undefined> {
-    return this.tasks$.pipe(
-      map(tasks => tasks.find(task => task.id === taskId))
-    );
-  }
+    // Store old status for potential rollback
+    const oldStatus = currentTasks[taskIndex].status;
+    
+    // Apply optimistic update immediately
+    const updatedTasks = [...currentTasks];
+    updatedTasks[taskIndex] = { 
+      ...updatedTasks[taskIndex], 
+      status: newStatus,
+      updatedAt: new Date()
+    };
+    this.tasksSignal.set(updatedTasks);
 
-  /**
-   * Filters tasks by status using Observable
-   * @param status - The desired status
-   * @returns Observable with filtered tasks
-   * @deprecated Use tasksByStatus signal instead
-   */
-  getTasksByStatus(status: 'todo' | 'in-progress' | 'done'): Observable<Task[]> {
-    return this.tasks$.pipe(
-      map(tasks => tasks.filter(task => task.status === status))
-    );
-  }
-
-  /**
-   * Returns high priority tasks using Observable
-   * @returns Observable with urgent tasks
-   * @deprecated Use urgentTasks signal instead
-   */
-  getUrgentTasks(): Observable<Task[]> {
-    return this.tasks$.pipe(
-      map(tasks => tasks.filter(task => task.priority === 'high'))
-    );
-  }
-
-  /**
-   * Returns task statistics using Observable
-   * @returns Observable with task statistics
-   * @deprecated Use taskStats signal instead
-   */
-  getTaskStats(): Observable<{
-    total: number;
-    todo: number;
-    inProgress: number;
-    done: number;
-    urgent: number;
-  }> {
-    return this.tasks$.pipe(
-      map(tasks => ({
-        total: tasks.length,
-        todo: tasks.filter(t => t.status === 'todo').length,
-        inProgress: tasks.filter(t => t.status === 'in-progress').length,
-        done: tasks.filter(t => t.status === 'done').length,
-        urgent: tasks.filter(t => t.priority === 'high').length
-      }))
-    );
-  }
-
-  /**
-   * Returns next urgent deadline using Observable
-   * @returns Observable with next deadline or null
-   * @deprecated Use nextUrgentDeadline signal instead
-   */
-  getNextUrgentDeadline(): Observable<Date | null> {
-    return this.tasks$.pipe(
-      map(tasks => {
-        const urgentTasks = tasks
-          .filter(t => t.priority === 'high' && t.status !== 'done')
-          .sort((a, b) => a.dueDate.getTime() - b.dueDate.getTime());
-
-        return urgentTasks.length > 0 ? urgentTasks[0].dueDate : null;
-      })
-    );
+    // Perform backend update
+    try {
+      await this.updateTaskStatus(taskId, newStatus);
+    } catch (error) {
+      // Revert optimistic update on error
+      const revertTasks = [...this.tasksSignal()];
+      const currentIndex = revertTasks.findIndex(t => t.id === taskId);
+      if (currentIndex !== -1) {
+        revertTasks[currentIndex] = { 
+          ...revertTasks[currentIndex], 
+          status: oldStatus 
+        };
+        this.tasksSignal.set(revertTasks);
+      }
+      throw error;
+    }
   }
 
   /**
    * Adds new task to Firestore
    * @param task - The task to add
-   * @returns Observable of the add operation
+   * @returns Promise of the add operation
    */
-  addTask(task: Task): Observable<void> {
+  async addTask(task: Task): Promise<void> {
     const taskDoc = doc(this.firestore, 'tasks', task.id);
 
     const taskData: any = {
@@ -388,10 +379,7 @@ export class TaskService {
       taskData.creatorEmail = task.creatorEmail;
     }
 
-    const promise = setDoc(taskDoc, taskData).then(() => {
-    });
-
-    return from(promise);
+    await setDoc(taskDoc, taskData);
   }
 
   /**
@@ -415,9 +403,9 @@ export class TaskService {
    * Updates existing task in Firestore
    * @param taskId - The task ID
    * @param updates - The fields to update
-   * @returns Observable of the update operation
+   * @returns Promise of the update operation
    */
-  updateTask(taskId: string, updates: Partial<Task>): Observable<void> {
+  async updateTask(taskId: string, updates: Partial<Task>): Promise<void> {
     const taskDoc = doc(this.firestore, 'tasks', taskId);
 
     const updateData: any = {
@@ -433,142 +421,197 @@ export class TaskService {
       updateData.subtasks = this.prepareSubtasks(updates.subtasks);
     }
 
-    const promise = updateDoc(taskDoc, updateData).then(() => {
-    });
-
-    return from(promise);
+    await updateDoc(taskDoc, updateData);
   }
 
   /**
    * Deletes task from Firestore
    * @param taskId - The ID of the task to delete
-   * @returns Observable of the delete operation
+   * @returns Promise of the delete operation
    */
-  deleteTask(taskId: string): Observable<void> {
+  async deleteTask(taskId: string): Promise<void> {
     const taskDoc = doc(this.firestore, 'tasks', taskId);
-    const promise = deleteDoc(taskDoc).then(() => {
-    });
-
-    return from(promise);
+    await deleteDoc(taskDoc);
   }
 
   /**
    * Updates task status
    * @param taskId - The task ID
    * @param status - The new status
-   * @returns Observable of the status update
+   * @returns Promise of the status update
    */
-  updateTaskStatus(taskId: string, status: 'triage' | 'todo' | 'in-progress' | 'await-feedback' | 'done'): Observable<void> {
-    return this.updateTask(taskId, { status });
+  async updateTaskStatus(taskId: string, status: 'triage' | 'todo' | 'in-progress' | 'await-feedback' | 'done'): Promise<void> {
+    await this.updateTask(taskId, { status });
   }
 
   /**
-   * Updates subtask completion status
+   * Updates subtask completion status using signals
    * @param taskId - The task ID
    * @param subtaskId - The subtask ID
    * @param completed - Completion status
-   * @returns Observable of the update
+   * @returns Promise of the update
    */
-  updateSubtaskCompletion(taskId: string, subtaskId: string, completed: boolean): Observable<void> {
-    const tasks = this.tasksSubject.value;
+  async updateSubtaskCompletion(taskId: string, subtaskId: string, completed: boolean): Promise<void> {
+    const tasks = this.tasksSignal();
     const task = tasks.find(t => t.id === taskId);
 
     if (!task || !task.subtasks) {
-      return new Observable(observer => {
-        observer.error(new Error('Task or subtasks not found'));
-        observer.complete();
-      });
+      throw new Error('Task or subtasks not found');
     }
 
     const subtask = task.subtasks.find(st => st.id === subtaskId);
     if (!subtask) {
-      return new Observable(observer => {
-        observer.error(new Error('Subtask not found'));
-        observer.complete();
-      });
+      throw new Error('Subtask not found');
     }
 
     const updatedSubtasks = task.subtasks.map(st =>
       st.id === subtaskId ? { ...st, completed: completed } : st
     );
 
-    return this.updateTask(taskId, { subtasks: updatedSubtasks });
+    await this.updateTask(taskId, { subtasks: updatedSubtasks });
   }
 
   /**
-   * Toggles subtask completion status
+   * Toggles subtask completion status using signals
    * @param taskId - The task ID
    * @param subtaskId - The subtask ID
-   * @returns Observable of the toggle operation
+   * @returns Promise of the toggle operation
    */
-  toggleSubtask(taskId: string, subtaskId: string): Observable<void> {
-    const tasks = this.tasksSubject.value;
+  async toggleSubtask(taskId: string, subtaskId: string): Promise<void> {
+    const tasks = this.tasksSignal();
     const task = tasks.find(t => t.id === taskId);
 
     if (!task || !task.subtasks) {
-      return new Observable(observer => {
-        observer.error(new Error('Task or subtasks not found'));
-        observer.complete();
-      });
+      throw new Error('Task or subtasks not found');
     }
 
     const subtask = task.subtasks.find(st => st.id === subtaskId);
     if (!subtask) {
-      return new Observable(observer => {
-        observer.error(new Error('Subtask not found'));
-        observer.complete();
-      });
+      throw new Error('Subtask not found');
     }
 
-    return this.updateSubtaskCompletion(taskId, subtaskId, !subtask.completed);
+    await this.updateSubtaskCompletion(taskId, subtaskId, !subtask.completed);
   }
 
   /**
-   * Adds new subtask to existing task
+   * Adds new subtask to existing task using signals
    * @param taskId - The task ID
    * @param subtask - The subtask to add
-   * @returns Observable of the add operation
+   * @returns Promise of the add operation
    */
-  addSubtaskToTask(taskId: string, subtask: Subtask): Observable<void> {
-    return new Observable(observer => {
-      this.getTaskById(taskId).subscribe(task => {
-        if (task) {
-          const updatedSubtasks = [...task.subtasks, subtask];
+  async addSubtaskToTask(taskId: string, subtask: Subtask): Promise<void> {
+    const task = this.findTaskById(taskId);
+    
+    if (!task) {
+      throw new Error('Task not found');
+    }
 
-          this.updateTask(taskId, { subtasks: updatedSubtasks }).subscribe({
-            next: () => observer.next(),
-            error: (err) => observer.error(err),
-            complete: () => observer.complete()
-          });
-        } else {
-          observer.error(new Error('Task not found'));
-        }
-      });
-    });
+    const updatedSubtasks = [...task.subtasks, subtask];
+    await this.updateTask(taskId, { subtasks: updatedSubtasks });
   }
 
   /**
-   * Removes subtask from task
+   * Removes subtask from existing task using signals
    * @param taskId - The task ID
    * @param subtaskId - The ID of the subtask to remove
-   * @returns Observable of the remove operation
+   * @returns Promise of the remove operation
    */
-  removeSubtaskFromTask(taskId: string, subtaskId: string): Observable<void> {
-    return new Observable(observer => {
-      this.getTaskById(taskId).subscribe(task => {
-        if (task) {
-          const updatedSubtasks = task.subtasks.filter(st => st.id !== subtaskId);
+  async removeSubtaskFromTask(taskId: string, subtaskId: string): Promise<void> {
+    const task = this.findTaskById(taskId);
+    
+    if (!task) {
+      throw new Error('Task not found');
+    }
 
-          this.updateTask(taskId, { subtasks: updatedSubtasks }).subscribe({
-            next: () => observer.next(),
-            error: (err) => observer.error(err),
-            complete: () => observer.complete()
-          });
-        } else {
-          observer.error(new Error('Task not found'));
-        }
-      });
-    });
+    const updatedSubtasks = task.subtasks.filter(st => st.id !== subtaskId);
+    await this.updateTask(taskId, { subtasks: updatedSubtasks });
+  }
+
+  /**
+   * Creates a new task with form data and user context
+   * @param formData - Form values from task creation form
+   * @param additionalData - Additional context data (userId, status, etc.)
+   * @returns Promise of the created task
+   */
+  async createTaskFromForm(
+    formData: any, 
+    additionalData: {
+      userId: string,
+      selectedCategory: string,
+      selectedContactIds: string[],
+      selectedPriority: string,
+      initialStatus: string,
+      subtasks: any[]
+    }
+  ): Promise<Task> {
+    const newTask: Task = {
+      id: this.generateTaskId(),
+      title: formData.title,
+      description: formData.description,
+      category: additionalData.selectedCategory,
+      assignedTo: additionalData.selectedContactIds,
+      dueDate: new Date(formData.dueDate),
+      priority: additionalData.selectedPriority as 'low' | 'medium' | 'high',
+      status: additionalData.initialStatus as 'triage' | 'todo' | 'in-progress' | 'await-feedback' | 'done',
+      subtasks: additionalData.subtasks.map(st => ({
+        id: st.id,
+        title: st.title,
+        completed: st.completed ?? false
+      })),
+      createdAt: new Date()
+    };
+
+    await this.addTask(newTask);
+    return newTask;
+  }
+
+  /**
+   * Updates an existing task with form data
+   * @param taskId - ID of the task to update
+   * @param formData - Form values from task edit form
+   * @param additionalData - Additional context data
+   * @returns Promise of the updated task
+   */
+  async updateTaskFromForm(
+    taskId: string,
+    formData: any,
+    additionalData: {
+      selectedCategory: string,
+      selectedContactIds: string[],
+      selectedPriority: string,
+      subtasks: any[]
+    }
+  ): Promise<Task> {
+    const task = this.findTaskById(taskId);
+    if (!task) {
+      throw new Error('Task not found');
+    }
+
+    const updates: Partial<Task> = {
+      title: formData.title,
+      description: formData.description,
+      category: additionalData.selectedCategory,
+      assignedTo: additionalData.selectedContactIds,
+      dueDate: new Date(formData.dueDate),
+      priority: additionalData.selectedPriority as 'low' | 'medium' | 'high',
+      subtasks: additionalData.subtasks.map(st => ({
+        id: st.id,
+        title: st.title,
+        completed: st.completed ?? false
+      }))
+    };
+
+    await this.updateTask(taskId, updates);
+    const updatedTask: Task = { ...task, ...updates };
+    return updatedTask;
+  }
+
+  /**
+   * Generates unique ID for new tasks
+   * @returns Unique string ID
+   */
+  private generateTaskId(): string {
+    return Date.now().toString(36) + Math.random().toString(36).substring(2);
   }
 }
 

@@ -178,114 +178,95 @@ export class AuthService {
   /**
    * Registers new user with email and password
    * @param data - Registration data (name, email, password)
-   * @returns Observable with user credentials
+   * @returns Promise with user credentials
    */
-  signup(data: SignupData): Observable<UserCredential> {
-    const promise = createUserWithEmailAndPassword(
+  async signup(data: SignupData): Promise<UserCredential> {
+    const userCredential = await createUserWithEmailAndPassword(
       this.auth,
       data.email,
       data.password
-    ).then(async (userCredential) => {
-      if (userCredential.user) {
-        await updateProfile(userCredential.user, {
-          displayName: data.name,
-        });
+    );
+    
+    if (userCredential.user) {
+      await updateProfile(userCredential.user, {
+        displayName: data.name,
+      });
 
-        await this.saveUserToFirestore(userCredential.user, data.name);
-      }
-      return userCredential;
-    });
-
-    return from(promise);
+      await this.saveUserToFirestore(userCredential.user, data.name);
+    }
+    return userCredential;
   }
 
   /**
    * Logs in user with email and password
    * @param email - User's email address
    * @param password - User's password
-   * @returns Observable with user credentials
+   * @returns Promise with user credentials
    */
-  login(email: string, password: string): Observable<UserCredential> {
-    const promise = signInWithEmailAndPassword(this.auth, email, password).then(
-      async (userCredential) => {
-        await this.ensureUserInFirestore(userCredential.user);
-        return userCredential;
-      }
-    );
-    return from(promise);
+  async login(email: string, password: string): Promise<UserCredential> {
+    const userCredential = await signInWithEmailAndPassword(this.auth, email, password);
+    await this.ensureUserInFirestore(userCredential.user);
+    return userCredential;
   }
 
   /**
    * Logs in as guest user, creates guest account if not exists
-   * @returns Observable with guest user credentials
+   * @returns Promise with guest user credentials
    */
-  guestLogin(): Observable<UserCredential> {
+  async guestLogin(): Promise<UserCredential> {
     const guestEmail = "guest@join.com";
     const guestPassword = "GuestJoin2024!";
 
-    return this.login(guestEmail, guestPassword).pipe(
-      catchError((error) => {
-        if (
-          error.code === "auth/user-not-found" ||
-          error.code === "auth/invalid-credential"
-        ) {
-          console.log(
-            "🔧 Guest user does not exist. Creating guest account..."
-          );
+    try {
+      return await this.login(guestEmail, guestPassword);
+    } catch (error: any) {
+      if (
+        error.code === "auth/user-not-found" ||
+        error.code === "auth/invalid-credential"
+      ) {
+        console.log("🔧 Guest user does not exist. Creating guest account...");
 
-          return this.signup({
+        try {
+          await this.signup({
             name: "Guest User",
             email: guestEmail,
             password: guestPassword,
-          }).pipe(
-            switchMap(() => {
-              console.log("✅ Guest account created successfully");
-              return this.login(guestEmail, guestPassword);
-            }),
-            catchError((signupError) => {
-              if (signupError.code === "auth/email-already-in-use") {
-                console.error(
-                  "❌ Guest account exists but wrong password. Please check credentials."
-                );
-              }
-              throw signupError;
-            })
-          );
+          });
+          console.log("✅ Guest account created successfully");
+          return await this.login(guestEmail, guestPassword);
+        } catch (signupError: any) {
+          if (signupError.code === "auth/email-already-in-use") {
+            console.error("❌ Guest account exists but wrong password. Please check credentials.");
+          }
+          throw signupError;
         }
-        throw error;
-      })
-    );
+      }
+      throw error;
+    }
   }
 
   /**
    * Signs in user with Google OAuth
-   * @returns Observable with Google OAuth credentials
+   * @returns Promise with Google OAuth credentials
    */
-  signInWithGoogle(): Observable<UserCredential> {
+  async signInWithGoogle(): Promise<UserCredential> {
     const provider = new GoogleAuthProvider();
     provider.setCustomParameters({
       prompt: "select_account",
     });
 
-    const promise = signInWithPopup(this.auth, provider).then(
-      async (userCredential) => {
-        await this.ensureUserInFirestore(userCredential.user);
-        return userCredential;
-      }
-    );
-
-    return from(promise);
+    const userCredential = await signInWithPopup(this.auth, provider);
+    await this.ensureUserInFirestore(userCredential.user);
+    return userCredential;
   }
 
   /**
    * Logs out current user and navigates to logo animation
-   * @returns Observable of logout operation
+   * @returns Promise of logout operation
    */
-  logout(): Observable<void> {
-    const promise = signOut(this.auth).then(() => {
-      this.router.navigate(["/logo-animation"]);
-    });
-    return from(promise);
+  async logout(): Promise<void> {
+    await signOut(this.auth);
+    this.router.navigate(["/logo-animation"]);
   }
 
   /**
