@@ -49,7 +49,6 @@ export class ContactService {
       grouped.get(initial)!.push(contact);
     });
     
-    // Convert Map to array format for template compatibility
     return Array.from(grouped.entries())
       .sort(([a], [b]) => a.localeCompare(b))
       .map(([letter, contacts]) => ({
@@ -59,7 +58,6 @@ export class ContactService {
   });
 
   constructor() {
-    // Automatically load contacts when service is instantiated
     this.loadContactsAsync().catch(error => {
       console.warn('❌ ContactService: Initial contact loading failed:', error);
     });
@@ -99,8 +97,8 @@ export class ContactService {
         const color = data['color'] || this.generateColorFromEmail(email);
 
         return {
-          id: doc.id, // This should be the Firebase Auth UID
-          authUid: doc.id, // Same as id since docs are stored with user.uid as doc ID
+          id: doc.id,
+          authUid: doc.id,
           firstName: firstName,
           lastName: lastName,
           email: email,
@@ -286,7 +284,6 @@ export class ContactService {
     }
 
     await setDoc(userDoc, updateData, { merge: true });
-    // Refresh contacts after update
     await this.loadContactsAsync();
   }
 
@@ -298,13 +295,8 @@ export class ContactService {
   async deleteUser(userId: string): Promise<void> {
     const userDoc = doc(this.firestore, 'users', userId);
     
-    // Remove user from all tasks first
     await this.removeUserFromAllTasks(userId);
-    
-    // Delete user document
     await deleteDoc(userDoc);
-    
-    // Refresh contacts after deletion
     await this.loadContactsAsync();
   }
 

@@ -64,7 +64,6 @@ export class TaskService {
     };
   });
   
-  // Computed filtered tasks by status
   public readonly filteredTasksByStatus = computed(() => {
     const filtered = this.filteredTasks();
     return {
@@ -96,14 +95,10 @@ export class TaskService {
     return urgent.length > 0 ? urgent[0].dueDate : null;
   });
   
-  /** Observable für Backwards Compatibility */
   public readonly tasks$ = toObservable(this.tasks);
-  
-  /** Referenz zum Snapshot-Listener */
   private unsubscribe: (() => void) | null = null;
 
   constructor() {
-    // Effect für Auth-State-Änderungen
     const authStateSignal = toSignal(authState(this.auth), { initialValue: null });
     
     effect(() => {
@@ -111,7 +106,6 @@ export class TaskService {
       if (user) {
         this.initializeTasksListener();
       } else {
-        // Wenn kein User eingeloggt ist, leere die Tasks und stoppe den Listener
         if (this.unsubscribe) {
           this.unsubscribe();
           this.unsubscribe = null;
@@ -125,7 +119,6 @@ export class TaskService {
    * Initializes real-time Firestore listener for task updates
    */
   private initializeTasksListener(): void {
-    // Wenn bereits ein Listener aktiv ist, stoppe ihn
     if (this.unsubscribe) {
       this.unsubscribe();
     }
@@ -148,7 +141,6 @@ export class TaskService {
             return dateB - dateA;
           });
 
-          // Signal aktualisieren 
           this.tasksSignal.set(tasks);
           this.loadingSignal.set(false);
           this.errorSignal.set(null);
@@ -308,7 +300,6 @@ export class TaskService {
    * @returns Promise of the update operation
    */
   async updateTaskStatusOptimistic(taskId: string, newStatus: Task['status']): Promise<void> {
-    // Find the task
     const currentTasks = this.tasksSignal();
     const taskIndex = currentTasks.findIndex(t => t.id === taskId);
     
@@ -316,10 +307,8 @@ export class TaskService {
       throw new Error('Task not found');
     }
 
-    // Store old status for potential rollback
     const oldStatus = currentTasks[taskIndex].status;
     
-    // Apply optimistic update immediately
     const updatedTasks = [...currentTasks];
     updatedTasks[taskIndex] = { 
       ...updatedTasks[taskIndex], 
@@ -328,11 +317,9 @@ export class TaskService {
     };
     this.tasksSignal.set(updatedTasks);
 
-    // Perform backend update
     try {
       await this.updateTaskStatus(taskId, newStatus);
     } catch (error) {
-      // Revert optimistic update on error
       const revertTasks = [...this.tasksSignal()];
       const currentIndex = revertTasks.findIndex(t => t.id === taskId);
       if (currentIndex !== -1) {
@@ -371,7 +358,6 @@ export class TaskService {
       aiGenerated: task.aiGenerated || false
     };
 
-    // Only add optional fields if they have values
     if (task.creatorName) {
       taskData.creatorName = task.creatorName;
     }

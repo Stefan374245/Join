@@ -85,19 +85,20 @@ export class BoardViewComponent implements OnInit, AfterViewInit, OnDestroy {
   public taskService = inject(TaskService);
   private contactService = inject(ContactService);
   private toastService = inject(ToastService);
-  private router = inject(Router);
+    
+  contacts = this.contactService.contacts;
 
   tasks = this.taskService.filteredTasksByStatus;
   loading = this.taskService.loading;
   allTasks = this.taskService.tasks;
-  
-  contacts = this.contactService.contacts;
 
   selectedTask: Task | null = null;
   showTaskDetail: boolean = false;
 
   taskToEdit: Task | null = null;
   showEditOverlay: boolean = false;
+  
+
 
   showAddTaskOverlay: boolean = false;
   addTaskStatus: 'triage' | 'todo' | 'in-progress' | 'await-feedback' | 'done' =
