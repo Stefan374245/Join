@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ContactService } from '../../../core/services/contact.service';
@@ -24,39 +24,38 @@ export class ContactDetailComponent implements OnInit {
   private contactService = inject(ContactService);
   private authService = inject(AuthService);
   private toastService = inject(ToastService);
-
-  contact: Contact | null = null;
+ 
+  // Signal for current email from route
+  private currentEmail = signal<string | null>(null);
+  
+  // Computed contact from ContactService signals
+  contact = computed(() => {
+    const email = this.currentEmail();
+    if (!email) return null;
+    return this.contactService.findContactByEmail(email) || null;
+  });
+  
+  // Use ContactService loading state
+  loading = this.contactService.loading;
+  
   showActionMenu = false;
   showDialog = false;
   dialogMode: 'add' | 'edit' = 'edit';
 
   /**
-   * Component initialization - loads contact from route parameter
+   * Component initialization - gets email from route and triggers ContactService loading
    */
   ngOnInit(): void {
+    // Load contacts from Firestore  
+    this.contactService.loadContactsAsync();
+    
+    // Get email from route and set signal
     const email = this.route.snapshot.paramMap.get('email');
     if (email) {
-      this.loadContact(email);
+      this.currentEmail.set(email);
+    } else {
+      this.router.navigate(['/contacts']);
     }
-  }
-
-  /**
-   * Loads contact by email address
-   * @param email - Contact email to load
-   */
-  private loadContact(email: string) {
-    this.contactService.loadAll().subscribe({
-      next: (contacts) => {
-        this.contact = contacts.find(c => c.email === email) || null;
-        if (!this.contact) {
-          this.router.navigate(['/contacts']);
-        }
-      },
-      error: (err) => {
-        console.error('Error loading contact:', err);
-        this.router.navigate(['/contacts']);
-      }
-    });
   }
 
   /**
@@ -104,12 +103,13 @@ export class ContactDetailComponent implements OnInit {
       return;
     }
     
-    if (!this.contact?.id) return;
+    const currentContact = this.contact();
+    if (!currentContact?.id) return;
 
-    if (confirm(`Delete contact ${this.contact.firstName} ${this.contact.lastName}?`)) {
+    if (confirm(`Delete contact ${currentContact.firstName} ${currentContact.lastName}?`)) {
       try {
-        await this.contactService.deleteUser(this.contact.id).toPromise();
-        this.toastService.showSuccess(`Contact ${this.contact.firstName} ${this.contact.lastName} deleted successfully!`);
+        await this.contactService.deleteUser(currentContact.id);
+        this.toastService.showSuccess(`Contact ${currentContact.firstName} ${currentContact.lastName} deleted successfully!`);
         this.router.navigate(['/contacts']);
       } catch (error) {
         console.error('Error deleting contact:', error);
@@ -138,8 +138,8 @@ export class ContactDetailComponent implements OnInit {
         firstName: updatedContact.firstName,
         lastName: updatedContact.lastName,
         phone: updatedContact.phone
-      }).toPromise();
-      this.contact = updatedContact;
+      });
+      // Contact will update automatically via signals
       this.showDialog = false;
       this.toastService.showSuccess(`Contact ${updatedContact.firstName} ${updatedContact.lastName} updated successfully!`);
     } catch (error) {

@@ -1,11 +1,11 @@
-<div class="contact-detail-page" *ngIf="contact">
+<div class="contact-detail-page" *ngIf="contact() && !loading()">
   <div class="detail-header">
     <h1>Contacts</h1>
     <button class="back-btn" (click)="goBack()">
       <img src="assets/images/arrow-left-line.svg" alt="Back" />
     </button>
   </div>
-
+ <!-- #region hallo-->
   <div class="detail-subheader">
     <p>Better with a team</p>
   </div>
@@ -13,27 +13,27 @@
 
   <div class="contact-info">
     <div class="contact-avatar">
-      <span class="avatar-large" [style.background-color]="contact.color">
-        {{ contact.initials }}
+      <span class="avatar-large" [style.background-color]="contact()!.color">
+        {{ contact()!.initials }}
       </span>
     </div>
 
     <div class="contact-name">
-      <h2>{{ contact.firstName }} {{ contact.lastName }}</h2>
+      <h2>{{ contact()!.firstName }} {{ contact()!.lastName }}</h2>
     </div>
   </div>
-
+ <!-- #endregion-->
   <div class="contact-details">
     <h3>Contact Information</h3>
 
     <div class="detail-item">
       <strong>Email</strong>
-      <a [href]="'mailto:' + contact.email" class="contact-email">{{ contact.email }}</a>
+      <a [href]="'mailto:' + contact()!.email" class="contact-email">{{ contact()!.email }}</a>
     </div>
 
     <div class="detail-item">
       <strong>Phone</strong>
-      <span>{{ contact.phone || '-' }}</span>
+      <span>{{ contact()!.phone || '-' }}</span>
     </div>
   </div>
 
@@ -57,9 +57,13 @@
   <app-contact-dialog
     *ngIf="showDialog"
     [mode]="dialogMode"
-    [contact]="contact"
+    [contact]="contact()"
     (close)="closeDialog()"
     (save)="saveContact($event)"
     (delete)="handleDelete($event)">
   </app-contact-dialog>
+</div>
+
+<div *ngIf="loading()" class="loading-state">
+  Loading contact...
 </div>
