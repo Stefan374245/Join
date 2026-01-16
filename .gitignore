@@ -85,3 +85,6 @@ n8n-credentials.json
 
 # Angular concepts documentation (internal development reference)
 **/ANGULAR_CONCEPTS_*.md
+
+# Signals architecture documentation (internal development reference)
+ANGULAR_SIGNALS_ARCHITECTURE.md
