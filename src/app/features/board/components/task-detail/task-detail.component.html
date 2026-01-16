@@ -72,37 +72,31 @@
         <div class="detail-row assigned-to">
           <span class="detail-label">Assigned To:</span>
           <div class="assignee-list">
-            <div *ngIf="contactsLoading" class="loading-spinner">
-              <img src="assets/images/loading.svg" alt="Loading..." />
+            <div
+              class="assignee-item"
+              *ngFor="let userId of task().assignedTo.slice(0, 3)"
+            >
+              <div
+                class="assignee-avatar"
+                [style.background-color]="getContactColor(userId)"
+              >
+                {{ getContactInitials(userId) }}
+              </div>
+              <span class="assignee-name">{{
+                getContactFullName(userId)
+              }}</span>
             </div>
 
-            <div *ngIf="!contactsLoading">
-              <div
-                class="assignee-item"
-                *ngFor="let userId of task().assignedTo.slice(0, 3)"
-              >
-                <div
-                  class="assignee-avatar"
-                  [style.background-color]="getContactColor(userId)"
-                >
-                  {{ getContactInitials(userId) }}
-                </div>
-                <span class="assignee-name">{{
-                  getContactFullName(userId)
-                }}</span>
+            <div
+              class="assignee-item more-users"
+              *ngIf="task().assignedTo.length > 3"
+            >
+              <div class="assignee-avatar more-avatar">
+                +{{ task().assignedTo.length - 3 }}
               </div>
-
-              <div
-                class="assignee-item more-users"
-                *ngIf="task().assignedTo.length > 3"
+              <span class="assignee-name"
+                >{{ task().assignedTo.length - 3 }} more</span
               >
-                <div class="assignee-avatar more-avatar">
-                  +{{ task().assignedTo.length - 3 }}
-                </div>
-                <span class="assignee-name"
-                  >{{ task().assignedTo.length - 3 }} more</span
-                >
-              </div>
             </div>
           </div>
         </div>

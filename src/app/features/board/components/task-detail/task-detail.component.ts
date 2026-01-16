@@ -1,10 +1,8 @@
-import { Component, input, output, inject, OnInit } from '@angular/core';
+import { Component, input, output, inject, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
 import { Task } from '../../../../core/models/task.interface';
 import { Contact } from '../../../../core/models/contact.interface';
 import { TaskService } from '../../../../core/services/task.service';
-import { ContactService } from '../../../../core/services/contact.service';
 import { ToastService } from '../../../../core/services/toast.service';
 
 /**
@@ -36,49 +34,33 @@ import { ToastService } from '../../../../core/services/toast.service';
   templateUrl: './task-detail.component.html',
   styleUrl: './task-detail.component.scss'
 })
-export class TaskDetailComponent implements OnInit {
-  contactsLoading: boolean = true;
+export class TaskDetailComponent {
   task = input.required<Task>();
+  contacts = input.required<Contact[]>();
   isVisible = input<boolean>(false);
   close = output<void>();
   edit = output<Task>();
   delete = output<string>();
 
   private taskService = inject(TaskService);
-  private contactService = inject(ContactService);
   private toastService = inject(ToastService);
-
-  contacts: Contact[] = [];
   showDeleteConfirm: boolean = false;
   private lastToggleTime: number = 0;
 
-  /**
-   * Angular lifecycle hook for component initialization.
-   * Triggers the loading of contacts data required for task assignment functionality.
-   * This ensures that contact information is available when the component is ready for user interaction.
-   */
-  ngOnInit(): void {
-    this.loadContacts();
-  }
-
-  /**
-   * Loads contact data from the ContactService for task assignment functionality.
-   * 
-   * This method fetches all available contacts and manages loading states to provide
-   * visual feedback to users. Contact data is essential for displaying assigned users
-   * and enabling contact assignment/removal operations within the task detail view.
-   */
-  private loadContacts(): void {
-    this.contactService.getContacts().subscribe({
-      next: (contacts) => {
-        setTimeout(() => {
-          this.contacts = contacts;
-          this.contactsLoading = false;
-        }, 600);
-      },
-      error: (error) => {
-        console.error('Error loading contacts:', error);
-        this.contactsLoading = false;
+  constructor() {
+    // Monitor contact assignments for debugging in development
+    effect(() => {
+      const currentTask = this.task();
+      if (currentTask?.assignedTo?.length > 0 && this.contacts().length > 0) {
+        // Check if all assigned contacts exist (only in development)
+        if (typeof window !== 'undefined' && !window.location.hostname.includes('localhost')) return;
+        
+        currentTask.assignedTo.forEach(userId => {
+          const contact = this.getContact(userId);
+          if (!contact) {
+            console.warn(`⚠️ TaskDetail: Contact not found for user ID: ${userId}`);
+          }
+        });
       }
     });
   }
@@ -92,8 +74,7 @@ export class TaskDetailComponent implements OnInit {
   }
 
   /**
-   * Handles clicks on the overlay backdrop to enable click-outside-to-close functionality.
-   * 
+   * Handles overlay click events for click-outside-to-close functionality. 
    * This method checks if the click occurred on the overlay background (not on the modal content)
    * and triggers the close action to provide intuitive UX for dismissing the modal.
    * 
@@ -146,20 +127,12 @@ export class TaskDetailComponent implements OnInit {
   /**
    * Toggles the completion status of a subtask with optimistic UI updates and debouncing.
    * 
-   * This method implements optimistic UI updates for better user experience, immediately
-   * updating the UI state while syncing with Firestore in the background. It includes
-   * debouncing to prevent rapid consecutive clicks and provides rollback functionality
-   * if the server update fails.
-   * 
-   * Features:
-   * - 300ms debounce protection against rapid clicks
-   * - Optimistic UI updates for immediate visual feedback
-   * - Error handling with automatic state rollback
-   * - Comprehensive logging for debugging
+   * Uses TaskService for centralized subtask management with optimistic UI updates
+   * for better user experience.
    * 
    * @param subtaskId - The unique identifier of the subtask to toggle
    */
-  toggleSubtask(subtaskId: string): void {
+  async toggleSubtask(subtaskId: string): Promise<void> {
     const now = Date.now();
     if (now - this.lastToggleTime < 300) {
       console.log('⏸️ Click ignored (debounce)');
@@ -167,38 +140,33 @@ export class TaskDetailComponent implements OnInit {
     }
     this.lastToggleTime = now;
 
-    if (!this.task().subtasks) {
+    const currentTask = this.task();
+    if (!currentTask.subtasks) {
       console.error('❌ Component: No subtasks found');
       return;
     }
 
-    const subtask = this.task().subtasks.find(st => st.id === subtaskId);
+    const subtask = currentTask.subtasks.find(st => st.id === subtaskId);
     if (!subtask) {
       console.error('❌ Component: Subtask not found:', subtaskId);
       return;
     }
 
-    const currentState = subtask.completed;
-    const newState = !currentState;
-    console.log('🎯 Component: Toggling subtask:', subtaskId, 'Current:', currentState, '→ New:', newState);
+    const newState = !subtask.completed;
+    console.log('🎯 Component: Toggling subtask:', subtaskId, 'Current:', subtask.completed, '→ New:', newState);
 
-    subtask.completed = newState;
-    console.log('🖼️ Component: UI updated immediately to:', subtask.completed);
-
-    this.taskService.updateSubtaskCompletion(this.task().id, subtaskId, newState).subscribe({
-      next: () => {
-        console.log('✅ Component: Firestore sync completed with state:', newState);
-      },
-      error: (error) => {
-        console.error('❌ Component: Error syncing with Firestore:', error);
-        subtask.completed = currentState;
-        console.log('⏮️ Component: Reverted to:', currentState);
-      }
-    });
+    // Use TaskService for centralized subtask management
+    try {
+      await this.taskService.toggleSubtask(currentTask.id, subtaskId);
+      console.log('✅ Component: Subtask toggled successfully');
+    } catch (error) {
+      console.error('❌ Component: Error toggling subtask:', error);
+      this.toastService.showError('Failed to update subtask');
+    }
   }
 
   /**
-   * Retrieves a contact object by user ID from the loaded contacts array.
+   * Retrieves a contact object by user ID from ContactService signals.
    * 
    * This utility method provides centralized contact lookup functionality used
    * by other contact-related methods throughout the component.
@@ -207,7 +175,7 @@ export class TaskDetailComponent implements OnInit {
    * @returns Contact object if found, undefined if not found
    */
   getContact(userId: string): Contact | undefined {
-    return this.contacts.find(c => c.id === userId);
+    return this.contacts().find(c => c.id === userId);
   }
 
   /**

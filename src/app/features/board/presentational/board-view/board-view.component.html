@@ -8,8 +8,8 @@
           type="text"
           class="search-input"
           placeholder="Find Task"
-          [(ngModel)]="searchQuery"
-          (input)="onSearch()"
+          [ngModel]="taskService.searchQuery()"
+          (ngModelChange)="taskService.setSearchQuery($event)"
           aria-label="Search tasks"
         />
         <div class="separator"></div>
@@ -38,18 +38,18 @@
     </nav>
   </header>
 
-  <div class="board-loading" *ngIf="tasksLoading">
+  <div class="board-loading" *ngIf="loading()">
     <app-loading-spinner></app-loading-spinner>
   </div>
-  <ng-container *ngIf="!tasksLoading">
+  <ng-container *ngIf="!loading()">
     <section class="board-columns" aria-label="Task board columns">
       <app-board-column
         *ngFor="let column of columns"
         [columnId]="column.id"
         [title]="column.title"
         [tasks]="column.getTasks()"
-        [contacts]="contacts"
-        [loading]="tasksLoading"
+        [contacts]="contacts()"
+        [loading]="loading()"
         (taskDropped)="onTaskDrop($event.event, $event.status)"
         (addTaskClicked)="openAddTaskModal($event)"
         (taskClicked)="openTaskDetail($event)"
@@ -62,6 +62,7 @@
 <div *ngIf="selectedTask" (clickOutside)="closeTaskDetail()">
   <app-task-detail
     [task]="selectedTask"
+    [contacts]="contacts()"
     [isVisible]="showTaskDetail"
     (close)="closeTaskDetail()"
     (edit)="onEditTask($event)"
