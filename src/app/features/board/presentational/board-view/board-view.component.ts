@@ -82,23 +82,16 @@ interface BoardColumn {
 export class BoardViewComponent implements OnInit, AfterViewInit, OnDestroy {
   boardColumns = viewChildren(BoardColumnComponent);
 
-  private taskService = inject(TaskService);
+  public taskService = inject(TaskService);
   private contactService = inject(ContactService);
   private toastService = inject(ToastService);
   private router = inject(Router);
 
-  searchQuery: string = '';
-  allTasks: Task[] = [];
-  filteredTasks: Task[] = [];
-  contacts: Contact[] = [];
-
-  tasksLoading: boolean = true;
-
-  triageTasks: Task[] = [];
-  todoTasks: Task[] = [];
-  inProgressTasks: Task[] = [];
-  awaitFeedbackTasks: Task[] = [];
-  doneTasks: Task[] = [];
+  tasks = this.taskService.filteredTasksByStatus;
+  loading = this.taskService.loading;
+  allTasks = this.taskService.tasks;
+  
+  contacts = this.contactService.contacts;
 
   selectedTask: Task | null = null;
   showTaskDetail: boolean = false;
@@ -115,28 +108,19 @@ export class BoardViewComponent implements OnInit, AfterViewInit, OnDestroy {
   private readonly scrollThreshold = 100;
 
   columns: BoardColumn[] = [
-    { id: 'triage', title: 'Triage', getTasks: () => this.triageTasks },
-    { id: 'todo', title: 'To do', getTasks: () => this.todoTasks },
-    { id: 'in-progress', title: 'In progress', getTasks: () => this.inProgressTasks },
-    { id: 'await-feedback', title: 'Await feedback', getTasks: () => this.awaitFeedbackTasks },
-    { id: 'done', title: 'Done', getTasks: () => this.doneTasks },
+    { id: 'triage', title: 'Triage', getTasks: () => this.tasks().triage },
+    { id: 'todo', title: 'To do', getTasks: () => this.tasks().todo },
+    { id: 'in-progress', title: 'In progress', getTasks: () => this.tasks().inProgress },
+    { id: 'await-feedback', title: 'Await feedback', getTasks: () => this.tasks().awaitFeedback },
+    { id: 'done', title: 'Done', getTasks: () => this.tasks().done },
   ];
 
   /**
    * Angular lifecycle hook for component initialization.
-   *
-   * Orchestrates the startup sequence by loading essential data and setting up
-   * interactive features. This ensures the board is fully functional when
-   * users interact with it.
-   *
-   * Initialization sequence:
-   * 1. Load all tasks from Firestore
-   * 2. Load contact data for task assignments
-   * 3. Initialize auto-scroll functionality for drag operations
+   * Loads tasks and contacts, then initializes auto-scroll functionality.
    */
   ngOnInit(): void {
-    this.loadTasks();
-    this.loadContacts();
+    this.contactService.loadContactsAsync();
     this.initAutoScroll();
   }
 
@@ -227,49 +211,6 @@ export class BoardViewComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   /**
-   * Loads all tasks from the TaskService and initializes the board data.
-   * 
-   * This method handles the complete task loading lifecycle including loading states,
-   * minimum spinner display time for better UX, task organization by status, and
-   * drop list connection setup for drag & drop functionality.
-   * 
-   * Features:
-   * - Minimum 500ms loading indicator for perceived performance
-   * - Automatic task filtering and column organization
-   * - Drop list connection setup after data loading
-   * - Comprehensive error handling with user feedback
-   */
-  private loadTasks(): void {
-    this.tasksLoading = true;
-    const minSpinnerTime = 500;
-    const startTime = Date.now();
-    this.taskService.getTasks().subscribe({
-      next: (tasks: Task[]) => {
-        this.allTasks = tasks;
-        this.filteredTasks = tasks;
-        this.updateColumnArrays();
-        const elapsed = Date.now() - startTime;
-        const remaining = minSpinnerTime - elapsed;
-        if (remaining > 0) {
-          setTimeout(() => {
-            this.tasksLoading = false;
-            this.connectDropLists();
-            console.log('📋 Loaded tasks:', tasks.length);
-          }, remaining);
-        } else {
-          this.tasksLoading = false;
-          this.connectDropLists();
-          console.log('📋 Loaded tasks:', tasks.length);
-        }
-      },
-      error: (error: any) => {
-        this.tasksLoading = false;
-        console.error('❌ Error loading tasks:', error);
-      },
-    });
-  }
-
-  /**
    * Establishes drag & drop connections between all board columns.
    * 
    * This method creates bidirectional connections between all column drop zones,
@@ -294,207 +235,43 @@ export class BoardViewComponent implements OnInit, AfterViewInit, OnDestroy {
               );
             }
           });
-          console.log(
-            "✅ Connected drop lists:",
-            allDropLists.map((l) => l.id)
-          );
         }
       }
     }, 0);
   }
 
   /**
-   * Organizes filtered tasks into status-specific arrays for column rendering.
-   * 
-   * This method processes the filtered tasks and distributes them into separate arrays
-   * based on their status property. Each column component receives its corresponding
-   * task array for rendering, enabling efficient change detection and UI updates.
-   * 
-   * Task status categories:
-   * - Triage: Initial task assessment
-   * - Todo: Ready for development
-   * - In Progress: Currently being worked on
-   * - Await Feedback: Waiting for review or input
-   * - Done: Completed tasks
-   */
-  private updateColumnArrays(): void {
-    this.triageTasks = this.filteredTasks.filter(
-      (task) => task.status === 'triage'
-    );
-    this.todoTasks = this.filteredTasks.filter(
-      (task) => task.status === 'todo'
-    );
-    this.inProgressTasks = this.filteredTasks.filter(
-      (task) => task.status === 'in-progress'
-    );
-    this.awaitFeedbackTasks = this.filteredTasks.filter(
-      (task) => task.status === 'await-feedback'
-    );
-    this.doneTasks = this.filteredTasks.filter(
-      (task) => task.status === 'done'
-    );
-
-    console.log('📊 Column Arrays Updated:', {
-      triage: this.triageTasks.length,
-      todo: this.todoTasks.length,
-      inProgress: this.inProgressTasks.length,
-      awaitFeedback: this.awaitFeedbackTasks.length,
-      done: this.doneTasks.length,
-    });
-  }
-
-  /**
    * Angular lifecycle hook called after the component's view has been fully initialized.
    * 
-   * This method is responsible for setting up drag & drop connections between all board columns
-   * after the view children (BoardColumnComponent instances) have been created and initialized.
-   * It ensures that tasks can be dragged between any columns by establishing bidirectional
-   * connections between all drop list zones.
-   * 
-   * The method uses setTimeout with 0ms delay to ensure that ViewChildren query has completed
-   * and all column components are properly instantiated before attempting to access their
-   * drop list references.
+   * Sets up drag & drop connections between all board columns after ViewChildren are available.
    */
   ngAfterViewInit(): void {
-    setTimeout(() => {
-      if (this.boardColumns() && this.boardColumns().length > 0) {
-        const allDropLists = this.boardColumns()
-          .map((col) => col.dropList())
-          .filter((list) => !!list);
-        console.log(
-          "🎯 Connecting drop lists:",
-          allDropLists.map((l) => l!.id)
-        );
-
-        this.boardColumns().forEach((column) => {
-          if (column.dropList()) {
-            column.dropList()!.connectedTo = allDropLists.filter(
-              (list) => list!.id !== column.dropList()!.id
-            );
-          }
-        });
-
-        console.log('✅ All drop lists connected');
-      }
-    }, 0);
+    this.connectDropLists();
   }
 
   /**
-   * Loads contact data from the ContactService for task assignment functionality.
-   * 
-   * This method fetches all available contacts from the data source and stores them
-   * in the component's contacts array. Contact data is essential for displaying
-   * assigned users on task cards and enabling contact selection during task editing.
-   * 
-   * The method includes comprehensive error handling to gracefully manage network
-   * or data access issues without breaking the application flow.
+   * Handles drag and drop events using TaskService optimistic updates.
    */
-  private loadContacts(): void {
-    this.contactService.getContacts().subscribe({
-      next: (contacts: Contact[]) => {
-        this.contacts = contacts;
-        console.log('👥 Loaded contacts:', contacts.length);
-      },
-      error: (error: any) => {
-        console.error('❌ Error loading contacts:', error);
-      },
-    });
-  }
-
-  /**
-   * Retrieves tasks filtered by their status from the appropriate status-specific array.
-   * 
-   * This utility method provides a centralized way to access tasks by status, returning
-   * the corresponding pre-filtered array based on the status parameter. Each status
-   * corresponds to a specific column in the Kanban board layout.
-   * 
-   * @param status - The task status to filter by ('triage', 'todo', 'in-progress', 'await-feedback', 'done')
-   * @returns Array of tasks matching the specified status, or empty array for invalid status
-   */
-  getTasksByStatus(status: string): Task[] {
-    switch (status) {
-      case 'triage':
-        return this.triageTasks;
-      case 'todo':
-        return this.todoTasks;
-      case 'in-progress':
-        return this.inProgressTasks;
-      case 'await-feedback':
-        return this.awaitFeedbackTasks;
-      case 'done':
-        return this.doneTasks;
-      default:
-        return [];
-    }
-  }
-
-  /**
-   * Performs real-time search filtering across all tasks based on the search query.
-   * 
-   * This method filters tasks by searching through title, description, and category fields
-   * using case-insensitive matching. When the search query is empty, all tasks are displayed.
-   * After filtering, the method updates column arrays to reflect the search results across
-   * all board columns.
-   * 
-   * Search functionality:
-   * - Searches in task title, description, and category fields
-   * - Case-insensitive matching for better user experience
-   * - Real-time filtering as user types
-   * - Automatic reset when search query is cleared
-   * - Updates all column displays immediately after filtering
-   */
-  onSearch(): void {
-    if (!this.searchQuery.trim()) {
-      this.filteredTasks = this.allTasks;
-      this.updateColumnArrays();
-      return;
-    }
-
-    const query = this.searchQuery.toLowerCase();
-    this.filteredTasks = this.allTasks.filter(
-      (task) =>
-        task.title.toLowerCase().includes(query) ||
-        task.description.toLowerCase().includes(query) ||
-        task.category.toLowerCase().includes(query)
-    );
-    this.updateColumnArrays();
-  }
-
-  /**
-   * Handles drag and drop events for moving tasks between board columns.
-   * 
-   * This method processes CDK drag-drop events when tasks are moved between different
-   * status columns. It implements optimistic UI updates for immediate user feedback
-   * while performing the actual status update in the background. The method includes
-   * comprehensive error handling with automatic rollback functionality.
-   * 
-   * Process flow:
-   * 1. Extract task and target status from the drop event
-   * 2. Log the drop event for debugging purposes
-   * 3. Check if the task is dropped in the same column (no action needed)
-   * 4. Perform optimistic local update for immediate UI feedback
-   * 5. Sync the change with the backend service
-   * 6. Scroll to the dropped task location on success
-   * 7. Revert the local change if backend update fails
-   * 
-   * @param event - The CDK drag-drop event containing source and target information
-   * @param targetStatus - The target status/column where the task was dropped
-   */
-  onTaskDrop(
-    event: CdkDragDrop<Task[]>,
-    targetStatus: string
-  ): void {
+  async onTaskDrop(event: CdkDragDrop<Task[]>, targetStatus: string): Promise<void> {
     const task = event.item.data as Task;
     const status = targetStatus as 'triage' | 'todo' | 'in-progress' | 'await-feedback' | 'done';
+    
     this.logDropEvent(task, event, status);
-    if (task.status === status) return this.logNoUpdate();
-    const oldStatus = task.status;
-    this.updateLocalTaskStatus(task.id, status);
-    this.taskService.updateTaskStatus(task.id, status).subscribe({
-      next: () => setTimeout(() => this.scrollToTask(task.id), 400),
-      error: () => this.revertLocalTaskStatus(task.id, oldStatus),
-    });
+    
+    if (task.status === status) {
+      this.logNoUpdate();
+      return;
+    }
+    
+    try {
+      await this.taskService.updateTaskStatusOptimistic(task.id, status);
+      console.log('✅ Task status updated optimistically');
+      setTimeout(() => this.scrollToTask(task.id), 400);
+    } catch (error) {
+      console.error('❌ Error updating task status:', error);
+    }
   }
+
   /**
    * Logs detailed information about drag and drop events for debugging and monitoring.
    * 
@@ -531,49 +308,6 @@ export class BoardViewComponent implements OnInit, AfterViewInit, OnDestroy {
    */
   private logNoUpdate() {
     console.log('ℹ️ Task dropped in same column - no update needed');
-  }
-
-  /**
-   * Updates the task status locally for optimistic UI updates during drag and drop operations.
-   * 
-   * This method performs immediate local updates to the task status without waiting for
-   * backend confirmation, providing instant visual feedback to users. It updates both
-   * the main tasks array and the filtered tasks array, then reorganizes column arrays
-   * to reflect the status change in the UI.
-   * 
-   * This optimistic update approach significantly improves the user experience by
-   * eliminating the perceived lag between user action and UI response.
-   * 
-   * @param id - The unique identifier of the task to update
-   * @param status - The new status to assign to the task
-   */
-  private updateLocalTaskStatus(id: string, status: Task['status']) {
-    const i = this.allTasks.findIndex((t) => t.id === id);
-    if (i !== -1) {
-      this.allTasks[i].status = status;
-      this.filteredTasks = [...this.allTasks];
-      this.updateColumnArrays();
-      console.log('✅ Local update done, column arrays updated');
-    }
-  }
-
-  /**
-   * Reverts a task's status to its previous value when backend update fails.
-   * 
-   * This method is part of the optimistic update error handling strategy. When a
-   * backend status update fails after an optimistic local update has already been
-   * applied, this method restores the task to its previous status to maintain
-   * data consistency between the UI and the backend.
-   * 
-   * The revert operation uses the same local update mechanism to ensure the UI
-   * properly reflects the rollback across all column displays.
-   * 
-   * @param id - The unique identifier of the task to revert
-   * @param status - The previous status to restore
-   */
-  private revertLocalTaskStatus(id: string, status: Task['status']) {
-    console.error('❌ Error updating task status');
-    this.updateLocalTaskStatus(id, status);
   }
 
   /**
@@ -764,35 +498,20 @@ export class BoardViewComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   /**
-   * Handles the deletion of a task by its ID.
-   * 
-   * Finds the task in the local task list, attempts to delete it via the task service,
-   * and displays appropriate toast notifications based on the operation result.
-   * Closes the task detail view upon successful deletion.
-   * 
-   * @param taskId - The unique identifier of the task to delete
-   * 
-   * @remarks
-   * - Shows a success toast with the task title if deletion succeeds
-   * - Shows an error toast if deletion fails
-   * - Logs the operation result to the console
-   * 
-   * @returns void
+   * Handles the deletion of a task by its ID using TaskService signals.
    */
-  onDeleteTask(taskId: string): void {
-    const taskToDelete = this.allTasks.find((t) => t.id === taskId);
+  async onDeleteTask(taskId: string): Promise<void> {
+    const taskToDelete = this.taskService.findTaskById(taskId);
     const taskTitle = taskToDelete?.title || 'Task';
 
-    this.taskService.deleteTask(taskId).subscribe({
-      next: () => {
-        console.log('✅ Task deleted successfully');
-        this.toastService.showTaskDeleted(taskTitle);
-        this.closeTaskDetail();
-      },
-      error: (error) => {
-        console.error('Error deleting task:', error);
-        this.toastService.showTaskDeleteError();
-      },
-    });
+    try {
+      await this.taskService.deleteTask(taskId);
+      console.log('✅ Task deleted successfully');
+      this.toastService.showTaskDeleted(taskTitle);
+      this.closeTaskDetail();
+    } catch (error) {
+      console.error('Error deleting task:', error);
+      this.toastService.showTaskDeleteError();
+    }
   }
 }

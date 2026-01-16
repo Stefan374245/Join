@@ -160,7 +160,7 @@ export class SignupComponent implements OnInit {
     return isValid;
   }
 
-  signup(): void {
+  async signup(): Promise<void> {
     this.nameError = false;
     this.emailError = false;
     this.passwordError = false;
@@ -178,28 +178,26 @@ export class SignupComponent implements OnInit {
       password: this.password
     };
 
-    this.authService.signup(signupData).subscribe({
-      next: (userCredential) => {
-        console.log('Signup successful:', userCredential.user);
-        this.showSignupSuccess();
-      },
-      error: (error) => {
-        console.error('Signup error:', error);
+    try {
+      const userCredential = await this.authService.signup(signupData);
+      console.log('Signup successful:', userCredential?.user);
+      this.showSignupSuccess();
+    } catch (error: any) {
+      console.error('Signup error:', error);
 
-        if (error.code === 'auth/email-already-in-use') {
-          this.emailError = true;
-          this.toastService.showToast('This email is already registered. Please use a different email or try logging in.');
-        } else if (error.code === 'auth/invalid-email') {
-          this.emailError = true;
-          this.toastService.showToast('Please enter a valid email address.');
-        } else if (error.code === 'auth/weak-password') {
-          this.passwordError = true;
-          this.toastService.showToast('Password is too weak. It should be at least 6 characters long.');
-        } else {
-          this.toastService.showToast('Signup failed. Please try again.');
-        }
+      if (error.code === 'auth/email-already-in-use') {
+        this.emailError = true;
+        this.toastService.showToast('This email is already registered. Please use a different email or try logging in.');
+      } else if (error.code === 'auth/invalid-email') {
+        this.emailError = true;
+        this.toastService.showToast('Please enter a valid email address.');
+      } else if (error.code === 'auth/weak-password') {
+        this.passwordError = true;
+        this.toastService.showToast('Password is too weak. It should be at least 6 characters long.');
+      } else {
+        this.toastService.showToast('Signup failed. Please try again.');
       }
-    });
+    }
   }
 
   showSignupSuccess(): void {

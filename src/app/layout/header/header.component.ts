@@ -26,15 +26,13 @@ export class HeaderComponent {
     this.showUserMenu = false;
   }
 
-  logout(): void {
-    this.authService.logout().subscribe({
-      next: () => {
-        this.showUserMenu = false;
-      },
-      error: (error) => {
-        console.error('Logout error:', error);
-      }
-    });
+  async logout(): Promise<void> {
+    try {
+      await this.authService.logout();
+      this.showUserMenu = false;
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
   }
 
   getUserInitials(displayName: string | null, email?: string | null): string {

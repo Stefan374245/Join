@@ -67,10 +67,10 @@ export class AddTaskViewComponent implements OnInit {
   ];
  
   /**
-   * Available contacts formatted for dropdown
+   * Available contacts formatted for dropdown - using ContactService signals
    */
   availableContacts = computed((): DropdownItem[] => {
-    // Transform contacts into dropdown format with color support
+    // Use ContactService signals instead of direct method calls
     return this.contactService.contacts().map((c: Contact) => ({
       id: c.id,
       label: `${c.firstName} ${c.lastName}`,
@@ -143,14 +143,13 @@ export class AddTaskViewComponent implements OnInit {
   }
 
   /**
-   * Component initialization - sets up form and loads data
+   * Component initialization - sets up form and loads data using signals
    */
   ngOnInit(): void {
     // Initialize reactive form with validation
     this.initForm();
     
-    // Load available contacts for assignment dropdown
-    this.contactService.loadContactsAsync();
+    // ContactService loads automatically via signals - no manual loading needed
     
     // Check if editing existing task and populate form
     const task = this.taskToEdit();
@@ -281,7 +280,7 @@ export class AddTaskViewComponent implements OnInit {
     
     // Create new subtask with unique ID
     const newSubtask: Subtask = {
-      id: this.generateId(),
+      id: Date.now().toString(36) + Math.random().toString(36).substring(2),
       title: title.trim(),
       completed: false
     };
@@ -404,7 +403,7 @@ export class AddTaskViewComponent implements OnInit {
   /**
    * Creates new task from form data
    */
-  private createTask(): void {
+  private async createTask(): Promise<void> {
     const formValue = this.taskForm.value;
     const userId = this.authService.userId();
     
@@ -413,45 +412,29 @@ export class AddTaskViewComponent implements OnInit {
       this.toastService.showToast('User not authenticated');
       return;
     }
-    
-    // Build new task object from form and signal data
-    const newTask: Task = {
-      id: this.generateId(),
-      title: formValue.title,
-      description: formValue.description,
-      category: this.selectedCategory(),
-      assignedTo: this.selectedContactIds(),
-      dueDate: new Date(formValue.dueDate),
-      priority: this.selectedPriority() as 'low' | 'medium' | 'high',
-      status: this.initialStatus(),
-      subtasks: this.subtasks().map(st => ({
-        id: st.id,
-        title: st.title,
-        completed: st.completed ?? false
-      })),
-      createdAt: new Date()
+
+    const additionalData = {
+      userId,
+      selectedCategory: this.selectedCategory(),
+      selectedContactIds: this.selectedContactIds(),
+      selectedPriority: this.selectedPriority().toString(),
+      initialStatus: this.initialStatus(),
+      subtasks: this.subtasks()
     };
-    
+
     // Save task via service with error handling
     try {
-      this.taskService.addTask(newTask).subscribe({
-        next: () => {
-          this.toastService.showToast('Task created successfully');
-          this.taskSaved.emit(newTask);
-          
-          // Navigate based on usage context
-          if (this.isOverlay()) {
-            this.close.emit();
-          } else {
-            this.router.navigate(['/board']);
-          }
-        },
-        error: (error) => {
-          this.toastService.showToast('Failed to create task');
-          console.error('Error creating task:', error);
-        }
-      });
-    } catch (error) {
+      const newTask = await this.taskService.createTaskFromForm(formValue, additionalData);
+      this.toastService.showToast('Task created successfully');
+      this.taskSaved.emit(newTask);
+      
+      // Navigate based on usage context
+      if (this.isOverlay()) {
+        this.close.emit();
+      } else {
+        this.router.navigate(['/board']);
+      }
+    } catch (error: any) {
       this.toastService.showToast('Failed to create task');
       console.error('Error creating task:', error);
     }
@@ -460,48 +443,31 @@ export class AddTaskViewComponent implements OnInit {
   /**
    * Updates existing task with form data
    */
-  private updateTask(): void {
+  private async updateTask(): Promise<void> {
     const task = this.taskToEdit();
     if (!task) return;
     
     const formValue = this.taskForm.value;
-    
-    // Build partial update object from changed data
-    const updates: Partial<Task> = {
-      title: formValue.title,
-      description: formValue.description,
-      category: this.selectedCategory(),
-      assignedTo: this.selectedContactIds(),
-      dueDate: new Date(formValue.dueDate),
-      priority: this.selectedPriority() as 'low' | 'medium' | 'high',
-      subtasks: this.subtasks().map(st => ({
-        id: st.id,
-        title: st.title,
-        completed: st.completed ?? false
-      }))
+    const additionalData = {
+      selectedCategory: this.selectedCategory(),
+      selectedContactIds: this.selectedContactIds(),
+      selectedPriority: this.selectedPriority().toString(),
+      subtasks: this.subtasks()
     };
     
     // Update task via service with error handling
     try {
-      this.taskService.updateTask(task.id, updates).subscribe({
-        next: () => {
-          this.toastService.showToast('Task updated successfully');
-          const updatedTask: Task = { ...task, ...updates };
-          this.taskSaved.emit(updatedTask);
-          
-          // Navigate based on usage context
-          if (this.isOverlay()) {
-            this.close.emit();
-          } else {
-            this.router.navigate(['/board']);
-          }
-        },
-        error: (error) => {
-          this.toastService.showToast('Failed to update task');
-          console.error('Error updating task:', error);
-        }
-      });
-    } catch (error) {
+      const updatedTask = await this.taskService.updateTaskFromForm(task.id, formValue, additionalData);
+      this.toastService.showToast('Task updated successfully');
+      this.taskSaved.emit(updatedTask);
+      
+      // Navigate based on usage context
+      if (this.isOverlay()) {
+        this.close.emit();
+      } else {
+        this.router.navigate(['/board']);
+      }
+    } catch (error: any) {
       this.toastService.showToast('Failed to update task');
       console.error('Error updating task:', error);
     }
@@ -515,14 +481,5 @@ export class AddTaskViewComponent implements OnInit {
     Object.keys(this.taskForm.controls).forEach(key => {
       this.taskForm.controls[key].markAsTouched();
     });
-  }
-  
-  /**
-   * Generates unique ID for new tasks and subtasks
-   * @returns Unique string ID
-   */
-  private generateId(): string {
-    // Combine timestamp and random string for uniqueness
-    return Date.now().toString(36) + Math.random().toString(36).substring(2);
   }
 }

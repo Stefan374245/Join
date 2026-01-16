@@ -82,7 +82,7 @@ export class LoginComponent implements OnInit {
     return isValid;
   }
 
-  login(): void {
+  async login(): Promise<void> {
     this.emailError = false;
     this.passwordError = false;
     this.loginFailError = false;
@@ -91,56 +91,50 @@ export class LoginComponent implements OnInit {
       return;
     }
 
-    this.authService.login(this.email, this.password).subscribe({
-      next: (userCredential) => {
-        console.log('Login successful:', userCredential.user);
-        this.showLoginSuccess();
-      },
-      error: (error) => {
-        console.error('Login error:', error);
+    try {
+      const userCredential = await this.authService.login(this.email, this.password);
+      console.log('Login successful:', userCredential?.user);
+      this.showLoginSuccess();
+    } catch (error: any) {
+      console.error('Login error:', error);
+      this.loginFailError = true;
+
+      if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
         this.loginFailError = true;
-
-        if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
-          this.loginFailError = true;
-        } else if (error.code === 'auth/invalid-email') {
-          this.emailError = true;
-        } else if (error.code === 'auth/too-many-requests') {
-          this.loginFailError = true;
-        }
-      }
-    });
-  }
-
-  guestLogin(): void {
-    this.authService.guestLogin().subscribe({
-      next: (userCredential) => {
-        console.log('Guest login successful:', userCredential.user);
-        this.showLoginSuccess();
-      },
-      error: (error) => {
-        console.error('Guest login error:', error);
+      } else if (error.code === 'auth/invalid-email') {
+        this.emailError = true;
+      } else if (error.code === 'auth/too-many-requests') {
         this.loginFailError = true;
       }
-    });
+    }
   }
 
-  signInWithGoogle(): void {
+  async guestLogin(): Promise<void> {
+    try {
+      const userCredential = await this.authService.guestLogin();
+      console.log('Guest login successful:', userCredential?.user);
+      this.showLoginSuccess();
+    } catch (error: any) {
+      console.error('Guest login error:', error);
+      this.loginFailError = true;
+    }
+  }
+
+  async signInWithGoogle(): Promise<void> {
     this.loginFailError = false;
 
-    this.authService.signInWithGoogle().subscribe({
-      next: (userCredential) => {
-        console.log('Google login successful:', userCredential.user);
-        this.showLoginSuccess();
-      },
-      error: (error) => {
-        console.error('Google login error:', error);
-        this.loginFailError = true;
+    try {
+      const userCredential = await this.authService.signInWithGoogle();
+      console.log('Google login successful:', userCredential?.user);
+      this.showLoginSuccess();
+    } catch (error: any) {
+      console.error('Google login error:', error);
+      this.loginFailError = true;
 
-        if (error.code === 'auth/popup-closed-by-user') {
-          this.loginFailError = false;
-        }
+      if (error.code === 'auth/popup-closed-by-user') {
+        this.loginFailError = false;
       }
-    });
+    }
   }
 
   showLoginSuccess(): void {

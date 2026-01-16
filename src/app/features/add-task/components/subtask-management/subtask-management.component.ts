@@ -1,4 +1,4 @@
-import { Component, ViewChild, ElementRef, signal, computed, input, output, effect, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ViewChild, ElementRef, signal, computed, input, output, effect, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormControl } from '@angular/forms';
 import { ToastService } from '../../../../core/services/toast.service';
@@ -30,29 +30,21 @@ export class SubtaskManagementComponent {
     @ViewChild('addInput') addInput!: ElementRef<HTMLInputElement>;
 
     subtasks = input<Subtask[]>([]);
-    
     editingSubtaskId = input<string | null>(null);
-    
     subtaskEditInput = input<string>('');
 
     addSubtask = output<string>();
-    
     editSubtask = output<Subtask>();
-    
     updateSubtask = output<void>();
-    
     cancelEditSubtask = output<void>();
-    
     deleteSubtask = output<string>();
-    
     subtaskEditInputChange = output<string>();
 
+    private toastService = inject(ToastService);
+
     subtaskInputControl = signal<FormControl>(new FormControl(''));
-    
     isDropdownOpen = signal(false);
-    
     editInputValue = signal('');
-    
     inputFocused = signal(false);
     
     readonly MAX_SUBTASKS = 5;
@@ -102,7 +94,7 @@ export class SubtaskManagementComponent {
      */
     isInputFocused = computed(() => this.inputFocused());
 
-    constructor(private toastService: ToastService) {
+    constructor() {
         effect(() => {
             this.editInputValue.set(this.subtaskEditInput());
         });
@@ -110,6 +102,7 @@ export class SubtaskManagementComponent {
 
     /**
      * Handles adding new subtask with validation
+     * Emits to parent component (AddTaskView) for handling via TaskService
      */
     onAddSubtask(): void {
         const input = this.subtaskInputControl().value?.trim();
@@ -123,9 +116,16 @@ export class SubtaskManagementComponent {
             return;
         }
 
+        // Always emit to parent - parent decides TaskService vs local handling
         this.addSubtask.emit(input);
         this.subtaskInputControl().reset();
-        
+        this.focusAddInput();
+    }
+
+    /**
+     * Focuses the add input field
+     */
+    private focusAddInput(): void {
         setTimeout(() => {
             if (this.addInput) {
                 this.addInput.nativeElement.focus();
@@ -213,7 +213,7 @@ export class SubtaskManagementComponent {
     }
 
     /**
-     * Deletes specified subtask
+     * Deletes specified subtask - emits to parent for TaskService handling
      * @param id - Subtask ID to delete
      */
     onDelete(id: string): void {

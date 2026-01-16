@@ -2,15 +2,15 @@
   <div class="content-left">
     <div 
       class="add-btn" 
-      [class.disabled]="(isGuest$ | async)"
+      [class.disabled]="authService.isGuestUser()"
       (click)="addContact()"
-      [title]="(isGuest$ | async) ? 'Guests cannot add contacts. Please sign up for full access.' : 'Add new contact'">
+      [title]="authService.isGuestUser() ? 'Guests cannot add contacts. Please sign up for full access.' : 'Add new contact'">
       <span>Add new contact</span>
       <img src="assets/images/person_add.svg" alt="add" />
     </div>
 
     <div id="allContacts" class="all-contacts">
-      <ng-container *ngIf="grouped$ | async as groups; else loading">
+      <ng-container *ngIf="groupedContacts() as groups; else loading">
         <ng-container *ngIf="groups.length > 0; else noContacts">
           <ng-container *ngFor="let g of groups">
             <div class="capital">

@@ -5,16 +5,10 @@ import { ContactService } from '../../../core/services/contact.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { Contact } from '../../../core/models/contact.interface';
-import { Observable, BehaviorSubject } from 'rxjs';
 import { ContactDialogComponent } from '../contact-dialog/contact-dialog.component';
 
 /**
- * Grouped contacts by alphabetical letter
- */
-type Grouped = { letter: string; items: Contact[] }[];
-
-/**
- * Contacts list view with search, selection and CRUD operations
+ * Contacts list view with search, selection and CRUD operations using ContactService signals
  */
 @Component({
   selector: 'app-contacts-list',
@@ -25,13 +19,14 @@ type Grouped = { letter: string; items: Contact[] }[];
 })
 export class ContactsListComponent implements OnInit {
   private contactService = inject(ContactService);
-  private authService = inject(AuthService);
+  authService = inject(AuthService); // Made public for template access
   private toastService = inject(ToastService);
   private router = inject(Router);
 
-  contacts$ = new BehaviorSubject<Contact[]>([]);
-  grouped$ = new BehaviorSubject<Grouped>([]);
-  isGuest$ = this.authService.isGuestUser$();
+  // Use ContactService signals directly
+  contacts = this.contactService.contacts;
+  groupedContacts = this.contactService.contactsByInitial;
+  loading = this.contactService.loading;
 
   selected: Contact | null = null;
   showRight = true;
@@ -45,50 +40,14 @@ export class ContactsListComponent implements OnInit {
   contactToDelete: Contact | null = null;
 
   /**
-   * Component initialization - loads contacts and sets up responsive behavior
+   * Component initialization - loads contacts and sets up auto-selection
    */
   ngOnInit(): void {
-    this.load();
-    // this.checkAutoSelect(); // Deaktiviert: Kein Auto-Select beim Laden
+    // Load contacts from Firestore
+    this.contactService.loadContactsAsync();
     this.onResize();
-  }
-
-  /**
-   * Loads all contacts from service and groups them alphabetically
-   */
-  async load() {
-    console.log('🔄 Starting to load contacts...');
-    this.contactService.loadAll().subscribe({
-      next: (list) => {
-        console.log('✅ Contacts loaded:', list.length, 'contacts', list);
-        this.contacts$.next(list);
-        this.group(list);
-
-        console.log('📊 Contacts$ value:', this.contacts$.value);
-        console.log('📊 Grouped$ value:', this.grouped$.value);
-      },
-      error: (err) => {
-        console.error('❌ Error loading contacts:', err);
-        console.error('❌ Error details:', err.message, err.code);
-      }
-    });
-  }
-
-  /**
-   * Groups contacts by first letter of name
-   * @param list - Array of contacts to group
-   */
-  private group(list: Contact[]) {
-    const groupedRecord: Record<string, Contact[]> = {};
-    list.forEach(u => {
-      const name = `${u.firstName} ${u.lastName}`.trim();
-      const letter = (name[0] || '#').toUpperCase();
-      (groupedRecord[letter] ||= []).push(u);
-    });
-
-    const grouped: Grouped = Object.keys(groupedRecord).sort().map(l => ({ letter: l, items: groupedRecord[l] }));
-    console.log('📋 Grouped contacts:', grouped);
-    this.grouped$.next(grouped);
+    // Auto-select last edited contact after data loads
+    setTimeout(() => this.checkAutoSelect(), 100);
   }
 
   /**
@@ -156,7 +115,7 @@ export class ContactsListComponent implements OnInit {
           id: contactId
         };
 
-        await this.contactService.saveContact(newContact).toPromise();
+        await this.contactService.saveContact(newContact);
         console.log('✅ Contact added successfully');
         this.toastService.showSuccess(`Contact ${contact.firstName} ${contact.lastName} added successfully!`);
       } else if (contact.id) {
@@ -166,7 +125,7 @@ export class ContactsListComponent implements OnInit {
           firstName: contact.firstName,
           lastName: contact.lastName,
           phone: contact.phone
-        }).toPromise();
+        });
 
         if (isOwnProfile) {
           const displayName = `${contact.firstName} ${contact.lastName}`;
@@ -177,8 +136,6 @@ export class ContactsListComponent implements OnInit {
         console.log('✅ Contact updated successfully');
         this.toastService.showSuccess(`Contact ${contact.firstName} ${contact.lastName} updated successfully!`);
       }
-
-      this.load();
 
       this.closeDialog();
 
@@ -212,7 +169,7 @@ export class ContactsListComponent implements OnInit {
   }
 
   /**
-   * Confirms and executes contact deletion
+   * Confirms and executes contact deletion using ContactService signals
    */
   async confirmDelete() {
     if (!this.contactToDelete) return;
@@ -226,7 +183,7 @@ export class ContactsListComponent implements OnInit {
         throw new Error('Contact ID not found');
       }
 
-      await this.contactService.deleteUser(contact.id).toPromise();
+      await this.contactService.deleteUser(contact.id);
       console.log('✅ Contact deleted successfully');
       this.toastService.showSuccess(`Contact ${contact.firstName} ${contact.lastName} deleted successfully!`);
 
@@ -234,7 +191,7 @@ export class ContactsListComponent implements OnInit {
         this.clearSelection();
       }
 
-      this.load();
+      // ContactService will update signals automatically
       this.closeDialog();
     } catch (error) {
       console.error('❌ Error deleting contact:', error);
@@ -256,9 +213,8 @@ export class ContactsListComponent implements OnInit {
   checkAutoSelect() {
     const last = localStorage.getItem('lastEditedContact') || localStorage.getItem('selectedContactEmail');
     if (!last) return;
-    this.contactService.getByEmail(last).subscribe(c => {
-      if (c) this.selected = c;
-    });
+    const contact = this.contactService.findContactByEmail(last);
+    if (contact) this.selected = contact;
   }
 
   /**
