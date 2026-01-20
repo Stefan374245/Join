@@ -1,9 +1,11 @@
-import { Component, input, output, inject, effect } from '@angular/core';
+import { Component, input, output, inject, effect, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Task } from '../../../../core/models/task.interface';
+import { Task, TaskAttachment } from '../../../../core/models/task.interface';
 import { Contact } from '../../../../core/models/contact.interface';
 import { TaskService } from '../../../../core/services/task.service';
 import { ToastService } from '../../../../core/services/toast.service';
+import { AttachmentStorageService } from '../../../../core/services/attachment-storage.service';
+import { TaskAttachmentsDisplayComponent } from '../task-attachments-display/task-attachments-display.component';
 
 /**
  * Task detail overlay component for comprehensive task viewing and editing.
@@ -30,12 +32,12 @@ import { ToastService } from '../../../../core/services/toast.service';
 @Component({
   selector: 'app-task-detail',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TaskAttachmentsDisplayComponent],
   templateUrl: './task-detail.component.html',
   styleUrl: './task-detail.component.scss'
 })
 export class TaskDetailComponent {
-  task = input.required<Task>();
+  taskId = input.required<string>();
   contacts = input.required<Contact[]>();
   isVisible = input<boolean>(false);
   close = output<void>();
@@ -44,14 +46,23 @@ export class TaskDetailComponent {
 
   private taskService = inject(TaskService);
   private toastService = inject(ToastService);
+  private attachmentStorageService = inject(AttachmentStorageService);
   showDeleteConfirm: boolean = false;
   private lastToggleTime: number = 0;
+
+  // Computed signal that always reads latest task from TaskService
+  task = computed<Task | undefined>(() => {
+    const id = this.taskId();
+    return this.taskService.findTaskById(id);
+  });
 
   constructor() {
     // Monitor contact assignments for debugging in development
     effect(() => {
       const currentTask = this.task();
-      if (currentTask?.assignedTo?.length > 0 && this.contacts().length > 0) {
+      if (!currentTask) return;
+      
+      if (currentTask.assignedTo?.length > 0 && this.contacts().length > 0) {
         // Check if all assigned contacts exist (only in development)
         if (typeof window !== 'undefined' && !window.location.hostname.includes('localhost')) return;
         
@@ -91,7 +102,9 @@ export class TaskDetailComponent {
    * This triggers the transition from view mode to edit mode in the task management flow.
    */
   onEdit(): void {
-    this.edit.emit(this.task());
+    const currentTask = this.task();
+    if (!currentTask) return;
+    this.edit.emit(currentTask);
   }
 
   /**
@@ -118,8 +131,11 @@ export class TaskDetailComponent {
    * is handled by the parent component to maintain proper data flow.
    */
   confirmDelete(): void {
-    this.toastService.showTaskDeleted(this.task().title);
-    this.delete.emit(this.task().id);
+    const currentTask = this.task();
+    if (!currentTask) return;
+    
+    this.toastService.showTaskDeleted(currentTask.title);
+    this.delete.emit(currentTask.id);
     this.showDeleteConfirm = false;
     this.onClose();
   }
@@ -141,8 +157,8 @@ export class TaskDetailComponent {
     this.lastToggleTime = now;
 
     const currentTask = this.task();
-    if (!currentTask.subtasks) {
-      console.error('❌ Component: No subtasks found');
+    if (!currentTask || !currentTask.subtasks) {
+      console.error('❌ Component: No task or subtasks found');
       return;
     }
 
@@ -230,47 +246,89 @@ export class TaskDetailComponent {
     return d.toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '/');
   }
 
+  /**
+   * Deletes an attachment from Storage and Firestore
+   * @param attachment - The attachment to delete
+   */
+  async onDeleteAttachment(attachment: TaskAttachment): Promise<void> {
+    const currentTask = this.task();
+    if (!currentTask) return;
+
+    try {
+      // Delete from Firebase Storage if downloadURL exists
+      if (attachment.downloadURL) {
+        await this.attachmentStorageService.deleteAttachment(attachment.downloadURL);
+      }
+
+      // Remove from task in Firestore
+      await this.taskService.removeAttachment(currentTask.id, attachment.id);
+
+      this.toastService.showSuccess('Attachment deleted successfully');
+    } catch (error) {
+      console.error('Error deleting attachment:', error);
+      this.toastService.showError('Failed to delete attachment');
+    }
+  }
+
   getPriorityIcon(priority: string): string {
     return `assets/images/${priority.toLowerCase()}.svg`;
   }
 
   getCreatorIcon(): string {
-    if (this.task().creatorType === 'external' || this.task().source === 'email') {
+    const currentTask = this.task();
+    if (!currentTask) return 'assets/images/team.svg';
+    
+    if (currentTask.creatorType === 'external' || currentTask.source === 'email') {
       return 'assets/images/creator-external.svg';
     }
     return 'assets/images/team.svg';
   }
 
   getCreatorContentIcon(): string {
-    if (this.task().source === 'email' || this.task().creatorType === 'external') {
+    const currentTask = this.task();
+    if (!currentTask) return 'assets/images/creator-profil.svg';
+    
+    if (currentTask.source === 'email' || currentTask.creatorType === 'external') {
       return 'assets/images/card_email.svg';
     }
     return 'assets/images/creator-profil.svg';
   }
 
   getCreatorContentText(): string {
-    if (this.task().source === 'email' || this.task().creatorType === 'external') {
+    const currentTask = this.task();
+    if (!currentTask) return 'Profil';
+    
+    if (currentTask.source === 'email' || currentTask.creatorType === 'external') {
       return 'E-mail';
     }
     return 'Profil';
   }
 
   getCreatorContentClass(): string {
-    if (this.task().source === 'email' || this.task().creatorType === 'external') {
+    const currentTask = this.task();
+    if (!currentTask) return 'content-member';
+    
+    if (currentTask.source === 'email' || currentTask.creatorType === 'external') {
       return 'content-external';
     }
     return 'content-member';
   }
 
   getCreatorBadgeClass(): string {
-    if (this.task().creatorType === 'external' || this.task().source === 'email') {
+    const currentTask = this.task();
+    if (!currentTask) return 'badge-member';
+    
+    if (currentTask.creatorType === 'external' || currentTask.source === 'email') {
       return 'badge-external';
     }
     return 'badge-member';
   }
 
   getCreatorBadgeText(): string {
-    if (this.task().creatorType === 'external' || this.task().source === 'email') {
+    const currentTask = this.task();
+    if (!currentTask) return 'Member';
+    
+    if (currentTask.creatorType === 'external' || currentTask.source === 'email') {
       return 'Extern';
     }
     return 'Member';
@@ -278,6 +336,8 @@ export class TaskDetailComponent {
 
   getCreatorDisplayName(): string {
     const task = this.task();
+    if (!task) return 'Unknown';
+    
     const creatorName = task.creatorName;
     if (creatorName) {
       return creatorName;

@@ -92,7 +92,7 @@ export class BoardViewComponent implements OnInit, AfterViewInit, OnDestroy {
   loading = this.taskService.loading;
   allTasks = this.taskService.tasks;
 
-  selectedTask: Task | null = null;
+  selectedTaskId: string | null = null;
   showTaskDetail: boolean = false;
 
   taskToEdit: Task | null = null;
@@ -416,7 +416,7 @@ export class BoardViewComponent implements OnInit, AfterViewInit, OnDestroy {
    * @param task - The task object to display in the detail view
    */
   openTaskDetail(task: Task): void {
-    this.selectedTask = task;
+    this.selectedTaskId = task.id;
     this.showTaskDetail = true;
   }
 
@@ -429,7 +429,7 @@ export class BoardViewComponent implements OnInit, AfterViewInit, OnDestroy {
    */
   closeTaskDetail(): void {
     this.showTaskDetail = false;
-    this.selectedTask = null;
+    this.selectedTaskId = null;
   }
 
   /**

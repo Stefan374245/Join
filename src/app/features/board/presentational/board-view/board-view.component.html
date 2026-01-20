@@ -59,9 +59,9 @@
   </ng-container>
 </main>
 
-<div *ngIf="selectedTask" (clickOutside)="closeTaskDetail()">
+<div *ngIf="selectedTaskId" (clickOutside)="closeTaskDetail()">
   <app-task-detail
-    [task]="selectedTask"
+    [taskId]="selectedTaskId"
     [contacts]="contacts()"
     [isVisible]="showTaskDetail"
     (close)="closeTaskDetail()"
