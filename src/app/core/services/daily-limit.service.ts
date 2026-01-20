@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, Injector, runInInjectionContext } from '@angular/core';
 import { Firestore, doc, getDoc } from '@angular/fire/firestore';
 import { BehaviorSubject, Observable } from 'rxjs';
 
@@ -19,6 +19,7 @@ export interface DailyLimitInfo {
 })
 export class DailyLimitService {
   private firestore = inject(Firestore);
+  private injector = inject(Injector);
 
   private limitInfo$ = new BehaviorSubject<DailyLimitInfo>({
     currentCount: 0,
@@ -88,7 +89,10 @@ export class DailyLimitService {
   private async fetchCountFromFirestore(date: string): Promise<number> {
     const docId = `global_${date}`;
     const docRef = doc(this.firestore, 'daily_limits', docId);
-    const docSnap = await getDoc(docRef);
+    
+    const docSnap = await runInInjectionContext(this.injector, async () => {
+      return await getDoc(docRef);
+    });
 
     if (docSnap.exists()) {
       const data = docSnap.data();
