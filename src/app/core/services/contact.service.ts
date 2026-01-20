@@ -1,4 +1,4 @@
-import { Injectable, inject, signal, computed } from '@angular/core';
+import { Injectable, inject, signal, computed, Injector, runInInjectionContext } from '@angular/core';
 import { Firestore, collection, getDocs, doc, setDoc, deleteDoc, query, where } from '@angular/fire/firestore';
 import { Auth } from '@angular/fire/auth';
 import { Observable, from, combineLatest } from 'rxjs';
@@ -16,6 +16,7 @@ import { Contact } from '../models/contact.interface';
 export class ContactService {
   private firestore = inject(Firestore);
   private auth = inject(Auth);
+  private injector = inject(Injector);
 
   private contactsSignal = signal<Contact[]>([]);
   
@@ -72,8 +73,10 @@ export class ContactService {
     this.errorSignal.set(null);
 
     try {
-      const usersCol = collection(this.firestore, 'users');
-      const snapshot = await getDocs(usersCol);
+      const snapshot = await runInInjectionContext(this.injector, async () => {
+        const usersCol = collection(this.firestore, 'users');
+        return await getDocs(usersCol);
+      });
 
       const result: Contact[] = snapshot.docs.map((doc) => {
         const data = doc.data();

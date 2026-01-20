@@ -1,0 +1,43 @@
+<div class="attachments-display" *ngIf="attachments().length > 0">
+  <div class="attachments-grid">
+    <div 
+      class="attachment-card" 
+      *ngFor="let attachment of attachments()"
+      (click)="onAttachmentClick(attachment)"
+      (mouseenter)="setHoveredAttachment(attachment.id)"
+      (mouseleave)="setHoveredAttachment(null)"
+      [title]="attachment.filename"
+    >
+      <div class="attachment-preview">
+        <img 
+          [src]="getPreviewUrl(attachment)" 
+          [alt]="attachment.filename"
+          title="{{ attachment.filename }}"
+          class="attachment-image"
+        />
+        <button 
+          *ngIf="hoveredAttachment() === attachment.id"
+          class="delete-button"
+          (click)="onDeleteClick($event, attachment)"
+          (mouseenter)="setHoveredDeleteButton(attachment.id)"
+          (mouseleave)="setHoveredDeleteButton(null)"
+          title="Delete attachment"
+        >
+          <img 
+            [src]="getDeleteIcon(attachment.id)" 
+            alt="Delete"
+            class="delete-icon"
+          />
+        </button>
+      </div>
+      <div class="attachment-info">
+        <span class="attachment-filename" [title]="attachment.filename">
+          {{ attachment.filename }}
+        </span>
+        <span class="attachment-size">
+          {{ formatFileSize(attachment.size) }}
+        </span>
+      </div>
+    </div>
+  </div>
+</div>

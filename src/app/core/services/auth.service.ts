@@ -31,48 +31,33 @@ export interface SignupData {
 
 /**
  * Authentication service using Firebase Auth with Angular Signals
- * 
+ *
  * Provides user registration, login, logout and reactive state management
  */
 @Injectable({
   providedIn: "root",
 })
 export class AuthService {
-  /** Firebase Authentication instance */
   private auth = inject(Auth);
-  
-  /** Firestore database instance */
   private firestore = inject(Firestore);
-  
-  /** Angular Router instance */
   private router = inject(Router);
-
-  /** Private signal containing current Firebase User state */
   private userSignal = toSignal(authState(this.auth), { initialValue: null });
-
-  /** Public readonly signal exposing current user state */
   public readonly currentUserSignal = this.userSignal;
 
-  /** Observable version of user signal for backward compatibility */
   user$: Observable<User | null> = toObservable(this.userSignal);
 
-  /** Computed signal indicating whether user is authenticated */
   public readonly isAuthenticated = computed(() => this.userSignal() !== null);
 
-  /** Computed signal containing current user's display name */
   public readonly userDisplayName = computed(
     () => this.userSignal()?.displayName ?? null
   );
 
-  /** Computed signal containing current user's email address */
   public readonly userEmail = computed(() => this.userSignal()?.email ?? null);
 
-  /** Computed signal indicating whether current user is a guest */
   public readonly isGuestUser = computed(
     () => this.userSignal()?.email === "guest@join.com"
   );
 
-  /** Computed signal containing current user's unique identifier */
   public readonly userId = computed(() => this.userSignal()?.uid ?? null);
 
   /**
@@ -186,7 +171,7 @@ export class AuthService {
       data.email,
       data.password
     );
-    
+
     if (userCredential.user) {
       await updateProfile(userCredential.user, {
         displayName: data.name,
@@ -204,7 +189,11 @@ export class AuthService {
    * @returns Promise with user credentials
    */
   async login(email: string, password: string): Promise<UserCredential> {
-    const userCredential = await signInWithEmailAndPassword(this.auth, email, password);
+    const userCredential = await signInWithEmailAndPassword(
+      this.auth,
+      email,
+      password
+    );
     await this.ensureUserInFirestore(userCredential.user);
     return userCredential;
   }
@@ -236,7 +225,9 @@ export class AuthService {
           return await this.login(guestEmail, guestPassword);
         } catch (signupError: any) {
           if (signupError.code === "auth/email-already-in-use") {
-            console.error("❌ Guest account exists but wrong password. Please check credentials.");
+            console.error(
+              "❌ Guest account exists but wrong password. Please check credentials."
+            );
           }
           throw signupError;
         }

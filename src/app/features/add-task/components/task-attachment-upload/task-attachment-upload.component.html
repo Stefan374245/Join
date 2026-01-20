@@ -1,0 +1,94 @@
+<div class="attachment-upload">
+  <!-- Upload Zone -->
+  <div 
+    class="upload-zone"
+    [class.drag-over]="isDragOver()"
+    (dragover)="onDragOver($event)"
+    (dragleave)="onDragLeave($event)"
+    (drop)="onDrop($event)"
+  >
+    <div class="upload-content">
+      <svg class="upload-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 16V4M12 4L8 8M12 4L16 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M4 16V18C4 19.1046 4.89543 20 6 20H18C19.1046 20 20 19.1046 20 18V16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      
+      <p class="upload-text">
+        Drag & drop images here or
+        <label class="file-picker-label">
+          browse files
+          <input 
+            type="file" 
+            accept="image/jpeg,image/png,.jpg,.jpeg,.png"
+            multiple
+            (change)="onFileSelected($event)"
+            class="file-input"
+          />
+        </label>
+      </p>
+      
+      <p class="upload-hint">Allowed file types: JPEG and PNG (max 1MB)</p>
+    </div>
+  </div>
+
+  <!-- Error Message -->
+  @if (errorMessage()) {
+    <div class="error-message">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M8 14C11.3137 14 14 11.3137 14 8C14 4.68629 11.3137 2 8 2C4.68629 2 2 4.68629 2 8C2 11.3137 4.68629 14 8 14Z" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M8 5V8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        <circle cx="8" cy="11" r="0.5" fill="currentColor"/>
+      </svg>
+      {{ errorMessage() }}
+    </div>
+  }
+
+  <!-- Attachments Preview Grid -->
+  @if (attachments().length > 0) {
+    <div class="attachments-section">
+      <div class="attachments-header">
+        <span class="attachments-count">{{ attachments().length }} file(s) selected</span>
+        <button 
+          type="button"
+          class="delete-all-btn"
+          (click)="removeAllAttachments()"
+        >
+          Delete all
+        </button>
+      </div>
+
+      <div class="attachments-grid">
+        @for (attachment of attachments(); track attachment.id) {
+          <div class="attachment-item">
+            <img 
+              [src]="getPreviewUrl(attachment)" 
+              [alt]="attachment.filename"
+              class="attachment-thumbnail"
+              title="{{ attachment.filename }}"
+            />
+            
+            <button 
+              type="button"
+              class="remove-btn"
+              (click)="removeAttachment(attachment.id)"
+              title="Remove attachment"
+            >
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 4L4 12M4 4L12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </button>
+
+            <div class="attachment-info">
+              <span class="attachment-name" [title]="attachment.filename">
+                {{ attachment.filename }}
+              </span>
+              <span class="attachment-size">
+                {{ formatFileSize(attachment.size) }}
+              </span>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  }
+</div>

@@ -1,4 +1,4 @@
-import { Injectable, inject, signal, computed, effect } from '@angular/core';
+import { Injectable, inject, signal, computed, effect, Injector, runInInjectionContext } from '@angular/core';
 import {
   Firestore,
   collection,
@@ -18,7 +18,8 @@ import { Auth, authState } from '@angular/fire/auth';
 import { Observable, from, of, throwError } from 'rxjs';
 import { map, catchError, tap } from 'rxjs/operators';
 import { toSignal, toObservable } from '@angular/core/rxjs-interop';
-import { Task, Subtask } from '../models/task.interface';
+import { Task, Subtask, TaskAttachment } from '../models/task.interface';
+import { AttachmentStorageService } from './attachment-storage.service';
 
 /**
  * Signal-based task management service with real-time Firestore synchronization
@@ -30,6 +31,8 @@ import { Task, Subtask } from '../models/task.interface';
 export class TaskService {
   private firestore = inject(Firestore);
   private auth = inject(Auth);
+  private attachmentStorage = inject(AttachmentStorageService);
+  private injector = inject(Injector);
   private tasksSignal = signal<Task[]>([]);
   private loadingSignal = signal<boolean>(false);
   private errorSignal = signal<string | null>(null);
@@ -126,31 +129,33 @@ export class TaskService {
     this.loadingSignal.set(true);
 
     try {
-      const tasksCol = collection(this.firestore, 'tasks');
+      runInInjectionContext(this.injector, () => {
+        const tasksCol = collection(this.firestore, 'tasks');
+        
+        this.unsubscribe = onSnapshot(tasksCol,
+          (snapshot) => {
+            const tasks = snapshot.docs.map((doc) => {
+              const data = doc.data();
+              return this.mapFirestoreTask({ id: doc.id, ...data });
+            });
 
-      this.unsubscribe = onSnapshot(tasksCol,
-        (snapshot) => {
-          const tasks = snapshot.docs.map((doc) => {
-            const data = doc.data();
-            return this.mapFirestoreTask({ id: doc.id, ...data });
-          });
+            tasks.sort((a, b) => {
+              const dateA = (a as any).createdAt instanceof Date ? (a as any).createdAt.getTime() : 0;
+              const dateB = (b as any).createdAt instanceof Date ? (b as any).createdAt.getTime() : 0;
+              return dateB - dateA;
+            });
 
-          tasks.sort((a, b) => {
-            const dateA = (a as any).createdAt instanceof Date ? (a as any).createdAt.getTime() : 0;
-            const dateB = (b as any).createdAt instanceof Date ? (b as any).createdAt.getTime() : 0;
-            return dateB - dateA;
-          });
-
-          this.tasksSignal.set(tasks);
-          this.loadingSignal.set(false);
-          this.errorSignal.set(null);
-        },
-        (error) => {
-          this.errorSignal.set('Failed to load tasks');
-          this.loadingSignal.set(false);
-          this.tasksSignal.set([]);
-        }
-      );
+            this.tasksSignal.set(tasks);
+            this.loadingSignal.set(false);
+            this.errorSignal.set(null);
+          },
+          (error) => {
+            this.errorSignal.set('Failed to load tasks');
+            this.loadingSignal.set(false);
+            this.tasksSignal.set([]);
+          }
+        );
+      });
     } catch (error) {
       this.errorSignal.set('Failed to initialize tasks listener');
       this.loadingSignal.set(false);
@@ -205,6 +210,7 @@ export class TaskService {
       priority: data['priority'] || 'medium',
       status: status,
       subtasks: this.mapSubtasks(data['subtasks']),
+      attachments: this.mapAttachments(data['attachments']),
       createdAt: this.convertToDate(data['createdAt']),
       updatedAt: data['updatedAt'] ? this.convertToDate(data['updatedAt']) : undefined,
       source: data['source'] || undefined,
@@ -229,6 +235,27 @@ export class TaskService {
       id: st.id || `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       title: st.title || st.name || '',
       completed: st.completed === true
+    }));
+  }
+
+  /**
+   * Maps Firestore attachment data to TaskAttachment array
+   * @param attachments - Raw attachment data
+   * @returns Array of mapped attachments
+   */
+  private mapAttachments(attachments: any): TaskAttachment[] {
+    if (!attachments || !Array.isArray(attachments)) {
+      return [];
+    }
+
+    return attachments.map((att: any) => ({
+      id: att.id || '',
+      filename: att.filename || '',
+      fileType: att.fileType || 'image/jpeg',
+      base64: att.downloadURL || '',  // Use downloadURL as base64 fallback for display
+      size: att.size || 0,
+      uploadedAt: this.convertToDate(att.uploadedAt),
+      downloadURL: att.downloadURL || undefined
     }));
   }
 
@@ -350,6 +377,7 @@ export class TaskService {
       priority: task.priority,
       status: task.status,
       subtasks: this.prepareSubtasks(task.subtasks),
+      attachments: this.prepareAttachments(task.attachments || []),
       createdAt: task.createdAt ? this.convertToTimestamp(task.createdAt) : Timestamp.now(),
       updatedAt: Timestamp.now(),
       createdBy: this.auth.currentUser?.uid || 'anonymous',
@@ -365,7 +393,9 @@ export class TaskService {
       taskData.creatorEmail = task.creatorEmail;
     }
 
-    await setDoc(taskDoc, taskData);
+    await runInInjectionContext(this.injector, async () => {
+      await setDoc(taskDoc, taskData);
+    });
   }
 
   /**
@@ -386,6 +416,26 @@ export class TaskService {
   }
 
   /**
+   * Prepares attachments for Firestore storage
+   * @param attachments - Array of attachments
+   * @returns Array of Firestore-compatible attachment objects
+   */
+  private prepareAttachments(attachments: TaskAttachment[]): any[] {
+    if (!attachments || attachments.length === 0) {
+      return [];
+    }
+
+    return attachments.map(att => ({
+      id: att.id,
+      filename: att.filename,
+      fileType: att.fileType,
+      size: att.size,
+      uploadedAt: this.convertToTimestamp(att.uploadedAt),
+      downloadURL: att.downloadURL || null
+    }));
+  }
+
+  /**
    * Updates existing task in Firestore
    * @param taskId - The task ID
    * @param updates - The fields to update
@@ -393,6 +443,17 @@ export class TaskService {
    */
   async updateTask(taskId: string, updates: Partial<Task>): Promise<void> {
     const taskDoc = doc(this.firestore, 'tasks', taskId);
+
+    console.log('🔄 TaskService.updateTask() called:', {
+      taskId,
+      updates: {
+        title: updates.title,
+        category: updates.category,
+        priority: updates.priority,
+        assignedTo: updates.assignedTo,
+        attachmentsCount: updates.attachments?.length || 0
+      }
+    });
 
     const updateData: any = {
       ...updates,
@@ -407,7 +468,22 @@ export class TaskService {
       updateData.subtasks = this.prepareSubtasks(updates.subtasks);
     }
 
-    await updateDoc(taskDoc, updateData);
+    if (updates.attachments) {
+      updateData.attachments = this.prepareAttachments(updates.attachments);
+      console.log('📎 Prepared attachments for Firestore:', updateData.attachments);
+    }
+
+    console.log('💾 Sending to Firestore:', updateData);
+
+    try {
+      await runInInjectionContext(this.injector, async () => {
+        await updateDoc(taskDoc, updateData);
+      });
+      console.log('✅ Firestore update successful');
+    } catch (error) {
+      console.error('❌ Firestore update failed:', error);
+      throw error;
+    }
   }
 
   /**
@@ -514,6 +590,23 @@ export class TaskService {
   }
 
   /**
+   * Removes attachment from task
+   * @param taskId - The task ID
+   * @param attachmentId - The attachment ID to remove
+   * @returns Promise of the update operation
+   */
+  async removeAttachment(taskId: string, attachmentId: string): Promise<void> {
+    const task = this.findTaskById(taskId);
+
+    if (!task || !task.attachments) {
+      throw new Error('Task or attachments not found');
+    }
+
+    const updatedAttachments = task.attachments.filter(att => att.id !== attachmentId);
+    await this.updateTask(taskId, { attachments: updatedAttachments });
+  }
+
+  /**
    * Creates a new task with form data and user context
    * @param formData - Form values from task creation form
    * @param additionalData - Additional context data (userId, status, etc.)
@@ -527,11 +620,37 @@ export class TaskService {
       selectedContactIds: string[],
       selectedPriority: string,
       initialStatus: string,
-      subtasks: any[]
+      subtasks: any[],
+      attachments?: TaskAttachment[]
     }
   ): Promise<Task> {
+    const taskId = this.generateTaskId();
+    
+    console.log('📝 Creating task with attachments:', {
+      taskId,
+      hasAttachments: !!additionalData.attachments,
+      attachmentCount: additionalData.attachments?.length || 0
+    });
+    
+    // Upload attachments to Firebase Storage if present
+    let attachmentsWithURLs: TaskAttachment[] = [];
+    if (additionalData.attachments && additionalData.attachments.length > 0) {
+      console.log('⬆️  Uploading attachments...');
+      const downloadURLs = await this.attachmentStorage.uploadAttachments(
+        additionalData.attachments,
+        taskId
+      );
+      
+      console.log('✅ Upload complete, URLs:', downloadURLs);
+      
+      attachmentsWithURLs = additionalData.attachments.map((att, index) => ({
+        ...att,
+        downloadURL: downloadURLs[index]
+      }));
+    }
+    
     const newTask: Task = {
-      id: this.generateTaskId(),
+      id: taskId,
       title: formData.title,
       description: formData.description,
       category: additionalData.selectedCategory,
@@ -544,6 +663,7 @@ export class TaskService {
         title: st.title,
         completed: st.completed ?? false
       })),
+      attachments: attachmentsWithURLs,
       createdAt: new Date()
     };
 
@@ -565,12 +685,53 @@ export class TaskService {
       selectedCategory: string,
       selectedContactIds: string[],
       selectedPriority: string,
-      subtasks: any[]
+      subtasks: any[],
+      attachments?: TaskAttachment[]
     }
   ): Promise<Task> {
     const task = this.findTaskById(taskId);
     if (!task) {
       throw new Error('Task not found');
+    }
+
+    console.log('📝 Updating task with attachments:', {
+      taskId,
+      hasAttachments: !!additionalData.attachments,
+      attachmentCount: additionalData.attachments?.length || 0
+    });
+
+    // Separate old attachments (with downloadURL) and new attachments (without downloadURL)
+    let finalAttachments: TaskAttachment[] = [];
+    
+    if (additionalData.attachments && additionalData.attachments.length > 0) {
+      const oldAttachments = additionalData.attachments.filter(att => att.downloadURL);
+      const newAttachments = additionalData.attachments.filter(att => !att.downloadURL);
+      
+      console.log('📂 Attachments breakdown:', {
+        total: additionalData.attachments.length,
+        existing: oldAttachments.length,
+        new: newAttachments.length
+      });
+      
+      // Upload only new attachments
+      if (newAttachments.length > 0) {
+        console.log('⬆️  Uploading new attachments...');
+        const downloadURLs = await this.attachmentStorage.uploadAttachments(
+          newAttachments,
+          taskId
+        );
+        
+        console.log('✅ Upload complete, URLs:', downloadURLs);
+        
+        const newAttachmentsWithURLs = newAttachments.map((att, index) => ({
+          ...att,
+          downloadURL: downloadURLs[index]
+        }));
+        
+        finalAttachments = [...oldAttachments, ...newAttachmentsWithURLs];
+      } else {
+        finalAttachments = oldAttachments;
+      }
     }
 
     const updates: Partial<Task> = {
@@ -584,7 +745,8 @@ export class TaskService {
         id: st.id,
         title: st.title,
         completed: st.completed ?? false
-      }))
+      })),
+      attachments: finalAttachments
     };
 
     await this.updateTask(taskId, updates);
