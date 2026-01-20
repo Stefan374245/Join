@@ -19,8 +19,7 @@ export const routes: Routes = [
   { path: '', redirectTo: '/logo-animation', pathMatch: 'full' },
   {
     path: 'logo-animation',
-    component: LogoAnimationComponent,
-    canActivate: [guestGuard]
+    component: LogoAnimationComponent
   },
   {
     path: 'hero',
