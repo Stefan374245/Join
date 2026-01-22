@@ -1,16 +1,16 @@
-import { Injectable, inject, signal, computed, Injector, runInInjectionContext } from '@angular/core';
-import { Firestore, collection, getDocs, doc, setDoc, deleteDoc } from '@angular/fire/firestore';
-import { Auth } from '@angular/fire/auth';
-import { Observable, from } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Injectable, inject, signal, computed, Injector, runInInjectionContext, effect } from '@angular/core';
+import { Firestore, collection, getDocs, doc, setDoc, deleteDoc, Timestamp } from '@angular/fire/firestore';
+import { Auth, authState } from '@angular/fire/auth';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { Contact } from '../models/contact.interface';
 import { generateColorFromEmail } from './auth/color-generator.helper';
-import { fetchContactsFromFirestore, saveContactToFirestore, updateContactInFirestore } from './contacts/contact-firestore.helper';
+import { fetchContactsFromFirestore, saveContactToFirestore, updateContactInFirestore, setupContactsListener } from './contacts/contact-firestore.helper';
 import { mapFirestoreToContact, sortContactsByName, buildFullName } from './contacts/contact-mapper.helper';
 import { groupContactsByInitial } from './contacts/contact-grouping.helper';
 
 /**
- * Signal-based contact management service with Firestore synchronization
+ * Signal-based contact management service with real-time Firestore synchronization
+ * Follows same pattern as TaskService for consistency
  */
 @Injectable({
   providedIn: 'root'
@@ -19,11 +19,8 @@ export class ContactService {
   private firestore = inject(Firestore);
   private auth = inject(Auth);
   private injector = inject(Injector);
-
   private contactsSignal = signal<Contact[]>([]);
-  
   private loadingSignal = signal<boolean>(false);
-  
   private errorSignal = signal<string | null>(null);
 
   public readonly contacts = this.contactsSignal.asReadonly();
@@ -40,91 +37,44 @@ export class ContactService {
     groupContactsByInitial(this.sortedContacts())
   );
 
+  private unsubscribe: (() => void) | null = null;
+
   constructor() {
-    this.loadContactsAsync().catch(error => {
-      console.warn('❌ ContactService: Initial contact loading failed:', error);
+    const authStateSignal = toSignal(authState(this.auth), { initialValue: null });
+    
+    effect(() => {
+      const user = authStateSignal();
+      if (user) {
+        this.initializeContactsListener();
+      } else {
+        if (this.unsubscribe) {
+          this.unsubscribe();
+          this.unsubscribe = null;
+        }
+        this.contactsSignal.set([]);
+      }
     });
   }
 
   /**
-   * Loads all contacts from Firestore and updates signals
-   * @returns Promise with all contacts
+   * Initializes real-time Firestore listener for contact updates
    */
-  async loadContactsAsync(): Promise<Contact[]> {
-    this.setLoadingState(true);
-
-    try {
-      const contacts = await this.fetchAndMapContacts();
-      this.updateContactsSignal(contacts);
-      return contacts;
-    } catch (err) {
-      this.handleLoadError(err);
-      return [];
+  private initializeContactsListener(): void {
+    if (this.unsubscribe) {
+      this.unsubscribe();
     }
-  }
 
-  /**
-   * Sets loading state
-   * @param loading - Loading state
-   */
-  private setLoadingState(loading: boolean): void {
-    this.loadingSignal.set(loading);
-    if (loading) {
-      this.errorSignal.set(null);
-    }
-  }
+    this.loadingSignal.set(true);
 
-  /**
-   * Fetches and maps contacts from Firestore
-   * @returns Promise with mapped contacts
-   */
-  private async fetchAndMapContacts(): Promise<Contact[]> {
-    const snapshot = await runInInjectionContext(this.injector, async () => {
-      return await fetchContactsFromFirestore(this.firestore);
-    });
-
-    const contacts = snapshot.docs.map(doc => 
-      mapFirestoreToContact(doc.id, doc.data(), generateColorFromEmail)
+    this.unsubscribe = setupContactsListener(
+      this.firestore,
+      this.injector,
+      this.contactsSignal,
+      this.loadingSignal,
+      this.errorSignal,
+      (docId, data) => mapFirestoreToContact(docId, data, generateColorFromEmail),
+      sortContactsByName
     );
-
-    return sortContactsByName(contacts);
-  }
-
-  /**
-   * Updates contacts signal with new data
-   * @param contacts - Array of contacts
-   */
-  private updateContactsSignal(contacts: Contact[]): void {
-    this.contactsSignal.set(contacts);
-    this.loadingSignal.set(false);
-  }
-
-  /**
-   * Handles load error
-   * @param err - Error object
-   */
-  private handleLoadError(err: any): void {
-    console.error('❌ ContactService: Error loading contacts:', err);
-    this.errorSignal.set('Failed to load contacts');
-    this.loadingSignal.set(false);
-  }
-
-  /**
-   * Loads all contacts using Observable
-   * @returns Observable with all contacts
-   * @deprecated Use loadContactsAsync() or contacts signal instead
-   */
-  loadAll(): Observable<Contact[]> {
-    return from(this.loadContactsAsync());
-  }
-
-  /**
-   * Returns all contacts using Observable
-   * @returns Observable with all contacts
-   * @deprecated Use loadContactsAsync() or contacts signal instead
-   */
-  getContacts(): Observable<Contact[]> {
-    return from(this.loadContactsAsync());
   }
 
   /**
@@ -175,19 +125,6 @@ export class ContactService {
     );
   }
 
-
-
-  /**
-   * Finds contact by email using Observable
-   * @param email - The email address to search for
-   * @returns Observable with contact or null
-   */
-  getByEmail(email: string): Observable<Contact | null> {
-    return this.loadAll().pipe(
-      map(list => list.find(c => c.email === email) ?? null)
-    );
-  }
-
   /**
    * Saves new contact to Firestore
    * @param contact - The contact to save
@@ -204,44 +141,43 @@ export class ContactService {
       phone: contact.phone || '',
       color: contact.color,
       initials: contact.initials,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      createdAt: Timestamp.now(),
+      updatedAt: Timestamp.now()
     };
 
     await setDoc(userDoc, contactData);
-    // Refresh contacts after save
-    await this.loadContactsAsync();
+    // Real-time listener will update automatically
   }
 
   /**
    * Saves new user to Firestore
    * @param userId - The unique user ID
    * @param userData - The user data
-   * @returns Observable of the save operation
+   * @returns Promise of the save operation
    */
-  saveUser(userId: string, userData: { displayName: string; email: string; color?: string }): Observable<void> {
+  async saveUser(userId: string, userData: { displayName: string; email: string; color?: string }): Promise<void> {
     const userDoc = doc(this.firestore, 'users', userId);
     const color = userData.color || generateColorFromEmail(userData.email);
 
-    const promise = setDoc(userDoc, {
+    await setDoc(userDoc, {
       displayName: userData.displayName,
       email: userData.email,
       color: color,
-      createdAt: new Date().toISOString()
+      createdAt: Timestamp.now(),
+      updatedAt: Timestamp.now()
     });
-
-    return from(promise);
+    // Real-time listener will update automatically
   }
 
   /**
-   * Updates existing user in Firestore and local cache
+   * Updates existing user in Firestore
    * @param userId - The user ID
    * @param data - The data to update
    * @returns Promise of the update operation
    */
   async updateUser(userId: string, data: Partial<Contact>): Promise<void> {
     await updateContactInFirestore(this.firestore, userId, this.buildUpdateData(data));
-    await this.loadContactsAsync();
+    // Real-time listener will update automatically
   }
 
   /**
@@ -272,7 +208,7 @@ export class ContactService {
     
     await this.removeUserFromAllTasks(userId);
     await deleteDoc(userDoc);
-    await this.loadContactsAsync();
+    // Real-time listener will update automatically
   }
 
   /**
