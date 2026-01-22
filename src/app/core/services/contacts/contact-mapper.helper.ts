@@ -1,4 +1,5 @@
 import { Contact } from '../../models/contact.interface';
+import { convertToDate } from './contact-timestamp.helper';
 
 /**
  * Helper functions for contact data mapping
@@ -78,7 +79,9 @@ export function mapFirestoreToContact(
     email,
     phone: data['phone'] || '',
     color,
-    initials
+    initials,
+    createdAt: data['createdAt'] ? convertToDate(data['createdAt']) : undefined,
+    updatedAt: data['updatedAt'] ? convertToDate(data['updatedAt']) : undefined
   } as Contact;
 }
 
