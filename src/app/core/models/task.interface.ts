@@ -28,7 +28,7 @@ export interface Subtask {
 export interface TaskAttachment {
   id: string;
   filename: string;
-  fileType: 'image/jpeg' | 'image/png';
+  fileType: string;
   base64: string;
   size: number;
   uploadedAt: Date;
