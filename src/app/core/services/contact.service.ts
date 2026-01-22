@@ -1,11 +1,13 @@
 import { Injectable, inject, signal, computed, Injector, runInInjectionContext } from '@angular/core';
-import { Firestore, collection, getDocs, doc, setDoc, deleteDoc, query, where } from '@angular/fire/firestore';
+import { Firestore, collection, getDocs, doc, setDoc, deleteDoc } from '@angular/fire/firestore';
 import { Auth } from '@angular/fire/auth';
-import { Observable, from, combineLatest } from 'rxjs';
+import { Observable, from } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { toObservable } from '@angular/core/rxjs-interop';
-
 import { Contact } from '../models/contact.interface';
+import { generateColorFromEmail } from './auth/color-generator.helper';
+import { fetchContactsFromFirestore, saveContactToFirestore, updateContactInFirestore } from './contacts/contact-firestore.helper';
+import { mapFirestoreToContact, sortContactsByName, buildFullName } from './contacts/contact-mapper.helper';
+import { groupContactsByInitial } from './contacts/contact-grouping.helper';
 
 /**
  * Signal-based contact management service with Firestore synchronization
@@ -29,34 +31,14 @@ export class ContactService {
   public readonly error = this.errorSignal.asReadonly();
 
   public readonly sortedContacts = computed(() => 
-    [...this.contacts()].sort((a, b) =>
-      `${a.firstName} ${a.lastName}`.localeCompare(
-        `${b.firstName} ${b.lastName}`,
-        undefined,
-        { sensitivity: 'base' }
-      )
-    )
+    sortContactsByName(this.contacts())
   );
 
   public readonly contactCount = computed(() => this.contacts().length);
 
-  public readonly contactsByInitial = computed(() => {
-    const grouped = new Map<string, Contact[]>();
-    this.sortedContacts().forEach(contact => {
-      const initial = contact.firstName.charAt(0).toUpperCase();
-      if (!grouped.has(initial)) {
-        grouped.set(initial, []);
-      }
-      grouped.get(initial)!.push(contact);
-    });
-    
-    return Array.from(grouped.entries())
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([letter, contacts]) => ({
-        letter,
-        items: contacts
-      }));
-  });
+  public readonly contactsByInitial = computed(() => 
+    groupContactsByInitial(this.sortedContacts())
+  );
 
   constructor() {
     this.loadContactsAsync().catch(error => {
@@ -69,65 +51,62 @@ export class ContactService {
    * @returns Promise with all contacts
    */
   async loadContactsAsync(): Promise<Contact[]> {
-    this.loadingSignal.set(true);
-    this.errorSignal.set(null);
+    this.setLoadingState(true);
 
     try {
-      const snapshot = await runInInjectionContext(this.injector, async () => {
-        const usersCol = collection(this.firestore, 'users');
-        return await getDocs(usersCol);
-      });
-
-      const result: Contact[] = snapshot.docs.map((doc) => {
-        const data = doc.data();
-        const email = data['email'] || '';
-
-        let firstName = data['firstName'] || '';
-        let lastName = data['lastName'] || '';
-
-        if (!firstName && !lastName && data['displayName']) {
-          const nameParts = data['displayName'].split(' ');
-          firstName = nameParts[0] || '';
-          lastName = nameParts.slice(1).join(' ') || '';
-        }
-
-        const fullName = `${firstName} ${lastName}`.trim();
-
-        const initials = data['initials'] || (fullName
-          ? fullName.split(' ').map((s: string) => s[0]).slice(0, 2).join('').toUpperCase()
-          : email.substring(0, 2).toUpperCase());
-
-        const color = data['color'] || this.generateColorFromEmail(email);
-
-        return {
-          id: doc.id,
-          authUid: doc.id,
-          firstName: firstName,
-          lastName: lastName,
-          email: email,
-          phone: data['phone'] || '',
-          color: color,
-          initials: initials
-        } as Contact;
-      });
-
-      result.sort((a, b) =>
-        (a.firstName + ' ' + a.lastName).localeCompare(
-          b.firstName + ' ' + b.lastName,
-          undefined,
-          { sensitivity: 'base' }
-        )
-      );
-
-      this.contactsSignal.set(result);
-      this.loadingSignal.set(false);
-      return result;
+      const contacts = await this.fetchAndMapContacts();
+      this.updateContactsSignal(contacts);
+      return contacts;
     } catch (err) {
-      console.error('❌ ContactService: Error loading contacts:', err);
-      this.errorSignal.set('Failed to load contacts');
-      this.loadingSignal.set(false);
+      this.handleLoadError(err);
       return [];
     }
+  }
+
+  /**
+   * Sets loading state
+   * @param loading - Loading state
+   */
+  private setLoadingState(loading: boolean): void {
+    this.loadingSignal.set(loading);
+    if (loading) {
+      this.errorSignal.set(null);
+    }
+  }
+
+  /**
+   * Fetches and maps contacts from Firestore
+   * @returns Promise with mapped contacts
+   */
+  private async fetchAndMapContacts(): Promise<Contact[]> {
+    const snapshot = await runInInjectionContext(this.injector, async () => {
+      return await fetchContactsFromFirestore(this.firestore);
+    });
+
+    const contacts = snapshot.docs.map(doc => 
+      mapFirestoreToContact(doc.id, doc.data(), generateColorFromEmail)
+    );
+
+    return sortContactsByName(contacts);
+  }
+
+  /**
+   * Updates contacts signal with new data
+   * @param contacts - Array of contacts
+   */
+  private updateContactsSignal(contacts: Contact[]): void {
+    this.contactsSignal.set(contacts);
+    this.loadingSignal.set(false);
+  }
+
+  /**
+   * Handles load error
+   * @param err - Error object
+   */
+  private handleLoadError(err: any): void {
+    console.error('❌ ContactService: Error loading contacts:', err);
+    this.errorSignal.set('Failed to load contacts');
+    this.loadingSignal.set(false);
   }
 
   /**
@@ -196,22 +175,7 @@ export class ContactService {
     );
   }
 
-  /**
-   * Generates consistent color based on email address
-   * @param email - The email address
-   * @returns Hexadecimal color code
-   */
-  private generateColorFromEmail(email: string): string {
-    const colors = [
-      '#FF7A00', '#FF5EB3', '#6E52FF', '#9327FF', '#00BEE8',
-      '#1FD7C1', '#FF745E', '#FFA35E', '#FC71FF', '#FFC701',
-      '#0038FF', '#C3FF2B', '#FFE62B', '#FF4646', '#FFBB2B'
-    ];
 
-    const hash = email.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    const colorIndex = hash % colors.length;
-    return colors[colorIndex];
-  }
 
   /**
    * Finds contact by email using Observable
@@ -257,7 +221,7 @@ export class ContactService {
    */
   saveUser(userId: string, userData: { displayName: string; email: string; color?: string }): Observable<void> {
     const userDoc = doc(this.firestore, 'users', userId);
-    const color = userData.color || this.generateColorFromEmail(userData.email);
+    const color = userData.color || generateColorFromEmail(userData.email);
 
     const promise = setDoc(userDoc, {
       displayName: userData.displayName,
@@ -276,18 +240,26 @@ export class ContactService {
    * @returns Promise of the update operation
    */
   async updateUser(userId: string, data: Partial<Contact>): Promise<void> {
-    const userDoc = doc(this.firestore, 'users', userId);
-    const updateData: any = {
-      ...data,
-      updatedAt: new Date().toISOString()
-    };
+    await updateContactInFirestore(this.firestore, userId, this.buildUpdateData(data));
+    await this.loadContactsAsync();
+  }
+
+  /**
+   * Builds update data with displayName if names changed
+   * @param data - Partial contact data
+   * @returns Update data object
+   */
+  private buildUpdateData(data: Partial<Contact>): any {
+    const updateData: any = { ...data };
 
     if (data.firstName || data.lastName) {
-      updateData.displayName = `${data.firstName || ''} ${data.lastName || ''}`.trim();
+      updateData.displayName = buildFullName(
+        data.firstName || '',
+        data.lastName || ''
+      );
     }
 
-    await setDoc(userDoc, updateData, { merge: true });
-    await this.loadContactsAsync();
+    return updateData;
   }
 
   /**
