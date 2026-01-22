@@ -39,10 +39,10 @@ export class ContactDetailComponent implements OnInit {
   dialogMode: 'add' | 'edit' = 'edit';
 
   /**
-   * Component initialization - gets email from route and triggers ContactService loading
+   * Component initialization - gets email from route
+   * Note: Contact data loads automatically via real-time listener in ContactService
    */
   ngOnInit(): void {
-    this.contactService.loadContactsAsync();
     
     const email = this.route.snapshot.paramMap.get('email');
     if (email) {

@@ -19,11 +19,10 @@ import { ContactDialogComponent } from '../contact-dialog/contact-dialog.compone
 })
 export class ContactsListComponent implements OnInit {
   private contactService = inject(ContactService);
-  authService = inject(AuthService); // Made public for template access
+  authService = inject(AuthService);
   private toastService = inject(ToastService);
   private router = inject(Router);
 
-  // Use ContactService signals directly
   contacts = this.contactService.contacts;
   groupedContacts = this.contactService.contactsByInitial;
   loading = this.contactService.loading;
@@ -40,13 +39,11 @@ export class ContactsListComponent implements OnInit {
   contactToDelete: Contact | null = null;
 
   /**
-   * Component initialization - loads contacts and sets up auto-selection
+   * Component initialization - sets up auto-selection
+   * Note: Contacts load automatically via real-time listener in ContactService
    */
   ngOnInit(): void {
-    // Load contacts from Firestore
-    this.contactService.loadContactsAsync();
     this.onResize();
-    // Auto-select last edited contact after data loads
     setTimeout(() => this.checkAutoSelect(), 100);
   }
 
