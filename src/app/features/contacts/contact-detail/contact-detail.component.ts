@@ -24,18 +24,14 @@ export class ContactDetailComponent implements OnInit {
   private contactService = inject(ContactService);
   private authService = inject(AuthService);
   private toastService = inject(ToastService);
- 
-  // Signal for current email from route
-  private currentEmail = signal<string | null>(null);
+   private currentEmail = signal<string | null>(null);
   
-  // Computed contact from ContactService signals
   contact = computed(() => {
     const email = this.currentEmail();
     if (!email) return null;
     return this.contactService.findContactByEmail(email) || null;
   });
   
-  // Use ContactService loading state
   loading = this.contactService.loading;
   
   showActionMenu = false;
@@ -46,10 +42,8 @@ export class ContactDetailComponent implements OnInit {
    * Component initialization - gets email from route and triggers ContactService loading
    */
   ngOnInit(): void {
-    // Load contacts from Firestore  
     this.contactService.loadContactsAsync();
     
-    // Get email from route and set signal
     const email = this.route.snapshot.paramMap.get('email');
     if (email) {
       this.currentEmail.set(email);

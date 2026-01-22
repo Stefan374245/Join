@@ -14,6 +14,7 @@ import { AuthService } from '../../../../core/services/auth.service';
 import { ToastService } from '../../../../core/services/toast.service';
 import { Task, TaskAttachment } from '../../../../core/models/task.interface';
 import { Contact } from '../../../../core/models/contact.interface';
+import { ImageViewerComponent } from '../../../board/components/image-viewer/image-viewer.component';
 
 /**
  * Comprehensive task creation and editing component with form validation
@@ -29,7 +30,8 @@ import { Contact } from '../../../../core/models/contact.interface';
     DropdownComponent,
     BadgeListComponent,
     SubtaskManagementComponent,
-    TaskAttachmentUploadComponent
+    TaskAttachmentUploadComponent,
+    ImageViewerComponent
   ],
   templateUrl: './add-task-view.component.html',
   styleUrl: './add-task-view.component.scss'
@@ -63,6 +65,21 @@ export class AddTaskViewComponent implements OnInit, AfterViewInit {
   minDate = signal<string>(this.formatDateForInput(new Date()));
   formValid = signal<boolean>(false);
   formDirty = signal<boolean>(false); // Signal for dirty state
+
+  // Image Viewer state
+  selectedAttachment = signal<TaskAttachment | null>(null);
+  selectedAttachmentIndex = computed<number>(() => {
+    const attachment = this.selectedAttachment();
+    const currentAttachments = this.attachments();
+    
+    if (!attachment || !currentAttachments || currentAttachments.length === 0) {
+      return 0;
+    }
+    
+    const index = currentAttachments.findIndex(att => att.id === attachment.id);
+    return index >= 0 ? index : 0;
+  });
+  showImageViewer = computed<boolean>(() => this.selectedAttachment() !== null);
   
   readonly categories = ['Technical Task', 'User Story'];
   
@@ -600,5 +617,43 @@ export class AddTaskViewComponent implements OnInit, AfterViewInit {
     Object.keys(this.taskForm.controls).forEach(key => {
       this.taskForm.controls[key].markAsTouched();
     });
+  }
+
+  /**
+   * Opens image viewer with selected attachment (Edit Mode)
+   * @param attachment - The attachment to view
+   */
+  onViewAttachment(attachment: TaskAttachment): void {
+    this.selectedAttachment.set(attachment);
+  }
+
+  /**
+   * Deletes an attachment from the attachments array (Edit Mode)
+   * @param attachment - The attachment to delete
+   */
+  onDeleteAttachment(attachment: TaskAttachment): void {
+    this.attachments.update(atts => atts.filter(a => a.id !== attachment.id));
+    this.toastService.showSuccess('Attachment removed');
+    
+    // Close viewer if this was the viewed attachment
+    if (this.selectedAttachment()?.id === attachment.id) {
+      this.selectedAttachment.set(null);
+    }
+  }
+
+  /**
+   * Deletes all attachments (Edit Mode)
+   */
+  onDeleteAllAttachments(): void {
+    this.attachments.set([]);
+    this.selectedAttachment.set(null);
+    this.toastService.showSuccess('All attachments removed');
+  }
+
+  /**
+   * Closes the image viewer
+   */
+  onCloseImageViewer(): void {
+    this.selectedAttachment.set(null);
   }
 }

@@ -105,8 +105,11 @@
         >
           <span class="detail-label">Attachments</span>
           <app-task-attachments-display 
-            [attachments]="currentTask.attachments || []" 
-            (deleteAttachment)="onDeleteAttachment($event)"
+            [attachments]="currentTask.attachments || []"
+            [isEditMode]="false"
+            (viewAttachment)="onViewAttachment($event)"
+            (downloadAttachment)="onDownloadAttachment($event)"
+            (downloadAllAsZip)="onDownloadAllAttachmentsAsZip()"
           />
         </div>
 
@@ -167,3 +170,14 @@
     </div>
   </div>
 </div>
+
+<!-- Image Viewer -->
+@if (showImageViewer() && task()?.attachments && task()!.attachments!.length > 0) {
+  <app-image-viewer
+    [images]="task()!.attachments!"
+    [initialIndex]="selectedAttachmentIndex()"
+    [isEditMode]="false"
+    [taskTitle]="task()?.title || 'Untitled Task'"
+    (close)="onCloseImageViewer()"
+  />
+}

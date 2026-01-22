@@ -161,3 +161,15 @@
   </main>
   </article>
 </div>
+
+<!-- Image Viewer (Edit Mode with Delete) -->
+<app-image-viewer
+  *ngIf="showImageViewer() && attachments().length > 0"
+  [images]="attachments()"
+  [initialIndex]="selectedAttachmentIndex()"
+  [isEditMode]="true"
+  [taskTitle]="taskForm.get('title')?.value || 'New Task'"
+  (close)="onCloseImageViewer()"
+  (delete)="onDeleteAttachment($event)"
+  (deleteAll)="onDeleteAllAttachments()"
+/>

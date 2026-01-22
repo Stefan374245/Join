@@ -1,4 +1,4 @@
-import { Component, input, output, inject, effect, computed } from '@angular/core';
+import { Component, input, output, inject, effect, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Task, TaskAttachment } from '../../../../core/models/task.interface';
 import { Contact } from '../../../../core/models/contact.interface';
@@ -6,6 +6,7 @@ import { TaskService } from '../../../../core/services/task.service';
 import { ToastService } from '../../../../core/services/toast.service';
 import { AttachmentStorageService } from '../../../../core/services/attachment-storage.service';
 import { TaskAttachmentsDisplayComponent } from '../task-attachments-display/task-attachments-display.component';
+import { ImageViewerComponent } from '../image-viewer/image-viewer.component';
 
 /**
  * Task detail overlay component for comprehensive task viewing and editing.
@@ -32,7 +33,7 @@ import { TaskAttachmentsDisplayComponent } from '../task-attachments-display/tas
 @Component({
   selector: 'app-task-detail',
   standalone: true,
-  imports: [CommonModule, TaskAttachmentsDisplayComponent],
+  imports: [CommonModule, TaskAttachmentsDisplayComponent, ImageViewerComponent],
   templateUrl: './task-detail.component.html',
   styleUrl: './task-detail.component.scss'
 })
@@ -49,6 +50,25 @@ export class TaskDetailComponent {
   private attachmentStorageService = inject(AttachmentStorageService);
   showDeleteConfirm: boolean = false;
   private lastToggleTime: number = 0;
+
+  // Image Viewer state
+  selectedAttachment = signal<TaskAttachment | null>(null);
+  
+  // Computed: Get the index of selected attachment
+  selectedAttachmentIndex = computed<number>(() => {
+    const attachment = this.selectedAttachment();
+    const currentTask = this.task();
+    
+    if (!attachment || !currentTask?.attachments) {
+      return 0;
+    }
+    
+    const index = currentTask.attachments.findIndex(att => att.id === attachment.id);
+    return index >= 0 ? index : 0;
+  });
+
+  // Computed: Show image viewer when attachment is selected
+  showImageViewer = computed<boolean>(() => this.selectedAttachment() !== null);
 
   // Computed signal that always reads latest task from TaskService
   task = computed<Task | undefined>(() => {
@@ -249,25 +269,55 @@ export class TaskDetailComponent {
   /**
    * Deletes an attachment from Storage and Firestore
    * @param attachment - The attachment to delete
+   
+
+  /**
+   * Opens image viewer with selected attachment
+   * @param attachment - The attachment to view
    */
-  async onDeleteAttachment(attachment: TaskAttachment): Promise<void> {
+  onViewAttachment(attachment: TaskAttachment): void {
+    this.selectedAttachment.set(attachment);
+  }
+
+  /**
+   * Downloads a single attachment
+   * @param attachment - The attachment to download
+   */
+  async onDownloadAttachment(attachment: TaskAttachment): Promise<void> {
+    try {
+      await this.attachmentStorageService.downloadSingleAttachment(attachment);
+      this.toastService.showSuccess('Download started');
+    } catch (error) {
+      console.error('Error downloading attachment:', error);
+      this.toastService.showError('Failed to download attachment');
+    }
+  }
+
+  /**
+   * Downloads all attachments as ZIP
+   */
+  async onDownloadAllAttachmentsAsZip(): Promise<void> {
     const currentTask = this.task();
-    if (!currentTask) return;
+    if (!currentTask || !currentTask.attachments || currentTask.attachments.length === 0) {
+      this.toastService.showError('No attachments to download');
+      return;
+    }
 
     try {
-      // Delete from Firebase Storage if downloadURL exists
-      if (attachment.downloadURL) {
-        await this.attachmentStorageService.deleteAttachment(attachment.downloadURL);
-      }
-
-      // Remove from task in Firestore
-      await this.taskService.removeAttachment(currentTask.id, attachment.id);
-
-      this.toastService.showSuccess('Attachment deleted successfully');
+      const zipName = `${currentTask.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_attachments`;
+      await this.attachmentStorageService.downloadAllAsZip(currentTask.attachments, zipName);
+      this.toastService.showSuccess(`Downloading ${currentTask.attachments.length} attachments as ZIP`);
     } catch (error) {
-      console.error('Error deleting attachment:', error);
-      this.toastService.showError('Failed to delete attachment');
+      console.error('Error downloading all attachments:', error);
+      this.toastService.showError('Failed to download attachments');
     }
+  }
+
+  /**
+   * Closes the image viewer
+   */
+  onCloseImageViewer(): void {
+    this.selectedAttachment.set(null);
   }
 
   getPriorityIcon(priority: string): string {
