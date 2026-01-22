@@ -1,0 +1,169 @@
+<div class="image-viewer-wrapper" 
+     [class.fullscreen]="isFullscreen()" 
+     [class.contained]="!isFullscreen()">
+  
+  <!-- Backdrop -->
+  <div class="backdrop" (click)="closeViewer()"></div>
+  
+  <!-- Viewer Content -->
+  <div class="viewer-content" (click)="$event.stopPropagation()">
+    
+    <!-- Top Bar -->
+    <div class="top-bar">
+      <span class="image-info">
+        {{ currentImage().filename }} • 
+        {{ formatFileSize(currentImage().size) }} • 
+        {{ imageCounter() }}
+      </span>
+      <button class="close-btn" (click)="closeViewer()" title="Close (ESC)">
+        ×
+      </button>
+    </div>
+    
+    <!-- Image Container -->
+    <div class="image-container">
+      <div class="cube-wrapper" [class.animating]="animationDirection() !== null">
+        @for (idx of renderedIndices(); track idx) {
+          <img 
+            [src]="imageUrls()[idx]" 
+            [alt]="images()[idx].filename"
+            [class.current]="idx === currentIndex()"
+            [class.animating-out]="idx === currentIndex() && animationDirection() !== null"
+            [style.transform]="getImageTransform()"
+            (error)="onImageError($event)"
+            loading="lazy"
+          />
+        }
+        
+        @if (imageLoadError()) {
+          <div class="error-placeholder">
+            <p>Failed to load image</p>
+            <button (click)="imageLoadError.set(false)">Retry</button>
+          </div>
+        }
+      </div>
+      
+      <!-- Navigation Buttons -->
+      <button 
+        class="nav-btn prev" 
+        [disabled]="!hasPrevious()" 
+        (click)="navigatePrev()"
+        title="Previous (←)"
+      >
+        ‹
+      </button>
+      
+      <button 
+        class="nav-btn next" 
+        [disabled]="!hasNext()" 
+        (click)="navigateNext()"
+        title="Next (→)"
+      >
+        ›
+      </button>
+    </div>
+    
+    <!-- Bottom Bar -->
+    <div class="bottom-bar">
+      
+      <!-- Thumbnail Navigation -->
+      @if (images().length > 1) {
+        <div class="thumbnail-bar">
+          @for (img of images(); track img.id; let idx = $index) {
+            <button 
+              class="thumbnail" 
+              [class.active]="idx === currentIndex()"
+              (click)="jumpToImage(idx)"
+              [title]="img.filename"
+            >
+              <img 
+                [src]="getPreviewUrl(img)" 
+                [alt]="img.filename"
+              />
+            </button>
+          }
+        </div>
+      }
+      
+      <!-- Controls -->
+      <div class="controls">
+        
+        <!-- Zoom Controls -->
+        <div class="zoom-controls">
+          <button 
+            (click)="zoomOut()" 
+            [disabled]="zoomLevel() <= 0.5"
+            title="Zoom Out (-)"
+          >
+            −
+          </button>
+          <span class="zoom-level">{{ (zoomLevel() * 100).toFixed(0) }}%</span>
+          <button 
+            (click)="zoomIn()" 
+            [disabled]="zoomLevel() >= 4"
+            title="Zoom In (+)"
+          >
+            +
+          </button>
+        </div>
+        
+        <!-- Rotation -->
+        <button 
+          class="rotate-btn" 
+          (click)="rotate90()"
+          title="Rotate 90° (R)"
+        >
+          ↻
+        </button>
+        
+        <!-- Mode-Specific Actions -->
+        @if (isEditMode()) {
+          <!-- Edit Mode: Delete Buttons -->
+          <button 
+            class="delete-btn" 
+            (click)="delete.emit(currentImage())"
+            title="Delete this image"
+          >
+            🗑️ Delete This
+          </button>
+          
+          @if (images().length > 1) {
+            <button 
+              class="delete-all-btn" 
+              (click)="deleteAll.emit()"
+              title="Delete all attachments"
+            >
+              🗑️ Delete All
+            </button>
+          }
+        } @else {
+          <!-- View Mode: Download Options -->
+          <button 
+            class="download-btn" 
+            (mouseup)="toggleActionPopup($event)"
+            title="Download options"
+          >
+            <img src="assets/images/download.svg" alt="Download" />
+          </button>
+          
+          @if (showActionPopup()) {
+            <div 
+              class="action-popup" 
+              [style.left.px]="actionPopupPosition().x" 
+              [style.top.px]="actionPopupPosition().y"
+              (clickOutside)="showActionPopup.set(false)"
+            >
+              <button (click)="onDownloadSingle()">
+                📥 Download This Image
+              </button>
+              <button (click)="onDownloadAll()">
+                📦 Download All as ZIP ({{ images().length }})
+              </button>
+            </div>
+          }
+        }
+      </div>
+    </div>
+    
+  </div>
+</div>
