@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, computed } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { CommonModule } from '@angular/common';
@@ -16,7 +16,21 @@ export class HeaderComponent {
   private router = inject(Router);
 
   showUserMenu = false;
-  user$ = this.authService.user$;
+  
+  user = this.authService.currentUserSignal;
+  userDisplayName = this.authService.userDisplayName;
+  userEmail = this.authService.userEmail;
+  
+  userInitials = computed(() => {
+    const displayName = this.userDisplayName();
+    const email = this.userEmail();
+    return this.getUserInitials(displayName, email);
+  });
+  
+  userColor = computed(() => {
+    const email = this.userEmail();
+    return this.getUserColor(email);
+  });
 
   toggleUserMenu(): void {
     this.showUserMenu = !this.showUserMenu;
