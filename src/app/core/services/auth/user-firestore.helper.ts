@@ -1,4 +1,4 @@
-import { Firestore, doc, setDoc, getDoc } from '@angular/fire/firestore';
+import { Firestore, doc, setDoc, getDoc, Timestamp } from '@angular/fire/firestore';
 import { User } from '@angular/fire/auth';
 import { UserDocument } from '../../models/user.interface';
 import { generateColorFromEmail } from './color-generator.helper';
@@ -79,7 +79,6 @@ export async function ensureUserInFirestore(
       await saveUserToFirestore(firestore, user, displayName);
     }
   } catch (error) {
-    // Silent fail - user document creation is non-critical
   }
 }
 

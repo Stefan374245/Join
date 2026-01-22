@@ -1,3 +1,5 @@
+import { Timestamp } from '@angular/fire/firestore';
+
 /**
  * Helper functions for user profile data
  */
@@ -51,9 +53,9 @@ function extractInitialsFromEmail(email?: string): string {
 }
 
 /**
- * Creates current timestamp in ISO format
- * @returns ISO timestamp string
+ * Creates current Firestore Timestamp
+ * @returns Firestore Timestamp
  */
-export function getCurrentTimestamp(): string {
-  return new Date().toISOString();
+export function getCurrentTimestamp(): Timestamp {
+  return Timestamp.now();
 }
