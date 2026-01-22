@@ -118,10 +118,10 @@ export class BoardViewComponent implements OnInit, AfterViewInit, OnDestroy {
 
   /**
    * Angular lifecycle hook for component initialization.
-   * Loads tasks and contacts, then initializes auto-scroll functionality.
+   * Initializes auto-scroll functionality.
+   * Note: Contacts load automatically via real-time listener in ContactService
    */
   ngOnInit(): void {
-    this.contactService.loadContactsAsync();
     this.initAutoScroll();
   }
 
