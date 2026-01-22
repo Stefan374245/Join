@@ -2,6 +2,43 @@
   margin-top: 16px;
 }
 
+.attachments-header {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 12px;
+}
+
+.btn-download-all {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background-color: #2A3647;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 400;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  img {
+    width: 16px;
+    height: 16px;
+    filter: brightness(0) invert(1);
+  }
+
+  &:hover {
+    background-color: #29ABE2;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(41, 171, 226, 0.3);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
 .attachments-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
@@ -58,10 +95,38 @@
   &:hover {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   }
-
 }
 
 .delete-icon {
+  width: 20px;
+  height: 20px;
+  transition: all 0.2s ease;
+}
+
+.download-button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 0;
+  background-color: #FFFFFF;
+
+  &:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    transform: translateY(-50%) scale(1.1);
+  }
+}
+
+.download-icon {
   width: 20px;
   height: 20px;
   transition: all 0.2s ease;

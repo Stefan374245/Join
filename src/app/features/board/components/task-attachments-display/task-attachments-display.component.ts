@@ -15,11 +15,16 @@ import { TaskAttachment } from '../../../../core/models/task.interface';
 })
 export class TaskAttachmentsDisplayComponent {
   attachments = input<TaskAttachment[]>([]);
+  isEditMode = input<boolean>(false);
+  
   viewAttachment = output<TaskAttachment>();
   deleteAttachment = output<TaskAttachment>();
+  downloadAttachment = output<TaskAttachment>();
+  downloadAllAsZip = output<void>();
 
   hoveredAttachment = signal<string | null>(null);
   hoveredDeleteButton = signal<string | null>(null);
+  hoveredDownloadButton = signal<string | null>(null);
 
   /**
    * Get preview URL for attachment
@@ -76,5 +81,37 @@ export class TaskAttachmentsDisplayComponent {
     return this.hoveredDeleteButton() === attachmentId
       ? 'assets/images/delete-blue.svg'
       : 'assets/images/delete.svg';
+  }
+
+  /**
+   * Download attachment
+   */
+  onDownloadClick(event: Event, attachment: TaskAttachment): void {
+    event.stopPropagation();
+    this.downloadAttachment.emit(attachment);
+  }
+
+  /**
+   * Track which download button is hovered
+   */
+  setHoveredDownloadButton(id: string | null): void {
+    this.hoveredDownloadButton.set(id);
+  }
+
+  /**
+   * Get download icon path based on hover state
+   */
+  getDownloadIcon(attachmentId: string): string {
+    return this.hoveredDownloadButton() === attachmentId
+      ? 'assets/images/download-blue.svg'
+      : 'assets/images/download.svg';
+  }
+
+  /**
+   * Download all attachments as ZIP
+   */
+  onDownloadAllAsZip(event: Event): void {
+    event.stopPropagation();
+    this.downloadAllAsZip.emit();
   }
 }

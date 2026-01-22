@@ -1,4 +1,16 @@
 <div class="attachments-display" *ngIf="attachments().length > 0">
+  <!-- Header with Download All Button -->
+  <div class="attachments-header" *ngIf="!isEditMode() && attachments().length > 1">
+    <button 
+      class="btn-download-all"
+      (click)="onDownloadAllAsZip($event)"
+      title="Download all attachments as ZIP"
+    >
+      <img src="assets/images/download.svg" alt="Download" />
+      Download All as ZIP ({{ attachments().length }})
+    </button>
+  </div>
+
   <div class="attachments-grid">
     <div 
       class="attachment-card" 
@@ -15,8 +27,10 @@
           title="{{ attachment.filename }}"
           class="attachment-image"
         />
+        
+        <!-- Edit Mode: Delete Button -->
         <button 
-          *ngIf="hoveredAttachment() === attachment.id"
+          *ngIf="isEditMode() && hoveredAttachment() === attachment.id"
           class="delete-button"
           (click)="onDeleteClick($event, attachment)"
           (mouseenter)="setHoveredDeleteButton(attachment.id)"
@@ -27,6 +41,22 @@
             [src]="getDeleteIcon(attachment.id)" 
             alt="Delete"
             class="delete-icon"
+          />
+        </button>
+
+        <!-- View Mode: Download Button -->
+        <button 
+          *ngIf="!isEditMode() && hoveredAttachment() === attachment.id"
+          class="download-button"
+          (click)="onDownloadClick($event, attachment)"
+          (mouseenter)="setHoveredDownloadButton(attachment.id)"
+          (mouseleave)="setHoveredDownloadButton(null)"
+          title="Download attachment"
+        >
+          <img 
+            [src]="getDownloadIcon(attachment.id)" 
+            alt="Download"
+            class="download-icon"
           />
         </button>
       </div>
