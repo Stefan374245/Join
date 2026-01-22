@@ -7,4 +7,6 @@ export interface Contact {
   phone?: string;
   color: string;
   initials: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
