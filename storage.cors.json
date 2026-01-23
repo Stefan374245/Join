@@ -1,0 +1,15 @@
+[
+  {
+    "origin": [
+      "http://localhost:4200",
+      "http://localhost:5000",
+      "https://join-angular-based.web.app",
+      "https://join-angular-based.firebaseapp.com",
+      "https://stefan-helldobler.de",
+      "https://www.stefan-helldobler.de"
+    ],
+    "method": ["GET", "HEAD", "OPTIONS"],
+    "responseHeader": ["Content-Type", "Content-Length", "Content-Disposition"],
+    "maxAgeSeconds": 3600
+  }
+]
