@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -6,11 +6,12 @@ import { AuthService } from '../../core/services/auth.service';
 import { ToastComponent } from '../../shared/components/toast/toast.component';
 import { ToastService } from '../../core/services/toast.service';
 import { FooterAuthComponent } from '../../shared/components/footer-auth/footer-auth.component';
+import { LoadingSpinnerComponent } from '../../shared/components/loading-spinner/loading-spinner.component';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [RouterLink, FormsModule, CommonModule, ToastComponent, FooterAuthComponent],
+  imports: [RouterLink, FormsModule, CommonModule, ToastComponent, FooterAuthComponent, LoadingSpinnerComponent],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'
 })
@@ -23,6 +24,8 @@ export class LoginComponent implements OnInit {
   showPassword = false;
   showSuccessMessage = false;
   passwordFocused = false;
+  
+  isLoading = signal<boolean>(false);
 
   constructor(
     private authService: AuthService,
@@ -91,6 +94,7 @@ export class LoginComponent implements OnInit {
       return;
     }
 
+    this.isLoading.set(true);
     try {
       const userCredential = await this.authService.login(this.email, this.password);
       console.log('Login successful:', userCredential?.user);
@@ -106,10 +110,13 @@ export class LoginComponent implements OnInit {
       } else if (error.code === 'auth/too-many-requests') {
         this.loginFailError = true;
       }
+    } finally {
+      this.isLoading.set(false);
     }
   }
 
   async guestLogin(): Promise<void> {
+    this.isLoading.set(true);
     try {
       const userCredential = await this.authService.guestLogin();
       console.log('Guest login successful:', userCredential?.user);
@@ -117,12 +124,15 @@ export class LoginComponent implements OnInit {
     } catch (error: any) {
       console.error('Guest login error:', error);
       this.loginFailError = true;
+    } finally {
+      this.isLoading.set(false);
     }
   }
 
   async signInWithGoogle(): Promise<void> {
     this.loginFailError = false;
 
+    this.isLoading.set(true);
     try {
       const userCredential = await this.authService.signInWithGoogle();
       console.log('Google login successful:', userCredential?.user);
@@ -134,6 +144,8 @@ export class LoginComponent implements OnInit {
       if (error.code === 'auth/popup-closed-by-user') {
         this.loginFailError = false;
       }
+    } finally {
+      this.isLoading.set(false);
     }
   }
 

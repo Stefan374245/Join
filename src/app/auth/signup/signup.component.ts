@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -6,11 +6,12 @@ import { AuthService } from '../../core/services/auth.service';
 import { ToastService } from '../../core/services/toast.service';
 import { ToastComponent } from '../../shared/components/toast/toast.component';
 import { FooterAuthComponent } from '../../shared/components/footer-auth/footer-auth.component';
+import { LoadingSpinnerComponent } from '../../shared/components/loading-spinner/loading-spinner.component';
 
 @Component({
   selector: 'app-signup',
   standalone: true,
-  imports: [RouterLink, FormsModule, CommonModule, ToastComponent, FooterAuthComponent],
+  imports: [RouterLink, FormsModule, CommonModule, ToastComponent, FooterAuthComponent, LoadingSpinnerComponent],
   templateUrl: './signup.component.html',
   styleUrl: './signup.component.scss'
 })
@@ -27,6 +28,8 @@ export class SignupComponent implements OnInit {
   confirmPasswordError = false;
   privacyError = false;
   signupFailError = false;
+  
+  isLoading = signal<boolean>(false);
 
   showPassword = false;
   showConfirmPassword = false;
@@ -178,6 +181,7 @@ export class SignupComponent implements OnInit {
       password: this.password
     };
 
+    this.isLoading.set(true);
     try {
       const userCredential = await this.authService.signup(signupData);
       console.log('Signup successful:', userCredential?.user);
@@ -197,6 +201,8 @@ export class SignupComponent implements OnInit {
       } else {
         this.toastService.showToast('Signup failed. Please try again.');
       }
+    } finally {
+      this.isLoading.set(false);
     }
   }
 
