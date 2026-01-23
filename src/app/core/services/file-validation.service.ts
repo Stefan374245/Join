@@ -12,7 +12,6 @@ export class FileValidationService {
   private readonly ALLOWED_TYPES = ['image/jpeg', 'image/png'] as const;
   private readonly ALLOWED_EXTENSIONS = ['.jpg', '.jpeg', '.png'] as const;
 
-  // Magic bytes for file type validation (security against renamed files)
   private readonly MAGIC_BYTES = {
     jpeg: [0xFF, 0xD8, 0xFF],
     png: [0x89, 0x50, 0x4E, 0x47]

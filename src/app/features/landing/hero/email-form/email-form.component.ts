@@ -114,7 +114,7 @@ export class EmailFormComponent implements OnInit {
       this.requestType = 'feature';
 
       setTimeout(() => {
-        this.router.navigate(['/request/stakeholder']);
+        this.router.navigate(['/login']);
       }, 2000);
 
     } catch (error: any) {
