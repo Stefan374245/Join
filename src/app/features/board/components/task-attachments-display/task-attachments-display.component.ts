@@ -25,6 +25,7 @@ export class TaskAttachmentsDisplayComponent {
   hoveredAttachment = signal<string | null>(null);
   hoveredDeleteButton = signal<string | null>(null);
   hoveredDownloadButton = signal<string | null>(null);
+  imageLoadingStates = signal<Map<string, boolean>>(new Map());
 
   /**
    * Get preview URL for attachment
@@ -113,5 +114,30 @@ export class TaskAttachmentsDisplayComponent {
   onDownloadAllAsZip(event: Event): void {
     event.stopPropagation();
     this.downloadAllAsZip.emit();
+  }
+
+  /**
+   * Check if image is loading
+   */
+  isImageLoading(attachmentId: string): boolean {
+    return this.imageLoadingStates().get(attachmentId) ?? true;
+  }
+
+  /**
+   * Handle image load start
+   */
+  onImageLoadStart(attachmentId: string): void {
+    const states = new Map(this.imageLoadingStates());
+    states.set(attachmentId, true);
+    this.imageLoadingStates.set(states);
+  }
+
+  /**
+   * Handle image load complete
+   */
+  onImageLoaded(attachmentId: string): void {
+    const states = new Map(this.imageLoadingStates());
+    states.set(attachmentId, false);
+    this.imageLoadingStates.set(states);
   }
 }

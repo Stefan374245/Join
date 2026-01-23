@@ -21,11 +21,19 @@
       [title]="attachment.filename"
     >
       <div class="attachment-preview">
+        <!-- Loading Spinner -->
+        <div class="loading-spinner" *ngIf="isImageLoading(attachment.id)">
+          <div class="spinner"></div>
+        </div>
+        
         <img 
           [src]="getPreviewUrl(attachment)" 
           [alt]="attachment.filename"
           title="{{ attachment.filename }}"
           class="attachment-image"
+          [class.loading]="isImageLoading(attachment.id)"
+          (load)="onImageLoaded(attachment.id)"
+          (loadstart)="onImageLoadStart(attachment.id)"
         />
         
         <!-- Edit Mode: Delete Button -->
