@@ -7,6 +7,7 @@ import { ToastService } from '../../../core/services/toast.service';
 import { Contact } from '../../../core/models/contact.interface';
 import { ContactDialogComponent } from '../contact-dialog/contact-dialog.component';
 import { ClickOutsideDirective } from '../../../shared/directives/click-outside.directive';
+import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
 
 /**
  * Contact detail view component with edit/delete actions
@@ -14,7 +15,7 @@ import { ClickOutsideDirective } from '../../../shared/directives/click-outside.
 @Component({
   selector: 'app-contact-detail',
   standalone: true,
-  imports: [CommonModule, ContactDialogComponent, ClickOutsideDirective],
+  imports: [CommonModule, ContactDialogComponent, ClickOutsideDirective, LoadingSpinnerComponent],
   templateUrl: './contact-detail.component.html',
   styleUrl: './contact-detail.component.scss'
 })
@@ -24,7 +25,7 @@ export class ContactDetailComponent implements OnInit {
   private contactService = inject(ContactService);
   private authService = inject(AuthService);
   private toastService = inject(ToastService);
-   private currentEmail = signal<string | null>(null);
+  private currentEmail = signal<string | null>(null);
   
   contact = computed(() => {
     const email = this.currentEmail();
@@ -33,6 +34,8 @@ export class ContactDetailComponent implements OnInit {
   });
   
   loading = this.contactService.loading;
+  isDeleting = signal<boolean>(false);
+  isUpdating = signal<boolean>(false);
   
   showActionMenu = false;
   showDialog = false;
@@ -101,6 +104,7 @@ export class ContactDetailComponent implements OnInit {
     if (!currentContact?.id) return;
 
     if (confirm(`Delete contact ${currentContact.firstName} ${currentContact.lastName}?`)) {
+      this.isDeleting.set(true);
       try {
         await this.contactService.deleteUser(currentContact.id);
         this.toastService.showSuccess(`Contact ${currentContact.firstName} ${currentContact.lastName} deleted successfully!`);
@@ -108,6 +112,8 @@ export class ContactDetailComponent implements OnInit {
       } catch (error) {
         console.error('Error deleting contact:', error);
         this.toastService.showError('Failed to delete contact. Please try again.');
+      } finally {
+        this.isDeleting.set(false);
       }
     }
     this.showActionMenu = false;
@@ -127,6 +133,7 @@ export class ContactDetailComponent implements OnInit {
   async saveContact(updatedContact: Contact) {
     if (!updatedContact.id) return;
 
+    this.isUpdating.set(true);
     try {
       await this.contactService.updateUser(updatedContact.id, {
         firstName: updatedContact.firstName,
@@ -139,6 +146,8 @@ export class ContactDetailComponent implements OnInit {
     } catch (error) {
       console.error('Error updating contact:', error);
       this.toastService.showError('Failed to update contact. Please try again.');
+    } finally {
+      this.isUpdating.set(false);
     }
   }
 

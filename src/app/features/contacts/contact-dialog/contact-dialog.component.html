@@ -1,4 +1,7 @@
 <div class="dialog-overlay" (click)="onClose()">
+  <!-- Loading Spinner -->
+  <app-loading-spinner [localLoading]="isSubmitting()" />
+
   <div class="dialog-container" (click)="$event.stopPropagation()">
     <button class="close-btn" (click)="onClose()" type="button">
       <img src="assets/images/closeWhite.svg" alt="Close" />
@@ -122,7 +125,7 @@
             <button
               type="submit"
               class="btn btn-primary"
-              [disabled]="!isFormValid || isSubmitting">
+              [disabled]="!isFormValid || isSubmitting()">
               {{ submitButtonText }}
               <img src="assets/images/check.svg" alt="Submit" class="btn-icon" />
             </button>

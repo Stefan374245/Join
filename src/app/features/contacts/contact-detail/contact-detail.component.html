@@ -1,3 +1,6 @@
+<!-- Loading Spinner for Delete/Update Operations -->
+<app-loading-spinner [localLoading]="isDeleting() || isUpdating()" />
+
 <div class="contact-detail-page" *ngIf="contact() && !loading()">
   <div class="detail-header">
     <h1>Contacts</h1>

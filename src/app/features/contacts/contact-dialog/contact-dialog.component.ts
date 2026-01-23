@@ -1,10 +1,11 @@
-import { Component, inject, Output, EventEmitter, Input, OnInit } from '@angular/core';
+import { Component, inject, Output, EventEmitter, Input, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ContactService } from '../../../core/services/contact.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { Contact } from '../../../core/models/contact.interface';
+import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
 
 /**
  * Modal dialog for adding/editing contacts with form validation
@@ -12,7 +13,7 @@ import { Contact } from '../../../core/models/contact.interface';
 @Component({
   selector: 'app-contact-dialog',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, LoadingSpinnerComponent],
   templateUrl: './contact-dialog.component.html',
   styleUrl: './contact-dialog.component.scss'
 })
@@ -29,7 +30,7 @@ export class ContactDialogComponent implements OnInit {
   private toastService = inject(ToastService);
 
   contactForm!: FormGroup;
-  isSubmitting = false;
+  isSubmitting = signal<boolean>(false);
   errorMessage = '';
 
   /**
@@ -138,14 +139,14 @@ export class ContactDialogComponent implements OnInit {
    * Handles form submission for add/edit operations
    */
   async onSubmit(): Promise<void> {
-    if (!this.isFormValid || this.isSubmitting) return;
+    if (!this.isFormValid || this.isSubmitting()) return;
 
     if (this.authService.isGuestUser()) {
       this.toastService.showGuestCannotAddContacts();
       return;
     }
 
-    this.isSubmitting = true;
+    this.isSubmitting.set(true);
     this.errorMessage = '';
 
     try {
@@ -184,7 +185,8 @@ export class ContactDialogComponent implements OnInit {
     } catch (error: any) {
       console.error('Error saving contact:', error);
       this.errorMessage = error.message || 'Failed to save contact';
-      this.isSubmitting = false;
+    } finally {
+      this.isSubmitting.set(false);
     }
   }
 
