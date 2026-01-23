@@ -22,6 +22,11 @@
     
     <!-- Image Container -->
     <div class="image-container">
+      <!-- Loading Spinner -->
+      <div class="loading-spinner" *ngIf="isImageLoading(currentIndex())">
+        <div class="spinner"></div>
+      </div>
+      
       <div class="cube-wrapper" [class.animating]="animationDirection() !== null">
         @for (idx of renderedIndices(); track idx) {
           <img 
@@ -29,8 +34,11 @@
             [alt]="images()[idx].filename"
             [class.current]="idx === currentIndex()"
             [class.animating-out]="idx === currentIndex() && animationDirection() !== null"
+            [class.loading]="isImageLoading(idx)"
             [style.transform]="getImageTransform()"
             (error)="onImageError($event)"
+            (load)="onImageLoaded(idx)"
+            (loadstart)="onImageLoadStart(idx)"
             loading="lazy"
           />
         }

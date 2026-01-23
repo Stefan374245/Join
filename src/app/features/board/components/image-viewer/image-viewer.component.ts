@@ -72,6 +72,7 @@ export class ImageViewerComponent {
   actionPopupPosition = signal<{x: number, y: number}>({x: 0, y: 0});
   animationDirection = signal<'next' | 'prev' | null>(null);
   imageLoadError = signal<boolean>(false);
+  imageLoadingStates = signal<Map<number, boolean>>(new Map());
 
   // ============================================
   // COMPUTED VALUES
@@ -195,6 +196,31 @@ export class ImageViewerComponent {
     }
     
     return `data:${attachment.fileType};base64,${attachment.base64}`;
+  }
+
+  /**
+   * Check if image is loading
+   */
+  isImageLoading(index: number): boolean {
+    return this.imageLoadingStates().get(index) ?? true;
+  }
+
+  /**
+   * Handle image load start
+   */
+  onImageLoadStart(index: number): void {
+    const states = new Map(this.imageLoadingStates());
+    states.set(index, true);
+    this.imageLoadingStates.set(states);
+  }
+
+  /**
+   * Handle image load complete
+   */
+  onImageLoaded(index: number): void {
+    const states = new Map(this.imageLoadingStates());
+    states.set(index, false);
+    this.imageLoadingStates.set(states);
   }
 
   /**
