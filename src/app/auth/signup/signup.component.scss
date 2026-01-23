@@ -3,37 +3,47 @@
 @import "../../../styles/components/buttons";
 
 .main-div {
-  @include flex(column, center, center);
+  @include flex(column, flex-start, center);
+  flex-direction: column;
   position: relative;
   opacity: 0;
   transition: opacity 0.5s;
   width: 100vw;
-  height: 100vh;
-  min-height: 630px;
+  min-height: 100vh;
   background-color: #f6f7f8;
+  padding: clamp(2.5rem, 5vh, 5rem) clamp(1.5rem, 3vw, 3rem) 2rem;
+  gap: clamp(1.5rem, 3vh, 2.5rem);
+  overflow-y: auto;
+  overflow-x: hidden;
 
   &.show {
     opacity: 1;
   }
+  
+  @media (max-width: $breakpoint-md) {
+    padding: 2.5rem 1.5rem 2rem;
+    gap: 1.5rem;
+  }
 }
 
 .logo {
-  position: absolute;
-  top: 80px;
-  left: 80px;
-  height: 6.25rem;
+  position: static;
+  height: clamp(4rem, 8vw, 6.25rem);
   width: auto;
-  z-index: 10;
+  align-self: flex-start;
+  flex-shrink: 0;
 
   @media (max-width: $breakpoint-md) {
-    top: 38px;
-    left: 38px;
     height: 4rem;
   }
 }
 
 .main-content {
-  margin: 50px;
+  width: 100%;
+  max-width: 39.375rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .signup-div {
