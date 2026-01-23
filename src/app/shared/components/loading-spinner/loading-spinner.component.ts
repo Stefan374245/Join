@@ -1,17 +1,18 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LoadingService } from '../../../core/services/loading.service';
 
 /**
- * Global loading spinner component
+ * Global and local loading spinner component
  * Displays loading overlay when any operation is in progress
+ * Can work with global LoadingService or local loading signal
  */
 @Component({
   selector: 'app-loading-spinner',
   standalone: true,
   imports: [CommonModule],
   template: `
-    @if (loadingService.loading()) {
+    @if (isLoading()) {
       <div class="global-loading-overlay">
         <div class="loading-spinner">
           <img src="assets/images/loading.svg" alt="Loading..." />
@@ -24,5 +25,14 @@ import { LoadingService } from '../../../core/services/loading.service';
 export class LoadingSpinnerComponent {
   /** Inject global loading service */
   loadingService = inject(LoadingService);
+  
+  /** Optional local loading state - if provided, uses this instead of global */
+  localLoading = input<boolean | undefined>(undefined);
+  
+  /** Computed: Use local loading if provided, otherwise global */
+  isLoading = computed(() => {
+    const local = this.localLoading();
+    return local !== undefined ? local : this.loadingService.loading();
+  });
 }
 
