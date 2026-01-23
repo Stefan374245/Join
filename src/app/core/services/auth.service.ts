@@ -12,10 +12,8 @@ import {
   authState,
 } from "@angular/fire/auth";
 import { Firestore } from "@angular/fire/firestore";
-import { Observable } from "rxjs";
-import { map } from "rxjs/operators";
 import { Router } from "@angular/router";
-import { toSignal, toObservable } from "@angular/core/rxjs-interop";
+import { toSignal } from "@angular/core/rxjs-interop";
 import { saveUserToFirestore, ensureUserInFirestore } from './auth/user-firestore.helper';
 import { GUEST_CREDENTIALS, isUserNotFoundError, isEmailInUseError, logGuestCreation, logGuestSuccess, logGuestError } from './auth/guest-login.helper';
 
@@ -51,7 +49,6 @@ export class AuthService {
   public readonly isGuestUser = computed(() => this.userSignal()?.email === "guest@join.com");
   public readonly userId = computed(() => this.userSignal()?.uid ?? null);
 
-  user$: Observable<User | null> = toObservable(this.userSignal);
   /**
    * Gets currently authenticated user from Firebase Auth (Legacy support)
    * @returns Current Firebase User object or null
@@ -246,15 +243,6 @@ export class AuthService {
    */
   isGuestUserLegacy(): boolean {
     return this.auth.currentUser?.email === "guest@join.com";
-  }
-
-  /**
-   * Returns Observable that checks if user is guest
-   * @returns Observable with guest status
-   * @deprecated Use isGuestUser signal instead
-   */
-  isGuestUser$(): Observable<boolean> {
-    return this.user$.pipe(map((user) => user?.email === "guest@join.com"));
   }
 
   /**
