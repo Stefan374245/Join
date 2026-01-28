@@ -44,6 +44,12 @@ Thumbs.db
 # Environment variables
 .env
 .env.local
+.env.*.local
+.environments.*
+
+# Ignore all environment files (ganzer Ordner)
+src/environments/
+
 
 # Firebase environment files with real credentials
 # Use environment.ts and environment.prod.ts with mock data

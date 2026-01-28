@@ -1,0 +1,417 @@
+{
+  "name": "Email to Kanban Task Converter with AI Analysis",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "feature-request",
+        "options": {
+          "responseData": "{\"success\": true, \"message\": \"Request received\"}"
+        }
+      },
+      "id": "65779ddf-83ec-4480-ba1b-8869c2484b2f",
+      "name": "Request Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1600,
+        416
+      ],
+      "webhookId": "46a1281c-c0cf-43ac-ad5c-ab19d61f0c8d"
+    },
+    {
+      "parameters": {
+        "jsCode": "// @ts-nocheck\nconst self = this;\n\nreturn (async () => {\n  const items = $input.all();\n\n  const parsedData = items.find(item => item.json.isValid);\n  if (!parsedData?.json) {\n    throw new Error('No valid parsed email data found.');\n  }\n\n  const input = parsedData.json;\n  const webhookData = items.find(item => item.json.emailUid);\n  const emailUid = webhookData?.json?.emailUid || 'unknown';\n\n  console.log('📊 ===== CHECK DAILY LIMIT (GLOBAL) START =====');\n\n  const projectId = 'join-angular-based';\n  const baseUrl = `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents`;\n\n  // === GLOBALER COUNT (nicht pro User!) ===\n  const today = new Date().toISOString().split('T')[0];\n  const docId = `global_${today}`;  // ← GEÄNDERT: global statt email-basiert\n  const limitDocPath = `daily_limits/${docId}`;\n\n  console.log('📂 Document Path:', limitDocPath);\n\n  let currentCount = 0;\n  const maxDaily = 10;\n\n  try {\n    const getUrl = `${baseUrl}/${limitDocPath}`;\n    const getResponse = await self.helpers.httpRequest({\n      method: 'GET',\n      url: getUrl,\n      headers: { 'Content-Type': 'application/json' },\n      returnFullResponse: true,\n      ignoreHttpStatusErrors: true\n    });\n\n    if (getResponse.statusCode === 200) {\n      const doc = getResponse.body;\n      currentCount = parseInt(doc.fields?.count?.integerValue || '0');\n      console.log('✅ Current GLOBAL count:', currentCount);\n    } else if (getResponse.statusCode === 404) {\n      console.log('📝 No document yet, starting at 0');\n    }\n\n    const newCount = currentCount + 1;\n    console.log(`📊 Count: ${currentCount} → ${newCount} / ${maxDaily}`);\n\n    const limitExceeded = newCount > maxDaily;\n\n    if (limitExceeded) {\n      console.log('❌ GLOBAL LIMIT EXCEEDED!');\n      return {\n        json: {\n          ...input,\n          emailUid: emailUid,\n          limitExceeded: true,\n          currentCount: currentCount,\n          dailyLimit: maxDaily,\n          remainingRequests: 0,\n          message: `Daily limit of ${maxDaily} requests exceeded.`\n        }\n      };\n    }\n\n    // Count hochzählen\n    const updateBody = {\n      fields: {\n        date: { stringValue: today },\n        count: { integerValue: String(newCount) },\n        lastUpdated: { timestampValue: new Date().toISOString() },\n        lastRequestTitle: { stringValue: String(input.title || 'untitled').substring(0, 100) }\n      }\n    };\n\n    const patchResponse = await self.helpers.httpRequest({\n      method: 'PATCH',\n      url: getUrl,\n      headers: { 'Content-Type': 'application/json' },\n      body: updateBody,\n      returnFullResponse: true,\n      ignoreHttpStatusErrors: true,\n      json: true\n    });\n\n    if (patchResponse.statusCode === 200) {\n      console.log(`✅ GLOBAL count updated: ${newCount} / ${maxDaily}`);\n    }\n\n    return {\n      json: {\n        ...input,\n        emailUid: emailUid,\n        limitExceeded: false,\n        currentCount: newCount,\n        dailyLimit: maxDaily,\n        remainingRequests: maxDaily - newCount\n      }\n    };\n\n  } catch (error) {\n    console.error('🔴 Error:', error.message);\n    return {\n      json: {\n        ...input,\n        emailUid: emailUid,\n        limitExceeded: false,\n        currentCount: 0,\n        dailyLimit: maxDaily,\n        remainingRequests: maxDaily,\n        _error: error.message\n      }\n    };\n  }\n})();"
+      },
+      "id": "bbe51ea9-519a-449e-94b2-e365f6e57d66",
+      "name": "Check Daily Limit",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -976,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "id-1",
+              "leftValue": "={{ $json.limitExceeded }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "ddfe1a2b-8f74-4b79-86a2-44228340f69e",
+      "name": "Is Limit Reached?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -768,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Node Name: Prepare Firebase Document\n// Language: JavaScript\n\nconst req = $input.first().json;\n\nconsole.log('📦 Preparing Firebase document...');\nconsole.log('Input data:', JSON.stringify(req, null, 2));\nconsole.log('🤖 Subtasks from AI:', req.subtasks?.length || 0);\nconsole.log('📊 Current Count:', req.currentCount, '/', req.dailyLimit);\n\n// === VALIDATE INPUT DATA ===\nif (!req) {\n  throw new Error('No data received from Check Daily Limit node');\n}\n\nif (!req.type) {\n  throw new Error('Missing required field: type. Received: ' + JSON.stringify(req));\n}\n\nif (!req.title) {\n  throw new Error('Missing required field: title');\n}\n\nif (!req.description) {\n  throw new Error('Missing required field: description');\n}\n\nif (!req.userEmail) {\n  throw new Error('Missing required field: userEmail');\n}\n\n// === CATEGORY MAPPING ===\nconst categoryMap = {\n  'feature': 'User Story',\n  'bug': 'Technical Task',\n  'question': 'User Story',\n  'improvement': 'User Story'\n};\nconst reqType = String(req.type || 'feature').toLowerCase();\nconst category = categoryMap[reqType] || 'User Story';\n\n// === DUE DATE BERECHNEN ===\nconst priorityDaysMap = {\n  'high': 3,\n  'medium': 7,\n  'low': 14\n};\n\nconst reqPriority = String(req.priority || 'medium').toLowerCase();\nconst priority = ['high', 'medium', 'low'].includes(reqPriority) ? reqPriority : 'medium';\nconst daysToAdd = priorityDaysMap[priority];\nconst dueDate = new Date(Date.now() + daysToAdd * 24 * 60 * 60 * 1000);\n\nconsole.log('📅 Priority:', priority, '→ Due in', daysToAdd, 'days');\n\n// === DESCRIPTION ===\nconst description = String(req.description);\n\n// === PREPARE SUBTASKS FOR FIRESTORE ===\nconst subtasks = req.subtasks || [];\nconst firestoreSubtasks = subtasks.map(function(st) {\n  return {\n    mapValue: {\n      fields: {\n        id: { stringValue: String(st.id) },\n        title: { stringValue: String(st.title) },\n        completed: { booleanValue: Boolean(st.completed) }\n      }\n    }\n  };\n});\n\nconsole.log('✅ Firebase document prepared:', req.title.substring(0, 80));\nconsole.log('🔍 Status set to:', req.status || 'triage');\nconsole.log('📋 Subtasks to save:', subtasks.length);\n\nif (subtasks.length > 0) {\n  console.log('📝 Subtasks:');\n  subtasks.forEach(function(st, i) {\n    console.log('   ' + (i + 1) + '. ' + st.title);\n  });\n}\n\n// === FIRESTORE REST API FORMAT ===\nconst firestoreBody = {\n  fields: {\n    title: { stringValue: String(req.title).substring(0, 80) },\n    description: { stringValue: description },\n    category: { stringValue: category },\n    dueDate: { timestampValue: dueDate.toISOString() },\n    priority: { stringValue: priority },\n    status: { stringValue: String(req.status || 'triage') },\n    createdAt: { timestampValue: new Date().toISOString() },\n    updatedAt: { timestampValue: new Date().toISOString() },\n    source: { stringValue: String(req.source || 'email') },\n    creatorType: { stringValue: 'external' },\n    creatorEmail: { stringValue: String(req.userEmail) },\n    creatorName: { stringValue: String(req.userName || req.userEmail.split('@')[0]) },\n    aiGenerated: { booleanValue: true },\n    subtasks: { \n      arrayValue: { \n        values: firestoreSubtasks\n      }\n    },\n    // NEU: Daily Limit Info speichern\n    dailyLimitInfo: {\n      mapValue: {\n        fields: {\n          currentCount: { integerValue: String(req.currentCount || 0) },\n          dailyLimit: { integerValue: String(req.dailyLimit || 10) },\n          remainingRequests: { integerValue: String(req.remainingRequests || 10) }\n        }\n      }\n    }\n  }\n};\n\nconsole.log('📊 Daily Limit Info added:', req.currentCount, '/', req.dailyLimit);\n\n// === OUTPUT ===\nreturn {\n  json: firestoreBody\n};"
+      },
+      "id": "14d62c7c-9f7e-4ad5-b631-0371c7746f7b",
+      "name": "Prepare Firebase Document",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        192,
+        432
+      ]
+    },
+    {
+      "parameters": {
+        "format": "resolved",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailReadImap",
+      "typeVersion": 2.1,
+      "position": [
+        -1600,
+        192
+      ],
+      "id": "170bd43c-af1f-4ca8-b3d8-1d216cdb146b",
+      "name": "Email Trigger (IMAP)",
+      "credentials": {
+        "imap": {
+          "id": "XgWRUdChlWoIHBtn",
+          "name": "IMAP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Node Name: Parse & Validate Email\n// Language: JavaScript\n\nconst input = $input.item.json;\n\nconsole.log('📧 Processing Email Input');\nconsole.log('=== COMPLETE INPUT ===');\nconsole.log(JSON.stringify(input, null, 2));\nconsole.log('=== END INPUT ===');\n\n// === DETECT INPUT SOURCE ===\nlet webhookData = null;\n\nif (input.body && typeof input.body === 'object' && !input.from && !input.subject) {\n  webhookData = input.body;\n  console.log('✅ Webhook data found in body property');\n}\n\nconst hasWebhookFields = webhookData && webhookData.type && webhookData.title && webhookData.description && webhookData.userEmail;\nconst hasEmailFields = input.from || input.subject || input.text || input.textPlain || (typeof input.body === 'string');\n\nlet type, title, description, userEmail, userName, priority, status, timestamp, emailUid, originalFrom, originalSubject;\n\n// ============================================================\n// WEBHOOK INPUT (Direct from Frontend)\n// ============================================================\nif (hasWebhookFields) {\n  console.log('✅ Processing WEBHOOK input');\n  \n  const data = webhookData;\n  \n  type = data.type || 'feature';\n  title = data.title || 'Untitled Request';\n  description = data.description || '';\n  userEmail = data.userEmail || '';\n  userName = data.userName || userEmail.split('@')[0];\n  timestamp = data.timestamp || new Date().toISOString();\n  emailUid = `webhook-${Date.now()}`;\n  \n  console.log('Extracted from webhook:');\n  console.log('  type:', type);\n  console.log('  title:', title);\n  console.log('  userEmail:', userEmail);\n  console.log('  userName:', userName);\n  \n  // KEINE VALIDIERUNG FÜR WEBHOOK\n  console.log('✅ Webhook data accepted (no validation)');\n  \n  // Priority detection from description content\n  const urgentKeywords = /urgent|dringend|sofort|kritisch|critical|security|high|asap|immediately/i;\n  const lowKeywords = /low|niedrig|später|nice to have|nice-to-have|optional|someday/i;\n  \n  priority = 'medium';\n  if (urgentKeywords.test(title) || urgentKeywords.test(description)) {\n    priority = 'high';\n  } else if (lowKeywords.test(title) || lowKeywords.test(description)) {\n    priority = 'low';\n  }\n  \n  status = 'triage';\n  originalFrom = userEmail;\n  originalSubject = `[${type}] ${title}`;\n}\n\n// ============================================================\n// EMAIL/IMAP INPUT (From Email)\n// ============================================================\nelse if (hasEmailFields) {\n  console.log('✅ Processing EMAIL/IMAP input');\n  \n  const from = input.from?.address || input.from?.text || input.from || '';\n  const subject = input.subject || '';\n  \n  let body = input.text \n    || input.textPlain \n    || (typeof input.body === 'string' ? input.body : '')\n    || input.textAsHtml \n    || input.html\n    || '';\n  \n  emailUid = input.uid || input.messageId || 'empty';\n  originalFrom = from;\n  originalSubject = subject;\n  \n  console.log('From:', from);\n  console.log('Subject:', subject);\n  \n  const bodyStr = typeof body === 'string' ? body : String(body || '');\n  const cleanBody = bodyStr.replace(/<[^>]*>/g, '');\n  \n  // === EXTRACT EMAIL AND NAME ===\n  const emailMatch = from.match(/([^\\s@]+@[^\\s@]+\\.[^\\s@]+)/);\n  userEmail = emailMatch ? emailMatch[1] : from;\n  \n  const nameMatch = from.match(/^([^<]+)</);\n  userName = nameMatch ? nameMatch[1].trim().replace(/\"/g, '') : userEmail.split('@')[0];\n  \n  // === EXTRACT TYPE ===\n  const subjectTypeMatch = subject.match(/^\\[(Feature|Bug|Question|Improvement)\\]/i);\n  \n  if (subjectTypeMatch) {\n    type = subjectTypeMatch[1].toLowerCase();\n  } else {\n    const bodyTypeMatch = cleanBody.match(/Type:\\s*(Feature|Bug|Question|Improvement)/i);\n    if (bodyTypeMatch) {\n      type = bodyTypeMatch[1].toLowerCase();\n    }\n  }\n  \n  const validTypes = ['feature', 'bug', 'question', 'improvement'];\n  type = validTypes.includes(type) ? type : 'feature';\n  \n  // === EXTRACT TITLE ===\n  title = subject.replace(/^\\[(Feature|Bug|Question|Improvement)\\]\\s*/i, '').trim();\n  \n  if (!title || title.length < 5) {\n    const titleMatch = cleanBody.match(/Title:\\s*(.+?)(?:\\n|$)/i);\n    title = titleMatch ? titleMatch[1].trim() : 'Untitled Request';\n  }\n  \n  // === EXTRACT DESCRIPTION - NUR DIE ORIGINAL-ANFRAGE ===\n  // Extrahiere nur den Text nach \"## 📝 Original-Anfrage:\" oder nehme den ganzen Body\n  const originalRequestMatch = cleanBody.match(/##\\s*📝\\s*Original-Anfrage:\\s*\\n\\s*(.+?)(?:\\n\\s*---|\\n\\s*\\*\\*Täglich|$)/is);\n  \n  if (originalRequestMatch) {\n    description = originalRequestMatch[1].trim();\n    console.log('✅ Extracted original request from email');\n  } else {\n    // Fallback: Nehme den ganzen Body ohne Metadaten\n    description = cleanBody\n      .replace(/\\*\\*Dieses Ticket wurde KI-generiert[\\s\\S]*?---/g, '')\n      .replace(/\\*\\*Täglich[\\s\\S]*$/g, '')\n      .replace(/💡\\s*\\*Dieser Stakeholder[\\s\\S]*$/g, '')\n      .replace(/Type:.*?\\n/gi, '')\n      .replace(/Title:.*?\\n/gi, '')\n      .replace(/Priority:.*?\\n/gi, '')\n      .replace(/---[\\s\\S]*$/g, '')\n      .trim();\n  }\n  \n  console.log('Extracted Description:', description);\n  \n  // === DETECT PRIORITY ===\n  const urgentKeywords = /urgent|dringend|sofort|kritisch|critical|security|high|asap|immediately/i;\n  const lowKeywords = /low|niedrig|später|nice to have|nice-to-have|optional|someday/i;\n  \n  priority = 'medium';\n  \n  if (urgentKeywords.test(subject) || urgentKeywords.test(cleanBody)) {\n    priority = 'high';\n  } else if (lowKeywords.test(subject) || lowKeywords.test(cleanBody)) {\n    priority = 'low';\n  }\n  \n  status = 'triage';\n  timestamp = input.date || new Date().toISOString();\n  \n  console.log('✅ Email processed successfully (no validation)');\n}\n\n// ============================================================\n// UNKNOWN INPUT\n// ============================================================\nelse {\n  console.log('❌ Unknown input format');\n  \n  return {\n    json: {\n      isValid: false,\n      reason: 'Unknown input format - expected either webhook or email data',\n      availableFields: Object.keys(input)\n    }\n  };\n}\n\n// ============================================================\n// RETURN DATA (No Validation - Always Valid)\n// ============================================================\nconsole.log('📋 Final data:', {\n  type,\n  title: title.substring(0, 80),\n  userEmail,\n  userName,\n  priority,\n  status,\n  source: hasWebhookFields ? 'webhook' : 'email'\n});\n\nreturn {\n  json: {\n    isValid: true,\n    reason: '',\n    emailUid: emailUid,\n    type: type,\n    title: title.substring(0, 80),\n    description: description,\n    userEmail: userEmail,\n    userName: userName,\n    priority: priority,\n    status: status,\n    timestamp: timestamp,\n    originalFrom: originalFrom,\n    originalSubject: originalSubject,\n    source: hasWebhookFields ? 'webhook' : 'email'\n  }\n};"
+      },
+      "id": "677ea399-546d-4046-b301-7ec2710ae10c",
+      "name": "Parse & Validate Email",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1168,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://firestore.googleapis.com/v1/projects/join-angular-based/databases/(default)/documents/tasks",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        432,
+        432
+      ],
+      "id": "2b3b7c6c-8dad-4334-ab62-cf4bdb83b0ce",
+      "name": "HTTP Request1",
+      "credentials": {
+        "googleApi": {
+          "id": "I7UTDNDObwKjyDdB",
+          "name": "Google Service Account account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "document",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-pro",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-pro"
+        },
+        "text": "='You are an expert task breakdown assistant.\\n\\n' +\n'===== TASK INFORMATION =====\\n' +\n'TYPE: ' + $json.type + '\\n' +\n'ORIGINAL TITLE: ' + $json.title + '\\n\\n' +\n'DESCRIPTION:\\n' +\n$json.description + '\\n' +\n'===== END TASK INFORMATION =====\\n\\n' +\n'Your job:\\n' +\n'1. Generate a concise, professional TITLE (max 50 chars, start with action verb)\\n' +\n'2. Create a brief summary description (1-2 sentences)\\n' +\n'3. Extract 2-4 specific, actionable subtasks based ONLY on what is mentioned\\n\\n' +\n'TITLE RULES:\\n' +\n'- Start with action verb: Add, Implement, Fix, Update, Create, Enable, etc.\\n' +\n'- Be specific and descriptive\\n' +\n'- Max 50 characters\\n' +\n'- Professional, ticket-style format\\n' +\n'- Examples: \"Add analytics dashboard with charts\", \"Fix login validation bug\", \"Implement CSV export feature\"\\n\\n' +\n'SUBTASK RULES:\\n' +\n'- Only create subtasks for features/topics EXPLICITLY mentioned\\n' +\n'- If \"Analytics\" mentioned → analytics subtasks\\n' +\n'- If \"Charts\" mentioned → chart subtasks\\n' +\n'- If \"CSV Export\" mentioned → export subtasks\\n' +\n'- If \"Login\" mentioned → login subtasks\\n' +\n'- DO NOT add generic tasks (keyboard nav, ARIA labels) unless EXPLICITLY requested\\n' +\n'- Each subtask: max 35 characters, in English\\n' +\n'- Be SPECIFIC to THIS request\\n\\n' +\n'OUTPUT FORMAT (JSON only, no markdown):\\n' +\n'{\\n' +\n'  \"title\": \"Generated ticket title\",\\n' +\n'  \"description\": \"Brief summary\",\\n' +\n'  \"subtasks\": [\\n' +\n'    {\"title\": \"Subtask 1\"},\\n' +\n'    {\"title\": \"Subtask 2\"}\\n' +\n'  ]\\n' +\n'}\\n\\n' +\n'EXAMPLE 1:\\n' +\n'INPUT: TYPE: feature, ORIGINAL TITLE: \"Dashboard Request\", DESCRIPTION: \"I need a dashboard showing user activity metrics as charts. Add CSV export too.\"\\n' +\n'OUTPUT: {\"title\":\"Add analytics dashboard with export\",\"description\":\"Analytics dashboard with user activity charts and CSV export functionality\",\"subtasks\":[{\"title\":\"Create dashboard UI layout\"},{\"title\":\"Add user activity charts\"},{\"title\":\"Implement CSV export\"}]}\\n\\n' +\n'EXAMPLE 2:\\n' +\n'INPUT: TYPE: bug, ORIGINAL TITLE: \"Login Problem\", DESCRIPTION: \"Login button doesn\\'t work on iOS Safari browser\"\\n' +\n'OUTPUT: {\"title\":\"Fix login button on iOS Safari\",\"description\":\"Resolve login button functionality issue on iOS Safari browser\",\"subtasks\":[{\"title\":\"Debug iOS Safari login issue\"},{\"title\":\"Test login on mobile devices\"}]}\\n\\n' +\n'NOW analyze the task above and output ONLY the JSON:'",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        -288,
+        432
+      ],
+      "id": "8c1451bd-e95d-4ae8-9011-4e9bc1a31469",
+      "name": "Analyze document",
+      "alwaysOutputData": true,
+      "executeOnce": true,
+      "retryOnFail": true,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "f1NClJdm7aoK4QHh",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      },
+      "notes": "You are a task extraction bot. Extract 2-3 subtasks from the text below.\n\nCRITICAL RULES:\n1. Return ONLY valid JSON\n2. NO explanations\n3. NO markdown\n4. NO other text\n\nRequired format:\n{\"subtasks\": [{\"title\": \"First task\"}, {\"title\": \"Second task\"}]}\n\nText to analyze:"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Node Name: Update Task ID from Firebase Response\n// Language: JavaScript\n\nconst response = $input.first().json;\n\n// Extract the auto-generated Firebase Document ID\nconst firebaseDocId = response.name.split('/').pop();\n\nconsole.log('🔥 Firebase created document:', firebaseDocId);\nconsole.log('📝 Updating task ID field to match...');\n\n// Return data for PATCH request\nreturn {\n  json: {\n    documentPath: response.name,\n    documentId: firebaseDocId,\n    patchUrl: `https://firestore.googleapis.com/v1/${response.name}?updateMask.fieldPaths=id`,\n    patchBody: {\n      fields: {\n        id: { stringValue: firebaseDocId }\n      }\n    }\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        704,
+        272
+      ],
+      "id": "eb8bc7aa-2d82-4479-a805-62e0492281ac",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "jsCode": "const aiResponse = $input.first().json;\nconst validatedData = $('Is Limit Reached?').first().json;\nconst filteredData = $('Filter for KI').first().json;\n\nlet subtasks = [];\nlet taskDescription = '';\nlet generatedTitle = '';\n\ntry {\n  let content = aiResponse.content?.parts?.[0]?.text || '';\n  \n  if (!content) {\n    throw new Error('AI response text content is empty.');\n  }\n  \n  console.log('📝 Raw Gemini Content:', content.substring(0, 500));\n  \n  // Entferne Markdown Code-Blöcke\n  const codeBlockMatch = content.match(/```(?:json)?\\s*([\\s\\S]*?)\\s*```/);\n  if (codeBlockMatch) {\n    content = codeBlockMatch[1];\n  }\n\n  // Finde JSON-Objekt\n  const jsonMatch = content.match(/\\{[\\s\\S]*\"subtasks\"[\\s\\S]*\\}/);\n  \n  if (!jsonMatch) {\n    throw new Error('No JSON object with \"subtasks\" key found.');\n  }\n  \n  const parsed = JSON.parse(jsonMatch[0]);\n  \n  // ✅ NEU: Extrahiere KI-generierten Titel\n  if (parsed.title && typeof parsed.title === 'string') {\n    generatedTitle = parsed.title.trim().substring(0, 80);\n    console.log('🎯 AI Generated Title:', generatedTitle);\n  }\n  \n  // Extrahiere Description (falls vorhanden)\n  taskDescription = parsed.description || filteredData.description;\n  \n  // Validiere Subtasks\n  if (!Array.isArray(parsed.subtasks)) {\n    throw new Error('The \"subtasks\" key does not contain a valid array.');\n  }\n\n  // Formatiere Subtasks\n  subtasks = parsed.subtasks.map(st => ({\n    id: `subtask_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,\n    title: String(st.title || st).trim().substring(0, 255),\n    completed: false\n  }));\n\n  console.log('✅ AI Analysis Success - Title:', generatedTitle, 'Subtasks:', subtasks.length);\n  \n} catch (error) {\n  console.error('🔴 Gemini parsing failed:', error.message);\n  taskDescription = filteredData.description;\n  subtasks = [];\n  generatedTitle = '';\n}\n\n// ✅ Fallback: Wenn KI keinen Titel generiert, nutze Original\nconst finalTitle = generatedTitle || validatedData.title || 'Feature Request';\n\n// Gib kombinierte Daten zurück\nreturn {\n  json: {\n    ...validatedData,\n    title: finalTitle,  // ← KI-generierter oder Original-Titel\n    description: taskDescription,\n    subtasks: subtasks,\n    _aiGenerated: {\n      title: !!generatedTitle,\n      subtasks: subtasks.length > 0\n    }\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -48,
+        432
+      ],
+      "id": "d5bdb6b6-0f0b-4667-b1ae-95d7e2592b4e",
+      "name": "Process AI Response"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Node: Filter for KI\nconst input = $input.first().json;\n\nconsole.log('🔍 ===== FILTER FOR KI START =====');\nconsole.log('Original Description Length:', (input.description || '').length);\nconsole.log('Original Description:', input.description);\n\n// Bereinige die Description\nlet cleanedDescription = input.description || '';\n\n// Entferne Grüße, Signaturen und überflüssige Zeilenumbrüche\ncleanedDescription = cleanedDescription\n  .replace(/^(Hi|Hello|Hey|Hallo|Guten Tag|Moin|Servus)[,!\\s]*/gi, '')\n  .replace(/\\n*(VG|Grüße|Gruß|LG|MfG|Best|Regards|Cheers|Thanks|Danke)[,!\\s]*$/gi, '')\n  .replace(/\\n{3,}/g, '\\n\\n')\n  .trim();\n\nconsole.log('Cleaned Description Length:', cleanedDescription.length);\nconsole.log('Cleaned Description:', cleanedDescription);\n\n// WICHTIG: Mindestlänge prüfen\nif (cleanedDescription.length < 10) {\n  console.log('⚠️ WARNING: Description too short after cleaning!');\n  cleanedDescription = input.description; // Fallback auf Original\n}\n\nconsole.log('🔍 ===== FILTER FOR KI END =====');\n\nreturn {\n  json: {\n    type: input.type,\n    title: input.title,\n    description: cleanedDescription,\n    originalDescription: input.description // Zur Sicherheit behalten\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -528,
+        432
+      ],
+      "id": "01871e11-85bd-49a4-b665-d9f39a9d36de",
+      "name": "Filter for KI"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.resend.com/emails",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"from\": \"requests@stefan-helldobler.de\",\n  \"to\": [\"={{ $('HTTP Request1').item.json.fields.creatorEmail.stringValue }}\"],\n  \"subject\": \"✅ Ihr Feature Request wurde erfasst - {{ $('HTTP Request1').item.json.fields.title.stringValue }}\",\n  \"html\": \"<div style=\\\"font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff;\\\"><div style=\\\"background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 30px; text-align: center; border-radius: 8px 8px 0 0;\\\"><h1 style=\\\"color: #ffffff; margin: 0; font-size: 28px; font-weight: 600;\\\">✅ Anfrage erfasst!</h1></div><div style=\\\"padding: 30px;\\\"><p style=\\\"font-size: 16px; color: #333333; margin-bottom: 20px;\\\">Hallo <strong>{{ $('HTTP Request1').item.json.fields.creatorName.stringValue }}</strong>,</p><p style=\\\"font-size: 15px; color: #555555; line-height: 1.6; margin-bottom: 25px;\\\">Vielen Dank für Ihre Anfrage! Ihr Ticket wurde erfolgreich erstellt und wird von unserem Team bearbeitet.</p><div style=\\\"background: #f5f5f5; padding: 20px; border-radius: 8px; margin-bottom: 25px;\\\"><h3 style=\\\"color: #333333; margin-top: 0; margin-bottom: 15px; font-size: 18px;\\\">📋 Ticket-Details</h3><table style=\\\"width: 100%; border-collapse: collapse;\\\"><tr><td style=\\\"padding: 8px 0; color: #666666; font-weight: 600; width: 30%;\\\">ID:</td><td style=\\\"padding: 8px 0; color: #333333;\\\">{{ $('Code in JavaScript').item.json.documentId }}</td></tr><tr><td style=\\\"padding: 8px 0; color: #666666; font-weight: 600;\\\">Titel:</td><td style=\\\"padding: 8px 0; color: #333333;\\\">{{ $('HTTP Request1').item.json.fields.title.stringValue }}</td></tr><tr><td style=\\\"padding: 8px 0; color: #666666; font-weight: 600;\\\">Kategorie:</td><td style=\\\"padding: 8px 0; color: #333333;\\\">{{ $('HTTP Request1').item.json.fields.category.stringValue }}</td></tr><tr><td style=\\\"padding: 8px 0; color: #666666; font-weight: 600;\\\">Priorität:</td><td style=\\\"padding: 8px 0; color: #333333;\\\">{{ $('HTTP Request1').item.json.fields.priority.stringValue.toUpperCase() }}</td></tr><tr><td style=\\\"padding: 8px 0; color: #666666; font-weight: 600;\\\">Status:</td><td style=\\\"padding: 8px 0; color: #333333;\\\">{{ $('HTTP Request1').item.json.fields.status.stringValue }}</td></tr></table></div><div style=\\\"background: #fff3e0; border-left: 4px solid #ff9800; padding: 15px 20px; border-radius: 4px; margin-bottom: 25px;\\\"><p style=\\\"margin: 0; color: #e65100; font-size: 14px; line-height: 1.5;\\\">🔔 <strong>Benachrichtigungen aktiviert:</strong> Sie werden automatisch informiert, wenn sich der Status Ihres Tickets ändert.</p></div><div style=\\\"background: #e3f2fd; padding: 20px; border-radius: 8px; margin-bottom: 25px;\\\"><h3 style=\\\"color: #1976d2; margin-top: 0; margin-bottom: 15px; font-size: 18px;\\\">🚀 Nächste Schritte</h3><ul style=\\\"margin: 0; padding-left: 20px; color: #555555; line-height: 1.8;\\\"><li style=\\\"margin-bottom: 8px;\\\">Unser Team wird Ihre Anfrage prüfen und bewerten</li><li style=\\\"margin-bottom: 8px;\\\">Die Priorität wird entsprechend der Dringlichkeit angepasst</li><li style=\\\"margin-bottom: 8px;\\\">Sie erhalten Updates bei jeder Statusänderung per E-Mail</li></ul></div><div style=\\\"background: #f5f5f5; padding: 15px 20px; border-radius: 4px; margin-bottom: 25px; text-align: center;\\\"><p style=\\\"margin: 0; color: #666666; font-size: 14px;\\\">📊 Heute noch <strong>{{ $('HTTP Request1').item.json.fields.dailyLimitInfo.mapValue.fields.remainingRequests.integerValue }} von {{ $('HTTP Request1').item.json.fields.dailyLimitInfo.mapValue.fields.dailyLimit.integerValue }} Anfragen</strong> verfügbar</p></div><p style=\\\"font-size: 14px; color: #666666; line-height: 1.6; margin-bottom: 10px;\\\">Bei Fragen können Sie sich jederzeit an uns wenden.</p></div><div style=\\\"background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 25px 30px; text-align: center; border-radius: 0 0 8px 8px;\\\"><p style=\\\"color: #ffffff; margin: 0; font-size: 16px; font-weight: 500;\\\">Ihr Join Team</p><p style=\\\"color: rgba(255, 255, 255, 0.8); margin: 8px 0 0 0; font-size: 12px;\\\">Diese E-Mail wurde automatisch generiert. Bitte nicht direkt antworten.</p></div></div>\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        912,
+        272
+      ],
+      "id": "971d5c34-45d6-4be2-9346-4add13bbb68a",
+      "name": "HTTP Email Success",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "Ahb7qTShV22hR2wx",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.resend.com/emails",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"from\": \"requests@stefan-helldobler.de\",\n  \"to\": [\"={{ $('Check Daily Limit').item.json.userEmail }}\"],\n  \"subject\": \"⚠️ Tageslimit erreicht\",\n  \"html\": \"<h2>Tageslimit erreicht</h2><p>Hallo {{ $('Check Daily Limit').item.json.userName }},</p><p>Wir haben heute bereits <strong>10 Feature Requests</strong> erreicht.</p><p>Stand: {{ $('Check Daily Limit').item.json.currentCount }}/10</p><p>Bitte versuchen Sie es morgen erneut.</p><p>Ihr Join Team</p>\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -288,
+        112
+      ],
+      "id": "0567a7dd-6918-41ee-b785-68a3129c8181",
+      "name": "Limit reached",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "Ahb7qTShV22hR2wx",
+          "name": "Header Auth account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Request Webhook": {
+      "main": [
+        [
+          {
+            "node": "Parse & Validate Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Daily Limit": {
+      "main": [
+        [
+          {
+            "node": "Is Limit Reached?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Limit Reached?": {
+      "main": [
+        [
+          {
+            "node": "Limit reached",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Filter for KI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Trigger (IMAP)": {
+      "main": [
+        [
+          {
+            "node": "Parse & Validate Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse & Validate Email": {
+      "main": [
+        [
+          {
+            "node": "Check Daily Limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Firebase Document": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze document": {
+      "main": [
+        [
+          {
+            "node": "Process AI Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process AI Response": {
+      "main": [
+        [
+          {
+            "node": "Prepare Firebase Document",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "HTTP Email Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter for KI": {
+      "main": [
+        [
+          {
+            "node": "Analyze document",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "timezone": "Europe/Berlin",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "5cb72d90-64ce-47e4-90ff-e23df6e05912",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "be47a6e455b920cd86a7d73206051da62efd9c6dcc2325fab12e4c502bad6067"
+  },
+  "id": "ytzTBjpL7v2bD-HVYhJ6Q",
+  "tags": []
+}
