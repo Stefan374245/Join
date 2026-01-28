@@ -44,11 +44,12 @@ Thumbs.db
 # Environment variables
 .env
 .env.local
-.env.*.local
-.environments.*
 
 # Ignore all environment files (ganzer Ordner)
-src/environments/
+
+# Einzelne Umgebungsdateien explizit ignorieren
+src/environments/environment.ts
+src/environments/environment.prod.ts
 
 
 # Firebase environment files with real credentials
