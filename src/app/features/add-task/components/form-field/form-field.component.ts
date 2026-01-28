@@ -8,14 +8,8 @@ import {
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormControl, ValidationErrors } from '@angular/forms';
 
-/**
- * Supported form field input types
- */
 export type FormFieldType = 'text' | 'email' | 'number' | 'date' | 'textarea';
 
-/**
- * Reusable form field component with validation and accessibility support
- */
 @Component({
     selector: 'app-form-field',
     standalone: true,
@@ -25,34 +19,19 @@ export type FormFieldType = 'text' | 'email' | 'number' | 'date' | 'textarea';
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FormFieldComponent {
-    /** Unique identifier for the form field */
     id = input.required<string>();
-    
-    /** Label text for the field */
     label = input.required<string>();
-    
-    /** Form control instance */
     control = input.required<FormControl>();
-    
-    /** Input type (text, email, number, date, textarea) */
+
     type = input<FormFieldType>('text');
-    
     placeholder = input<string>('');
-    
     required = input<boolean>(false);
-    
     errorMessage = input<string>('');
-    
     hint = input<string>('');
-    
     rows = input<number>(4);
-    
     min = input<string | number>('');
-    
     max = input<string | number>('');
-    
     maxLength = input<number>(1000);
-    
     spellcheck = input<boolean>(false);
     
     /**

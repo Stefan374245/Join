@@ -51,10 +51,8 @@ export class TaskDetailComponent {
   showDeleteConfirm: boolean = false;
   private lastToggleTime: number = 0;
 
-  // Image Viewer state
   selectedAttachment = signal<TaskAttachment | null>(null);
   
-  // Computed: Get the index of selected attachment
   selectedAttachmentIndex = computed<number>(() => {
     const attachment = this.selectedAttachment();
     const currentTask = this.task();
@@ -67,23 +65,28 @@ export class TaskDetailComponent {
     return index >= 0 ? index : 0;
   });
 
-  // Computed: Show image viewer when attachment is selected
   showImageViewer = computed<boolean>(() => this.selectedAttachment() !== null);
 
-  // Computed signal that always reads latest task from TaskService
   task = computed<Task | undefined>(() => {
     const id = this.taskId();
     return this.taskService.findTaskById(id);
   });
 
+  /**
+   * Initializes the TaskDetailComponent and sets up a reactive effect to monitor the current task.
+   * 
+   * The effect checks if the current task and contacts are available. If so, and if the application is running
+   * on localhost, it iterates through the assigned user IDs of the current task and verifies that each user
+   * has a corresponding contact. If a contact is missing, a warning is logged to the console.
+   *
+   * This logic is intended for development environments only (i.e., when running on localhost).
+   */
   constructor() {
-    // Monitor contact assignments for debugging in development
     effect(() => {
       const currentTask = this.task();
       if (!currentTask) return;
       
       if (currentTask.assignedTo?.length > 0 && this.contacts().length > 0) {
-        // Check if all assigned contacts exist (only in development)
         if (typeof window !== 'undefined' && !window.location.hostname.includes('localhost')) return;
         
         currentTask.assignedTo.forEach(userId => {
@@ -191,7 +194,6 @@ export class TaskDetailComponent {
     const newState = !subtask.completed;
     console.log('🎯 Component: Toggling subtask:', subtaskId, 'Current:', subtask.completed, '→ New:', newState);
 
-    // Use TaskService for centralized subtask management
     try {
       await this.taskService.toggleSubtask(currentTask.id, subtaskId);
       console.log('✅ Component: Subtask toggled successfully');
@@ -256,20 +258,32 @@ export class TaskDetailComponent {
     return contact ? `${contact.firstName} ${contact.lastName}` : 'Unknown';
   }
 
+  /**
+   * Converts a category name to a CSS-friendly class name.
+   *
+   * This method transforms the input string to lowercase and replaces all whitespace
+   * characters with hyphens, making it suitable for use as a CSS class.
+   *
+   * @param category - The category name to be converted.
+   * @returns The formatted string as a CSS class name.
+   */
   getCategoryClass(category: string): string {
     return category.toLowerCase().replace(/\s+/g, '-');
   }
 
+  /**
+   * Formats a given Date object into a string with the format 'MM/DD/YYYY'.
+   *
+   * @param date - The Date object to format.
+   * @returns A string representing the formatted date in 'MM/DD/YYYY' format,
+   *          or an empty string if the input is falsy.
+   */
   formatDate(date: Date): string {
     if (!date) return '';
     const d = new Date(date);
     return d.toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '/');
   }
 
-  /**
-   * Deletes an attachment from Storage and Firestore
-   * @param attachment - The attachment to delete
-   
 
   /**
    * Opens image viewer with selected attachment
@@ -293,8 +307,17 @@ export class TaskDetailComponent {
     }
   }
 
+  
   /**
-   * Downloads all attachments as ZIP
+   * Downloads all attachments of the current task as a ZIP file.
+   *
+   * - If there are no attachments, displays an error toast notification.
+   * - Otherwise, generates a ZIP file name based on the task title,
+   *   initiates the download via the attachment storage service,
+   *   and shows a success toast notification.
+   * - Handles and logs any errors, displaying an error toast if the download fails.
+   *
+   * @returns {Promise<void>} A promise that resolves when the download process is complete.
    */
   async onDownloadAllAttachmentsAsZip(): Promise<void> {
     const currentTask = this.task();
@@ -313,17 +336,34 @@ export class TaskDetailComponent {
     }
   }
 
+
   /**
-   * Closes the image viewer
+   * Closes the image viewer by resetting the selected attachment to null.
+   * This method is typically called when the user closes the image viewer modal or overlay.
    */
   onCloseImageViewer(): void {
     this.selectedAttachment.set(null);
   }
 
+  /**
+   * Returns the file path to the SVG icon corresponding to the given task priority.
+   *
+   * @param priority - The priority level of the task (e.g., 'High', 'Medium', 'Low').
+   * @returns The relative path to the SVG icon for the specified priority.
+   */
   getPriorityIcon(priority: string): string {
     return `assets/images/${priority.toLowerCase()}.svg`;
   }
 
+  /**
+   * Returns the appropriate icon path for the task creator.
+   *
+   * - If there is no current task, returns the default team icon.
+   * - If the creator type is 'external' or the source is 'email', returns the external creator icon.
+   * - Otherwise, returns the default team icon.
+   *
+   * @returns {string} The file path to the creator's icon image.
+   */
   getCreatorIcon(): string {
     const currentTask = this.task();
     if (!currentTask) return 'assets/images/team.svg';
@@ -334,6 +374,15 @@ export class TaskDetailComponent {
     return 'assets/images/team.svg';
   }
 
+  /**
+   * Returns the appropriate icon path representing the creator of the current task.
+   *
+   * - If there is no current task, returns the default creator profile icon.
+   * - If the task's source is 'email' or the creator type is 'external', returns the email card icon.
+   * - Otherwise, returns the default creator profile icon.
+   *
+   * @returns {string} The file path to the icon representing the task creator.
+   */
   getCreatorContentIcon(): string {
     const currentTask = this.task();
     if (!currentTask) return 'assets/images/creator-profil.svg';
@@ -344,6 +393,15 @@ export class TaskDetailComponent {
     return 'assets/images/creator-profil.svg';
   }
 
+  /**
+   * Returns a string representing the content type of the task creator.
+   *
+   * - If the current task does not exist, returns 'Profil'.
+   * - If the task's source is 'email' or the creator type is 'external', returns 'E-mail'.
+   * - Otherwise, returns 'Profil'.
+   *
+   * @returns {string} The content type text for the task creator.
+   */
   getCreatorContentText(): string {
     const currentTask = this.task();
     if (!currentTask) return 'Profil';
@@ -354,6 +412,14 @@ export class TaskDetailComponent {
     return 'Profil';
   }
 
+  /**
+   * Determines the CSS class to apply based on the creator of the current task.
+   *
+   * Returns `'content-external'` if the task was created from an email or by an external creator,
+   * otherwise returns `'content-member'`.
+   *
+   * @returns {string} The CSS class name representing the creator type.
+   */
   getCreatorContentClass(): string {
     const currentTask = this.task();
     if (!currentTask) return 'content-member';
@@ -364,6 +430,14 @@ export class TaskDetailComponent {
     return 'content-member';
   }
 
+  /**
+   * Returns the CSS class name for the creator badge based on the current task's creator type and source.
+   *
+   * - If the task's creator type is 'external' or the source is 'email', returns 'badge-external'.
+   * - Otherwise, returns 'badge-member'.
+   *
+   * @returns {string} The CSS class name for the creator badge.
+   */
   getCreatorBadgeClass(): string {
     const currentTask = this.task();
     if (!currentTask) return 'badge-member';
@@ -374,6 +448,15 @@ export class TaskDetailComponent {
     return 'badge-member';
   }
 
+  /**
+   * Returns the badge text representing the creator type of the current task.
+   *
+   * - If there is no current task, returns `'Member'`.
+   * - If the creator type is `'external'` or the source is `'email'`, returns `'Extern'`.
+   * - Otherwise, returns `'Member'`.
+   *
+   * @returns {string} The badge text for the task creator.
+   */
   getCreatorBadgeText(): string {
     const currentTask = this.task();
     if (!currentTask) return 'Member';
@@ -384,6 +467,15 @@ export class TaskDetailComponent {
     return 'Member';
   }
 
+  /**
+   * Returns a display name for the creator of the current task.
+   *
+   * The method checks for the creator's name, then email, and finally falls back to
+   * a generic label based on the creator's type or source. If none of these are available,
+   * it returns 'Unknown'.
+   *
+   * @returns {string} The display name of the task creator, their email, 'Member', or 'Unknown'.
+   */
   getCreatorDisplayName(): string {
     const task = this.task();
     if (!task) return 'Unknown';

@@ -10,4 +10,5 @@ export const environment = {
     appId: '1:997212360363:web:4790443452314fafd971ee',
   },
   n8nWebhookUrl: 'https://n8n-production-04d3.up.railway.app/webhook/feature-request',
+  n8nStatusChangeWebhookUrl: 'https://n8n-production-04d3.up.railway.app/webhook/task-status-changed',
 };

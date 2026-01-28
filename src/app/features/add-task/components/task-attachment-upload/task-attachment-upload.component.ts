@@ -21,7 +21,6 @@ export class TaskAttachmentUploadComponent {
   private hasInitialized = false;
 
   @Input() set initialAttachments(attachments: TaskAttachment[] | undefined) {
-    // Only initialize once to avoid infinite loop
     if (!this.hasInitialized && attachments && attachments.length > 0) {
       this.attachments.set([...attachments]);
       this.hasInitialized = true;
@@ -36,6 +35,9 @@ export class TaskAttachmentUploadComponent {
 
   /**
    * Handle drag over event
+   * @param event - Drag event
+   * @remarks
+   * Prevents default behavior and sets drag-over state.
    */
   onDragOver(event: DragEvent): void {
     event.preventDefault();
@@ -45,6 +47,9 @@ export class TaskAttachmentUploadComponent {
 
   /**
    * Handle drag leave event
+   * @param event - Drag event
+   * @remarks
+   * Resets drag-over state when dragging leaves the upload zone.
    */
   onDragLeave(event: DragEvent): void {
     event.preventDefault();
@@ -54,6 +59,9 @@ export class TaskAttachmentUploadComponent {
 
   /**
    * Handle file drop
+   * @param event - Drag event
+   * @remarks
+   * Processes dropped files and resets drag-over state.
    */
   async onDrop(event: DragEvent): Promise<void> {
     event.preventDefault();
@@ -68,6 +76,9 @@ export class TaskAttachmentUploadComponent {
 
   /**
    * Handle file selection from input
+   * @param event - File input change event
+   * @remarks
+   * Processes selected files and resets input value to allow re-selection of the same file.
    */
   async onFileSelected(event: Event): Promise<void> {
     const input = event.target as HTMLInputElement;
@@ -75,12 +86,15 @@ export class TaskAttachmentUploadComponent {
     
     if (files) {
       await this.processFiles(Array.from(files));
-      input.value = ''; // Reset input
+      input.value = '';
     }
   }
 
   /**
    * Process multiple files
+   * @param files - Array of files to process
+   * @remarks
+   * Iterates over each file and processes it individually.
    */
   private async processFiles(files: File[]): Promise<void> {
     this.errorMessage.set(null);
@@ -92,6 +106,12 @@ export class TaskAttachmentUploadComponent {
 
   /**
    * Process single file with validation and compression
+   * @param file - File to process
+   * @remarks
+   * Validates the file using FileValidationService.
+   * If valid, compresses the image using ImageCompressionService.
+   * Creates a TaskAttachment object and adds it to the attachments list.
+   * Emits the updated attachments list via attachmentsChange event emitter.
    */
   private async processFile(file: File): Promise<void> {
     const validation = await this.fileValidation.validateFile(file);
@@ -122,7 +142,12 @@ export class TaskAttachmentUploadComponent {
   }
 
   /**
-   * Remove attachment by ID
+   * Removes an attachment from the attachments list by its unique identifier.
+   *
+   * @param id - The unique identifier of the attachment to be removed.
+   * @remarks
+   * This method updates the attachments list by filtering out the attachment with the specified `id`.
+   * After updating the list, it emits the updated attachments through the `attachmentsChange` event emitter.
    */
   removeAttachment(id: string): void {
     this.attachments.update(current => 
@@ -132,7 +157,11 @@ export class TaskAttachmentUploadComponent {
   }
 
   /**
-   * Remove all attachments
+   * Removes all attachments from the current list.
+   * 
+   * This method clears the attachments by setting the attachments array to an empty array.
+   * It also emits an empty array via the `attachmentsChange` event to notify any listeners
+   * that all attachments have been removed.
    */
   removeAllAttachments(): void {
     this.attachments.set([]);
@@ -141,6 +170,7 @@ export class TaskAttachmentUploadComponent {
 
   /**
    * Generate unique ID for attachment
+   * @return Unique ID string
    */
   private generateId(): string {
     return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
@@ -148,10 +178,10 @@ export class TaskAttachmentUploadComponent {
 
   /**
    * Get data URL for preview
+   * @param attachment - Task attachment
+   * @returns Preview URL string
    */
   getPreviewUrl(attachment: TaskAttachment): string {
-    // During upload, use base64 data URL
-    // After upload (when downloadURL exists), use that
     if (attachment.downloadURL) {
       return attachment.downloadURL;
     }
@@ -160,6 +190,8 @@ export class TaskAttachmentUploadComponent {
 
   /**
    * Format file size for display
+   * @param bytes - Size in bytes
+   * @returns Formatted size string
    */
   formatFileSize(bytes: number): string {
     if (bytes < 1024) return `${bytes} B`;

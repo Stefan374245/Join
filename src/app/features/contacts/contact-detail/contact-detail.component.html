@@ -1,4 +1,3 @@
-<!-- Loading Spinner for Delete/Update Operations -->
 <app-loading-spinner [localLoading]="isDeleting() || isUpdating()" />
 
 <div class="contact-detail-page" *ngIf="contact() && !loading()">
@@ -8,7 +7,6 @@
       <img src="assets/images/arrow-left-line.svg" alt="Back" />
     </button>
   </div>
- <!-- #region hallo-->
   <div class="detail-subheader">
     <p>Better with a team</p>
   </div>
@@ -25,7 +23,6 @@
       <h2>{{ contact()!.firstName }} {{ contact()!.lastName }}</h2>
     </div>
   </div>
- <!-- #endregion-->
   <div class="contact-details">
     <h3>Contact Information</h3>
 

@@ -30,39 +30,25 @@ import { TaskAttachment } from '../../../../core/models/task.interface';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ImageViewerComponent {
-  // ============================================
-  // INPUTS
-  // ============================================
+  
   images = input.required<TaskAttachment[]>();
   initialIndex = input<number>(0);
   isEditMode = input<boolean>(false);
   taskTitle = input<string>('Untitled');
 
-  // ============================================
-  // OUTPUTS
-  // ============================================
   close = output<void>();
   delete = output<TaskAttachment>();
   deleteAll = output<void>();
 
-  // ============================================
-  // SERVICES
-  // ============================================
   private loadingService = inject(LoadingService);
   private toastService = inject(ToastService);
   private attachmentStorageService = inject(AttachmentStorageService);
   private liveAnnouncer = inject(LiveAnnouncer);
 
-  // ============================================
-  // STATE SIGNALS - PRIVATE
-  // ============================================
   private windowWidthSignal = signal<number>(window.innerWidth);
   private touchStartXSignal = signal<number>(0);
   private touchStartYSignal = signal<number>(0);
 
-  // ============================================
-  // STATE SIGNALS - PUBLIC
-  // ============================================
   currentIndex = signal<number>(0);
   zoomLevel = signal<number>(1);
   rotation = signal<number>(0);
@@ -74,9 +60,6 @@ export class ImageViewerComponent {
   imageLoadError = signal<boolean>(false);
   imageLoadingStates = signal<Map<number, boolean>>(new Map());
 
-  // ============================================
-  // COMPUTED VALUES
-  // ============================================
   isMobile = computed(() => this.windowWidthSignal() < 992);
   isFullscreen = computed(() => this.isMobile());
   
@@ -118,7 +101,6 @@ export class ImageViewerComponent {
   // CONSTRUCTOR & EFFECTS
   // ============================================
   constructor() {
-    // Effect: Initialize index from input
     effect(() => {
       const initial = this.initialIndex();
       const length = this.images().length;
@@ -127,7 +109,6 @@ export class ImageViewerComponent {
       }
     });
 
-    // Effect: Preload adjacent images for smooth navigation
     effect(() => {
       const indices = this.renderedIndices();
       const urls = this.imageUrls();
@@ -255,7 +236,8 @@ export class ImageViewerComponent {
     const rotate = this.rotation();
     const pan = this.panPosition();
     
-    return `scale(${zoom}) rotate(${rotate}deg) translate(${pan.x}px, ${pan.y}px)`;
+    // Important: translate before rotate to avoid coordinate system issues
+    return `translate(${pan.x}px, ${pan.y}px) rotate(${rotate}deg) scale(${zoom})`;
   }
 
   // Methods will be added in next steps...
@@ -268,24 +250,26 @@ export class ImageViewerComponent {
    * Navigate to next image
    */
   navigateNext(): void {
-    if (!this.hasNext()) return;
-    
+    const length = this.images().length;
+    if (length === 0) return;
     this.animationDirection.set('next');
-    this.currentIndex.update(i => i + 1);
+    this.currentIndex.update(i => (i + 1) % length);
     this.resetImageState();
     this.announceCurrentImage();
+    setTimeout(() => this.animationDirection.set(null), 500);
   }
 
   /**
    * Navigate to previous image
    */
   navigatePrev(): void {
-    if (!this.hasPrevious()) return;
-    
+    const length = this.images().length;
+    if (length === 0) return;
     this.animationDirection.set('prev');
-    this.currentIndex.update(i => i - 1);
+    this.currentIndex.update(i => (i - 1 + length) % length);
     this.resetImageState();
     this.announceCurrentImage();
+    setTimeout(() => this.animationDirection.set(null), 500);
   }
 
   /**
@@ -300,6 +284,9 @@ export class ImageViewerComponent {
     this.currentIndex.set(index);
     this.resetImageState();
     this.announceCurrentImage();
+    
+    // Reset animation direction after animation completes (500ms)
+    setTimeout(() => this.animationDirection.set(null), 500);
   }
 
   /**

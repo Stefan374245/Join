@@ -9,9 +9,6 @@ import { ContactDialogComponent } from '../contact-dialog/contact-dialog.compone
 import { ClickOutsideDirective } from '../../../shared/directives/click-outside.directive';
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
 
-/**
- * Contact detail view component with edit/delete actions
- */
 @Component({
   selector: 'app-contact-detail',
   standalone: true,
@@ -78,6 +75,8 @@ export class ContactDetailComponent implements OnInit {
 
   /**
    * Opens edit dialog for current contact
+   * @remarks
+   * Prevents guest users from editing contacts
    */
   editContact() {
     if (this.authService.isGuestUser()) {
@@ -90,8 +89,19 @@ export class ContactDetailComponent implements OnInit {
     this.showDialog = true;
   }
 
+ 
   /**
-   * Deletes current contact after confirmation
+   * Deletes the currently selected contact after user confirmation.
+   * 
+   * - If the user is a guest, shows a toast notification and exits.
+   * - Prompts the user for confirmation before deleting.
+   * - Sets a loading state while the deletion is in progress.
+   * - On successful deletion, shows a success toast and navigates to the contacts list.
+   * - On failure, logs the error and shows an error toast.
+   * - Always resets the loading state and hides the action menu after the operation.
+   * 
+   * @async
+   * @returns {Promise<void>}
    */
   async deleteContact() {
     if (this.authService.isGuestUser()) {
@@ -110,7 +120,6 @@ export class ContactDetailComponent implements OnInit {
         this.toastService.showSuccess(`Contact ${currentContact.firstName} ${currentContact.lastName} deleted successfully!`);
         this.router.navigate(['/contacts']);
       } catch (error) {
-        console.error('Error deleting contact:', error);
         this.toastService.showError('Failed to delete contact. Please try again.');
       } finally {
         this.isDeleting.set(false);
@@ -140,11 +149,9 @@ export class ContactDetailComponent implements OnInit {
         lastName: updatedContact.lastName,
         phone: updatedContact.phone
       });
-      // Contact will update automatically via signals
       this.showDialog = false;
       this.toastService.showSuccess(`Contact ${updatedContact.firstName} ${updatedContact.lastName} updated successfully!`);
     } catch (error) {
-      console.error('Error updating contact:', error);
       this.toastService.showError('Failed to update contact. Please try again.');
     } finally {
       this.isUpdating.set(false);

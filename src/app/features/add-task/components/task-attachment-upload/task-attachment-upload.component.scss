@@ -3,7 +3,6 @@
   margin-top: 16px;
 }
 
-// Upload Zone
 .upload-zone {
   border: 2px dashed #D1D1D1;
   border-radius: 8px;
@@ -62,7 +61,6 @@
   color: #A8A8A8;
 }
 
-// Error Message
 .error-message {
   display: flex;
   align-items: center;
@@ -81,8 +79,7 @@
   }
 }
 
-// Attachments Section
-.attachments-section {
+  .attachments-section {
   margin-top: 24px;
 }
 
@@ -135,7 +132,6 @@
   }
 }
 
-// Attachments Grid
 .attachments-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));

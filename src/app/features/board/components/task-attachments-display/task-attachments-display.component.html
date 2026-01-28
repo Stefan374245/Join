@@ -1,5 +1,4 @@
 <div class="attachments-display" *ngIf="attachments().length > 0">
-  <!-- Header with Download All Button -->
   <div class="attachments-header" *ngIf="!isEditMode() && attachments().length > 1">
     <button 
       class="btn-download-all"
@@ -21,7 +20,6 @@
       [title]="attachment.filename"
     >
       <div class="attachment-preview">
-        <!-- Loading Spinner -->
         <div class="loading-spinner" *ngIf="isImageLoading(attachment.id)">
           <div class="spinner"></div>
         </div>
@@ -36,7 +34,6 @@
           (loadstart)="onImageLoadStart(attachment.id)"
         />
         
-        <!-- Edit Mode: Delete Button -->
         <button 
           *ngIf="isEditMode() && hoveredAttachment() === attachment.id"
           class="delete-button"
@@ -52,7 +49,6 @@
           />
         </button>
 
-        <!-- View Mode: Download Button -->
         <button 
           *ngIf="!isEditMode() && hoveredAttachment() === attachment.id"
           class="download-button"

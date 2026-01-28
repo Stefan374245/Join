@@ -4,19 +4,12 @@ import { FormsModule, ReactiveFormsModule, FormControl } from '@angular/forms';
 import { ToastService } from '../../../../core/services/toast.service';
 import { ToastComponent } from '../../../../shared/components/toast/toast.component';
 import { ClickOutsideDirective } from '../../../../shared/directives/click-outside.directive';
-
-/**
- * Subtask data interface
- */
 export interface Subtask {
     id: string;
     title: string;
     completed?: boolean;
 }
 
-/**
- * Subtask management component with add, edit, delete and overflow handling
- */
 @Component({
     selector: 'app-subtask-management',
     standalone: true,
@@ -49,9 +42,6 @@ export class SubtaskManagementComponent {
     
     readonly MAX_SUBTASKS = 5;
 
-    /**
-     * First 2 subtasks that are always visible
-     */
     visibleSubtasks = computed(() => {
         const tasks = this.subtasks();
         if (tasks.length <= 2) {
@@ -60,28 +50,16 @@ export class SubtaskManagementComponent {
         return tasks.slice(0, 2);
     });
 
-    /**
-     * Subtasks hidden in dropdown after first 2
-     */
     remainingSubtasks = computed(() => {
         return this.subtasks().slice(2);
     });
 
-    /**
-     * Count of hidden subtasks for display
-     */
     remainingSubtasksCount = computed(() => {
         return Math.max(0, this.subtasks().length - 2);
     });
 
-    /**
-     * Whether more subtasks can be added (max 5)
-     */
     canAddMore = computed(() => this.subtasks().length < this.MAX_SUBTASKS);
-    
-    /**
-     * Dynamic placeholder text based on current state
-     */
+  
     inputPlaceholder = computed(() => {
         const count = this.subtasks().length;
         if (count === 0) return 'Add new subtask';
@@ -89,9 +67,6 @@ export class SubtaskManagementComponent {
         return 'Add another subtask';
     });
     
-    /**
-     * Input focus state for UI styling
-     */
     isInputFocused = computed(() => this.inputFocused());
 
     constructor() {
@@ -100,9 +75,15 @@ export class SubtaskManagementComponent {
         });
     }
 
+   
     /**
-     * Handles adding new subtask with validation
-     * Emits to parent component (AddTaskView) for handling via TaskService
+     * Handles the addition of a new subtask.
+     *
+     * - Retrieves and trims the input value from the subtask input control.
+     * - If the input is empty, the method returns early.
+     * - Checks if the maximum number of subtasks (5) has been reached; if so, displays a toast notification and returns.
+     * - Emits the new subtask input to the parent component for further handling.
+     * - Resets the subtask input control and refocuses the input field.
      */
     onAddSubtask(): void {
         const input = this.subtaskInputControl().value?.trim();
@@ -122,8 +103,13 @@ export class SubtaskManagementComponent {
         this.focusAddInput();
     }
 
+  
     /**
-     * Focuses the add input field
+     * Sets focus to the add input element after the current call stack is cleared.
+     * Uses `setTimeout` with a delay of 0 to ensure the DOM is updated before focusing.
+     * Checks if `addInput` is defined before attempting to focus.
+     *
+     * @private
      */
     private focusAddInput(): void {
         setTimeout(() => {
@@ -144,16 +130,19 @@ export class SubtaskManagementComponent {
         }
     }
     
-    /**
-     * Handles input field focus event
-     */
+   
     onAddInputFocus(): void {
         console.log('Input focused!');
         this.inputFocused.set(true);
     }
     
+
     /**
-     * Handles input field blur event with delay
+     * Handles the blur event on the input field.
+     * Logs a message to the console and, after a short delay,
+     * sets the `inputFocused` state to false.
+     * The delay ensures that any related events (such as click)
+     * are processed before the focus state changes.
      */
     onAddInputBlur(): void {
         console.log('Input blurred!');
@@ -162,8 +151,13 @@ export class SubtaskManagementComponent {
         }, 150);
     }
     
+    
     /**
-     * Clears input field and refocuses
+     * Clears the value of the subtask input control and resets its state.
+     * If the input element reference (`addInput`) exists, it sets focus back to the input field.
+     *
+     * @remarks
+     * This method is typically used to clear user input and prepare the input field for new data entry.
      */
     onClearInput(): void {
         this.subtaskInputControl().reset();
@@ -185,15 +179,22 @@ export class SubtaskManagementComponent {
         }, 0);
     }
 
+   
     /**
-     * Confirms subtask update
+     * Emits an event to notify that a subtask update action has been triggered.
+     *
+     * This method should be called when the user initiates an update operation
+     * for a subtask. It emits the `updateSubtask` event to inform parent components
+     * or services that the update process should proceed.
      */
     onUpdate(): void {
         this.updateSubtask.emit();
     }
 
+
     /**
-     * Cancels subtask editing
+     * Emits an event to notify that the subtask edit operation has been cancelled.
+     * Typically used to revert the UI to its previous state or close an edit form.
      */
     onCancelEdit(): void {
         this.cancelEditSubtask.emit();
@@ -220,8 +221,12 @@ export class SubtaskManagementComponent {
         this.deleteSubtask.emit(id);
     }
 
+  
     /**
-     * Toggles dropdown visibility for overflow subtasks
+     * Toggles the open state of the dropdown menu.
+     * 
+     * This method updates the `isDropdownOpen` state by inverting its current value.
+     * Typically used to show or hide a dropdown in the UI.
      */
     toggleDropdown(): void {
         this.isDropdownOpen.update(open => !open);

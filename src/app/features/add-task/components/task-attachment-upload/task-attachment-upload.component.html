@@ -1,5 +1,4 @@
 <div class="attachment-upload">
-  <!-- Upload Zone -->
   <div
     class="upload-zone"
     [class.drag-over]="isDragOver()"
@@ -49,7 +48,6 @@
     </div>
   </div>
 
-  <!-- Error Message -->
   @if (errorMessage()) {
     <div class="error-message">
       <svg
@@ -76,7 +74,6 @@
     </div>
   }
 
-  <!-- Attachments Preview Grid -->
   @if (attachments().length > 0) {
     <div class="attachments-section">
       <div class="attachments-header">

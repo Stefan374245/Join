@@ -190,6 +190,14 @@ export class BoardViewComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  /**
+   * Starts an automatic scrolling interval in the specified direction for the given container element.
+   * The scrolling continues at a fixed speed until stopped.
+   * If an auto-scroll interval is already running, this method does nothing.
+   *
+   * @param direction - The direction to scroll, either 'up' or 'down'.
+   * @param container - The DOM element to be scrolled.
+   */
   private startAutoScroll(direction: 'up' | 'down', container: Element): void {
     if (this.autoScrollInterval) {
       return;
@@ -204,6 +212,12 @@ export class BoardViewComponent implements OnInit, AfterViewInit, OnDestroy {
     }, 16);
   }
 
+  /**
+   * Stops the auto-scrolling behavior by clearing the interval timer if it exists.
+   * Resets the `autoScrollInterval` property to `null` after stopping.
+   *
+   * @private
+   */
   private stopAutoScroll(): void {
     if (this.autoScrollInterval) {
       clearInterval(this.autoScrollInterval);
