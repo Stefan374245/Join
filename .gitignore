@@ -42,19 +42,10 @@ testem.log
 Thumbs.db
 
 # Environment variables
-.env
-.env.local
+.environments/
 
-# Ignore all environment files (ganzer Ordner)
-
-# Einzelne Umgebungsdateien explizit ignorieren
 src/environments/environment.ts
 src/environments/environment.prod.ts
-
-
-# Firebase environment files with real credentials
-# Use environment.ts and environment.prod.ts with mock data
-# Copy from .env.example and add your real credentials locally
 src/environments/environment.local.ts
 src/environments/environment.prod.local.ts
 
