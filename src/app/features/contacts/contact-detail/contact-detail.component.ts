@@ -103,7 +103,7 @@ export class ContactDetailComponent implements OnInit {
    * @async
    * @returns {Promise<void>}
    */
-  async deleteContact() {
+  async deleteContact(): Promise<void> {
     if (this.authService.isGuestUser()) {
       this.toastService.showGuestCannotAddContacts();
       this.showActionMenu = false;
@@ -129,17 +129,22 @@ export class ContactDetailComponent implements OnInit {
   }
 
   /**
-   * Closes contact dialog
+   * Closes contact dialog.
+   * 
+   * @returns {void}
    */
-  closeDialog() {
+  closeDialog(): void {
     this.showDialog = false;
   }
 
   /**
-   * Saves updated contact data
+   * Saves updated contact data to the service.
+   * Displays success or error toast based on outcome.
+   * 
    * @param updatedContact - Contact with updated data
+   * @async @returns {Promise<void>}
    */
-  async saveContact(updatedContact: Contact) {
+  async saveContact(updatedContact: Contact): Promise<void> {
     if (!updatedContact.id) return;
 
     this.isUpdating.set(true);
@@ -160,9 +165,9 @@ export class ContactDetailComponent implements OnInit {
 
   /**
    * Handles contact deletion by navigating back
-   * @param email - Deleted contact email
+   * @param _email - Deleted contact email
    */
-  handleDelete(email: string) {
+  handleDelete(_email: string) {
     this.router.navigate(['/contacts']);
   }
 }

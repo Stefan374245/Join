@@ -1,21 +1,21 @@
-import { Component, OnInit, inject, HostListener } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { Router, RouterLink, RouterLinkActive } from '@angular/router';
-import { ContactService } from '../../../core/services/contact.service';
-import { AuthService } from '../../../core/services/auth.service';
-import { ToastService } from '../../../core/services/toast.service';
-import { Contact } from '../../../core/models/contact.interface';
-import { ContactDialogComponent } from '../contact-dialog/contact-dialog.component';
+import { Component, OnInit, inject, HostListener } from "@angular/core";
+import { CommonModule } from "@angular/common";
+import { Router, RouterLink, RouterLinkActive } from "@angular/router";
+import { ContactService } from "../../../core/services/contact.service";
+import { AuthService } from "../../../core/services/auth.service";
+import { ToastService } from "../../../core/services/toast.service";
+import { Contact } from "../../../core/models/contact.interface";
+import { ContactDialogComponent } from "../contact-dialog/contact-dialog.component";
 
 /**
  * Contacts list view with search, selection and CRUD operations using ContactService signals
  */
 @Component({
-  selector: 'app-contacts-list',
+  selector: "app-contacts-list",
   standalone: true,
   imports: [CommonModule, RouterLink, ContactDialogComponent],
-  templateUrl: './contacts-list.component.html',
-  styleUrl: './contacts-list.component.scss'
+  templateUrl: "./contacts-list.component.html",
+  styleUrl: "./contacts-list.component.scss",
 })
 export class ContactsListComponent implements OnInit {
   private contactService = inject(ContactService);
@@ -32,15 +32,30 @@ export class ContactsListComponent implements OnInit {
   isMobile = false;
 
   showDialog = false;
-  dialogMode: 'add' | 'edit' = 'add';
+  dialogMode: "add" | "edit" = "add";
   dialogContact: Contact | null = null;
 
   showDeleteConfirm = false;
   contactToDelete: Contact | null = null;
 
   /**
+   * Determines if the selected contact is the current user's own profile
+   *
+   * @returns {boolean} True if selected contact matches current user email
+   * @remarks Used to conditionally allow editing of own profile
+   * in the contact detail view.
+   */
+  get isOwnProfile(): boolean {
+    if (!this.selected || !this.authService.currentUser) {
+      return false;
+    }
+    return this.selected.email === this.authService.currentUser.email;
+  }
+  /**
    * Component initialization - sets up auto-selection
    * Note: Contacts load automatically via real-time listener in ContactService
+   *
+   * @returns {void}
    */
   ngOnInit(): void {
     this.onResize();
@@ -51,104 +66,157 @@ export class ContactsListComponent implements OnInit {
    * Selects a contact and updates localStorage
    * @param contact - Contact to select
    * @param event - Optional click event
+   * @returns {void}
    */
-  select(contact: Contact, event?: Event) {
+  select(contact: Contact, event?: Event): void {
     if (window.innerWidth >= 900) {
       if (event) {
         event.preventDefault();
       }
     }
     this.selected = contact;
-    localStorage.setItem('selectedContactEmail', contact.email);
-    localStorage.setItem('lastEditedContact', contact.email);
+    localStorage.setItem("selectedContactEmail", contact.email);
+    localStorage.setItem("lastEditedContact", contact.email);
   }
 
   /**
-   * Opens dialog to add new contact (blocked for guest users)
+   * Opens dialog to add new contact (blocked for guest users).
+   *
+   * @returns {void}
    */
-  addContact() {
+  addContact(): void {
     if (this.authService.isGuestUser()) {
       this.toastService.showGuestCannotAddContacts();
       return;
     }
-    this.dialogMode = 'add';
+    this.dialogMode = "add";
     this.dialogContact = null;
     this.showDialog = true;
   }
 
   /**
-   * Opens dialog to edit existing contact (blocked for guest users)
+   * Opens dialog to edit existing contact (blocked for guest users).
    * @param contact - Contact to edit
+   *
+   * @returns {void}
    */
-  editContact(contact: Contact) {
+  editContact(contact: Contact): void {
     if (this.authService.isGuestUser()) {
       this.toastService.showGuestCannotAddContacts();
       return;
     }
-    this.dialogMode = 'edit';
+    this.dialogMode = "edit";
     this.dialogContact = contact;
     this.showDialog = true;
   }
 
   /**
-   * Closes contact dialog and resets state
+   * Closes contact dialog and resets state.
+   *
+   * @returns {void}
    */
-  closeDialog() {
+  closeDialog(): void {
     this.showDialog = false;
     this.dialogContact = null;
   }
 
   /**
-   * Saves contact (add or update) and handles own profile updates
+   * Saves contact (add or edit) using ContactService signals.
    * @param contact - Contact data to save
+   * @async
+   * @returns {Promise<void>}
+   * @remarks Handles both adding new contacts and updating existing ones.
+   * Emits success or error toasts based on operation outcome.
    */
-  async saveContact(contact: Contact) {
+  async saveContact(contact: Contact): Promise<void> {
     try {
-      if (this.dialogMode === 'add') {
-        const contactId = contact.email.replace(/[.@]/g, '_');
-
-        const newContact: Contact = {
-          ...contact,
-          id: contactId
-        };
-
-        await this.contactService.saveContact(newContact);
-        console.log('✅ Contact added successfully');
-        this.toastService.showSuccess(`Contact ${contact.firstName} ${contact.lastName} added successfully!`);
+      if (this.dialogMode === "add") {
+        await this.addContactLogic(contact);
       } else if (contact.id) {
-        const isOwnProfile = this.authService.currentUser?.email === contact.email;
-
-        await this.contactService.updateUser(contact.id, {
-          firstName: contact.firstName,
-          lastName: contact.lastName,
-          phone: contact.phone
-        });
-
-        if (isOwnProfile) {
-          const displayName = `${contact.firstName} ${contact.lastName}`;
-          await this.authService.updateDisplayName(displayName);
-          console.log('✅ Profile updated in both Firestore and Auth');
-        }
-
-        console.log('✅ Contact updated successfully');
-        this.toastService.showSuccess(`Contact ${contact.firstName} ${contact.lastName} updated successfully!`);
+        await this.updateContactLogic(contact);
       }
-
-      this.closeDialog();
-
-      this.selected = contact;
-      localStorage.setItem('selectedContactEmail', contact.email);
+      this.afterContactSave(contact);
     } catch (error) {
-      console.error('❌ Error saving contact:', error);
-      this.toastService.showError('Failed to save contact. Please try again.');
+      this.handleContactSaveError(error);
     }
+  }
+
+  /**
+   * Shared logic to add a new contact.
+   *
+   * @param contact - Contact data to add
+   * @async
+   * @returns {Promise<void>}
+   * @remarks Generates contact ID from email, saves via ContactService,
+   * and shows success toast on completion.
+   */
+  private async addContactLogic(contact: Contact): Promise<void> {
+    const contactId = contact.email.replace(/[.@]/g, "_");
+    const newContact: Contact = { ...contact, id: contactId };
+    await this.contactService.saveContact(newContact);
+    this.toastService.showSuccess(
+      `Contact ${contact.firstName} ${contact.lastName} added successfully!`,
+    );
+  }
+
+  /**
+   * Shared logic to update an existing contact.
+   *
+   * @param contact - Contact data to update
+   * @async
+   * @returns {Promise<void>}
+   * @remarks Updates contact via ContactService,
+   * updates auth display name if own profile,
+   * and shows success toast on completion.
+   */
+  private async updateContactLogic(contact: Contact): Promise<void> {
+    const isOwnProfile = this.authService.currentUser?.email === contact.email;
+    await this.contactService.updateUser(contact.id!, {
+      firstName: contact.firstName,
+      lastName: contact.lastName,
+      phone: contact.phone,
+    });
+    if (isOwnProfile) {
+      const displayName = `${contact.firstName} ${contact.lastName}`;
+      await this.authService.updateDisplayName(displayName);
+    }
+    this.toastService.showSuccess(
+      `Contact ${contact.firstName} ${contact.lastName} updated successfully!`,
+    );
+  }
+
+  /**
+   * Post-save logic to close dialog and update selection.
+   * @param contact - Contact that was saved
+   * @returns {void}
+   * @remarks Closes the contact dialog, sets the selected contact,
+   * and updates localStorage with the selected contact email.
+   */
+  private afterContactSave(contact: Contact): void {
+    this.closeDialog();
+    this.selected = contact;
+    localStorage.setItem("selectedContactEmail", contact.email);
+  }
+
+  /**
+   * Handles errors during contact save operations and shows error toast.
+   *
+   * @param error - Error encountered during save
+   * @returns {void}
+   * @remarks Logs error to console and displays user-friendly error message.
+   */
+  private handleContactSaveError(error: any): void {
+    console.error("❌ Error saving contact:", error);
+    this.toastService.showError("Failed to save contact. Please try again.");
   }
 
   /**
    * Shows delete confirmation dialog (blocked for guest users)
    * @param contact - Contact to delete
+   * @returns {void}
+   * @remarks Sets up state for confirmation dialog display.
    */
-  showDeleteConfirmation(contact: Contact) {
+  showDeleteConfirmation(contact: Contact): void {
     if (this.authService.isGuestUser()) {
       this.toastService.showGuestCannotAddContacts();
       return;
@@ -159,77 +227,119 @@ export class ContactsListComponent implements OnInit {
 
   /**
    * Cancels delete operation and closes confirmation dialog
+   *
+   * @returns {void}
+   * @remarks Resets state related to deletion confirmation.
    */
-  cancelDelete() {
+  cancelDelete(): void {
     this.showDeleteConfirm = false;
     this.contactToDelete = null;
   }
 
   /**
-   * Confirms and executes contact deletion using ContactService signals
+   * Confirms and executes contact deletion and handles post-deletion logic.
+   * @async
+   * @returns {Promise<void>}
+   * @remarks Deletes contact via ContactService, shows success or error toasts,
+   * clears selection if deleted contact was selected, and closes dialog.
    */
-  async confirmDelete() {
+  async confirmDelete(): Promise<void> {
     if (!this.contactToDelete) return;
-
     const contact = this.contactToDelete;
-    this.showDeleteConfirm = false;
-    this.contactToDelete = null;
-
+    this.resetDeleteState();
     try {
-      if (!contact.id) {
-        throw new Error('Contact ID not found');
-      }
-
-      await this.contactService.deleteUser(contact.id);
-      console.log('✅ Contact deleted successfully');
-      this.toastService.showSuccess(`Contact ${contact.firstName} ${contact.lastName} deleted successfully!`);
-
-      if (this.selected?.email === contact.email) {
-        this.clearSelection();
-      }
-
-      // ContactService will update signals automatically
-      this.closeDialog();
+      await this.deleteContactLogic(contact);
+      this.afterContactDelete(contact);
     } catch (error) {
-      console.error('❌ Error deleting contact:', error);
-      this.toastService.showError('Failed to delete contact. Please try again.');
+      this.handleContactDeleteError(error);
     }
   }
 
   /**
-   * Clears current selection and removes from localStorage
+   * Resets deletion confirmation state
+   *
+   * @returns {void}
+   * @remarks Clears contactToDelete and hides confirmation dialog.
    */
-  clearSelection() {
+  private resetDeleteState(): void {
+    this.showDeleteConfirm = false;
+    this.contactToDelete = null;
+  }
+
+  /**
+   * Executes contact deletion via ContactService.
+   *
+   * @param contact - Contact to delete
+   * @async
+   * @returns {Promise<void>}
+   * @remarks Deletes contact by ID and shows success toast on completion.
+   */
+  private async deleteContactLogic(contact: Contact): Promise<void> {
+    if (!contact.id) throw new Error("Contact ID not found");
+    await this.contactService.deleteUser(contact.id);
+    this.toastService.showSuccess(
+      `Contact ${contact.firstName} ${contact.lastName} deleted successfully!`,
+    );
+  }
+
+  /**
+   * Post-deletion logic to clear selection and close dialog.
+   * @param contact - Contact that was deleted
+   * @returns {void}
+   * @remarks Clears selection if deleted contact was selected,
+   * and closes any open dialog.
+   */
+  private afterContactDelete(contact: Contact): void {
+    if (this.selected?.email === contact.email) this.clearSelection();
+    this.closeDialog();
+  }
+
+  /**
+   * Handles errors during contact deletion and shows error toast.
+   *
+   * @param error - Error encountered during deletion
+   * @returns {void}
+   * @remarks Logs error to console and displays user-friendly error message.
+   */
+  private handleContactDeleteError(error: any): void {
+    console.error("❌ Error deleting contact:", error);
+    this.toastService.showError("Failed to delete contact. Please try again.");
+  }
+
+  /**
+   * Clears current selection and removes from localStorage
+   *
+   * @returns {void}
+   * @remarks Used after contact deletion to reset selection state.
+   */
+  clearSelection(): void {
     this.selected = null;
-    localStorage.removeItem('selectedContactEmail');
+    localStorage.removeItem("selectedContactEmail");
   }
 
   /**
    * Automatically selects last edited contact from localStorage
+   *
+   * @returns {void}
+   * @remarks Checks localStorage for last edited contact email
+   * and selects that contact if found.
    */
-  checkAutoSelect() {
-    const last = localStorage.getItem('lastEditedContact') || localStorage.getItem('selectedContactEmail');
+  checkAutoSelect(): void {
+    const last =
+      localStorage.getItem("lastEditedContact") ||
+      localStorage.getItem("selectedContactEmail");
     if (!last) return;
     const contact = this.contactService.findContactByEmail(last);
     if (contact) this.selected = contact;
   }
 
   /**
-   * Checks if selected contact is the user's own profile
-   * @returns True if selected contact matches current user email
-   */
-  get isOwnProfile(): boolean {
-    if (!this.selected || !this.authService.currentUser) {
-      return false;
-    }
-    return this.selected.email === this.authService.currentUser.email;
-  }
-
-  /**
    * Handles window resize for responsive layout
+   * @returns {void}
+   * @remarks Updates showRight and isMobile flags based on window width.
    */
-  @HostListener('window:resize')
-  onResize() {
+  @HostListener("window:resize")
+  onResize(): void {
     const w = window.innerWidth;
     this.showRight = w >= 900;
     this.isMobile = w < 900;

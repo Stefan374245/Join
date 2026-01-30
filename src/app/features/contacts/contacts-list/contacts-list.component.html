@@ -93,7 +93,6 @@
   </div>
 </main>
 
-<!-- Contact Dialog -->
 <app-contact-dialog
   *ngIf="showDialog"
   [mode]="dialogMode"
@@ -103,14 +102,12 @@
   (delete)="showDeleteConfirmation(dialogContact!)">
 </app-contact-dialog>
 
-<!-- FAB Add Contact Button (Mobile Only) -->
 <div class="fab-add-contact">
   <button class="fab-button" (click)="addContact()" title="Add Contact">
     <img src="assets/images/person_add.svg" alt="Add Contact" />
   </button>
 </div>
 
-<!-- Delete Confirmation Dialog -->
 <div class="confirm-dialog-overlay"
      *ngIf="showDeleteConfirm"
      (click)="cancelDelete()">

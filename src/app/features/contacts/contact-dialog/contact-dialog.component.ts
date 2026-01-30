@@ -7,9 +7,6 @@ import { ToastService } from '../../../core/services/toast.service';
 import { Contact } from '../../../core/models/contact.interface';
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
 
-/**
- * Modal dialog for adding/editing contacts with form validation
- */
 @Component({
   selector: 'app-contact-dialog',
   standalone: true,
