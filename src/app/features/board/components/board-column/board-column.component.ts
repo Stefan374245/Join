@@ -4,6 +4,7 @@ import { DragDropModule, CdkDragDrop, CdkDropList } from '@angular/cdk/drag-drop
 import { Task } from '../../../../core/models/task.interface';
 import { Contact } from '../../../../core/models/contact.interface';
 import { TaskCardComponent } from '../task-card/task-card.component';
+import { TaskService } from '../../../../core/services/task.service';
 
 /**
  * Board column component representing individual status columns in the Kanban board.
@@ -32,7 +33,7 @@ import { TaskCardComponent } from '../task-card/task-card.component';
 })
 export class BoardColumnComponent implements AfterViewInit {
 
-  constructor() {
+  constructor(private taskService: TaskService) {
     effect(() => {
       const dropList = this.dropList();
       const connected = this.connectedDropLists();
@@ -42,6 +43,7 @@ export class BoardColumnComponent implements AfterViewInit {
       }
     });
   }
+
   dropList = viewChild.required<CdkDropList>(CdkDropList);
   
   columnId = input.required<string>();
@@ -50,7 +52,7 @@ export class BoardColumnComponent implements AfterViewInit {
   contacts = input.required<Contact[]>();
   loading = input<boolean>(false);
   connectedDropLists = input<CdkDropList[]>([]);
-  
+
   taskDropped = output<{ event: CdkDragDrop<Task[]>, status: string }>();
   addTaskClicked = output<string>();
   taskClicked = output<Task>();
@@ -77,7 +79,27 @@ export class BoardColumnComponent implements AfterViewInit {
    * @param event - The CDK drag-drop event containing source, destination, and task information
    */
  onTaskDrop(event: CdkDragDrop<Task[]>): void {
+  console.log('Webhook Payload', {
+  taskId: event.item.data.id,
+  oldStatus: this.mapStatus(event.previousContainer.id),
+  newStatus: this.mapStatus(event.container.id),
+});
   this.taskDropped.emit({ event, status: event.container.id });
+  const updatedBy = 'system'; // Replace with actual user info if available
+  this.taskService.triggerStatusWebhook(
+    event.item.data,
+    this.mapStatus(event.previousContainer.id),
+    this.mapStatus(event.container.id),
+    updatedBy
+  );
+}   
+
+/**
+ * Maps a column ID to a status string.
+ * Replace this logic with your actual mapping if needed.
+ */
+private mapStatus(columnId: string): string {
+  return columnId.replace('-list', '');
 }
 
   /**

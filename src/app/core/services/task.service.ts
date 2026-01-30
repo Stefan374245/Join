@@ -1,67 +1,97 @@
-import { Injectable, inject, signal, computed, effect, Injector } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { Firestore } from '@angular/fire/firestore';
-import { Auth, authState } from '@angular/fire/auth';
-import { Task, Subtask, TaskAttachment } from '../models/task.interface';
-import { AttachmentStorageService } from './attachment-storage.service';
-import { mapFirestoreToTask } from './tasks/task-mapper.helper';
-import { filterTasksByQuery, groupTasksByStatus, filterUrgentTasks, calculateTaskStats, findNextUrgentDeadline} from './tasks/task-filter.helper';
-import { addTaskToFirestore, updateTaskInFirestore, deleteTaskFromFirestore, setupTasksListener } from './tasks/task-firestore.helper';
-import { performOptimisticStatusUpdate } from './tasks/task-optimistic-update.helper';
-import { uploadAndPrepareAttachments, processAttachmentsForUpdate, buildTaskFromFormData, buildTaskUpdatesFromFormData, generateTaskId } from './tasks/task-form.helper';
-import { updateSubtaskInTask, addSubtaskToTaskList, removeSubtaskFromTaskList } from './tasks/task-subtask.helper';
+import {
+  Injectable,
+  inject,
+  signal,
+  computed,
+  effect,
+  Injector,
+} from "@angular/core";
+import { toSignal } from "@angular/core/rxjs-interop";
+import { Firestore } from "@angular/fire/firestore";
+import { Auth, authState } from "@angular/fire/auth";
+import { Task, Subtask, TaskAttachment } from "../models/task.interface";
+import { AttachmentStorageService } from "./attachment-storage.service";
+import { mapFirestoreToTask } from "./tasks/task-mapper.helper";
+import {
+  filterTasksByQuery,
+  groupTasksByStatus,
+  filterUrgentTasks,
+  calculateTaskStats,
+  findNextUrgentDeadline,
+} from "./tasks/task-filter.helper";
+import {
+  addTaskToFirestore,
+  updateTaskInFirestore,
+  deleteTaskFromFirestore,
+  setupTasksListener,
+} from "./tasks/task-firestore.helper";
+import { performOptimisticStatusUpdate } from "./tasks/task-optimistic-update.helper";
+import {
+  uploadAndPrepareAttachments,
+  processAttachmentsForUpdate,
+  buildTaskFromFormData,
+  buildTaskUpdatesFromFormData,
+  generateTaskId,
+} from "./tasks/task-form.helper";
+import {
+  updateSubtaskInTask,
+  addSubtaskToTaskList,
+  removeSubtaskFromTaskList,
+} from "./tasks/task-subtask.helper";
+import { HttpClient } from "@angular/common/http";
 
 /**
  * Signal-based task management service with real-time Firestore synchronization
  */
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root",
 })
 export class TaskService {
   private firestore = inject(Firestore);
   private auth = inject(Auth);
   private attachmentStorage = inject(AttachmentStorageService);
   private injector = inject(Injector);
+  private http = inject(HttpClient);
   private tasksSignal = signal<Task[]>([]);
   private loadingSignal = signal<boolean>(false);
   private errorSignal = signal<string | null>(null);
-  private searchQuerySignal = signal<string>('');
-  
+  private searchQuerySignal = signal<string>("");
+
   public readonly tasks = this.tasksSignal.asReadonly();
   public readonly loading = this.loadingSignal.asReadonly();
   public readonly error = this.errorSignal.asReadonly();
   public readonly searchQuery = this.searchQuerySignal.asReadonly();
-  
-  public readonly filteredTasks = computed(() => 
-    filterTasksByQuery(this.tasks(), this.searchQuerySignal())
+
+  public readonly filteredTasks = computed(() =>
+    filterTasksByQuery(this.tasks(), this.searchQuerySignal()),
   );
-  
-  public readonly tasksByStatus = computed(() => 
-    groupTasksByStatus(this.tasks())
+
+  public readonly tasksByStatus = computed(() =>
+    groupTasksByStatus(this.tasks()),
   );
-  
-  public readonly filteredTasksByStatus = computed(() => 
-    groupTasksByStatus(this.filteredTasks())
+
+  public readonly filteredTasksByStatus = computed(() =>
+    groupTasksByStatus(this.filteredTasks()),
   );
-  
-  public readonly urgentTasks = computed(() => 
-    filterUrgentTasks(this.tasks())
+
+  public readonly urgentTasks = computed(() => filterUrgentTasks(this.tasks()));
+
+  public readonly taskStats = computed(() =>
+    calculateTaskStats(this.tasks(), this.urgentTasks()),
   );
-  
-  public readonly taskStats = computed(() => 
-    calculateTaskStats(this.tasks(), this.urgentTasks())
+
+  public readonly nextUrgentDeadline = computed(() =>
+    findNextUrgentDeadline(this.urgentTasks()),
   );
-  
-  public readonly nextUrgentDeadline = computed(() => 
-    findNextUrgentDeadline(this.urgentTasks())
-  );
-  
+
   private unsubscribe: (() => void) | null = null;
 
   constructor() {
-    const authStateSignal = toSignal(authState(this.auth), { initialValue: null });
-    
+    const authStateSignal = toSignal(authState(this.auth), {
+      initialValue: null,
+    });
+
     effect(() => {
       const user = authStateSignal();
       if (user) {
@@ -91,7 +121,7 @@ export class TaskService {
       this.injector,
       this.tasksSignal,
       this.loadingSignal,
-      this.errorSignal
+      this.errorSignal,
     );
   }
 
@@ -101,10 +131,8 @@ export class TaskService {
    * @returns The task if found, undefined otherwise
    */
   findTaskById(id: string): Task | undefined {
-    return this.tasksSignal().find(task => task.id === id);
+    return this.tasksSignal().find((task) => task.id === id);
   }
-
-
 
   /**
    * Sets the search query for filtering tasks
@@ -118,7 +146,7 @@ export class TaskService {
    * Clears the current search query
    */
   clearSearch(): void {
-    this.searchQuerySignal.set('');
+    this.searchQuerySignal.set("");
   }
 
   /**
@@ -127,11 +155,14 @@ export class TaskService {
    * @param newStatus - The new status
    * @returns Promise of the update operation
    */
-  async updateTaskStatusOptimistic(taskId: string, newStatus: Task['status']): Promise<void> {
+  async updateTaskStatusOptimistic(
+    taskId: string,
+    newStatus: Task["status"],
+  ): Promise<void> {
     const { revertFn } = performOptimisticStatusUpdate(
       this.tasksSignal,
       taskId,
-      newStatus
+      newStatus,
     );
 
     try {
@@ -148,12 +179,7 @@ export class TaskService {
    * @returns Promise of the add operation
    */
   async addTask(task: Task): Promise<void> {
-    await addTaskToFirestore(
-      this.firestore,
-      this.auth,
-      this.injector,
-      task
-    );
+    await addTaskToFirestore(this.firestore, this.auth, this.injector, task);
   }
 
   /**
@@ -163,12 +189,7 @@ export class TaskService {
    * @returns Promise of the update operation
    */
   async updateTask(taskId: string, updates: Partial<Task>): Promise<void> {
-    await updateTaskInFirestore(
-      this.firestore,
-      this.injector,
-      taskId,
-      updates
-    );
+    await updateTaskInFirestore(this.firestore, this.injector, taskId, updates);
   }
 
   /**
@@ -186,7 +207,10 @@ export class TaskService {
    * @param status - The new status
    * @returns Promise of the status update
    */
-  async updateTaskStatus(taskId: string, status: 'triage' | 'todo' | 'in-progress' | 'await-feedback' | 'done'): Promise<void> {
+  async updateTaskStatus(
+    taskId: string,
+    status: "triage" | "todo" | "in-progress" | "await-feedback" | "done",
+  ): Promise<void> {
     await this.updateTask(taskId, { status });
   }
 
@@ -197,10 +221,14 @@ export class TaskService {
    * @param completed - Completion status
    * @returns Promise of the update
    */
-  async updateSubtaskCompletion(taskId: string, subtaskId: string, completed: boolean): Promise<void> {
+  async updateSubtaskCompletion(
+    taskId: string,
+    subtaskId: string,
+    completed: boolean,
+  ): Promise<void> {
     const task = this.findTaskById(taskId);
     if (!task) {
-      throw new Error('Task not found');
+      throw new Error("Task not found");
     }
 
     const updatedSubtasks = updateSubtaskInTask(task, subtaskId, completed);
@@ -215,15 +243,15 @@ export class TaskService {
    */
   async toggleSubtask(taskId: string, subtaskId: string): Promise<void> {
     const tasks = this.tasksSignal();
-    const task = tasks.find(t => t.id === taskId);
+    const task = tasks.find((t) => t.id === taskId);
 
     if (!task || !task.subtasks) {
-      throw new Error('Task or subtasks not found');
+      throw new Error("Task or subtasks not found");
     }
 
-    const subtask = task.subtasks.find(st => st.id === subtaskId);
+    const subtask = task.subtasks.find((st) => st.id === subtaskId);
     if (!subtask) {
-      throw new Error('Subtask not found');
+      throw new Error("Subtask not found");
     }
 
     await this.updateSubtaskCompletion(taskId, subtaskId, !subtask.completed);
@@ -238,7 +266,7 @@ export class TaskService {
   async addSubtaskToTask(taskId: string, subtask: Subtask): Promise<void> {
     const task = this.findTaskById(taskId);
     if (!task) {
-      throw new Error('Task not found');
+      throw new Error("Task not found");
     }
 
     const updatedSubtasks = addSubtaskToTaskList(task, subtask);
@@ -251,10 +279,13 @@ export class TaskService {
    * @param subtaskId - The ID of the subtask to remove
    * @returns Promise of the remove operation
    */
-  async removeSubtaskFromTask(taskId: string, subtaskId: string): Promise<void> {
+  async removeSubtaskFromTask(
+    taskId: string,
+    subtaskId: string,
+  ): Promise<void> {
     const task = this.findTaskById(taskId);
     if (!task) {
-      throw new Error('Task not found');
+      throw new Error("Task not found");
     }
 
     const updatedSubtasks = removeSubtaskFromTaskList(task, subtaskId);
@@ -271,10 +302,12 @@ export class TaskService {
     const task = this.findTaskById(taskId);
 
     if (!task || !task.attachments) {
-      throw new Error('Task or attachments not found');
+      throw new Error("Task or attachments not found");
     }
 
-    const updatedAttachments = task.attachments.filter(att => att.id !== attachmentId);
+    const updatedAttachments = task.attachments.filter(
+      (att) => att.id !== attachmentId,
+    );
     await this.updateTask(taskId, { attachments: updatedAttachments });
   }
 
@@ -294,21 +327,21 @@ export class TaskService {
       initialStatus: string;
       subtasks: any[];
       attachments?: TaskAttachment[];
-    }
+    },
   ): Promise<Task> {
     const taskId = generateTaskId();
 
     const attachmentsWithURLs = await uploadAndPrepareAttachments(
       additionalData.attachments,
       taskId,
-      this.attachmentStorage.uploadAttachments.bind(this.attachmentStorage)
+      this.attachmentStorage.uploadAttachments.bind(this.attachmentStorage),
     );
 
     const newTask = buildTaskFromFormData(
       formData,
       additionalData,
       taskId,
-      attachmentsWithURLs
+      attachmentsWithURLs,
     );
 
     await this.addTask(newTask);
@@ -331,29 +364,57 @@ export class TaskService {
       selectedPriority: string;
       subtasks: any[];
       attachments?: TaskAttachment[];
-    }
+    },
   ): Promise<Task> {
     const task = this.findTaskById(taskId);
     if (!task) {
-      throw new Error('Task not found');
+      throw new Error("Task not found");
     }
 
     const finalAttachments = await processAttachmentsForUpdate(
       additionalData.attachments,
       taskId,
-      this.attachmentStorage.uploadAttachments.bind(this.attachmentStorage)
+      this.attachmentStorage.uploadAttachments.bind(this.attachmentStorage),
     );
 
     const updates = buildTaskUpdatesFromFormData(
       formData,
       additionalData,
-      finalAttachments
+      finalAttachments,
     );
 
     await this.updateTask(taskId, updates);
     return { ...task, ...updates };
   }
 
+  /**
+   * Triggers a webhook for task status changes
+   * @param task - The task object
+   * @param oldStatus - The old status
+   * @param newStatus - The new status
+   * @param updatedBy - The user who updated the task
+   */
+  triggerStatusWebhook(
+    task: Task,
+    oldStatus: string,
+    newStatus: string,
+    updatedBy: string,
+  ): void {
+    const url =
+      "https://n8n-production-04d3.up.railway.app/webhook/task-status-changed";
+    const body = {
+      taskId: task.id,
+      oldStatus: oldStatus,
+      newStatus: newStatus,
+      taskTitle: task.title,
+      creatorEmail: task.creatorEmail,
+      creatorName: task.creatorName,
+      updatedBy: updatedBy,
+      timestamp: new Date().toISOString(),
+    };
+    this.http.post(url, body).subscribe({
+      next: () => console.log("Webhook triggered!"),
+      error: (err) => console.error("Webhook error:", err),
+    });
+  }
 }
-
-
