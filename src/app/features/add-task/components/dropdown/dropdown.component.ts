@@ -31,7 +31,8 @@ export interface DropdownItem {
 export class DropdownComponent {
   id = input.required<string>();
   items = input.required<DropdownItem[]>();
-
+  
+  showClearButton = input<boolean>(true);
   selectedIds = input<string[]>([]);
   placeholder = input<string>("Select an option");
   searchable = input<boolean>(true);
@@ -47,6 +48,7 @@ export class DropdownComponent {
   isOpen = signal<boolean>(false);
   searchQuery = signal<string>("");
   focusedIndex = signal<number>(-1);
+
 
   /**
    * Items filtered by search query

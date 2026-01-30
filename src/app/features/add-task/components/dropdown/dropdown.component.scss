@@ -1,26 +1,13 @@
-// ============================================
-// DROPDOWN COMPONENT STYLES
-// Copied from: src/app/features/add-task/styles/_dropdowns.scss
-// Purpose: Generic dropdown with search, keyboard navigation, accessibility
-// Used for: Contacts (Assigned To), Categories
-// ============================================
-
 @import "../../../../../styles/variables";
 @import "../../../../../styles/mixins";
 @import "../../../../../styles/scrollbar";
 
-// ============================================
-// DROPDOWN CONTAINER
-// ============================================
+
 
 .dropdown-container {
   position: relative;
   width: 100%;
 }
-
-// ============================================
-// DROPDOWN TRIGGER BUTTON
-// ============================================
 
 .dropdown-trigger {
   width: 100%;
@@ -70,10 +57,6 @@
   }
 }
 
-// ============================================
-// CLEAR BUTTON
-// ============================================
-
 .clear-button {
   padding: 4px;
   background: none;
@@ -94,10 +77,6 @@
   }
 }
 
-// ============================================
-// DROPDOWN ARROW
-// ============================================
-
 .dropdown-arrow {
   width: 14px;
   height: 8px;
@@ -109,10 +88,6 @@
     transform: rotate(180deg);
   }
 }
-
-// ============================================
-// DROPDOWN MENU
-// ============================================
 
 .dropdown-menu {
   position: absolute;
@@ -138,10 +113,6 @@
     transform: translateY(0);
   }
 }
-
-// ============================================
-// SEARCH WRAPPER
-// ============================================
 
 .search-wrapper {
   position: relative;
@@ -180,9 +151,6 @@
   pointer-events: none;
 }
 
-// ============================================
-// DROPDOWN LIST
-// ============================================
 
 .dropdown-list {
   list-style: none;
@@ -192,10 +160,6 @@
   overflow-y: auto;
   @include custom-scrollbar;
 }
-
-// ============================================
-// DROPDOWN ITEM
-// ============================================
 
 .dropdown-item {
   padding: 12px 16px;
@@ -251,10 +215,9 @@
     justify-content: center;
   }
 
-  // Checkbox for multi-select
   input[type="checkbox"] {
-    appearance: none;
     -webkit-appearance: none;
+    appearance: none;
     width: 18px;
     height: 18px;
     border: 2px solid #d1d1d1;
@@ -288,7 +251,6 @@
     }
   }
   
-  // Checkbox in hover/selected state
   &:hover:not(.disabled):not(.empty),
   &.focused:not(.disabled):not(.empty),
   &.selected:not(.disabled) {
@@ -325,10 +287,6 @@
   }
 }
 
-// ============================================
-// CONTACT-SPECIFIC STYLES (for Badge List integration)
-// ============================================
-
 .contact-info {
   @include flex(row, flex-start, center);
   gap: 12px;
@@ -346,10 +304,6 @@
   flex-shrink: 0;
   text-transform: uppercase;
 }
-
-// ============================================
-// RESPONSIVE
-// ============================================
 
 @media (max-width: 768px) {
   .dropdown-trigger {
@@ -369,11 +323,6 @@
   }
 }
 
-// ============================================
-// ACCESSIBILITY
-// ============================================
-
-// High contrast mode support
 @media (prefers-contrast: high) {
   .dropdown-trigger,
   .dropdown-menu,
@@ -382,7 +331,6 @@
   }
 }
 
-// Reduced motion support
 @media (prefers-reduced-motion: reduce) {
   .dropdown-arrow,
   .dropdown-item,

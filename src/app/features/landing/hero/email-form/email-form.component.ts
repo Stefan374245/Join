@@ -7,11 +7,13 @@ import { DailyLimitService } from '../../../../core/services/daily-limit.service
 import { ToastService } from '../../../../core/services/toast.service';
 import { FooterAuthComponent } from '../../../../shared/components/footer-auth/footer-auth.component';
 import { environment } from '../../../../../environments/environment';
+import { DropdownComponent } from '../../../add-task/components/dropdown/dropdown.component';
+
 
 @Component({
   selector: 'app-email-form',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, FooterAuthComponent],
+  imports: [CommonModule, FormsModule, RouterModule, FooterAuthComponent, DropdownComponent],
   templateUrl: './email-form.component.html',
   styleUrls: ['./email-form.component.scss']
 })
@@ -29,6 +31,11 @@ export class EmailFormComponent implements OnInit {
   maxRequests = 10;
   isLimitReached = false;
   isLoading = true;
+  requestTypeItems = [
+  { id: 'feature', label: 'Feature Request' },
+  { id: 'bug', label: 'Bug Report' },
+  { id: 'question', label: 'Question' }
+];
 
   private http = inject(HttpClient);
 
@@ -178,6 +185,11 @@ export class EmailFormComponent implements OnInit {
     this.stakeholderName = '';
     this.requestType = 'feature';
   }
+
+  onRequestTypeChange(ids: string[]) {
+  const allowedTypes: Array<'feature' | 'bug' | 'question'> = ['feature', 'bug', 'question'];
+  this.requestType = allowedTypes.includes(ids[0] as any) ? (ids[0] as 'feature' | 'bug' | 'question') : 'feature';
+}
 
   /**
    * Navigates back to the feature request role.

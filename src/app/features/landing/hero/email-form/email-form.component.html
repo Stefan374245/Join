@@ -26,11 +26,16 @@
     <form class="request-form" (ngSubmit)="onSubmit()">
       <div class="form-group">
         <label for="requestType">Request Type *</label>
-        <select id="requestType" [(ngModel)]="requestType" name="requestType" required>
-          <option value="feature">Feature Request</option>
-          <option value="bug">Bug Report</option>
-          <option value="question">Question</option>
-        </select>
+        <app-dropdown
+          id="requestType"
+          [items]="requestTypeItems"
+          [selectedIds]="[requestType]"
+          placeholder="Select request type"
+          [searchable]="false"
+          [multiple]="false"
+          [showClearButton]="false"
+          (selectionChange)="onRequestTypeChange($event)"
+        ></app-dropdown>
       </div>
 
       <div class="form-group">
@@ -103,6 +108,6 @@
       </button>
     </form>
   </article>
-  
+
   <app-footer-auth />
 </main>

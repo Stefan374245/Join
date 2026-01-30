@@ -1,21 +1,37 @@
 <div class="dropdown-container" (clickOutside)="onClickOutside()">
-  <button
-    type="button"
-    [id]="id()"
-    class="dropdown-trigger"
-    [class.open]="isOpen()"
-    [class.has-selection]="hasSelection()"
-    [disabled]="disabled()"
-    [attr.aria-expanded]="ariaExpanded()"
-    [attr.aria-haspopup]="'listbox'"
-    [attr.aria-controls]="id() + '-listbox'"
-    [attr.aria-activedescendant]="ariaActiveDescendant()"
-    (click)="toggleDropdown()"
-    (keydown)="onKeyDown($event)"
-  >
-    <span class="dropdown-label">{{ displayText() }}</span>
-
-    @if (hasSelection() && !disabled()) {
+  <div class="dropdown-trigger-wrapper">
+    <button
+      type="button"
+      [id]="id()"
+      class="dropdown-trigger"
+      [class.open]="isOpen()"
+      [class.has-selection]="hasSelection()"
+      [disabled]="disabled()"
+      [attr.aria-expanded]="ariaExpanded()"
+      [attr.aria-haspopup]="'listbox'"
+      [attr.aria-controls]="id() + '-listbox'"
+      [attr.aria-activedescendant]="ariaActiveDescendant()"
+      (click)="toggleDropdown()"
+      (keydown)="onKeyDown($event)"
+    >
+      <span class="dropdown-label">{{ displayText() }}</span>
+      <svg
+        class="dropdown-arrow"
+        [class.rotated]="isOpen()"
+        width="14"
+        height="8"
+        viewBox="0 0 14 8"
+        fill="none"
+      >
+        <path
+          d="M1 1L7 7L13 1"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+        />
+      </svg>
+    </button>
+    @if (hasSelection() && !disabled() && showClearButton()) {
       <button
         type="button"
         class="clear-button"
@@ -30,36 +46,20 @@
         </svg>
       </button>
     }
-
-    <svg
-      class="dropdown-arrow"
-      [class.rotated]="isOpen()"
-      width="14"
-      height="8"
-      viewBox="0 0 14 8"
-      fill="none"
-    >
-      <path
-        d="M1 1L7 7L13 1"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-      />
-    </svg>
-  </button>
+  </div>
 
   @if (isOpen()) {
-    <div
-      class="dropdown-menu"
+    <ul
+      class="dropdown-list dropdown-menu"
       [id]="id() + '-listbox'"
       role="listbox"
       [attr.aria-labelledby]="id()"
       [attr.aria-multiselectable]="multiple()"
       [style.max-height]="maxHeight()"
-      [title]="maxHeight()"
+      [attr.title]="maxHeight()"
     >
       @if (searchable()) {
-        <div class="search-wrapper">
+        <li class="search-wrapper" role="presentation">
           <input
             type="text"
             class="search-input"
@@ -90,72 +90,55 @@
               stroke-linejoin="round"
             />
           </svg>
-        </div>
+        </li>
       }
-
-      <ul class="dropdown-list">
-        @for (item of filteredItems(); track trackByItemId($index, item)) {
-          <li
-            class="dropdown-item"
-            [id]="id() + '-item-' + item.id"
-            [class.selected]="isSelected()(item.id)"
-            [class.focused]="focusedIndex() === $index"
-            [class.disabled]="item.disabled"
-            role="option"
-            [attr.aria-selected]="isSelected()(item.id)"
-            [attr.aria-disabled]="item.disabled"
-            (click)="selectItem(item)"
-            (mouseenter)="focusedIndex.set($index)"
-          >
-            @if (hasColor(item)) {
-              <div class="avatar" [style.background-color]="getColor(item)">
-                {{ getInitials(item.label) }}
-              </div>
-            } @else if (item.icon) {
-              <img
-                [src]="item.icon"
-                [alt]="item.label"
-                class="item-icon"
-                title="icon"
+      @for (item of filteredItems(); track trackByItemId($index, item)) {
+        <li
+          class="dropdown-item"
+          [id]="id() + '-item-' + item.id"
+          [class.selected]="isSelected()(item.id)"
+          [class.focused]="focusedIndex() === $index"
+          [class.disabled]="item.disabled"
+          role="option"
+          [attr.aria-selected]="isSelected()(item.id)"
+          [attr.aria-disabled]="item.disabled"
+          (click)="selectItem(item)"
+          (mouseenter)="focusedIndex.set($index)"
+        >
+          <span *ngIf="hasColor(item)" class="avatar" [style.background-color]="getColor(item)">
+            {{ getInitials(item.label) }}
+          </span>
+          <span *ngIf="!hasColor(item) && item.icon" class="item-icon-wrapper">
+            <img
+              [src]="item.icon"
+              [alt]="item.label"
+              class="item-icon"
+              title="icon"
+              aria-hidden="true"
+            />
+          </span>
+          <span class="item-label" [title]="item.label">{{ item.label }}</span>
+          <span *ngIf="multiple()" class="checkbox-indicator" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <rect x="2" y="2" width="12" height="12" rx="3" fill="#fff" stroke="#bbb" stroke-width="2" />
+              <path *ngIf="isSelected()(item.id)" d="M4 8l3 3 5-5" stroke="#29ABE2" stroke-width="2" fill="none" />
+            </svg>
+          </span>
+          <span *ngIf="!multiple() && isSelected()(item.id)" class="check-indicator" aria-hidden="true">
+            <svg class="check-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path
+                d="M13.5 4L6 11.5L2.5 8"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
               />
-            }
-
-            <span class="item-label" title="{{ item.label }}">{{
-              item.label
-            }}</span>
-
-            @if (multiple()) {
-              <input
-                type="checkbox"
-                [checked]="isSelected()(item.id)"
-                [disabled]="item.disabled"
-                tabindex="-1"
-                aria-hidden="true"
-              />
-            }
-
-            @if (!multiple() && isSelected()(item.id)) {
-              <svg
-                class="check-icon"
-                width="16"
-                height="16"
-                viewBox="0 0 16 16"
-                fill="none"
-              >
-                <path
-                  d="M13.5 4L6 11.5L2.5 8"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-              </svg>
-            }
-          </li>
-        } @empty {
-          <li class="dropdown-item empty">No results found</li>
-        }
-      </ul>
-    </div>
+            </svg>
+          </span>
+        </li>
+      } @empty {
+        <li class="dropdown-item empty">No results found</li>
+      }
+    </ul>
   }
 </div>
