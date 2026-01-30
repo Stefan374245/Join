@@ -40,7 +40,7 @@ import { ToastService } from "../../../../core/services/toast.service";
 import { Task, TaskAttachment } from "../../../../core/models/task.interface";
 import { Contact } from "../../../../core/models/contact.interface";
 import { ImageViewerComponent } from "../../../board/components/image-viewer/image-viewer.component";
-
+import { ClickOutsideDirective } from "../../../../shared/directives/click-outside.directive";
 @Component({
   selector: "app-add-task-view",
   standalone: true,
@@ -54,6 +54,7 @@ import { ImageViewerComponent } from "../../../board/components/image-viewer/ima
     SubtaskManagementComponent,
     TaskAttachmentUploadComponent,
     ImageViewerComponent,
+    ClickOutsideDirective,
   ],
   templateUrl: "./add-task-view.component.html",
   styleUrl: "./add-task-view.component.scss",

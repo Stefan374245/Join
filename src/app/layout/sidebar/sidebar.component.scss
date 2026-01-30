@@ -1,10 +1,6 @@
 @import '../../../styles/variables';
 @import '../../../styles/mixins';
 
-/**
- * ✅ Kein position: fixed mehr
- * CSS Grid managed die Position
- */
 .sidebar {
   height: 100%;
   width: 100%;
@@ -105,7 +101,6 @@
   }
 }
 
-// Responsive design
 @media (max-width: $breakpoint-lg-xl) {
   .sidebar {
     width: 80px;
