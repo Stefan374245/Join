@@ -1,4 +1,4 @@
-import { Component, input, output, ViewEncapsulation, viewChild, AfterViewInit } from '@angular/core';
+import { Component, input, output, ViewEncapsulation, viewChild, AfterViewInit, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DragDropModule, CdkDragDrop, CdkDropList } from '@angular/cdk/drag-drop';
 import { Task } from '../../../../core/models/task.interface';
@@ -31,6 +31,17 @@ import { TaskCardComponent } from '../task-card/task-card.component';
   encapsulation: ViewEncapsulation.None,
 })
 export class BoardColumnComponent implements AfterViewInit {
+
+  constructor() {
+    effect(() => {
+      const dropList = this.dropList();
+      const connected = this.connectedDropLists();
+      if (dropList && connected.length > 0) {
+        console.log('[effect] BoardColumnComponent: updating dropList.connectedTo', dropList.id, connected.map(c => c.id));
+        dropList.connectedTo = connected;
+      }
+    });
+  }
   dropList = viewChild.required<CdkDropList>(CdkDropList);
   
   columnId = input.required<string>();
@@ -65,9 +76,9 @@ export class BoardColumnComponent implements AfterViewInit {
    * 
    * @param event - The CDK drag-drop event containing source, destination, and task information
    */
-  onTaskDrop(event: CdkDragDrop<Task[]>): void {
-    this.taskDropped.emit({ event, status: this.columnId() });
-  }
+ onTaskDrop(event: CdkDragDrop<Task[]>): void {
+  this.taskDropped.emit({ event, status: event.container.id });
+}
 
   /**
    * Handles add task button clicks and emits the column status for task creation.

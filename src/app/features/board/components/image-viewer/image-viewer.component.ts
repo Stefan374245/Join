@@ -81,9 +81,7 @@ export class ImageViewerComponent {
     return this.images().map(att => this.getImageUrl(att));
   });
   
-  /**
-   * Performance optimization: Only render current + adjacent images
-   */
+
   renderedIndices = computed(() => {
     const curr = this.currentIndex();
     const prev = curr - 1;
@@ -97,9 +95,6 @@ export class ImageViewerComponent {
     return `${this.currentIndex() + 1} / ${this.images().length}`;
   });
 
-  // ============================================
-  // CONSTRUCTOR & EFFECTS
-  // ============================================
   constructor() {
     effect(() => {
       const initial = this.initialIndex();
@@ -124,9 +119,6 @@ export class ImageViewerComponent {
     this.setupEventListeners();
   }
 
-  /**
-   * Setup window resize and body scroll lock
-   */
   private setupEventListeners(): void {
     const resizeHandler = () => {
       this.windowWidthSignal.set(window.innerWidth);
@@ -144,9 +136,7 @@ export class ImageViewerComponent {
     this.setupBodyScrollLock();
   }
 
-  /**
-   * Lock body scroll when viewer is open
-   */
+ 
   private setupBodyScrollLock(): void {
     effect(() => {
       if (this.images().length > 0) {
@@ -159,9 +149,6 @@ export class ImageViewerComponent {
     });
   }
 
-  // ============================================
-  // HELPER METHODS
-  // ============================================
   
   /**
    * Get display URL for attachment
@@ -236,15 +223,9 @@ export class ImageViewerComponent {
     const rotate = this.rotation();
     const pan = this.panPosition();
     
-    // Important: translate before rotate to avoid coordinate system issues
     return `translate(${pan.x}px, ${pan.y}px) rotate(${rotate}deg) scale(${zoom})`;
   }
 
-  // Methods will be added in next steps...
-
-  // ============================================
-  // NAVIGATION METHODS
-  // ============================================
   
   /**
    * Navigate to next image

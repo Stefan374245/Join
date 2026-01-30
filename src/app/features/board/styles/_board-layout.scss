@@ -2,7 +2,6 @@
 
 .board-container {
   @include page-layout-board;
-  overfl
   .board-loading {
     display: flex;
     align-items: center;
@@ -167,7 +166,6 @@
     margin-bottom: 0;
   }
 
-  // ========== Task Footer ==========
   .task-footer {
     display: flex;
     flex-direction: row;
@@ -247,7 +245,6 @@
   }
 }
 
-// ========== Mobile Task Actions ==========
 .mobile-task-actions {
   background-color: $primary-color;
   position: absolute;
