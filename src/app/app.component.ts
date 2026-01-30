@@ -11,8 +11,16 @@ import { ToastComponent } from './shared/components/toast/toast.component';
   styleUrl: './app.component.scss',
 })
 export class AppComponent {
+  title(_title: any) {
+    throw new Error('Method not implemented.');
+  }
   showMainLayout = false;
-
+/**
+ * Constructor sets up router event listener to toggle main layout visibility.
+ *
+ * @param router - Injected Angular Router for navigation event listening.
+ * @remarks The main layout is hidden on authentication and informational pages. 
+ */
   constructor(private router: Router) {
     this.router.events.subscribe(() => {
       const url = this.router.url;

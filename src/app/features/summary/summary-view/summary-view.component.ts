@@ -16,15 +16,12 @@ export class SummaryViewComponent implements OnInit {
   private taskService = inject(TaskService);
   private router = inject(Router);
 
-  // Use AuthService signals instead of Observables
   isGuest = this.authService.isGuestUser;
   userName = this.authService.userDisplayName;
-  
-  greeting = '';
-
-  // Use TaskService signals directly
   taskStats = this.taskService.taskStats;
   nextUrgentDeadline = this.taskService.nextUrgentDeadline;
+  
+  greeting = '';
   
   formattedDeadline = computed(() => {
     const deadline = this.nextUrgentDeadline();
@@ -39,19 +36,37 @@ export class SummaryViewComponent implements OnInit {
     this.taskService.tasksByStatus().awaitFeedback.length
   );
 
+  /**
+   * Constructor initializes greeting based on time of day and sets up dependencies.
+   * 
+   * @remarks This component provides a summary view of user tasks and greetings.
+   */
   constructor() {
-    // Set greeting based on time of day
     this.setGreeting();
   }
 
-  ngOnInit(): void {
-    this.setGreeting();
-  }
+  /**
+   * Angular lifecycle hook called on component initialization.
+   * @remarks Currently no initialization logic is required.
+   */
+  ngOnInit(): void {}
 
+  /**
+   * Navigates to the main board view.
+   * 
+   * @returns {void}
+   * @remarks Invoked when the user clicks to view their task board.
+   */
   navigateToBoard(): void {
     this.router.navigate(['/board']);
   }
 
+  /**
+   * Formats a given deadline date into a human-readable string.
+   * 
+   * @param {Date} deadline - The deadline date to format.
+   * @returns {string} A formatted date string or a message if no deadline is provided.
+   */
   private formatDate(deadline: Date): string {
     if (!deadline) return 'No urgent deadlines';
     
@@ -63,6 +78,12 @@ export class SummaryViewComponent implements OnInit {
     return deadline.toLocaleDateString('en-US', options);
   }
 
+  /**
+   * Sets the greeting message based on the current time of day.
+   * 
+   * @returns {void}
+   * @remarks Updates the greeting property to reflect morning, afternoon, or evening.
+   */
   private setGreeting(): void {
     const hour = new Date().getHours();
 

@@ -3,8 +3,7 @@
 @import '../../../styles/page-layouts';
 
 .legal-main {
-  @include page-layout-standard; // ✅ 5rem top Desktop, 3rem Mobile + 96px left Desktop
-  max-width: 1200px;
+  @include page-layout-standard;
   gap: $spacing-xl;
 
   h1 {
@@ -72,7 +71,6 @@
   }
 }
 
-// Responsive
 @media (max-width: $breakpoint-md) {
   .legal-main {
     margin: 90px $spacing-md 0 $spacing-md;

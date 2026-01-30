@@ -22,9 +22,7 @@ export const appConfig: ApplicationConfig = {
     provideAuth(() => getAuth()),
     provideFirestore(() => getFirestore()),
     provideStorage(() => {
-      const auth = getAuth();
       const storage = getStorage();
-      // Storage wird automatisch mit Auth verbunden durch Firebase SDK
       return storage;
     }),
     ToastService

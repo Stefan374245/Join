@@ -1,11 +1,6 @@
 @import '../styles/variables';
 @import '../styles/mixins';
 
-/**
- * 🎯 Simplicity: CSS Grid übernimmt das Layout
- * App Component muss sich nicht mehr um Layout kümmern
- */
-
 :host {
   display: block;
   height: 100vh;

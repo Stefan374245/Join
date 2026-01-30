@@ -23,13 +23,9 @@ import { LoadingService } from '../../../core/services/loading.service';
   styleUrls: ['./loading-spinner.component.scss']
 })
 export class LoadingSpinnerComponent {
-  /** Inject global loading service */
   loadingService = inject(LoadingService);
-  
-  /** Optional local loading state - if provided, uses this instead of global */
   localLoading = input<boolean | undefined>(undefined);
   
-  /** Computed: Use local loading if provided, otherwise global */
   isLoading = computed(() => {
     const local = this.localLoading();
     return local !== undefined ? local : this.loadingService.loading();
