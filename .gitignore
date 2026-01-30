@@ -1,17 +1,12 @@
-# See https://docs.github.com/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
-
-# Compiled output
 /dist
 /tmp
 /out-tsc
 /bazel-out
 
-# Node
 /node_modules
 npm-debug.log
 yarn-error.log
 
-# IDEs and editors
 .idea/
 .project
 .classpath
@@ -20,7 +15,6 @@ yarn-error.log
 .settings/
 *.sublime-workspace
 
-# Visual Studio Code
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
@@ -28,7 +22,6 @@ yarn-error.log
 !.vscode/extensions.json
 .history/*
 
-# Miscellaneous
 /.angular/cache
 .sass-cache/
 /connect.lock
@@ -37,11 +30,9 @@ yarn-error.log
 testem.log
 /typings
 
-# System files
 .DS_Store
 Thumbs.db
 
-# Environment variables
 .environments/
 
 src/environments/environment.ts
@@ -49,13 +40,10 @@ src/environments/environment.prod.ts
 src/environments/environment.local.ts
 src/environments/environment.prod.local.ts
 
-# MCP Server Config (contains sensitive tokens)
 mcp.config.json
 
-# Service Documentation (local development only)
 src/app/services/README.md
 
-# Development Documentation (internal use only)
 JSDOC_PROGRESS.md
 LAYOUT_MIGRATION_PLAN.md
 LAYOUT_VISUAL_GUIDE.md
@@ -70,19 +58,16 @@ FINAL_PREFLIGHT_CHECK.md
 SIGNALS_GUIDE.md
 SIGNAL_MIGRATION_PLAN.md
 
-# Firebase Service Account Key (NEVER commit!)
 firebase-service-account.json
 *-service-account.json
 
-# N8N Configuration (contains API keys)
 n8n-config.json
 n8n-credentials.json
 
-# Documentation folder (internal development documentation)
 /docs
 
-# Angular concepts documentation (internal development reference)
 **/ANGULAR_CONCEPTS_*.md
 
-# Signals architecture documentation (internal development reference)
 ANGULAR_SIGNALS_ARCHITECTURE.md
+
+.hintrc
