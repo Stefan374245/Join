@@ -1,7 +1,5 @@
 @mixin hide-scrollbar {
-
   -ms-overflow-style: none;
-
   scrollbar-width: none;
 
   &::-webkit-scrollbar {
@@ -23,7 +21,7 @@
     border-radius: $width / 2;
   }
 
-  scrollbar-width: thin;
+  // scrollbar-width: thin; // Removed for better browser compatibility
   scrollbar-color: $thumb-color $track-color;
 
   -ms-overflow-style: auto;
