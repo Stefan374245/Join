@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { IMAGE_COMPRESSION } from '../../shared/constants';
 
 /**
  * Service for compressing images to meet exam requirements
@@ -8,8 +9,8 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class ImageCompressionService {
-  private readonly MAX_DIMENSION = 800;
-  private readonly COMPRESSION_QUALITY = 0.7;
+  private readonly MAX_DIMENSION = IMAGE_COMPRESSION.MAX_DIMENSION;
+  private readonly COMPRESSION_QUALITY = IMAGE_COMPRESSION.QUALITY;
 
   /**
    * Compress image to base64 string

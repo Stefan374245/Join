@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { FILE_UPLOAD } from '../../shared/constants';
 
 /**
  * Service for validating file uploads with security checks
@@ -8,9 +9,9 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class FileValidationService {
-  private readonly MAX_FILE_SIZE = 1 * 1024 * 1024; // 1MB
-  private readonly ALLOWED_TYPES = ['image/jpeg', 'image/png'] as const;
-  private readonly ALLOWED_EXTENSIONS = ['.jpg', '.jpeg', '.png'] as const;
+  private readonly MAX_FILE_SIZE = FILE_UPLOAD.MAX_FILE_SIZE;
+  private readonly ALLOWED_TYPES = FILE_UPLOAD.ALLOWED_TYPES;
+  private readonly ALLOWED_EXTENSIONS = FILE_UPLOAD.ALLOWED_EXTENSIONS;
 
   private readonly MAGIC_BYTES = {
     jpeg: [0xFF, 0xD8, 0xFF],
