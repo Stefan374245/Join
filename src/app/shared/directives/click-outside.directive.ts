@@ -9,11 +9,22 @@ export class ClickOutsideDirective {
 
   constructor(private elementRef: ElementRef) {}
 
-  @HostListener('document:click', ['$event.target'])
-  public onClick(target: EventTarget | null): void {
+  @HostListener('document:click', ['$event'])
+  public onClick(event: MouseEvent): void {
+    this.handleClickOutside(event);
+  }
+
+  @HostListener('document:mousedown', ['$event'])
+  public onMouseDown(event: MouseEvent): void {
+    this.handleClickOutside(event);
+  }
+
+  private handleClickOutside(event: MouseEvent): void {
+    const target = event.target;
     if (!target || !(target instanceof HTMLElement)) {
       return;
     }
+    
     const clickedInside = this.elementRef.nativeElement.contains(target);
     if (!clickedInside) {
       this.clickOutside.emit();
