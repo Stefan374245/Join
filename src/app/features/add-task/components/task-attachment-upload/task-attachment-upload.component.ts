@@ -1,8 +1,10 @@
 import { Component, EventEmitter, Output, Input, signal, inject, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { DragDropDirective } from '../../../../shared/directives';
 import { FileValidationService } from '../../../../core/services/file-validation.service';
 import { ImageCompressionService } from '../../../../core/services/image-compression.service';
 import { TaskAttachment } from '../../../../core/models/task.interface';
+import { formatFileSize } from '../../../../shared/utils';
 
 /**
  * Component for uploading and managing task attachments
@@ -11,7 +13,7 @@ import { TaskAttachment } from '../../../../core/models/task.interface';
 @Component({
   selector: 'app-task-attachment-upload',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, DragDropDirective],
   templateUrl: './task-attachment-upload.component.html',
   styleUrl: './task-attachment-upload.component.scss'
 })
@@ -30,48 +32,14 @@ export class TaskAttachmentUploadComponent {
   @Output() attachmentsChange = new EventEmitter<TaskAttachment[]>();
 
   attachments = signal<TaskAttachment[]>([]);
-  isDragOver = signal(false);
   errorMessage = signal<string | null>(null);
 
   /**
-   * Handle drag over event
-   * @param event - Drag event
-   * @remarks
-   * Prevents default behavior and sets drag-over state.
+   * Handle files dropped via DragDropDirective
+   * @param files - Array of dropped files
    */
-  onDragOver(event: DragEvent): void {
-    event.preventDefault();
-    event.stopPropagation();
-    this.isDragOver.set(true);
-  }
-
-  /**
-   * Handle drag leave event
-   * @param event - Drag event
-   * @remarks
-   * Resets drag-over state when dragging leaves the upload zone.
-   */
-  onDragLeave(event: DragEvent): void {
-    event.preventDefault();
-    event.stopPropagation();
-    this.isDragOver.set(false);
-  }
-
-  /**
-   * Handle file drop
-   * @param event - Drag event
-   * @remarks
-   * Processes dropped files and resets drag-over state.
-   */
-  async onDrop(event: DragEvent): Promise<void> {
-    event.preventDefault();
-    event.stopPropagation();
-    this.isDragOver.set(false);
-
-    const files = event.dataTransfer?.files;
-    if (files) {
-      await this.processFiles(Array.from(files));
-    }
+  async handleFilesDropped(files: File[]): Promise<void> {
+    await this.processFiles(files);
   }
 
   /**
@@ -189,13 +157,9 @@ export class TaskAttachmentUploadComponent {
   }
 
   /**
-   * Format file size for display
-   * @param bytes - Size in bytes
-   * @returns Formatted size string
+   * Format file size for display (using shared utility)
+   * @param bytes - File size in bytes
+   * @returns Formatted file size string
    */
-  formatFileSize(bytes: number): string {
-    if (bytes < 1024) return `${bytes} B`;
-    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-  }
+  formatFileSize = formatFileSize;
 }
