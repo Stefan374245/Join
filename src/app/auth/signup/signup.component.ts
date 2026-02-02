@@ -2,6 +2,7 @@ import { Component, OnInit, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { PreventDefaultDirective } from '../../shared/directives';
 import { AuthService } from '../../core/services/auth.service';
 import { ToastService } from '../../core/services/toast.service';
 import { ToastComponent } from '../../shared/components/toast/toast.component';
@@ -11,7 +12,7 @@ import { LoadingSpinnerComponent } from '../../shared/components/loading-spinner
 @Component({
   selector: 'app-signup',
   standalone: true,
-  imports: [RouterLink, FormsModule, CommonModule, ToastComponent, FooterAuthComponent, LoadingSpinnerComponent],
+  imports: [RouterLink, FormsModule, CommonModule, ToastComponent, FooterAuthComponent, LoadingSpinnerComponent, PreventDefaultDirective],
   templateUrl: './signup.component.html',
   styleUrl: './signup.component.scss'
 })
