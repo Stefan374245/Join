@@ -1,5 +1,6 @@
 import { Component, ChangeDetectionStrategy, input, output, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { getInitials } from '../../../../shared/utils';
 export interface BadgeItem {
   id: string;
   label: string;
@@ -76,14 +77,5 @@ export class BadgeListComponent {
    * @param label - Text to generate initials from
    * @returns Two-letter initials in uppercase
    */
-  getInitials(label: string): string {
-    if (!label) return '';
-    
-    const parts = label.trim().split(' ');
-    if (parts.length === 1) {
-      return parts[0].substring(0, 2).toUpperCase();
-    }
-    
-    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-  }
+  getInitials = getInitials;
 }

@@ -1,6 +1,7 @@
 import { Component, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TaskAttachment } from '../../../../core/models/task.interface';
+import { formatFileSize } from '../../../../shared/utils';
 
 /**
  * Component for displaying task attachments in detail view
@@ -48,18 +49,9 @@ export class TaskAttachmentsDisplayComponent {
   /**
    * Formats a file size in bytes into a human-readable string with appropriate units (B, KB, MB).
    *
-   * - For sizes less than 1024 bytes, returns the size in bytes (e.g., "512 B").
-   * - For sizes less than 1 MB, returns the size in kilobytes with one decimal place (e.g., "2.5 KB").
-   * - For sizes 1 MB or greater, returns the size in megabytes with one decimal place (e.g., "1.2 MB").
-   *
-   * @param bytes - The file size in bytes.
-   * @returns The formatted file size as a string.
+   * Format file size for display (using shared utility)
    */
-  formatFileSize(bytes: number): string {
-    if (bytes < 1024) return `${bytes} B`;
-    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-  }
+  formatFileSize = formatFileSize;
 
   
   /**

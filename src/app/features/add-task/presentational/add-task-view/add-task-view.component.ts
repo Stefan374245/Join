@@ -41,6 +41,7 @@ import { Task, TaskAttachment } from "../../../../core/models/task.interface";
 import { Contact } from "../../../../core/models/contact.interface";
 import { ImageViewerComponent } from "../../../board/components/image-viewer/image-viewer.component";
 import { LoadingSpinnerComponent } from "../../../../shared/components/loading-spinner/loading-spinner.component";
+import { TASK_MESSAGES, TASK_LIMITS } from "../../../../shared/constants";
 @Component({
   selector: "app-add-task-view",
   standalone: true,
@@ -406,8 +407,8 @@ export class AddTaskViewComponent implements OnInit, AfterViewInit {
    * @param title - The title of the subtask to add.
    */
   onAddSubtask(title: string): void {
-    if (this.subtasks().length >= 5) {
-      this.toastService.showToast("Maximal 5 Subtasks erlaubt");
+    if (this.subtasks().length >= TASK_LIMITS.MAX_SUBTASKS) {
+      this.toastService.showToast(TASK_MESSAGES.MAX_SUBTASKS);
       return;
     }
 
@@ -598,7 +599,7 @@ export class AddTaskViewComponent implements OnInit, AfterViewInit {
     const dueDateControl = this.taskForm.get("dueDate");
     if (!titleControl?.value?.trim() || !dueDateControl?.value) {
       this.markFormAsTouched();
-      this.toastService.showToast("Title and Due Date are required");
+      this.toastService.showToast(TASK_MESSAGES.TITLE_REQUIRED);
       return false;
     }
     return true;
@@ -613,7 +614,7 @@ export class AddTaskViewComponent implements OnInit, AfterViewInit {
   private isCreateValid(): boolean {
     if (!this.isFormValid()) {
       this.markFormAsTouched();
-      this.toastService.showToast("Please fill all required fields");
+      this.toastService.showToast(TASK_MESSAGES.REQUIRED_FIELDS);
       return false;
     }
     return true;
@@ -630,7 +631,7 @@ export class AddTaskViewComponent implements OnInit, AfterViewInit {
    */
   private async createTask(): Promise<void> {
     const userId = this.authService.userId();
-    if (!userId) return this.toastService.showToast("User not authenticated");
+    if (!userId) return this.toastService.showToast(TASK_MESSAGES.USER_NOT_AUTH);
     const formValue = this.taskForm.value;
     const additionalData = this.buildAdditionalData(userId);
     this.isLoading.set(true);
@@ -639,11 +640,11 @@ export class AddTaskViewComponent implements OnInit, AfterViewInit {
         formValue,
         additionalData,
       );
-      this.toastService.showToast("Task created successfully");
+      this.toastService.showToast(TASK_MESSAGES.CREATE_SUCCESS);
       this.taskSaved.emit(newTask);
       this.handleAfterCreate();
     } catch (error: any) {
-      this.toastService.showToast("Failed to create task");
+      this.toastService.showToast(TASK_MESSAGES.CREATE_ERROR);
       console.error("Error creating task:", error);
     } finally {
       this.isLoading.set(false);
@@ -700,11 +701,11 @@ export class AddTaskViewComponent implements OnInit, AfterViewInit {
     this.isLoading.set(true);
     try {
       const updatedTask = await this.taskService.updateTaskFromForm(task.id, formValue, additionalData);
-      this.toastService.showToast("Task updated successfully");
+      this.toastService.showToast(TASK_MESSAGES.UPDATE_SUCCESS);
       this.taskSaved.emit(updatedTask);
       this.handleAfterUpdate();
     } catch (error: any) {
-      this.toastService.showToast("Failed to update task");
+      this.toastService.showToast(TASK_MESSAGES.UPDATE_ERROR);
       console.error("❌ Error updating task:", error);
     } finally {
       this.isLoading.set(false);
