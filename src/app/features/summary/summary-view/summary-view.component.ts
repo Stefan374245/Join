@@ -29,7 +29,7 @@ export class SummaryViewComponent implements OnInit {
   });
   
   emailRequestsTasks = computed(() => 
-    this.taskService.tasks().filter(task => task.source === 'email').length
+    this.taskService.tasks().filter(task => task.source === 'email' || task.source === 'webhook').length
   );
   
   awaitingFeedbackTasks = computed(() => 
