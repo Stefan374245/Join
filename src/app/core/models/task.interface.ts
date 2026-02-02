@@ -12,7 +12,7 @@ export interface Task {
 
   createdAt?: Date;
   updatedAt?: Date;
-  source?: 'email' |'member';
+  source?: 'email' | 'webhook' | 'member';
   creatorType?: 'member' | 'external';
   creatorEmail?: string;
   creatorName?: string;

@@ -35,7 +35,7 @@ export interface FirestoreTaskDocument {
   createdAt: Timestamp;
   updatedAt?: Timestamp;
   createdBy?: string;
-  source?: 'email' | 'member';
+  source?: 'email' | 'webhook' | 'member';
   creatorType?: 'member' | 'external';
   creatorEmail?: string;
   creatorName?: string;
