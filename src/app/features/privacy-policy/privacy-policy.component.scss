@@ -21,4 +21,7 @@
 
 .privacy-footer {
   @extend .info-page-footer;
+  p{
+    text-align: center;
+  }
 }

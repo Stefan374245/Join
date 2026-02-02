@@ -9,6 +9,7 @@
         <li><a (click)="scrollTo('mOverview')">Übersicht der Verarbeitungen</a></li>
         <li><a (click)="scrollTo('m2427')">Maßgebliche Rechtsgrundlagen</a></li>
         <li><a (click)="scrollTo('m27')">Sicherheitsmaßnahmen</a></li>
+        <li><a (click)="scrollTo('m28')">Dateiuploads und Speicherung</a></li>
         <li><a (click)="scrollTo('m10')">Rechte der betroffenen Personen</a></li>
       </ul>
     </nav>
@@ -44,6 +45,7 @@
         <li>Nutzungsdaten</li>
         <li>Meta-, Kommunikations- und Verfahrensdaten</li>
         <li>Protokolldaten</li>
+        <li>Dateianhänge (Bilder)</li>
       </ul>
 
       <h3>Kategorien betroffener Personen</h3>
@@ -58,6 +60,7 @@
         <li>Sicherheitsmaßnahmen</li>
         <li>Bereitstellung unseres Onlineangebotes und Nutzerfreundlichkeit</li>
         <li>Informationstechnische Infrastruktur</li>
+        <li>Speicherung und Verwaltung von Aufgabenanhängen</li>
       </ul>
     </section>
 
@@ -105,6 +108,48 @@
       </p>
     </section>
 
+    <section id="m28" class="privacy-section">
+      <h2>Dateiuploads und Speicherung</h2>
+      
+      <h3>Technische Verarbeitung hochgeladener Dateien</h3>
+      <p>
+        <strong>Lokale Verarbeitung:</strong> Hochgeladene Dateien werden zunächst lokal in Ihrem Browser verarbeitet. Bilddateien werden automatisch auf maximal 800x800 Pixel skaliert und mit 70% JPEG-Qualität komprimiert. Alle Dateien werden in Base64-Format kodiert, bevor sie an unsere Server übertragen werden.
+      </p>
+      <p>
+        <strong>Cloud-Speicherung:</strong> Die verarbeiteten Dateien werden verschlüsselt über HTTPS an Firebase Storage (Google Cloud Platform, Standort: Europa) übertragen und dort gespeichert. Firebase Storage bietet eine sichere, skalierbare Infrastruktur mit automatischer Verschlüsselung im Ruhezustand (Encryption at Rest) und während der Übertragung (Encryption in Transit).
+      </p>
+      <p>
+        <strong>Dateiverwaltung:</strong> Jede Datei wird mit einer eindeutigen ID versehen und ist ausschließlich der zugehörigen Aufgabe zugeordnet. Der Zugriff erfolgt über gesicherte Download-URLs, die nur für authentifizierte Nutzer zugänglich sind.
+      </p>
+      
+      <h3>Datensicherheit und Zugriffskontrolle</h3>
+      <p>
+        <strong>Authentifizierung:</strong> Alle Upload- und Download-Vorgänge erfordern eine gültige Benutzerauthentifizierung über Firebase Authentication. Unautorisierte Zugriffe werden automatisch blockiert.
+      </p>
+      <p>
+        <strong>Verschlüsselung:</strong> Sämtliche Datenübertragungen erfolgen über TLS/SSL-verschlüsselte Verbindungen. Die gespeicherten Dateien werden durch Google Cloud Platform mit AES-256 verschlüsselt.
+      </p>
+      
+      <h3>Dateilöschung und Aufbewahrung</h3>
+      <p>
+        <strong>Automatische Löschung:</strong> Beim Löschen einer Aufgabe werden alle zugehörigen Dateianhänge automatisch und unwiderruflich aus Firebase Storage entfernt. Es erfolgt keine weitere Aufbewahrung oder Archivierung gelöschter Dateien.
+      </p>
+      <p>
+        <strong>Einzelne Löschung:</strong> Nutzer können jederzeit einzelne Dateianhänge aus Aufgaben entfernen. Diese werden sofort und dauerhaft gelöscht.
+      </p>
+      
+      <h3>Technische Beschränkungen</h3>
+    
+      <p>
+          <strong>Unterstützte Formate:</strong> Es werden gängige Dateiformate wie Bilder (JPEG, PNG, GIF, WebP).
+        </p>
+        
+        <h3>Datenverarbeitungsgrundlage</h3>
+      <p>
+        Die Verarbeitung von hochgeladenen Dateien erfolgt auf Grundlage Ihrer Einwilligung (Art. 6 Abs. 1 lit. a DSGVO) und zur Erfüllung des Nutzungsvertrags (Art. 6 Abs. 1 lit. b DSGVO). Firebase/Google Cloud Platform agiert dabei als Auftragsverarbeiter gemäß Art. 28 DSGVO.
+      </p>
+    </section>
+
     <section id="m10" class="privacy-section">
       <h2>Rechte der betroffenen Personen</h2>
       <p>Ihnen stehen als Betroffene nach der DSGVO verschiedene Rechte zu:</p>
@@ -144,17 +189,11 @@
 
     <footer class="privacy-footer">
       <p>
-        Erstellt mit kostenlosem
-        <a
-          href="https://datenschutz-generator.de/"
-          target="_blank"
-          rel="noopener noreferrer nofollow"
-        >
-          Datenschutz-Generator.de
-        </a>
-        von Dr. Thomas Schwenke
+        Stefan Helldobler<br />
+        Siedlerweg 5<br /> 
+        46535 Dinslaken
       </p>
-      <p>Stand: 2025</p>
+      
     </footer>
   </section>
 </article>
