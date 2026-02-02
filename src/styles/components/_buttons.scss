@@ -1,3 +1,6 @@
+@import "../variables";
+@import "../mixins";
+
 .btn {
   @include flex(row, center, center);
   gap: 10px;
