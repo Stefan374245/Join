@@ -1,0 +1,155 @@
+@import '../variables';
+@import '../mixins';
+@import '../page-layouts';
+@import '../scrollbar';
+
+.info-page-main {
+  @include page-layout-standard;
+  max-width: 1200px;
+  h1 {
+    @include page-title;
+    margin-bottom: $spacing-xl;
+  }
+}
+
+.info-page-content {
+  @include flex(column, flex-start, flex-start);
+  gap: $spacing-xl;
+  width: 100%;
+  max-width: 900px;
+  margin: 0;
+  background-color: #F6F7F8;
+  border-radius: $border-radius-lg;
+  color: $text-color;
+
+  a {
+    color: $link-color;
+    text-decoration: none;
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: $secondary-color;
+      text-decoration: underline;
+    }
+  }
+
+  ul {
+    padding-left: $spacing-lg;
+    margin: 0;
+    @include flex(column, flex-start, flex-start);
+    gap: $spacing-sm;
+
+    li {
+      line-height: 1.6;
+      color: $text-color;
+    }
+  }
+
+  @media (max-width: $breakpoint-md) {
+    padding: $spacing-lg;
+  }
+
+  @media (max-width: $breakpoint-sm) {
+    padding: $spacing-md;
+  }
+}
+
+.info-page-section {
+  @include flex(column, flex-start, flex-start);
+  gap: $spacing-md;
+  width: 100%;
+  scroll-margin-top: 120px;
+
+  h2 {
+    font-size: 24px;
+    font-weight: 700;
+    color: $primary-color;
+    margin: 0;
+  }
+
+  h3 {
+    font-size: 20px;
+    font-weight: 600;
+    color: $primary-color;
+  }
+
+  p {
+    font-size: $font-size-base;
+    color: $text-color;
+    line-height: 1.6;
+    margin: 0;
+    word-break: break-word;
+  }
+}
+
+.info-page-footer {
+  margin-top: $spacing-lg;
+  padding-top: $spacing-lg;
+  border-top: 1px solid $border-color;
+  width: 100%;
+
+  p {
+    font-size: $font-size-sm;
+    color: $gray-600;
+    margin: $spacing-sm 0;
+  }
+
+  h2 {
+    text-align: center;
+    color: $primary-color;
+    margin: 0;
+  }
+}
+
+.highlight-text {
+  color: $secondary-color;
+  font-weight: 600;
+}
+
+.info-page-nav {
+  background: $background-color;
+  border-radius: $border-radius-lg;
+  width: 100%;
+
+  h2 {
+    font-size: 24px;
+    font-weight: 700;
+    color: $primary-color;
+    margin: 0 0 $spacing-md 0;
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    @include flex(column, flex-start, flex-start);
+    gap: $spacing-sm;
+
+    li a {
+      color: $link-color;
+      text-decoration: none;
+      transition: color 0.2s ease;
+
+      &:hover {
+        color: $secondary-color;
+        text-decoration: underline;
+      }
+    }
+  }
+}
+
+@media (max-width: $breakpoint-sm) {
+  .info-page-main {
+    padding: $spacing-md;
+  }
+
+  .info-page-section {
+    h2 {
+      font-size: 20px;
+    }
+
+    h3 {
+      font-size: 18px;
+    }
+  }
+}
