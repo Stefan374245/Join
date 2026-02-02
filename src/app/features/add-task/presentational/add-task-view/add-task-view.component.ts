@@ -40,6 +40,7 @@ import { ToastService } from "../../../../core/services/toast.service";
 import { Task, TaskAttachment } from "../../../../core/models/task.interface";
 import { Contact } from "../../../../core/models/contact.interface";
 import { ImageViewerComponent } from "../../../board/components/image-viewer/image-viewer.component";
+import { LoadingSpinnerComponent } from "../../../../shared/components/loading-spinner/loading-spinner.component";
 @Component({
   selector: "app-add-task-view",
   standalone: true,
@@ -53,6 +54,7 @@ import { ImageViewerComponent } from "../../../board/components/image-viewer/ima
     SubtaskManagementComponent,
     TaskAttachmentUploadComponent,
     ImageViewerComponent,
+    LoadingSpinnerComponent,
   ],
   templateUrl: "./add-task-view.component.html",
   styleUrl: "./add-task-view.component.scss",
@@ -87,6 +89,7 @@ export class AddTaskViewComponent implements OnInit, AfterViewInit {
   minDate = signal<string>(this.formatDateForInput(new Date()));
   formValid = signal<boolean>(false);
   formDirty = signal<boolean>(false);
+  isLoading = signal<boolean>(false);
 
   selectedAttachment = signal<TaskAttachment | null>(null);
   selectedAttachmentIndex = computed<number>(() => {
@@ -630,6 +633,7 @@ export class AddTaskViewComponent implements OnInit, AfterViewInit {
     if (!userId) return this.toastService.showToast("User not authenticated");
     const formValue = this.taskForm.value;
     const additionalData = this.buildAdditionalData(userId);
+    this.isLoading.set(true);
     try {
       const newTask = await this.taskService.createTaskFromForm(
         formValue,
@@ -641,6 +645,8 @@ export class AddTaskViewComponent implements OnInit, AfterViewInit {
     } catch (error: any) {
       this.toastService.showToast("Failed to create task");
       console.error("Error creating task:", error);
+    } finally {
+      this.isLoading.set(false);
     }
   }
 /**
@@ -691,6 +697,7 @@ export class AddTaskViewComponent implements OnInit, AfterViewInit {
     if (!task) return console.error("❌ No task to edit found");
     const formValue = this.taskForm.value;
     const additionalData = this.buildUpdateData();
+    this.isLoading.set(true);
     try {
       const updatedTask = await this.taskService.updateTaskFromForm(task.id, formValue, additionalData);
       this.toastService.showToast("Task updated successfully");
@@ -699,6 +706,8 @@ export class AddTaskViewComponent implements OnInit, AfterViewInit {
     } catch (error: any) {
       this.toastService.showToast("Failed to update task");
       console.error("❌ Error updating task:", error);
+    } finally {
+      this.isLoading.set(false);
     }
   }
 

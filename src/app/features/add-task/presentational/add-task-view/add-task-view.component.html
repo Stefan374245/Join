@@ -1,3 +1,5 @@
+<app-loading-spinner [localLoading]="isLoading()" />
+
 <div
   [class.task-edit-overlay]="isOverlay()"
   [class.add-task-container]="!isOverlay()"
@@ -8,7 +10,6 @@
 >
   <article
     [class.task-edit-card]="isOverlay()"
-    (click)="isOverlay() ? $event.stopPropagation() : null"
   >
     <button
       *ngIf="isOverlay()"
