@@ -85,7 +85,7 @@ export class BoardColumnComponent implements AfterViewInit {
   newStatus: this.mapStatus(event.container.id),
 });
   this.taskDropped.emit({ event, status: event.container.id });
-  const updatedBy = 'system'; // Replace with actual user info if available
+  const updatedBy = 'system';
   this.taskService.triggerStatusWebhook(
     event.item.data,
     this.mapStatus(event.previousContainer.id),
