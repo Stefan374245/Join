@@ -66,7 +66,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Node Name: Prepare Firebase Document\n// Language: JavaScript\n\nconst req = $input.first().json;\n\nconsole.log('📦 Preparing Firebase document...');\nconsole.log('Input data:', JSON.stringify(req, null, 2));\nconsole.log('🤖 Subtasks from AI:', req.subtasks?.length || 0);\nconsole.log('📊 Current Count:', req.currentCount, '/', req.dailyLimit);\n\n// === VALIDATE INPUT DATA ===\nif (!req) {\n  throw new Error('No data received from Check Daily Limit node');\n}\n\nif (!req.type) {\n  throw new Error('Missing required field: type. Received: ' + JSON.stringify(req));\n}\n\nif (!req.title) {\n  throw new Error('Missing required field: title');\n}\n\nif (!req.description) {\n  throw new Error('Missing required field: description');\n}\n\nif (!req.userEmail) {\n  throw new Error('Missing required field: userEmail');\n}\n\n// === CATEGORY MAPPING ===\nconst categoryMap = {\n  'feature': 'User Story',\n  'bug': 'Technical Task',\n  'question': 'User Story',\n  'improvement': 'User Story'\n};\nconst reqType = String(req.type || 'feature').toLowerCase();\nconst category = categoryMap[reqType] || 'User Story';\n\n// === DUE DATE BERECHNEN ===\nconst priorityDaysMap = {\n  'high': 3,\n  'medium': 7,\n  'low': 14\n};\n\nconst reqPriority = String(req.priority || 'medium').toLowerCase();\nconst priority = ['high', 'medium', 'low'].includes(reqPriority) ? reqPriority : 'medium';\nconst daysToAdd = priorityDaysMap[priority];\nconst dueDate = new Date(Date.now() + daysToAdd * 24 * 60 * 60 * 1000);\n\nconsole.log('📅 Priority:', priority, '→ Due in', daysToAdd, 'days');\n\n// === DESCRIPTION ===\nconst description = String(req.description);\n\n// === PREPARE SUBTASKS FOR FIRESTORE ===\nconst subtasks = req.subtasks || [];\nconst firestoreSubtasks = subtasks.map(function(st) {\n  return {\n    mapValue: {\n      fields: {\n        id: { stringValue: String(st.id) },\n        title: { stringValue: String(st.title) },\n        completed: { booleanValue: Boolean(st.completed) }\n      }\n    }\n  };\n});\n\nconsole.log('✅ Firebase document prepared:', req.title.substring(0, 80));\nconsole.log('🔍 Status set to:', req.status || 'triage');\nconsole.log('📋 Subtasks to save:', subtasks.length);\n\nif (subtasks.length > 0) {\n  console.log('📝 Subtasks:');\n  subtasks.forEach(function(st, i) {\n    console.log('   ' + (i + 1) + '. ' + st.title);\n  });\n}\n\n// === FIRESTORE REST API FORMAT ===\nconst firestoreBody = {\n  fields: {\n    title: { stringValue: String(req.title).substring(0, 80) },\n    description: { stringValue: description },\n    category: { stringValue: category },\n    dueDate: { timestampValue: dueDate.toISOString() },\n    priority: { stringValue: priority },\n    status: { stringValue: String(req.status || 'triage') },\n    createdAt: { timestampValue: new Date().toISOString() },\n    updatedAt: { timestampValue: new Date().toISOString() },\n    source: { stringValue: String(req.source || 'email') },\n    creatorType: { stringValue: 'external' },\n    creatorEmail: { stringValue: String(req.userEmail) },\n    creatorName: { stringValue: String(req.userName || req.userEmail.split('@')[0]) },\n    aiGenerated: { booleanValue: true },\n    subtasks: { \n      arrayValue: { \n        values: firestoreSubtasks\n      }\n    },\n    // NEU: Daily Limit Info speichern\n    dailyLimitInfo: {\n      mapValue: {\n        fields: {\n          currentCount: { integerValue: String(req.currentCount || 0) },\n          dailyLimit: { integerValue: String(req.dailyLimit || 10) },\n          remainingRequests: { integerValue: String(req.remainingRequests || 10) }\n        }\n      }\n    }\n  }\n};\n\nconsole.log('📊 Daily Limit Info added:', req.currentCount, '/', req.dailyLimit);\n\n// === OUTPUT ===\nreturn {\n  json: firestoreBody\n};"
+        "jsCode": "const req = $input.first().json;\n\nif (!req) {\n  throw new Error('No data received from Check Daily Limit node');\n}\n\nif (!req.type) {\n  throw new Error('Missing required field: type. Received: ' + JSON.stringify(req));\n}\n\nif (!req.title) {\n  throw new Error('Missing required field: title');\n}\n\nif (!req.description) {\n  throw new Error('Missing required field: description');\n}\n\nif (!req.userEmail) {\n  throw new Error('Missing required field: userEmail');\n}\n\nconst categoryMap = {\n  'feature': 'User Story',\n  'bug': 'Technical Task',\n  'question': 'User Story',\n  'improvement': 'User Story'\n};\nconst reqType = String(req.type || 'feature').toLowerCase();\nconst category = categoryMap[reqType] || 'User Story';\n\nconst priorityDaysMap = {\n  'high': 3,\n  'medium': 7,\n  'low': 14\n};\n\nconst reqPriority = String(req.priority || 'medium').toLowerCase();\nconst priority = ['high', 'medium', 'low'].includes(reqPriority) ? reqPriority : 'medium';\nconst daysToAdd = priorityDaysMap[priority];\nconst dueDate = new Date(Date.now() + daysToAdd * 24 * 60 * 60 * 1000);\n\n\nconst description = String(req.description);\n\nconst subtasks = req.subtasks || [];\nconst firestoreSubtasks = subtasks.map(function(st) {\n  return {\n    mapValue: {\n      fields: {\n        id: { stringValue: String(st.id) },\n        title: { stringValue: String(st.title) },\n        completed: { booleanValue: Boolean(st.completed) }\n      }\n    }\n  };\n});\n\nconsole.log('✅ Firebase document prepared:', req.title.substring(0, 80));\nconsole.log('🔍 Status set to:', req.status || 'triage');\nconsole.log('📋 Subtasks to save:', subtasks.length);\n\nif (subtasks.length > 0) {\n  console.log('📝 Subtasks:');\n  subtasks.forEach(function(st, i) {\n    console.log('   ' + (i + 1) + '. ' + st.title);\n  });\n}\n\nconst firestoreBody = {\n  fields: {\n    title: { stringValue: String(req.title).substring(0, 80) },\n    description: { stringValue: description },\n    category: { stringValue: category },\n    dueDate: { timestampValue: dueDate.toISOString() },\n    priority: { stringValue: priority },\n    status: { stringValue: String(req.status || 'triage') },\n    createdAt: { timestampValue: new Date().toISOString() },\n    updatedAt: { timestampValue: new Date().toISOString() },\n    source: { stringValue: String(req.source || 'email') },\n    creatorType: { stringValue: 'external' },\n    creatorEmail: { stringValue: String(req.userEmail) },\n    creatorName: { stringValue: String(req.userName || req.userEmail.split('@')[0]) },\n    aiGenerated: { booleanValue: true },\n    subtasks: { \n      arrayValue: { \n        values: firestoreSubtasks\n      }\n    },\n    dailyLimitInfo: {\n      mapValue: {\n        fields: {\n          currentCount: { integerValue: String(req.currentCount || 0) },\n          dailyLimit: { integerValue: String(req.dailyLimit || 10) },\n          remainingRequests: { integerValue: String(req.remainingRequests || 10) }\n        }\n      }\n    }\n  }\n};\n\n\nreturn {\n  json: firestoreBody\n};"
       },
       "id": "14d62c7c-9f7e-4ad5-b631-0371c7746f7b",
       "name": "Prepare Firebase Document",
@@ -109,41 +109,6 @@
         -1168,
         304
       ]
-    },
-    {
-      "parameters": {
-        "method": "POST",
-        "url": "https://firestore.googleapis.com/v1/projects/join-angular-based/databases/(default)/documents/tasks",
-        "authentication": "predefinedCredentialType",
-        "nodeCredentialType": "googleApi",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            {
-              "name": "Content-Type",
-              "value": "application/json"
-            }
-          ]
-        },
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={{ $json }}",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [
-        432,
-        432
-      ],
-      "id": "2b3b7c6c-8dad-4334-ab62-cf4bdb83b0ce",
-      "name": "HTTP Request1",
-      "credentials": {
-        "googleApi": {
-          "id": "I7UTDNDObwKjyDdB",
-          "name": "Google Service Account account"
-        }
-      }
     },
     {
       "parameters": {
@@ -223,7 +188,7 @@
         "genericAuthType": "httpHeaderAuth",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"from\": \"requests@stefan-helldobler.de\",\n  \"to\": [\"={{ $('HTTP Request1').item.json.fields.creatorEmail.stringValue }}\"],\n  \"subject\": \"✅ Ihr Feature Request wurde erfasst - {{ $('HTTP Request1').item.json.fields.title.stringValue }}\",\n  \"html\": \"<div style=\\\"font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff;\\\"><div style=\\\"background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 30px; text-align: center; border-radius: 8px 8px 0 0;\\\"><h1 style=\\\"color: #ffffff; margin: 0; font-size: 28px; font-weight: 600;\\\">✅ Anfrage erfasst!</h1></div><div style=\\\"padding: 30px;\\\"><p style=\\\"font-size: 16px; color: #333333; margin-bottom: 20px;\\\">Hallo <strong>{{ $('HTTP Request1').item.json.fields.creatorName.stringValue }}</strong>,</p><p style=\\\"font-size: 15px; color: #555555; line-height: 1.6; margin-bottom: 25px;\\\">Vielen Dank für Ihre Anfrage! Ihr Ticket wurde erfolgreich erstellt und wird von unserem Team bearbeitet.</p><div style=\\\"background: #f5f5f5; padding: 20px; border-radius: 8px; margin-bottom: 25px;\\\"><h3 style=\\\"color: #333333; margin-top: 0; margin-bottom: 15px; font-size: 18px;\\\">📋 Ticket-Details</h3><table style=\\\"width: 100%; border-collapse: collapse;\\\"><tr><td style=\\\"padding: 8px 0; color: #666666; font-weight: 600; width: 30%;\\\">ID:</td><td style=\\\"padding: 8px 0; color: #333333;\\\">{{ $('Code in JavaScript').item.json.documentId }}</td></tr><tr><td style=\\\"padding: 8px 0; color: #666666; font-weight: 600;\\\">Titel:</td><td style=\\\"padding: 8px 0; color: #333333;\\\">{{ $('HTTP Request1').item.json.fields.title.stringValue }}</td></tr><tr><td style=\\\"padding: 8px 0; color: #666666; font-weight: 600;\\\">Kategorie:</td><td style=\\\"padding: 8px 0; color: #333333;\\\">{{ $('HTTP Request1').item.json.fields.category.stringValue }}</td></tr><tr><td style=\\\"padding: 8px 0; color: #666666; font-weight: 600;\\\">Priorität:</td><td style=\\\"padding: 8px 0; color: #333333;\\\">{{ $('HTTP Request1').item.json.fields.priority.stringValue.toUpperCase() }}</td></tr><tr><td style=\\\"padding: 8px 0; color: #666666; font-weight: 600;\\\">Status:</td><td style=\\\"padding: 8px 0; color: #333333;\\\">{{ $('HTTP Request1').item.json.fields.status.stringValue }}</td></tr></table></div><div style=\\\"background: #fff3e0; border-left: 4px solid #ff9800; padding: 15px 20px; border-radius: 4px; margin-bottom: 25px;\\\"><p style=\\\"margin: 0; color: #e65100; font-size: 14px; line-height: 1.5;\\\">🔔 <strong>Benachrichtigungen aktiviert:</strong> Sie werden automatisch informiert, wenn sich der Status Ihres Tickets ändert.</p></div><div style=\\\"background: #e3f2fd; padding: 20px; border-radius: 8px; margin-bottom: 25px;\\\"><h3 style=\\\"color: #1976d2; margin-top: 0; margin-bottom: 15px; font-size: 18px;\\\">🚀 Nächste Schritte</h3><ul style=\\\"margin: 0; padding-left: 20px; color: #555555; line-height: 1.8;\\\"><li style=\\\"margin-bottom: 8px;\\\">Unser Team wird Ihre Anfrage prüfen und bewerten</li><li style=\\\"margin-bottom: 8px;\\\">Die Priorität wird entsprechend der Dringlichkeit angepasst</li><li style=\\\"margin-bottom: 8px;\\\">Sie erhalten Updates bei jeder Statusänderung per E-Mail</li></ul></div><div style=\\\"background: #f5f5f5; padding: 15px 20px; border-radius: 4px; margin-bottom: 25px; text-align: center;\\\"><p style=\\\"margin: 0; color: #666666; font-size: 14px;\\\">📊 Heute noch <strong>{{ $('HTTP Request1').item.json.fields.dailyLimitInfo.mapValue.fields.remainingRequests.integerValue }} von {{ $('HTTP Request1').item.json.fields.dailyLimitInfo.mapValue.fields.dailyLimit.integerValue }} Anfragen</strong> verfügbar</p></div><p style=\\\"font-size: 14px; color: #666666; line-height: 1.6; margin-bottom: 10px;\\\">Bei Fragen können Sie sich jederzeit an uns wenden.</p></div><div style=\\\"background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 25px 30px; text-align: center; border-radius: 0 0 8px 8px;\\\"><p style=\\\"color: #ffffff; margin: 0; font-size: 16px; font-weight: 500;\\\">Ihr Join Team</p><p style=\\\"color: rgba(255, 255, 255, 0.8); margin: 8px 0 0 0; font-size: 12px;\\\">Diese E-Mail wurde automatisch generiert. Bitte nicht direkt antworten.</p></div></div>\"\n}",
+        "jsonBody": "={\n  \"from\": \"requests@stefan-helldobler.de\",\n  \"to\": [\"{{ $('Prepare Firebase Document').item.json.fields.creatorEmail.stringValue.replace(/^=+/, '').replace(/[<>]/g, '') }}\"],\n  \"subject\": \"✅ Ihr Feature Request wurde erfasst - {{ $('HTTP Firebase').item.json.fields.title.stringValue }}\",\n  \"html\": \"<div style=\\\"font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff;\\\"><div style=\\\"background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 30px; text-align: center; border-radius: 8px 8px 0 0;\\\"><h1 style=\\\"color: #ffffff; margin: 0; font-size: 28px; font-weight: 600;\\\">✅ Anfrage erfasst!</h1></div><div style=\\\"padding: 30px;\\\"><p style=\\\"font-size: 16px; color: #333333; margin-bottom: 20px;\\\">Hallo <strong>{{ $('HTTP Firebase').item.json.fields.creatorName.stringValue }}</strong>,</p><p style=\\\"font-size: 15px; color: #555555; line-height: 1.6; margin-bottom: 25px;\\\">Vielen Dank für Ihre Anfrage! Ihr Ticket wurde erfolgreich erstellt und wird von unserem Team bearbeitet.</p><div style=\\\"background: #f5f5f5; padding: 20px; border-radius: 8px; margin-bottom: 25px;\\\"><h3 style=\\\"color: #333333; margin-top: 0; margin-bottom: 15px; font-size: 18px;\\\">📋 Ticket-Details</h3><table style=\\\"width: 100%; border-collapse: collapse;\\\"><tr><td style=\\\"padding: 8px 0; color: #666666; font-weight: 600; width: 30%;\\\">ID:</td><td style=\\\"padding: 8px 0; color: #333333;\\\">{{ $('Code in JavaScript').item.json.documentId }}</td></tr><tr><td style=\\\"padding: 8px 0; color: #666666; font-weight: 600;\\\">Titel:</td><td style=\\\"padding: 8px 0; color: #333333;\\\">{{ $('HTTP Firebase').item.json.fields.title.stringValue }}</td></tr><tr><td style=\\\"padding: 8px 0; color: #666666; font-weight: 600;\\\">Kategorie:</td><td style=\\\"padding: 8px 0; color: #333333;\\\">{{ $('HTTP Firebase').item.json.fields.category.stringValue }}</td></tr><tr><td style=\\\"padding: 8px 0; color: #666666; font-weight: 600;\\\">Priorität:</td><td style=\\\"padding: 8px 0; color: #333333;\\\">{{ $('HTTP Firebase').item.json.fields.priority.stringValue.toUpperCase() }}</td></tr><tr><td style=\\\"padding: 8px 0; color: #666666; font-weight: 600;\\\">Status:</td><td style=\\\"padding: 8px 0; color: #333333;\\\">{{ $('HTTP Firebase').item.json.fields.status.stringValue }}</td></tr></table></div><div style=\\\"background: #fff3e0; border-left: 4px solid #ff9800; padding: 15px 20px; border-radius: 4px; margin-bottom: 25px;\\\"><p style=\\\"margin: 0; color: #e65100; font-size: 14px; line-height: 1.5;\\\">🔔 <strong>Benachrichtigungen aktiviert:</strong> Sie werden automatisch informiert, wenn sich der Status Ihres Tickets ändert.</p></div><div style=\\\"background: #e3f2fd; padding: 20px; border-radius: 8px; margin-bottom: 25px;\\\"><h3 style=\\\"color: #1976d2; margin-top: 0; margin-bottom: 15px; font-size: 18px;\\\">🚀 Nächste Schritte</h3><ul style=\\\"margin: 0; padding-left: 20px; color: #555555; line-height: 1.8;\\\"><li style=\\\"margin-bottom: 8px;\\\">Unser Team wird Ihre Anfrage prüfen und bewerten</li><li style=\\\"margin-bottom: 8px;\\\">Die Priorität wird entsprechend der Dringlichkeit angepasst</li><li style=\\\"margin-bottom: 8px;\\\">Sie erhalten Updates bei jeder Statusänderung per E-Mail</li></ul></div><div style=\\\"background: #f5f5f5; padding: 15px 20px; border-radius: 4px; margin-bottom: 25px; text-align: center;\\\"><p style=\\\"margin: 0; color: #666666; font-size: 14px;\\\">📊 Heute noch <strong>{{ $('HTTP Firebase').item.json.fields.dailyLimitInfo.mapValue.fields.remainingRequests.integerValue }} von {{ $('HTTP Firebase').item.json.fields.dailyLimitInfo.mapValue.fields.dailyLimit.integerValue }} Anfragen</strong> verfügbar</p></div><p style=\\\"font-size: 14px; color: #666666; line-height: 1.6; margin-bottom: 10px;\\\">Bei Fragen können Sie sich jederzeit an uns wenden.</p></div><div style=\\\"background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 25px 30px; text-align: center; border-radius: 0 0 8px 8px;\\\"><p style=\\\"color: #ffffff; margin: 0; font-size: 16px; font-weight: 500;\\\">Ihr Join Team</p><p style=\\\"color: rgba(255, 255, 255, 0.8); margin: 8px 0 0 0; font-size: 12px;\\\">Diese E-Mail wurde automatisch generiert. Bitte nicht direkt antworten.</p></div></div>\"\n}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
@@ -264,6 +229,41 @@
         "httpHeaderAuth": {
           "id": "Ahb7qTShV22hR2wx",
           "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://firestore.googleapis.com/v1/projects/join-angular-based/databases/(default)/documents/tasks",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        432,
+        432
+      ],
+      "id": "2b3b7c6c-8dad-4334-ab62-cf4bdb83b0ce",
+      "name": "HTTP Firebase",
+      "credentials": {
+        "googleApi": {
+          "id": "I7UTDNDObwKjyDdB",
+          "name": "Google Service Account account"
         }
       }
     }
@@ -336,18 +336,7 @@
       "main": [
         [
           {
-            "node": "HTTP Request1",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "HTTP Request1": {
-      "main": [
-        [
-          {
-            "node": "Code in JavaScript",
+            "node": "HTTP Firebase",
             "type": "main",
             "index": 0
           }
@@ -397,6 +386,17 @@
           }
         ]
       ]
+    },
+    "HTTP Firebase": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": true,
@@ -407,7 +407,7 @@
     "timezone": "Europe/Berlin",
     "callerPolicy": "workflowsFromSameOwner"
   },
-  "versionId": "5cb72d90-64ce-47e4-90ff-e23df6e05912",
+  "versionId": "86c1fd8f-58c3-4e6f-9b29-cf70ab4e0328",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "be47a6e455b920cd86a7d73206051da62efd9c6dcc2325fab12e4c502bad6067"

@@ -1,0 +1,122 @@
+{
+  "name": "Task Status Change Notifier",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "task-status-changed",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "f3a5497a-545a-48c0-9560-cfe336fe9390",
+      "name": "Status Change Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "task-status-webhook-001"
+    },
+    {
+      "parameters": {
+        "jsCode": "const webhookData = $input.first().json;\nconst data = webhookData.body;\n\nconsole.log('📬 Received:', JSON.stringify(data, null, 2));\n\nif (!data.source || (data.source !== 'email' && data.source !== 'webhook')) {\n  console.log('⏭️ Skipping - wrong source');\n  return [];\n}\n\nif (!data.creatorEmail) {\n  console.log('⚠️ No email');\n  return [];\n}\n\nconst isStatusChange = !!(data.oldStatus && data.newStatus);\n\nconsole.log('🔍 Status change:', isStatusChange);\n\nconst statusNames = {\n  'triage': 'Triage',\n  'todo': 'To Do',\n  'in-progress': 'In Bearbeitung',\n  'await-feedback': 'Feedback abwarten',\n  'done': 'Erledigt'\n};\n\nconst statusEmojis = {\n  'triage': '🔍',\n  'todo': '📋',\n  'in-progress': '⚙️',\n  'await-feedback': '⏳',\n  'done': '✅'\n};\n\nif (isStatusChange) {\n  const oldStatusFormatted = statusNames[data.oldStatus] || data.oldStatus;\n  const newStatusFormatted = statusNames[data.newStatus] || data.newStatus;\n  const statusEmoji = statusEmojis[data.newStatus] || '🔔';\n  \n  return {\n    json: {\n      taskId: data.taskId,\n      taskTitle: data.taskTitle || 'Aufgabe',\n      oldStatus: oldStatusFormatted,\n      newStatus: newStatusFormatted,\n      statusEmoji: statusEmoji,\n      creatorEmail: data.creatorEmail,\n      creatorName: data.creatorName || 'User',\n      updatedBy: data.updatedBy || 'Team',\n      formattedDate: new Date().toLocaleString('de-DE')\n    }\n  };\n}\n\nreturn [];"
+      },
+      "id": "fb4f0d14-442d-4461-b99a-55e39820fb12",
+      "name": "Process Status Change",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        208,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.resend.com/emails",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"from\": \"requests@stefan-helldobler.de\",\n  \"to\": [\"{{ $json.creatorEmail }}\"],\n  \"subject\": \"{{ $json.statusEmoji }} Status-Update: {{ $json.taskTitle }}\",\n  \"html\": \"<div style='font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1);'><div style='background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 30px; text-align: center;'><h1 style='color: #ffffff; margin: 0; font-size: 28px; font-weight: 600;'>{{ $json.statusEmoji }} Status-Update</h1></div><div style='padding: 40px 30px; background: #f8f9fa;'><p style='font-size: 16px; color: #333333; margin-bottom: 8px;'>Hallo <strong style='color: #667eea;'>{{ $json.creatorName }}</strong>,</p><p style='font-size: 15px; color: #666666; line-height: 1.6; margin-bottom: 30px;'>Der Status Ihres Tickets wurde soeben aktualisiert:</p><div style='background: #ffffff; padding: 25px; border-radius: 12px; margin: 25px 0; border-left: 4px solid #667eea; box-shadow: 0 2px 8px rgba(0,0,0,0.08);'><h3 style='margin: 0 0 20px 0; color: #333333; font-size: 18px; font-weight: 600;'>📋 {{ $json.taskTitle }}</h3><table style='width: 100%; border-collapse: collapse;'><tr style='border-bottom: 1px solid #e9ecef;'><td style='padding: 12px 8px; color: #6c757d; font-weight: 500; width: 40%;'>Alter Status:</td><td style='padding: 12px 8px; color: #495057; font-weight: 600;'>{{ $json.oldStatus }}</td></tr><tr style='border-bottom: 1px solid #e9ecef;'><td style='padding: 12px 8px; color: #6c757d; font-weight: 500;'>Neuer Status:</td><td style='padding: 12px 8px; color: #667eea; font-weight: 700; font-size: 16px;'>→ {{ $json.newStatus }}</td></tr><tr style='border-bottom: 1px solid #e9ecef;'><td style='padding: 12px 8px; color: #6c757d; font-weight: 500;'>Aktualisiert von:</td><td style='padding: 12px 8px; color: #495057;'>{{ $json.updatedBy }}</td></tr><tr><td style='padding: 12px 8px; color: #6c757d; font-weight: 500;'>Zeitpunkt:</td><td style='padding: 12px 8px; color: #495057;'>{{ $json.formattedDate }}</td></tr></table></div><div style='background: #e7f3ff; border-left: 4px solid #0066cc; padding: 16px 20px; border-radius: 8px; margin: 25px 0;'><p style='margin: 0; color: #004080; font-size: 14px; line-height: 1.6;'><strong>💡 Hinweis:</strong> Sie erhalten diese Benachrichtigung, weil Sie der Ersteller dieses Tickets sind. Bei weiteren Statusänderungen werden Sie automatisch informiert.</p></div><p style='font-size: 14px; color: #6c757d; line-height: 1.6; margin: 20px 0 0 0;'>Sie können den aktuellen Stand jederzeit in Ihrem Dashboard überprüfen.</p></div><div style='background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 25px 30px; text-align: center;'><p style='color: #ffffff; margin: 0 0 8px 0; font-size: 16px; font-weight: 600;'>Ihr Join Team</p><p style='color: rgba(255, 255, 255, 0.85); margin: 0; font-size: 13px;'>Diese E-Mail wurde automatisch generiert. Bitte nicht direkt antworten.</p></div></div>\"\n}",
+        "options": {}
+      },
+      "id": "154e4ef3-460c-43bf-b750-f917b69b7505",
+      "name": "Send Status Update Email",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        400,
+        0
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "Ahb7qTShV22hR2wx",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        752,
+        192
+      ],
+      "id": "c8ad682a-8339-4003-9b8f-95d95acd682c",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Status Change Webhook": {
+      "main": [
+        [
+          {
+            "node": "Process Status Change",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Status Change": {
+      "main": [
+        [
+          {
+            "node": "Send Status Update Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Status Update Email": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "3fc5cf64-9a63-493a-91c9-2cb4b8d61e1c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "be47a6e455b920cd86a7d73206051da62efd9c6dcc2325fab12e4c502bad6067"
+  },
+  "id": "3JZK74MujibQyCZ5HZFx5",
+  "tags": []
+}
