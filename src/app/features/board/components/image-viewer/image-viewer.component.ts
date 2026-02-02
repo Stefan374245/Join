@@ -417,12 +417,21 @@ export class ImageViewerComponent {
   toggleActionPopup(event: MouseEvent): void {
     event.stopPropagation();
     
+    if (this.showActionPopup()) {
+      this.showActionPopup.set(false);
+      return;
+    }
+    
+    const button = event.currentTarget as HTMLElement;
+    const rect = button.getBoundingClientRect();
+    
+    // Position popup above the button
     this.actionPopupPosition.set({
-      x: event.clientX - 100,
-      y: event.clientY - 80
+      x: rect.left,
+      y: rect.top - 120 // Popup appears above button (estimated height ~110px + spacing)
     });
     
-    this.showActionPopup.update(v => !v);
+    this.showActionPopup.set(true);
   }
 
   /**
@@ -430,8 +439,7 @@ export class ImageViewerComponent {
    */
   async onDownloadSingle(): Promise<void> {
     this.showActionPopup.set(false);
-    const img = this.currentImage();
-    await this.attachmentStorageService.downloadSingleAttachment(img);
+    await this.attachmentStorageService.downloadSingleAttachment(this.currentImage());
   }
 
   /**

@@ -5,8 +5,8 @@
 >
   <div class="backdrop" (click)="closeViewer()"></div>
 
-  <div class="viewer-content" (click)="$event.stopPropagation()">
-    <div class="top-bar">
+  <article class="viewer-content" (click)="$event.stopPropagation()">
+    <header class="top-bar">
       <span class="image-info">
         {{ currentImage().filename }} •
         {{ formatFileSize(currentImage().size) }} •
@@ -15,9 +15,9 @@
       <button class="close-btn" (click)="closeViewer()" title="Close (ESC)">
         ×
       </button>
-    </div>
+    </header>
 
-    <div class="image-container">
+    <figure class="image-container">
       <div class="loading-spinner" *ngIf="isImageLoading(currentIndex())">
         <div class="spinner"></div>
       </div>
@@ -27,7 +27,7 @@
         [class.animating]="animationDirection() !== null"
         style="position: relative;"
       >
-        @for (idx of renderedIndices(); track idx) {
+        @for (idx of renderedIndices(); track images()[idx].id) {
           <img
             [src]="imageUrls()[idx]"
             [alt]="images()[idx].filename"
@@ -68,11 +68,11 @@
       <button class="nav-btn next" (click)="navigateNext()" title="Next (→)">
         ›
       </button>
-    </div>
+    </figure>
 
-    <div class="bottom-bar">
+    <footer class="bottom-bar">
       @if (images().length > 1) {
-        <div class="thumbnail-bar">
+        <nav class="thumbnail-bar" aria-label="Image thumbnails">
           @for (img of images(); track img.id; let idx = $index) {
             <button
               class="thumbnail"
@@ -87,36 +87,22 @@
               />
             </button>
           }
-        </div>
+        </nav>
       }
 
-      <div class="controls">
+      <nav class="controls" aria-label="Image viewer controls">
         @if (!isEditMode()) {
           <button
-            class="download-btn custom-download-btn"
+            class="download-btn"
             (click)="toggleActionPopup($event)"
             title="Download options"
             aria-label="Download options"
           >
-            <img src="assets/images/download-blue.svg" alt="Download" class="download-icon" />
+            <img src="assets/images/download-blue.svg" alt="Download" />
+            Download
           </button>
-                  @if (showActionPopup()) {
-                    <div
-                      class="action-popup"
-                      [style.left.px]="actionPopupPosition().x"
-                      [style.top.px]="actionPopupPosition().y"
-                      (clickOutside)="showActionPopup.set(false)"
-                      style="z-index: 20;"
-                    >
-                      <button (click)="onDownloadSingle()">
-                        📥 Download This Image
-                      </button>
-                      <button (click)="onDownloadAll()">
-                        📦 Download All as ZIP ({{ images().length }})
-                      </button>
-                    </div>
-                  }
-                }
+        }
+
         <div class="zoom-controls">
           <button
             (click)="zoomOut()"
@@ -158,7 +144,24 @@
             </button>
           }
         }
-      </div>
-    </div>
-  </div>
+      </nav>
+    </footer>
+  </article>
+
+  @if (showActionPopup()) {
+    <menu
+      class="action-popup"
+      [style.left.px]="actionPopupPosition().x"
+      [style.top.px]="actionPopupPosition().y"
+      (click)="$event.stopPropagation()"
+      (clickOutside)="showActionPopup.set(false)"
+    >
+      <button (click)="onDownloadSingle()">
+        📥 Download This Image
+      </button>
+      <button (click)="onDownloadAll()">
+        📦 Download All as ZIP ({{ images().length }})
+      </button>
+    </menu>
+  }
 </div>

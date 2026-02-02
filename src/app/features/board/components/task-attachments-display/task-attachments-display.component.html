@@ -1,5 +1,5 @@
-<div class="attachments-display" *ngIf="attachments().length > 0">
-  <div class="attachments-header" *ngIf="!isEditMode() && attachments().length > 1">
+<section class="attachments-display" *ngIf="attachments().length > 0">
+  <header class="attachments-header" *ngIf="!isEditMode() && attachments().length > 1">
     <button 
       class="btn-download-all"
       (click)="onDownloadAllAsZip($event)"
@@ -8,10 +8,10 @@
       <img src="assets/images/download.svg" alt="Download" />
       Download All as ZIP ({{ attachments().length }})
     </button>
-  </div>
+  </header>
 
-  <div class="attachments-grid">
-    <div 
+  <ul class="attachments-grid">
+    <li 
       class="attachment-card" 
       *ngFor="let attachment of attachments()"
       (click)="onAttachmentClick(attachment)"
@@ -19,7 +19,7 @@
       (mouseleave)="setHoveredAttachment(null)"
       [title]="attachment.filename"
     >
-      <div class="attachment-preview">
+      <figure class="attachment-preview">
         <div class="loading-spinner" *ngIf="isImageLoading(attachment.id)">
           <div class="spinner"></div>
         </div>
@@ -63,15 +63,15 @@
             class="download-icon"
           />
         </button>
-      </div>
-      <div class="attachment-info">
+      </figure>
+      <figcaption class="attachment-info">
         <span class="attachment-filename" [title]="attachment.filename">
           {{ attachment.filename }}
         </span>
         <span class="attachment-size">
           {{ formatFileSize(attachment.size) }}
         </span>
-      </div>
-    </div>
-  </div>
-</div>
+      </figcaption>
+    </li>
+  </ul>
+</section>
