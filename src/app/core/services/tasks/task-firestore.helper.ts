@@ -131,12 +131,10 @@ export async function updateTaskInFirestore(
     }
   });
   
-  // Build update data with proper type conversion
   const updateData: Partial<FirestoreTaskDocument> = {
     updatedAt: Timestamp.now()
   };
 
-  // Copy safe properties that don't need conversion
   if (updates.title !== undefined) updateData.title = updates.title;
   if (updates.description !== undefined) updateData.description = updates.description;
   if (updates.category !== undefined) updateData.category = updates.category;
@@ -149,7 +147,6 @@ export async function updateTaskInFirestore(
   if (updates.creatorName !== undefined) updateData.creatorName = updates.creatorName;
   if (updates.creatorEmail !== undefined) updateData.creatorEmail = updates.creatorEmail;
 
-  // Convert Date objects to Timestamps
   if (updates.dueDate) {
     updateData.dueDate = convertToTimestamp(updates.dueDate);
   }
@@ -158,7 +155,6 @@ export async function updateTaskInFirestore(
     updateData.createdAt = convertToTimestamp(updates.createdAt);
   }
 
-  // Convert complex nested objects
   if (updates.subtasks) {
     updateData.subtasks = prepareSubtasksForFirestore(updates.subtasks);
   }

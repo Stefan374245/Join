@@ -391,6 +391,7 @@ export class TaskService {
   
   /**
    * Triggers a webhook for task status changes
+   * Only triggers for external tasks (source === 'email')
    * @param task - The task object
    * @param oldStatus - The old status
    * @param newStatus - The new status
@@ -402,10 +403,15 @@ export class TaskService {
     newStatus: string,
     updatedBy: string,
   ): void {
+    if (!task.source || (task.source !== 'email' && task.source !== 'webhook')) {
+      return;
+    }
+
     const url =
       "https://n8n-production-04d3.up.railway.app/webhook/task-status-changed";
     const body = {
       taskId: task.id,
+      source: task.source,
       oldStatus: oldStatus,
       newStatus: newStatus,
       taskTitle: task.title,
@@ -415,8 +421,8 @@ export class TaskService {
       timestamp: new Date().toISOString(),
     };
     this.http.post(url, body).subscribe({
-      next: () => console.log("Webhook triggered!"),
-      error: (err) => console.error("Webhook error:", err),
+      next: () => console.log("✅ Webhook triggered for external task:", task.id),
+      error: (err) => console.error("❌ Webhook error:", err),
     });
   }
 }
