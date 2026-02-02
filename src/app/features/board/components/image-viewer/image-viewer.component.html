@@ -5,7 +5,7 @@
 >
   <div class="backdrop" (click)="closeViewer()"></div>
 
-  <article class="viewer-content" (click)="$event.stopPropagation()">
+  <article class="viewer-content" stopPropagation>
     <header class="top-bar">
       <span class="image-info">
         {{ currentImage().filename }} •
@@ -153,7 +153,7 @@
       class="action-popup"
       [style.left.px]="actionPopupPosition().x"
       [style.top.px]="actionPopupPosition().y"
-      (click)="$event.stopPropagation()"
+      stopPropagation
       (clickOutside)="showActionPopup.set(false)"
     >
       <button (click)="onDownloadSingle()">

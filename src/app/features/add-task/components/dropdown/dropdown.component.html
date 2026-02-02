@@ -65,7 +65,7 @@
             class="search-input"
             [placeholder]="searchPlaceholder()"
             [(ngModel)]="searchQuery"
-            (click)="$event.stopPropagation()"
+            stopPropagation
             aria-label="Search items"
           />
           <svg

@@ -1,6 +1,6 @@
 <ng-container *ngIf="isVisible() && task() as currentTask">
   <div class="task-overlay" (click)="onOverlayClick($event)">
-    <div class="task-card-overlay" (click)="$event.stopPropagation()">
+    <div class="task-card-overlay" stopPropagation>
       <div class="task-header">
         <div class="task-category" [ngClass]="getCategoryClass(currentTask.category)">
           <span>{{ currentTask.category }}</span>
@@ -162,7 +162,7 @@
   *ngIf="showDeleteConfirm"
   (click)="cancelDelete()"
 >
-  <div class="confirm-dialog" (click)="$event.stopPropagation()">
+  <div class="confirm-dialog" stopPropagation>
     <h3>Delete permanently?</h3>
     <div class="confirm-buttons">
       <button class="btn btn-secondary" (click)="cancelDelete()">Cancel</button>

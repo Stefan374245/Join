@@ -2,7 +2,7 @@
   <!-- Loading Spinner -->
   <app-loading-spinner [localLoading]="isSubmitting()" />
 
-  <div class="dialog-container" (click)="$event.stopPropagation()">
+  <div class="dialog-container" stopPropagation>
     <button class="close-btn" (click)="onClose()" type="button">
       <img src="assets/images/closeWhite.svg" alt="Close" />
     </button>

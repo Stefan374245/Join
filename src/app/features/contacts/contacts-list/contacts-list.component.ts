@@ -1,6 +1,7 @@
 import { Component, OnInit, inject, HostListener } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { Router, RouterLink, RouterLinkActive } from "@angular/router";
+import { StopPropagationDirective } from '../../../shared/directives';
 import { ContactService } from "../../../core/services/contact.service";
 import { AuthService } from "../../../core/services/auth.service";
 import { ToastService } from "../../../core/services/toast.service";
@@ -13,7 +14,7 @@ import { ContactDialogComponent } from "../contact-dialog/contact-dialog.compone
 @Component({
   selector: "app-contacts-list",
   standalone: true,
-  imports: [CommonModule, RouterLink, ContactDialogComponent],
+  imports: [CommonModule, RouterLink, ContactDialogComponent, StopPropagationDirective],
   templateUrl: "./contacts-list.component.html",
   styleUrl: "./contacts-list.component.scss",
 })

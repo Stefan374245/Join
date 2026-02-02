@@ -9,7 +9,8 @@ import {
 } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
-import { ClickOutsideDirective } from "../../../../shared/directives/click-outside.directive";
+import { ClickOutsideDirective, StopPropagationDirective } from "../../../../shared/directives";
+import { getInitials } from '../../../../shared/utils';
 
 export interface DropdownItem {
   id: string;
@@ -22,7 +23,7 @@ export interface DropdownItem {
 @Component({
   selector: "app-dropdown",
   standalone: true,
-  imports: [CommonModule, FormsModule, ClickOutsideDirective],
+  imports: [CommonModule, FormsModule, ClickOutsideDirective, StopPropagationDirective],
   templateUrl: "./dropdown.component.html",
   styleUrl: "./dropdown.component.scss",
   changeDetection: ChangeDetectionStrategy.OnPush,

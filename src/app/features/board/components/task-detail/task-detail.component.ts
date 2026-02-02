@@ -1,5 +1,6 @@
 import { Component, input, output, inject, effect, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { StopPropagationDirective } from '../../../../shared/directives';
 import { Task, TaskAttachment } from '../../../../core/models/task.interface';
 import { Contact } from '../../../../core/models/contact.interface';
 import { TaskService } from '../../../../core/services/task.service';
@@ -33,7 +34,7 @@ import { ImageViewerComponent } from '../image-viewer/image-viewer.component';
 @Component({
   selector: 'app-task-detail',
   standalone: true,
-  imports: [CommonModule, TaskAttachmentsDisplayComponent, ImageViewerComponent],
+  imports: [CommonModule, TaskAttachmentsDisplayComponent, ImageViewerComponent, StopPropagationDirective],
   templateUrl: './task-detail.component.html',
   styleUrl: './task-detail.component.scss'
 })

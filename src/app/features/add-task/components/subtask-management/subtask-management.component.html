@@ -71,7 +71,8 @@
         [value]="editInputValue()"
         (input)="editInputValue.set($any($event.target).value); subtaskEditInputChange.emit($any($event.target).value)"
         placeholder="Edit subtask"
-        (keydown.enter)="onUpdate(); $event.preventDefault()"
+        (keydown.enter)="onUpdate()"
+        preventDefault="keydown.enter"
         (keydown.escape)="onCancelEdit()"
         (blur)="onInputBlur($event)"
         maxlength="35"
@@ -144,7 +145,8 @@
               [value]="editInputValue()"
               (input)="editInputValue.set($any($event.target).value); subtaskEditInputChange.emit($any($event.target).value)"
               placeholder="Edit subtask"
-              (keydown.enter)="onUpdate(); $event.preventDefault()"
+              (keydown.enter)="onUpdate()"
+              preventDefault="keydown.enter"
               (keydown.escape)="onCancelEdit()"
               (blur)="onInputBlur($event)"
               maxlength="35"
@@ -156,7 +158,8 @@
                 src="assets/images/close.svg"
                 alt="Cancel edit"
                 class="subtask-edit-icon subtask-edit-clear"
-                (click)="onCancelEdit(); $event.stopPropagation()"
+                (click)="onCancelEdit()"
+                stopPropagation
                 role="button"
                 tabindex="0" />
               <div class="subtask-edit-divider" aria-hidden="true"></div>
@@ -164,7 +167,8 @@
                 src="assets/images/checkDark.svg"
                 alt="Save subtask"
                 class="subtask-edit-icon subtask-edit-add"
-                (click)="onUpdate(); $event.stopPropagation()"
+                (click)="onUpdate()"
+                stopPropagation
                 role="button"
                 tabindex="0" />
             </div>
@@ -174,14 +178,16 @@
             <img src="assets/images/edit-2.svg"
                  alt="Edit subtask"
                  class="subtask-action-icon"
-                 (click)="onEdit(subtask); $event.stopPropagation()"
+                 (click)="onEdit(subtask)"
+                 stopPropagation
                  role="button"
                  tabindex="0"/>
             <div class="vertical-line-subtask" aria-hidden="true"></div>
             <img src="assets/images/delete.svg"
                  alt="Delete subtask"
                  class="subtask-action-icon"
-                 (click)="onDelete(subtask.id); $event.stopPropagation()"
+                 (click)="onDelete(subtask.id)"
+                 stopPropagation
                  role="button"
                  tabindex="0"/>
           </div>

@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormControl } from '@angular/forms';
 import { ToastService } from '../../../../core/services/toast.service';
 import { ToastComponent } from '../../../../shared/components/toast/toast.component';
-import { ClickOutsideDirective } from '../../../../shared/directives/click-outside.directive';
+import { ClickOutsideDirective, StopPropagationDirective, PreventDefaultDirective } from '../../../../shared/directives';
 export interface Subtask {
     id: string;
     title: string;
@@ -13,7 +13,7 @@ export interface Subtask {
 @Component({
     selector: 'app-subtask-management',
     standalone: true,
-    imports: [CommonModule, FormsModule, ReactiveFormsModule, ToastComponent, ClickOutsideDirective],
+    imports: [CommonModule, FormsModule, ReactiveFormsModule, ToastComponent, ClickOutsideDirective, StopPropagationDirective, PreventDefaultDirective],
     templateUrl: './subtask-management.component.html',
     styleUrl: './subtask-management.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush

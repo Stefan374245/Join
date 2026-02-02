@@ -27,7 +27,7 @@
                 <span class="userInitials" [ngStyle]="{'background-color': user.color}">{{ user.initials }}</span>
                 <div class="userDetails">
                   <span class="userName">{{ user.firstName }} {{ user.lastName }}</span>
-                  <a class="emailText" [href]="'mailto:' + user.email" (click)="$event.stopPropagation()">{{ user.email }}</a>
+                  <a class="emailText" [href]="'mailto:' + user.email" stopPropagation>{{ user.email }}</a>
                 </div>
               </nav>
             </ng-container>
@@ -111,7 +111,7 @@
 <div class="confirm-dialog-overlay"
      *ngIf="showDeleteConfirm"
      (click)="cancelDelete()">
-  <div class="confirm-dialog" (click)="$event.stopPropagation()">
+  <div class="confirm-dialog" stopPropagation>
     <h3>Delete permanently?</h3>
     <div class="confirm-buttons">
       <button class="btn btn-secondary" (click)="cancelDelete()">Cancel <img src="assets/images/canceldarkblue.svg" alt="Cancel"></button>

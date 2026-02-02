@@ -11,11 +11,12 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LiveAnnouncer } from '@angular/cdk/a11y';
-import { ClickOutsideDirective } from '../../../../shared/directives/click-outside.directive';
+import { ClickOutsideDirective, StopPropagationDirective } from '../../../../shared/directives';
 import { LoadingService } from '../../../../core/services/loading.service';
 import { ToastService } from '../../../../core/services/toast.service';
 import { AttachmentStorageService } from '../../../../core/services/attachment-storage.service';
 import { TaskAttachment } from '../../../../core/models/task.interface';
+import { formatFileSize } from '../../../../shared/utils';
 
 /**
  * Modern Angular 19 Signal-based Image Viewer
@@ -24,7 +25,7 @@ import { TaskAttachment } from '../../../../core/models/task.interface';
 @Component({
   selector: 'app-image-viewer',
   standalone: true,
-  imports: [CommonModule, ClickOutsideDirective],
+  imports: [CommonModule, ClickOutsideDirective, StopPropagationDirective],
   templateUrl: './image-viewer.component.html',
   styleUrl: './image-viewer.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -200,13 +201,9 @@ export class ImageViewerComponent {
   }
 
   /**
-   * Format file size for display
+   * Format file size for display (using shared utility)
    */
-  formatFileSize(bytes: number): string {
-    if (bytes < 1024) return `${bytes} B`;
-    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-  }
+  formatFileSize = formatFileSize;
 
   /**
    * Get preview URL for thumbnails
