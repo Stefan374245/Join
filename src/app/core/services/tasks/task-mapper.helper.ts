@@ -1,6 +1,7 @@
 import { Task, Subtask, TaskAttachment } from '../../models/task.interface';
 import { FirestoreTaskDocument, FirestoreSubtask, FirestoreAttachment } from '../../models/firestore-types.interface';
 import { convertToDate } from './task-timestamp.helper';
+import { TASK_STATUS } from '../../../shared/constants';
 
 /**
  * Helper functions for mapping Firestore data to Task objects
@@ -49,29 +50,29 @@ function extractAssignedTo(data: FirestoreTaskDocument): string[] {
  */
 export function normalizeTaskStatus(status: string | undefined): 'triage' | 'todo' | 'in-progress' | 'await-feedback' | 'done' {
   if (!status) {
-    return 'todo';
+    return TASK_STATUS.TODO as 'todo';
   }
 
   const normalized = status.toLowerCase().replace(/\s+/g, '-');
 
   switch (normalized) {
     case 'triage':
-      return 'triage';
+      return TASK_STATUS.TRIAGE as 'triage';
     case 'todo':
     case 'to-do':
-      return 'todo';
+      return TASK_STATUS.TODO as 'todo';
     case 'in-progress':
     case 'inprogress':
-      return 'in-progress';
+      return TASK_STATUS.IN_PROGRESS as 'in-progress';
     case 'await-feedback':
     case 'awaiting-feedback':
     case 'awaitfeedback':
-      return 'await-feedback';
+      return TASK_STATUS.AWAIT_FEEDBACK as 'await-feedback';
     case 'done':
     case 'completed':
-      return 'done';
+      return TASK_STATUS.DONE as 'done';
     default:
-      return 'todo';
+      return TASK_STATUS.TODO as 'todo';
   }
 }
 

@@ -1,4 +1,5 @@
 import { Task } from '../../models/task.interface';
+import { TASK_STATUS, TASK_PRIORITY } from '../../../shared/constants';
 
 /**
  * Helper functions for filtering and searching tasks
@@ -43,11 +44,11 @@ function taskMatchesQuery(task: Task, query: string): boolean {
  */
 export function groupTasksByStatus(tasks: Task[]) {
   return {
-    triage: tasks.filter(t => t.status === 'triage'),
-    todo: tasks.filter(t => t.status === 'todo'),
-    inProgress: tasks.filter(t => t.status === 'in-progress'),
-    awaitFeedback: tasks.filter(t => t.status === 'await-feedback'),
-    done: tasks.filter(t => t.status === 'done')
+    triage: tasks.filter(t => t.status === TASK_STATUS.TRIAGE),
+    todo: tasks.filter(t => t.status === TASK_STATUS.TODO),
+    inProgress: tasks.filter(t => t.status === TASK_STATUS.IN_PROGRESS),
+    awaitFeedback: tasks.filter(t => t.status === TASK_STATUS.AWAIT_FEEDBACK),
+    done: tasks.filter(t => t.status === TASK_STATUS.DONE)
   };
 }
 
