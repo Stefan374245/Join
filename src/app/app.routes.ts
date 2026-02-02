@@ -74,16 +74,19 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
   {
+    path: 'help',
+    component: HelpComponent,
+    canActivate: [authGuard]
+  },
+  {
     path: 'legal-notice',
-    component: LegalNoticeComponent
+    component: LegalNoticeComponent,
+    canActivate: [authGuard]
   },
   {
     path: 'privacy-policy',
-    component: PrivacyPolicyComponent
-  },
-  {
-    path: 'help',
-    component: HelpComponent
+    component: PrivacyPolicyComponent,
+    canActivate: [authGuard]
   },
   { path: '**', redirectTo: '/logo-animation' }
 ];

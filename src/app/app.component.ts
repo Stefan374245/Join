@@ -29,10 +29,7 @@ export class AppComponent {
                          url.startsWith('/logo-animation') ||
                          url.startsWith('/hero') ||
                          url.startsWith('/request') ||
-                         url.startsWith('/email-form') ||
-                         url.startsWith('/legal-notice') ||
-                         url.startsWith('/privacy-policy') ||
-                         url.startsWith('/help');
+                         url.startsWith('/email-form');
       this.showMainLayout = !isAuthPage;
     });
   }
