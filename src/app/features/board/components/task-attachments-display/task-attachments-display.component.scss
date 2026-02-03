@@ -1,16 +1,16 @@
+@import "../../../../../styles/mixins";
+
 .attachments-display {
   margin-top: 16px;
 }
 
 .attachments-header {
-  display: flex;
-  justify-content: flex-end;
+ @include flex (space-between, center);
   margin-bottom: 12px;
 }
 
 .btn-download-all {
-  display: flex;
-  align-items: center;
+  @include flex (center, center);
   gap: 8px;
   padding: 8px 16px;
   background-color: #2A3647;
@@ -60,12 +60,10 @@
 }
 
 .attachment-preview {
+  @include flex (center, center);
   width: 100%;
   height: 80px;
   background-color: #F6F7F8;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   overflow: hidden;
   position: relative;
 }
@@ -105,23 +103,25 @@
 }
 
 .delete-button {
+  @include flex (center, center);
   position: absolute;
   top: 50%;
-  transform: translateY(-50%);
+  left: 50%;
+  transform: translate(-50%, -50%);
   width: 32px;
   height: 32px;
   border: none;
   border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.95);
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   transition: all 0.2s ease;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   padding: 0;
+  z-index: 10;
 
   &:hover {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    transform: translate(-50%, -50%) scale(1.1);
   }
 }
 
@@ -132,25 +132,25 @@
 }
 
 .download-button {
+  @include flex (row, center, center);
   position: absolute;
   top: 50%;
-  transform: translateY(-50%);
+  left: 50%;
+  transform: translate(-50%, -50%);
   width: 32px;
   height: 32px;
   border: none;
   border-radius: 50%;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   transition: all 0.2s ease;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   padding: 0;
-  background-color: #FFFFFF;
+  background-color: rgba(255, 255, 255, 0.95);
+  z-index: 10;
 
   &:hover {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-    transform: translateY(-50%) scale(1.1);
+    transform: translate(-50%, -50%) scale(1.1);
   }
 }
 
@@ -161,9 +161,8 @@
 }
 
 .attachment-info {
+  @include flex (column, flex-start);
   padding: 8px;
-  display: flex;
-  flex-direction: column;
   gap: 4px;
   background-color: #FFFFFF;
 }
