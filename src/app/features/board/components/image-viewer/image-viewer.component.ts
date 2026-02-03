@@ -138,6 +138,19 @@ export class ImageViewerComponent {
   }
 
  
+  /**
+   * Sets up a reactive effect to lock the body scroll when images are present.
+   *
+   * When the images array has one or more items, this method sets the body's
+   * `overflow` style to `'hidden'`, preventing the user from scrolling the page.
+   * When the effect is cleaned up (e.g., when the images array becomes empty or the component is destroyed),
+   * it restores the body's `overflow` style to its default value.
+   *
+   * This is useful for modal or overlay components that should prevent background scrolling
+   * while active.
+   *
+   * @private
+   */
   private setupBodyScrollLock(): void {
     effect(() => {
       if (this.images().length > 0) {
@@ -153,13 +166,15 @@ export class ImageViewerComponent {
   
   /**
    * Get display URL for attachment
+   * @param attachment - Task attachment
+   * @returns Display URL string
+   * @remarks Uses downloadURL if available, otherwise constructs data URL from base64
    */
   private getImageUrl(attachment: TaskAttachment): string {
     if (attachment.downloadURL) {
       return attachment.downloadURL;
     }
     
-    // Fallback to base64
     if (attachment.base64.startsWith('data:')) {
       return attachment.base64;
     }
@@ -169,6 +184,9 @@ export class ImageViewerComponent {
 
   /**
    * Check if image is loading
+   * @param index - Image index
+   * @returns True if image is loading, otherwise false
+   * @remarks Uses internal loading states map
    */
   isImageLoading(index: number): boolean {
     return this.imageLoadingStates().get(index) ?? true;
@@ -176,6 +194,8 @@ export class ImageViewerComponent {
 
   /**
    * Handle image load start
+   * @param index - Image index
+   * @remarks Updates internal loading states map
    */
   onImageLoadStart(index: number): void {
     const states = new Map(this.imageLoadingStates());
@@ -185,6 +205,8 @@ export class ImageViewerComponent {
 
   /**
    * Handle image load complete
+   * @param index - Image index
+   * @remarks Updates internal loading states map
    */
   onImageLoaded(index: number): void {
     const states = new Map(this.imageLoadingStates());
@@ -194,6 +216,8 @@ export class ImageViewerComponent {
 
   /**
    * Preload image for smooth transitions
+   * @param url - Image URL
+   * @remarks Creates new Image object to trigger browser preload
    */
   private preloadImage(url: string): void {
     const img = new Image();
@@ -202,11 +226,16 @@ export class ImageViewerComponent {
 
   /**
    * Format file size for display (using shared utility)
+   * @return Formatted file size string
+   * @remarks Uses shared utility function
    */
   formatFileSize = formatFileSize;
 
   /**
    * Get preview URL for thumbnails
+   * @param attachment - Task attachment
+   * @returns Preview URL string
+   * @remarks Uses getImageUrl method
    */
   getPreviewUrl(attachment: TaskAttachment): string {
     return this.getImageUrl(attachment);
@@ -214,6 +243,8 @@ export class ImageViewerComponent {
 
   /**
    * Get transform for current image (zoom, rotation, pan)
+   * @returns CSS transform string
+   * @remarks Combines zoom, rotation, and pan into single transform string
    */
   getImageTransform(): string {
     const zoom = this.zoomLevel();
@@ -226,6 +257,7 @@ export class ImageViewerComponent {
   
   /**
    * Navigate to next image
+   * @remarks Loops to first image if at end
    */
   navigateNext(): void {
     const length = this.images().length;
@@ -239,6 +271,7 @@ export class ImageViewerComponent {
 
   /**
    * Navigate to previous image
+   * @remarks Loops to last image if at start
    */
   navigatePrev(): void {
     const length = this.images().length;
@@ -252,6 +285,8 @@ export class ImageViewerComponent {
 
   /**
    * Jump to specific image by index
+   * @param index - Image index to jump to
+   * @remarks Updates current index and resets image state
    */
   jumpToImage(index: number): void {
     if (index < 0 || index >= this.images().length) return;
@@ -263,12 +298,12 @@ export class ImageViewerComponent {
     this.resetImageState();
     this.announceCurrentImage();
     
-    // Reset animation direction after animation completes (500ms)
     setTimeout(() => this.animationDirection.set(null), 500);
   }
 
   /**
    * Announce current image to screen readers
+   *  @remarks Uses LiveAnnouncer to announce image position and filename
    */
   private announceCurrentImage(): void {
     const img = this.currentImage();
@@ -278,6 +313,7 @@ export class ImageViewerComponent {
 
   /**
    * Reset image state (zoom, rotation, pan)
+   * @remarks Resets zoom level, rotation, pan position, and load error state
    */
   private resetImageState(): void {
     this.zoomLevel.set(1);
@@ -286,12 +322,10 @@ export class ImageViewerComponent {
     this.imageLoadError.set(false);
   }
 
-  // ============================================
-  // ZOOM & ROTATION
-  // ============================================
-  
+
   /**
    * Zoom in
+   * @remarks Max zoom level of 4x
    */
   zoomIn(): void {
     this.zoomLevel.update(z => Math.min(z + 0.25, 4));
@@ -299,6 +333,7 @@ export class ImageViewerComponent {
 
   /**
    * Zoom out
+   * @remarks Min zoom level of 0.5x
    */
   zoomOut(): void {
     this.zoomLevel.update(z => Math.max(z - 0.25, 0.5));
@@ -306,6 +341,7 @@ export class ImageViewerComponent {
 
   /**
    * Rotate image 90 degrees clockwise
+   * @remarks Rotates image by 90 degrees clockwise
    */
   rotate90(): void {
     this.rotation.update(r => (r + 90) % 360);
@@ -313,16 +349,21 @@ export class ImageViewerComponent {
 
   /**
    * Close viewer and emit close event
+   * @remarks Resets image state before emitting close event
    */
   closeViewer(): void {
     this.resetImageState();
     this.close.emit();
   }
 
-  // ============================================
-  // KEYBOARD NAVIGATION
-  // ============================================
-  
+  /**
+   * Handle keydown events for viewer controls
+   * @returns {void}
+   * @param event - The keyboard event triggered when a key is pressed.
+   * @remarks
+   * - Escape: Closes the viewer.
+   * - ArrowLeft: Navigates to the previous image.
+   */
   @HostListener('window:keydown', ['$event'])
   onKeyDown(event: KeyboardEvent): void {
     switch(event.key) {
@@ -351,10 +392,13 @@ export class ImageViewerComponent {
     }
   }
 
-  // ============================================
-  // TOUCH GESTURES
-  // ============================================
-  
+/**
+ *  Handles the touch start event for the image viewer component.
+ * @returns {void}
+ * @param event - The touch event triggered when the user places their finger on the screen.  
+ * @remarks
+ * - Records the starting touch position for potential panning or swipe navigation.
+ */
   @HostListener('touchstart', ['$event'])
   onTouchStart(event: TouchEvent): void {
     if (event.touches.length === 1) {
@@ -365,6 +409,11 @@ export class ImageViewerComponent {
     }
   }
 
+  /**
+   * Handles the touch move event for the image viewer component.
+   * @returns {void}
+   * @param event - The touch event triggered when the user moves their finger on the screen. 
+   */
   @HostListener('touchmove', ['$event'])
   onTouchMove(event: TouchEvent): void {
     if (this.isPanning() && event.touches.length === 2) {
@@ -384,6 +433,11 @@ export class ImageViewerComponent {
   }
 
   @HostListener('touchend', ['$event'])
+  /**
+   * Handles the touch end event for the image viewer component.
+   * @returns {void}
+   * @param event - The touch event triggered when the user lifts their finger.
+   */
   onTouchEnd(event: TouchEvent): void {
     this.isPanning.set(false);
     
@@ -394,7 +448,6 @@ export class ImageViewerComponent {
     const deltaX = touchEndX - this.touchStartXSignal();
     const deltaY = touchEndY - this.touchStartYSignal();
     
-    // Swipe detection (horizontal swipe with > 50px threshold)
     if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 50) {
       if (deltaX > 0) {
         this.navigatePrev();
@@ -404,12 +457,11 @@ export class ImageViewerComponent {
     }
   }
 
-  // ============================================
-  // DOWNLOAD & ACTION POPUP
-  // ============================================
   
   /**
    * Toggle action popup for download options
+   * @param event - Mouse event
+   * @remarks Positions popup near button and toggles visibility
    */
   toggleActionPopup(event: MouseEvent): void {
     event.stopPropagation();
@@ -422,10 +474,9 @@ export class ImageViewerComponent {
     const button = event.currentTarget as HTMLElement;
     const rect = button.getBoundingClientRect();
     
-    // Position popup above the button
     this.actionPopupPosition.set({
       x: rect.left,
-      y: rect.top - 120 // Popup appears above button (estimated height ~110px + spacing)
+      y: rect.top - 120
     });
     
     this.showActionPopup.set(true);
@@ -433,6 +484,7 @@ export class ImageViewerComponent {
 
   /**
    * Download single image
+   * @remarks Uses AttachmentStorageService to download current image
    */
   async onDownloadSingle(): Promise<void> {
     this.showActionPopup.set(false);
