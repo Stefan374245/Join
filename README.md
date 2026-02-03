@@ -1,123 +1,135 @@
-# Join - Kanban Project Management Tool
+# Join - Kanban Project Management
 
-**Angular-basiertes Kanban Board mit AI-gesteuertem Feature Request Collector**
+**Angular 19 Kanban Board mit AI-gesteuertem Feature Request System**
 
 ## 🚀 Live App
 
-**Frontend**: https://[(https://stefan-helldobler.de/join-issuecollector)]  
-**AI Workflow (n8n)**: https://n8n-production-04d3.up.railway.app  
-**Feature Request E-Mail**: requests@stefan-helldobler.de
+- **Frontend**: https://stefan-helldobler.de/join-issuecollector
+- **AI Workflow**: https://n8n-production-04d3.up.railway.app (n8n auf Railway)
+- **Feature Requests**: requests@stefan-helldobler.de
 
 ## 📋 Was ist Join?
 
-Join ist eine Kanban-basierte Task-Management-Plattform mit einem besonderen Feature: **Externe Stakeholder können Feature Requests per E-Mail oder Webformular einreichen**, ohne sich registrieren zu müssen. Ein AI-gesteuerter Workflow analysiert die Requests automatisch und erstellt Tasks im System.
+Kanban-basierte Task-Management-Plattform mit AI-Integration. **Externe Stakeholder können Feature Requests per E-Mail oder Webformular einreichen** – ein n8n-Workflow auf Railway analysiert diese mit Google Gemini und erstellt automatisch Tasks in Firebase.
 
-### 🎯 Kern-Features
+### 🎯 Features
 
-- **📊 Kanban Board**: Drag & Drop Tasks zwischen 5 Status-Spalten (Triage, To-Do, In Progress, Await Feedback, Done)
-- **✅ Subtasks**: Detaillierte Aufgaben mit AI-generierten Subtasks
-- **👥 Kontakte**: Team-Mitglieder verwalten und Tasks zuweisen
-- **🎯 Prioritäten**: High, Medium, Low mit visueller Kennzeichnung
-- **📧 Feature Request Collector**: Externe können Requests per E-Mail oder Formular senden
-- **🤖 AI-Integration**: Google Gemini analysiert Requests und generiert Subtasks
-- **🔥 Firebase Backend**: Echtzeit-Synchronisation aller Tasks und Kontakte
+- **📊 Kanban Board**: Drag & Drop zwischen 5 Status-Spalten
+- **✅ Subtasks**: AI-generierte Subtasks via Google Gemini
+- **👥 Kontakte**: Team-Management mit Farbcodes
+- **📎 Attachments**: Bild-Upload (JPEG/PNG) mit Validierung & Kompression
+- **🎯 Prioritäten**: High/Medium/Low mit visueller Kennzeichnung
+- **📧 Request System**: E-Mail (IMAP) + Webhook-Integration
+- **🤖 AI-Analyse**: Automatische Bug/Feature-Erkennung
+- **🔥 Firebase**: Echtzeit-Synchronisation
 
-## 🔄 Wie funktioniert der Feature Request Workflow?
-
-### Übersicht
+## 🔄 Feature Request Workflow (Railway + Resend)
 
 ```
-User sendet Request (Web-Formular oder E-Mail)
-            ↓
-    [Railway n8n Workflow]
-            ↓
-    Parse & Validate Daten
-            ↓
-    Check Daily Limit (max 10/Tag)
-            ↓
-    Google Gemini AI Analyse
-            ↓
-    Task in Firebase erstellen
-            ↓
-    Bestätigungs-E-Mail senden
-            ↓
-    ✅ Task erscheint im Board
+User sendet Request
+    ↓
+┌─────────────────────────────────────┐
+│   Railway n8n Workflow              │
+├─────────────────────────────────────┤
+│ 1. Email Trigger (IMAP)             │ ← requests@stefan-helldobler.de
+│    oder Webhook (POST)              │ ← Webformular
+│ 2. Parse & Validate                 │
+│ 3. Check Daily Limit (10/Tag)       │ ← Firebase Counter
+│ 4. Google Gemini AI Analyse         │ ← Type, Subtasks generieren
+│ 5. Firebase Task erstellen          │ ← Firestore Collection
+│ 6. Resend API Email senden          │ ← Bestätigung via REST
+└─────────────────────────────────────┘
+    ↓
+Task im Board sichtbar (Echtzeit)
 ```
 
-### Schritt-für-Schritt
+### Workflow-Details
 
-**1. Input (Dual-System)**
-- **Webformular**: User füllt Formular auf Help-Seite aus → POST an n8n Webhook
-- **E-Mail**: User sendet E-Mail an requests@stefan-helldobler.de → IMAP Trigger in n8n
+**1. Input-Kanäle**
+- **IMAP**: Email an requests@stefan-helldobler.de (Check alle 1-2 Min)
+- **Webhook**: POST https://n8n-production-04d3.up.railway.app/webhook/feature-request
 
-**2. Parsing & Validation**
-- Extrahiert: Typ (Feature/Bug/Question), Titel, Beschreibung, User-E-Mail
-- Bereinigt Text (entfernt Signaturen, Grüße, unnötige Formatierung)
+**2. Parsing**
+- Extrahiert: Type (auto-detect: bug/feature), Titel, Beschreibung, User-Email
+- Bereinigt: Signaturen, Grüße, HTML-Tags entfernt
+- Bug-Keywords: `vulnerability`, `security`, `error`, `broken` → type: "bug"
 
-**3. Daily Limit Check**
-- Firebase Collection `daily_limits` mit globalem Tages-Counter
-- Maximum: 10 Requests pro Tag
-- Bei Überschreitung: Limit-Warnung per E-Mail
+**3. Daily Limit (Firebase)**
+- Collection: `daily_limits/global_YYYY-MM-DD`
+- Max: 10 Requests/Tag (global)
+- Bei Überschreitung: Email via Resend
 
-**4. AI-Analyse (Google Gemini)**
-- Eingabe: Bereinigte Beschreibung
-- AI generiert: 2-3 konkrete Subtasks
-- Beispiel: "User Login" → Subtasks: ["Erstelle Login-Formular", "Implementiere JWT-Auth", "Error Handling"]
+**4. AI-Analyse (Gemini)**
+- Model: `gemini-2.0-flash-001`
+- Temperature: `0.1` (konsistente Ausgabe)
+- Input: Bereinigte Beschreibung
+- Output: 2-4 Subtasks (max 35 chars/Subtask)
 
-**5. Firebase Integration**
-- Task wird in `tasks` Collection gespeichert
-- Status: "triage" (zur Review durch Team)
-- Eigenschaften: Priorität (low/medium/high), Kategorie (User Story/Technical Task), Deadline (AI-berechnet)
+**5. Firebase Speicherung**
+```javascript
+{
+  title: "Fix XSS vulnerability in CommentFormComponent",
+  description: "AI-generierte Zusammenfassung",
+  status: "triage",
+  priority: "high",  // Auto-erkannt via Keywords
+  category: "Technical Task",  // bug → Technical Task
+  subtasks: [
+    {id: "...", title: "Sanitize input fields", completed: false},
+    {id: "...", title: "Deploy hotfix", completed: false}
+  ],
+  aiGenerated: true,
+  source: "email" | "webhook"
+}
+```
 
-**6. E-Mail Bestätigung**
-- Resend API sendet Bestätigung an User
+**6. Email-Benachrichtigung (Resend)**
+- API: `POST https://api.resend.com/emails`
 - Von: requests@stefan-helldobler.de
-- Inhalt: Task-Details, Subtasks, Tracking-Info
-
-**7. Board Update**
-- Task erscheint sofort im Board (Echtzeit via Firebase)
-- Team kann Task bearbeiten, priorisieren, zuweisen
+- Inhalt: Task-Details, Subtasks, Daily Limit Info
+- **Warum Resend?** Railway blockiert SMTP-Ports (465, 587) → REST API nötig
 
 ## 🧪 App testen
 
-### Option 1: Über die Web-App (Empfohlen)
+### Option 1: Web-Formular (Empfohlen)
 
-3. **Mit Login:**
-   - Registriere Test-Account ODER nutze Guest-Login
-   - Navigiere zum Board
-   - ✅ Sieh den neu erstellten Task in "Triage" Spalte
-   - Teste Drag & Drop zwischen Spalten
-   - Click auf Task → Details mit Subtasks ansehen
+1. **Öffne**: https://stefan-helldobler.de/join-issuecollector
+2. **Navigiere zu**: Help → "Feature Request einreichen"
+3. **Fülle aus**:
+   - Type: Feature/Bug
+   - Titel: "Dein Feature-Wunsch"
+   - Beschreibung: Mindestens 20 Zeichen
+   - Email: deine@email.de
+4. **Submit** → Task wird in 5-10 Sek erstellt
+5. **Login** → Board → Task in "Triage" Spalte sehen
 
-### Option 2: Per E-Mail (IMAP Trigger)
+### Option 2: E-Mail (IMAP Trigger)
 
-**Sende E-Mail an**: requests@stefan-helldobler.de
+**Sende an**: requests@stefan-helldobler.de
 
-**Format:**
 ```
-Betreff: [Feature] Deine Feature-Idee
-Text: 
-Ich hätte gerne eine Funktion zum...
-Bitte implementiert das.
+Betreff: [Bug] Login funktioniert nicht
 
-Viele Grüße
-Dein Name
+Beschreibung:
+Seit gestern können Benutzer sich nicht mehr einloggen.
+Fehlermeldung "Invalid credentials" erscheint.
+
+Grüße
+Max
 ```
 
-**Was passiert:**
-1. ✅ IMAP Trigger in n8n erkennt neue E-Mail (kann 1-2 Min dauern)
-2. ✅ Workflow extrahiert Betreff + Text
-3. ✅ Google Gemini AI analysiert Content
-4. ✅ Task wird in Firebase erstellt
-5. ✅ Du erhältst Bestätigungs-E-Mail
+**Erwartung**:
+- ✅ IMAP Check (1-2 Min Delay)
+- ✅ AI erkennt Bug → type: "bug", priority: "high"
+- ✅ Subtasks generiert: ["Debug login flow", "Fix auth service"]
+- ✅ Bestätigungs-Email innerhalb 30 Sek
 
-### Option 3: Direkter Webhook-Test (PowerShell)
+### Option 3: Webhook (PowerShell)
 
 ```powershell
 $body = @{
     type = "feature"
-    title = "Test Feature Request"
-    description = "Dies ist ein Test des Workflows"
+    title = "CSV Export für User-Daten"
+    description = "Wir brauchen einen CSV-Export für die User-Liste mit allen Feldern."
     userEmail = "test@example.com"
     userName = "Test User"
 } | ConvertTo-Json
@@ -125,15 +137,14 @@ $body = @{
 Invoke-RestMethod -Uri "https://n8n-production-04d3.up.railway.app/webhook/feature-request" -Method POST -Body $body -ContentType "application/json"
 ```
 
-**Erwartetes Ergebnis:** Task wird sofort erstellt, Bestätigungs-E-Mail innerhalb 10 Sekunden
-
 ## 📧 E-Mail Integration Details
 
 ### Resend API (Ausgehend)
 - **Provider**: Resend (https://resend.com)
 - **Domain**: stefan-helldobler.de (DKIM/SPF verifiziert)
-- **Methode**: REST API (kein SMTP, da Railway Ports 465/587 blockiert)
-- **Nodes**: 2x HTTP Request Nodes in n8n
+- **Methode**: REST API via `POST https://api.resend.com/emails`
+- **Warum REST?** Railway blockiert SMTP-Ports (465, 587)
+- **Nodes**: 2x HTTP Request in n8n
   - Success Confirmation (nach Task-Erstellung)
   - Limit Email (bei Daily Limit erreicht)
 
@@ -143,134 +154,212 @@ Invoke-RestMethod -Uri "https://n8n-production-04d3.up.railway.app/webhook/featu
 - **Check-Intervall**: Alle 1-2 Minuten
 - **Parsing**: Automatisch Betreff + Body + Absender
 
-## 🔒 Firebase
+## 🔒 Firebase Konfiguration
 
 ### Collections
 
-**tasks**: Alle Kanban Tasks
+**tasks**
 ```javascript
 {
-  id: "auto-generated-id",
-  title: "Feature Request Title",
-  description: "Detaillierte Beschreibung...",
-  status: "triage|todo|in-progress|await-feedback|done",
-  priority: "low|medium|high",
-  category: "User Story|Technical Task",
-  dueDate: "2026-01-16T10:00:00Z",
+  id: "auto-id",
+  title: "Fix XSS vulnerability in CommentFormComponent",
+  description: "AI-generierte Zusammenfassung",
+  status: "triage" | "todo" | "in-progress" | "await-feedback" | "done",
+  priority: "low" | "medium" | "high",
+  category: "User Story" | "Technical Task",
+  dueDate: "2026-02-06T10:00:00Z",
   subtasks: [
-    {id: "subtask_1", title: "Erstelle UI", completed: false},
-    {id: "subtask_2", title: "Backend Logic", completed: false}
+    {id: "subtask_1", title: "Sanitize inputs", completed: false}
   ],
-  creatorEmail: "user@example.com",
-  creatorName: "User Name",
+  attachments: [
+    {id: "att_1", name: "screenshot.png", url: "https://...", type: "image/png"}
+  ],
+  assignedTo: ["user@example.com"],
+  creatorEmail: "requests@stefan-helldobler.de",
+  creatorType: "external",
   aiGenerated: true,
-  source: "webhook|email",
-  createdAt: "2026-01-09T15:30:00Z"
+  source: "webhook" | "email",
+  createdAt: "2026-02-03T12:00:00Z"
 }
 ```
 
-**users**: Authentifizierte User + Kontakte
+**users** (Auth + Kontakte)
 ```javascript
 {
-  id: "user-id-or-email",
+  id: "user-id",
   email: "user@example.com",
   firstName: "Max",
   lastName: "Mustermann",
-  color: "#FF7A00",  // Auto-generiert
+  color: "#FF7A00",
   initials: "MM"
 }
 ```
 
-**daily_limits**: Request Counter
+**daily_limits** (Request Counter für n8n)
 ```javascript
 {
-  id: "global_2026-01-09",
+  id: "global_2026-02-03",
   count: 7,
   dailyLimit: 10,
-  lastUpdated: "2026-01-09T15:30:00Z",
-  lastRequestTitle: "Feature XYZ"
+  lastUpdated: "2026-02-03T15:30:00Z",
+  lastRequestTitle: "CSV Export Feature"
 }
 ```
 
-### Security Rules
-
-Siehe `firestore.rules`:
-
-- **Authenticated Users**: Voller Zugriff auf tasks/users (CRUD)
-- **Public Write**: n8n kann Tasks mit `aiGenerated: true` erstellen
-- **Public Read/Write**: daily_limits Collection für Counter
-
 ## 🛠️ Technologie-Stack
 
-| Komponente | Technologie | Zweck |
-|------------|-------------|-------|
-| **Frontend** | Angular 19 (Standalone) | UI, Routing, State Management |
-| **Backend** | Firebase Firestore | NoSQL Database, Echtzeit-Sync |
-| **Auth** | Firebase Authentication | User Login, Guards |
-| **AI** | Google Gemini | Subtask-Generierung, Analyse |
-| **Workflow** | n8n (Railway) | Automation Engine |
-| **E-Mail (Out)** | Resend API | Transactional Emails |
-| **E-Mail (In)** | IMAP | Request-Empfang |
-| **Hosting** | Hostinger | Static Hosting via FTP |
+| Layer | Technologie | Details |
+|-------|-------------|---------|
+| **Frontend** | Angular 19 Standalone | Signals, RxJS, TypeScript |
+| **Styling** | SCSS | Mixins, Variables, Responsive |
+| **Backend** | Firebase Firestore | NoSQL, Echtzeit-Sync |
+| **Auth** | Firebase Authentication | Email/Password + Guest Login |
+| **Storage** | Firebase Storage | Bild-Uploads (JPEG/PNG) |
+| **AI** | Google Gemini 2.0 Flash | Task-Analyse, Subtask-Generierung |
+| **Workflow** | n8n (Railway) | Automation, IMAP, Webhooks |
+| **Email (Out)** | Resend API | REST (Railway blockiert SMTP-Ports) |
+| **Email (In)** | IMAP | requests@stefan-helldobler.de |
+| **Hosting** | Hostinger | Static Files via FTP |
+
+### 🔑 Warum diese Tech-Wahl?
+
+- **Railway**: Kostenlose n8n-Instanz, aber Ports 465/587 blockiert → Resend REST API
+- **Resend**: Moderne Email-API, DKIM/SPF verifiziert, kein SMTP nötig
+- **Firebase Storage**: Integriert mit Firestore, einfache Bild-Uploads
+- **Gemini 2.0 Flash**: Schnell, günstig, gute JSON-Ausgabe
 
 ## 📁 Projekt-Struktur
 
 ```
 src/app/
-├── components/
+├── auth/                           # Authentication
+│   ├── login/
+│   ├── signup/
+│   └── logo-animation/
+│
+├── core/                           # Services & Models
+│   ├── guards/
+│   │   └── auth.guard.ts           # Route Protection
+│   ├── models/
+│   │   ├── task.interface.ts
+│   │   ├── contact.interface.ts
+│   │   └── user.interface.ts
+│   └── services/
+│       ├── task.service.ts         # Task CRUD + Firestore
+│       ├── contact.service.ts      # Contact Management
+│       ├── auth.service.ts         # Login, Signup, Guest
+│       ├── file-validation.service.ts  # Magic Bytes Check (PNG/JPEG)
+│       ├── image-compression.service.ts  # Komprimierung vor Upload
+│       ├── attachment-storage.service.ts  # Firebase Storage
+│       ├── daily-limit.service.ts  # Request Counter (n8n)
+│       ├── loading.service.ts      # Global Loading State
+│       └── toast.service.ts        # Notifications
+│
+├── features/                       # Feature Modules
+│   ├── add-task/
+│   │   ├── components/
+│   │   │   ├── badge-list/
+│   │   │   ├── dropdown/
+│   │   │   ├── subtask-management/
+│   │   │   └── task-attachment-upload/  # 📎 Bild-Upload
+│   │   └── presentational/
+│   │       └── add-task-view/
+│   │
 │   ├── board/
-│   │   ├── board-view/          # Kanban Board mit Drag & Drop
-│   │   └── task-detail/         # Task-Detail Modal
+│   │   ├── components/
+│   │   │   ├── board-column/
+│   │   │   ├── task-card/
+│   │   │   ├── task-detail/
+│   │   │   ├── task-attachments-display/
+│   │   │   └── image-viewer/      # Lightbox für Bilder
+│   │   └── presentational/
+│   │       └── board-view/
+│   │
 │   ├── contacts/
-│   │   ├── contacts-list/       # Kontakt-Übersicht
-│   │   ├── contact-dialog/      # Erstellen/Bearbeiten
-│   │   └── contact-detail/      # Detail-Ansicht
-│   ├── help/                    # Feature Request Formular
-│   ├── summary/                 # Dashboard
-│   └── public/welcome/          # Landing Page für Stakeholder
-├── services/
-│   ├── task.service.ts          # Task CRUD (Firebase)
-│   ├── contact.service.ts       # Kontakte (Firebase)
-│   ├── auth.service.ts          # Authentication
-│   └── toast.service.ts         # Notifications
-├── models/
-│   ├── task.interface.ts        # Task Type
-│   └── contact.interface.ts     # Contact Type
-└── guards/
-    └── auth.guard.ts            # Route Protection
+│   │   ├── contacts-list/
+│   │   ├── contact-dialog/
+│   │   └── contact-detail/
+│   │
+│   ├── landing/                    # Public Pages
+│   │   └── hero/
+│   │       ├── request/            # Feature Request Form
+│   │       └── email-form/
+│   │
+│   ├── summary/                    # Dashboard
+│   ├── help/                       # Feature Request Info
+│   ├── legal-notice/
+│   └── privacy-policy/
+│
+├── layout/
+│   ├── header/
+│   ├── sidebar/
+│   └── main-layout/
+│
+└── shared/
+    ├── components/
+    │   ├── user-avatar/
+    │   ├── loading-spinner/
+    │   ├── toast/
+    │   └── footer-auth/
+    ├── directives/
+    │   ├── drag-drop.directive.ts  # Drag & Drop für Board
+    │   ├── click-outside.directive.ts
+    │   └── prevent-default.directive.ts
+    ├── constants/
+    │   ├── file-upload.constants.ts  # Allowed Types: image/jpeg, image/png
+    │   ├── task.constants.ts
+    │   └── colors.constants.ts
+    └── utils/
 
 n8n-workflows/
-└── Email to Kanban Task Converter with AI Analysis.json
+├── Email to Kanban Task Converter.json  # AI Feature Request Handler
+└── Task Status Change.json              # Status Update Notifier
 ```
 
-## 🚨 Bekannte Einschränkungen
+### 📎 File Upload Details
 
-- **Daily Limit**: Max 10 Feature Requests/Tag (Counter in Firebase)
-- **IMAP Delay**: E-Mail-Trigger kann 1-2 Minuten dauern (nicht Echtzeit)
-- **SMTP blockiert**: Railway blockiert Ports → Resend REST API statt SMTP
-- **AI-Fehler**: Bei Gemini-Fehler werden Tasks ohne Subtasks erstellt (Fallback)
+**Erlaubte Formate**: Nur Bilder (JPEG, PNG)
 
-## 📚 Weitere Dokumentation
+**Upload-Flow**:
+1. `file-validation.service.ts`: Magic Bytes Check (verhindert fake Extensions)
+2. `image-compression.service.ts`: Komprimierung (max 500KB, Quality 0.8)
+3. `attachment-storage.service.ts`: Upload zu Firebase Storage
+4. Task: Speichert Download-URLs in `attachments` Array
 
-- **[N8N Workflow Details](./n8n-workflows/README.md)**: Komplette Workflow-Dokumentation
-- **[Routing Guide](./ROUTING_INTEGRATION_GUIDE.md)**: Angular Routing Setup
-- **[Migration Plan](./MIGRATION_STEP_BY_STEP_PLAN.md)**: Architektur-Änderungen
+**Sicherheit**:
+- Content-Type Validierung
+- File Size Limit (5MB vor Kompression)
+- Magic Bytes Check (echtes JPEG/PNG)
+- Firebase Storage Rules (auth required)
+
+## 🚨 Limits & Constraints
+
+- **Daily Limit**: 10 Feature Requests/Tag (global Counter in Firebase)
+- **IMAP Delay**: Email-Trigger 1-2 Min (nicht Echtzeit)
+- **Railway Ports**: 465/587 blockiert → Resend REST API statt SMTP
+- **File Upload**: Nur Bilder (JPEG, PNG), max 5MB vor Kompression
+- **AI-Fallback**: Bei Gemini-Fehler → Task ohne Subtasks erstellt
 
 ## 💡 FAQ
 
-**Q: Warum erscheint mein Task nicht sofort?**  
-A: Bei E-Mail-Requests: IMAP Check alle 1-2 Min. Bei Webhook: Sofort, aber App-Reload nötig.
+**Q: Task erscheint nicht sofort?**  
+A: Email (IMAP): 1-2 Min Delay. Webhook: Sofort, aber Browser-Reload nötig.
 
-**Q: Kann ich mehr als 10 Requests/Tag senden?**  
-A: Nein, Daily Limit ist hardcoded. Du erhältst eine Limit-E-Mail.
+**Q: Mehr als 10 Requests/Tag?**  
+A: Nein, hardcoded. Limit-Email via Resend bei Überschreitung.
 
-**Q: Werden Subtasks immer generiert?**  
-A: Nein, bei AI-Fehler oder zu kurzer Beschreibung: Task ohne Subtasks.
+**Q: Warum Resend statt SMTP?**  
+A: Railway blockiert SMTP-Ports (465, 587) → REST API als Workaround.
 
-**Q: Kann ich den Workflow selbst hosten?**  
-A: Ja, siehe `n8n-workflows/README.md` für Import-Anleitung.
+**Q: Welche Dateien kann ich hochladen?**  
+A: Nur Bilder (JPEG/PNG). Validierung via Magic Bytes + Content-Type Check.
+
+**Q: AI generiert manchmal keine Subtasks?**  
+A: Bei zu kurzer Beschreibung (<20 Zeichen) oder Gemini-API-Fehler.
 
 ---
 
-**Entwickelt mit ❤️ und Angular**  
-Bei Fragen: Check n8n Workflow Logs oder Firebase Console
+**Entwickelt mit Angular 19 + Firebase + n8n auf Railway**  
+Workflow Logs: https://railway.app/dashboard
+
+
