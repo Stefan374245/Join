@@ -180,6 +180,16 @@ export class SignupComponent implements OnInit {
   }
 
     /**
+     * Toggles the privacy policy acceptance checkbox.
+     * @returns {void}
+     * @remarks Used to make the checkbox clickable via the container and label.
+     */
+  togglePrivacy(): void {
+    this.acceptPrivacy = !this.acceptPrivacy;
+    this.privacyError = false;
+  }
+
+    /**
      * Gets the icon path for the password field.
      * @returns {string} Path to the icon image.
      * @remarks Changes icon based on password state and focus.

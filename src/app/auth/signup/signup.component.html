@@ -107,13 +107,14 @@
         >
 
         <div class="checkbox-div">
-          <div class="custom-checkbox">
+          <div class="custom-checkbox" (click)="togglePrivacy()">
             <input
               type="checkbox"
               id="privacyCheckbox"
               name="acceptPrivacy"
               [(ngModel)]="acceptPrivacy"
               class="privacy-checkbox"
+              tabindex="0"
             />
             <img
               [src]="
@@ -125,9 +126,9 @@
               class="checkbox-icon"
             />
           </div>
-          <label for="privacyCheckbox" class="privacy-label">
+          <label for="privacyCheckbox" class="privacy-label" (click)="togglePrivacy()">
             I accept the
-            <a routerLink="/privacy-policy" class="privacy-link"
+            <a routerLink="/privacy-policy" class="privacy-link" (click)="$event.stopPropagation()"
               >Privacy Policy</a
             >
           </label>

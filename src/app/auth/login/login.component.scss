@@ -121,21 +121,10 @@
   }
 }
 
-.login-input-div {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-}
-
 .input-div {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  @include flex(row, center, center);
   width: 23.4375rem;
   padding-left: 25px;
-  margin-top: 0px;
-  margin-bottom: 0px;
 }
 
 .login-input {
@@ -144,10 +133,7 @@
   height: 46px;
   border-width: 1px;
   font-size: 20px;
-  background-repeat: no-repeat;
-  background-position: right 20px center;
-  padding-left: 20px;
-  padding-right: 50px;
+  padding: 16px;
   outline: none;
   cursor: pointer;
 
