@@ -1,4 +1,4 @@
-import { Injectable, inject, signal, computed, effect } from "@angular/core";
+import { Injectable, inject, computed } from "@angular/core";
 import {
   Auth,
   createUserWithEmailAndPassword,
@@ -31,8 +31,8 @@ export interface SignupData {
 
 /**
  * Authentication service using Firebase Auth with Angular Signals
- *
  * Provides user registration, login, logout and reactive state management
+ * @remarks Utilizes Angular Signals for reactive user state
  */
 @Injectable({
   providedIn: "root",
@@ -41,13 +41,13 @@ export class AuthService {
   private auth = inject(Auth);
   private firestore = inject(Firestore);
   private router = inject(Router);
-  private userSignal = toSignal(authState(this.auth), { initialValue: null });
-  public readonly currentUserSignal = this.userSignal;
-  public readonly isAuthenticated = computed(() => this.userSignal() !== null);
-  public readonly userDisplayName = computed(() => this.userSignal()?.displayName ?? null);
-  public readonly userEmail = computed(() => this.userSignal()?.email ?? null);
-  public readonly isGuestUser = computed(() => this.userSignal()?.email === "guest@join.com");
-  public readonly userId = computed(() => this.userSignal()?.uid ?? null);
+  
+  public readonly currentUserSignal = toSignal(authState(this.auth), { initialValue: null });
+  public readonly isAuthenticated = computed(() => this.currentUserSignal() !== null);
+  public readonly userDisplayName = computed(() => this.currentUserSignal()?.displayName ?? null);
+  public readonly userEmail = computed(() => this.currentUserSignal()?.email ?? null);
+  public readonly isGuestUser = computed(() => this.currentUserSignal()?.email === "guest@join.com");
+  public readonly userId = computed(() => this.currentUserSignal()?.uid ?? null);
 
   /**
    * Gets currently authenticated user from Firebase Auth (Legacy support)
@@ -175,8 +175,8 @@ export class AuthService {
   }
 
   /**
-   * Signs in user with Google OAuth
-   * @returns Promise with Google OAuth credentials
+   * Signs in user with Google OAuth using popup
+   * @returns Promise with user credentials
    * @remarks Creates Firestore user document if new user
    */
   async signInWithGoogle(): Promise<UserCredential> {

@@ -37,7 +37,6 @@ export class LoginComponent implements OnInit {
   /**
    * Component initialization lifecycle hook.
    * @returns {void}
-   * @remarks No initialization logic required.
    */
   ngOnInit(): void {}
 
@@ -185,22 +184,22 @@ export class LoginComponent implements OnInit {
   }
 
   /**
-   * Signs in using Google authentication.
+   * Signs in using Google authentication with popup.
    * @returns {Promise<void>}
-   * @remarks Handles popup errors and shows success or error toast.
+   * @remarks Shows success or error toast.
    */
   async signInWithGoogle(): Promise<void> {
     this.loginFailError = false;
     this.isLoading.set(true);
     try {
       const userCredential = await this.authService.signInWithGoogle();
-      console.log('Google login successful:', userCredential?.user);
+      console.log('✅ Google login successful:', userCredential?.user);
       this.showLoginSuccess();
     } catch (error: any) {
-      console.error('Google login error:', error);
+      console.error('❌ Google login error:', error);
       this.loginFailError = true;
-      if (error.code === 'auth/popup-closed-by-user') {
-        this.loginFailError = false;
+      if (error.code !== 'auth/popup-closed-by-user') {
+        this.toastService.showToast('Google login failed. Please try again.');
       }
     } finally {
       this.isLoading.set(false);
