@@ -59,11 +59,6 @@ export class AuthService {
   }
 
 
-
-
-
-
-
   /**
    * Registers new user with email and password
    * @param data - Registration data (name, email, password)
@@ -182,6 +177,7 @@ export class AuthService {
   /**
    * Signs in user with Google OAuth
    * @returns Promise with Google OAuth credentials
+   * @remarks Creates Firestore user document if new user
    */
   async signInWithGoogle(): Promise<UserCredential> {
     const provider = this.createGoogleProvider();
@@ -193,6 +189,7 @@ export class AuthService {
   /**
    * Creates configured Google OAuth provider
    * @returns Google OAuth provider instance
+   * @remarks Sets prompt to select account
    */
   private createGoogleProvider(): GoogleAuthProvider {
     const provider = new GoogleAuthProvider();
