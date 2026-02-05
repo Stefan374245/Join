@@ -312,8 +312,6 @@
   }
 
   .creator-section {
-    flex-direction: column;
-    align-items: flex-start;
     gap: 8px;
 
     .detail-label {
@@ -321,7 +319,6 @@
     }
 
     .creator-info {
-      flex-wrap: wrap;
       gap: 8px;
 
       .creator-badge {

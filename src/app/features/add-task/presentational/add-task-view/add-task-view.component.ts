@@ -589,7 +589,7 @@ export class AddTaskViewComponent implements OnInit, AfterViewInit {
 
   /**
    * Validates the form in edit mode to ensure required fields are filled.
-   * Checks that the title is not empty and the due date is set.
+   * Checks that the title is not empty, the due date is set, and a category is selected.
    * If validation fails, marks the form as touched and shows a toast notification.
    * 
    * @returns {boolean} - True if the form is valid, false otherwise.
@@ -597,9 +597,11 @@ export class AddTaskViewComponent implements OnInit, AfterViewInit {
   private isEditValid(): boolean {
     const titleControl = this.taskForm.get("title");
     const dueDateControl = this.taskForm.get("dueDate");
-    if (!titleControl?.value?.trim() || !dueDateControl?.value) {
+    const categoryValid = this.selectedCategory() !== "";
+    
+    if (!titleControl?.value?.trim() || !dueDateControl?.value || !categoryValid) {
       this.markFormAsTouched();
-      this.toastService.showToast(TASK_MESSAGES.TITLE_REQUIRED);
+      this.toastService.showToast(TASK_MESSAGES.REQUIRED_FIELDS);
       return false;
     }
     return true;
