@@ -1,12 +1,5 @@
 import { Directive, ElementRef, HostListener, input, output } from '@angular/core';
 
-/**
- * Directive for drag and drop file handling
- * Usage: 
- * <div dragDrop (filesDropped)="handleFiles($event)">
- *   Drop files here
- * </div>
- */
 @Directive({
   selector: '[dragDrop]',
   standalone: true

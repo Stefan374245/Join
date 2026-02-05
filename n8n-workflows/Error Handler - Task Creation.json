@@ -1,0 +1,116 @@
+{
+  "name": "Error Handler - Task Creation",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "d9adfeb9-eb89-4770-a824-570816d44141",
+      "name": "Error Trigger",
+      "alwaysOutputData": true,
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nconsole.log('🚨 ===== ERROR CAUGHT =====');\nconsole.log('📊 Total items received:', items.length);\n\n// Error Trigger gibt die Error-Daten im ersten Item\nconst errorItem = items[0].json;\n\nconsole.log('📋 Error Item Keys:', Object.keys(errorItem));\nconsole.log('📋 Full Error Object:', JSON.stringify(errorItem, null, 2));\n\n// ✅ Extract error details (n8n Error Trigger structure)\nconst errorDetails = {\n  timestamp: new Date().toISOString(),\n  \n  // Workflow Info\n  workflowName: $workflow.name || 'Unknown Workflow',\n  workflowId: $workflow.id || 'unknown',\n  \n  // Execution Info\n  executionId: $execution.id || 'unknown',\n  executionMode: $execution.mode || 'unknown',\n  \n  // Error Info\n  errorMessage: errorItem.error?.message || errorItem.message || 'No error message',\n  errorStack: errorItem.error?.stack || errorItem.stack || 'No stack trace',\n  errorDescription: errorItem.error?.description || errorItem.description || '',\n  \n  // Node Info\n  nodeName: errorItem.node?.name || 'Unknown Node',\n  nodeType: errorItem.node?.type || 'Unknown',\n  nodeParameters: errorItem.node?.parameters || {},\n  \n  // Try to extract input data that caused the error\n  inputData: errorItem.error?.context?.data || errorItem.inputData || null,\n  \n  // Try to extract user data from execution data\n  userData: {\n    userEmail: errorItem.inputData?.userEmail || \n               errorItem.error?.context?.userEmail || \n               'unknown',\n    userName: errorItem.inputData?.userName || \n              errorItem.error?.context?.userName || \n              'unknown',\n    title: errorItem.inputData?.title || \n           errorItem.error?.context?.title || \n           'unknown',\n    source: errorItem.inputData?.source || \n            errorItem.error?.context?.source || \n            'unknown'\n  }\n};\n\nconsole.log('✅ Parsed Error Details:', errorDetails);\nconsole.log('📧 User Email:', errorDetails.userData.userEmail);\nconsole.log('🔧 Failed Node:', errorDetails.nodeName);\nconsole.log('❌ Error Message:', errorDetails.errorMessage);\n\nreturn {\n  json: errorDetails\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "38347f81-b64a-47c7-b49e-0e3f383e710e",
+      "name": "Parse Error Data"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.resend.com/emails",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"from\": \"requests@stefan-helldobler.de\",\n  \"to\": [\"shelldobler@gmx.de\"],\n  \"subject\": \"❌ n8n Workflow Error\",\n  \"html\": \"<div style='font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1);'><div style='background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); padding: 40px 30px; text-align: center;'><div style='font-size: 48px; margin-bottom: 10px;'>❌</div><h1 style='color: #ffffff; margin: 0; font-size: 28px; font-weight: 600;'>n8n Workflow Error</h1></div><div style='padding: 40px 30px; background: #f8f9fa;'><p style='font-size: 16px; color: #333333; margin-bottom: 8px;'>Hallo <strong style='color: #ef4444;'>Admin</strong>,</p><p style='font-size: 15px; color: #666666; line-height: 1.6; margin-bottom: 30px;'>Ein n8n Workflow ist fehlgeschlagen und benötigt Ihre Aufmerksamkeit.</p><div style='background: #fee2e2; border-left: 4px solid #ef4444; padding: 20px; border-radius: 8px; margin: 25px 0;'><p style='margin: 0 0 12px 0; color: #991b1b; font-size: 15px; font-weight: 700;'>🚨 Ein Workflow ist fehlgeschlagen</p><p style='margin: 0; color: #7f1d1d; font-size: 14px; line-height: 1.6;'>Bitte überprüfen Sie die n8n-Oberfläche für weitere Details zum Fehler.</p></div><div style='background: #fff3cd; border-left: 4px solid #ffc107; padding: 16px 20px; border-radius: 8px; margin: 25px 0;'><p style='margin: 0; color: #856404; font-size: 14px; line-height: 1.6;'><strong>💡 Hinweis:</strong> Öffnen Sie n8n und prüfen Sie die Workflow-Ausführungen für detaillierte Fehlerinformationen.</p></div></div><div style='background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); padding: 25px 30px; text-align: center;'><p style='color: #ffffff; margin: 0 0 8px 0; font-size: 16px; font-weight: 600;'>n8n Error Alert System</p><p style='color: rgba(255, 255, 255, 0.85); margin: 0; font-size: 13px;'>Diese E-Mail wurde automatisch generiert.</p></div></div>\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        416,
+        0
+      ],
+      "id": "58369f27-9c44-43be-b823-578e19936843",
+      "name": "Send Error Email",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "Ahb7qTShV22hR2wx",
+          "name": "Header Auth account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Error Trigger": [
+      {
+        "json": {
+          "error": {
+            "message": "TEST: Email parsing failed - missing userEmail field",
+            "stack": "Error: TEST ERROR\n    at parseEmail (/parse-validate-email.js:45)\n    at workflow.execute (workflow.js:123)\n    at async processNextTask",
+            "description": "Failed to extract userEmail from input data. The 'from' field was undefined or malformed."
+          },
+          "node": {
+            "name": "Parse & Validate Email",
+            "type": "n8n-nodes-base.code",
+            "parameters": {}
+          },
+          "inputData": {
+            "userEmail": "shelldobler@gmx.de",
+            "userName": "Stefan Helldobler",
+            "title": "Add new feature for task export",
+            "source": "email"
+          }
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Parse Error Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Error Data": {
+      "main": [
+        [
+          {
+            "node": "Send Error Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "01796fc1-440b-4a82-9560-45426850b746",
+  "meta": {
+    "instanceId": "be47a6e455b920cd86a7d73206051da62efd9c6dcc2325fab12e4c502bad6067"
+  },
+  "id": "mGSVGHf2AHYEtByltVNTl",
+  "tags": []
+}
