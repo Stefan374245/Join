@@ -20,6 +20,9 @@ import { ToastService } from "../../../core/services/toast.service";
         top: 100%;
         transform: translate(-50%, -150%);
         z-index: 1000;
+        max-width: 90vw;
+        width: auto;
+        padding: 0 16px;
       }
       .toast-message {
         color: white;
@@ -30,7 +33,30 @@ import { ToastService } from "../../../core/services/toast.service";
         padding: 20px;
         text-align: center;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-        white-space: nowrap;
+        white-space: normal;
+        word-wrap: break-word;
+        max-width: 100%;
+        line-height: 1.4;
+      }
+
+      @media (max-width: 768px) {
+        .toast-container {
+          max-width: 92vw;
+        }
+        .toast-message {
+          padding: 18px;
+          border-radius: 8px;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .toast-container {
+          max-width: 95vw;
+          padding: 0 12px;
+        }
+        .toast-message {
+          padding: 16px;
+        }
       }
     `,
   ],
