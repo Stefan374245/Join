@@ -58,10 +58,14 @@
   &.shrinking {
     width: 80px;
     height: 80px;
-    left: 80px;
+    left: max(80px, calc(50vw - 572px + 80px));
     top: 80px;
     transform: translate(0, 0);
     opacity: 1;
+
+    @media (max-width: 1200px) {
+      left: 80px;
+    }
 
     @media (max-width: 800px) {
       width: 60px;
@@ -74,10 +78,14 @@
   &.final {
     width: 80px;
     height: 80px;
-    left: 80px;
+    left: max(80px, calc(50vw - 572px + 80px));
     top: 80px;
     transform: translate(0, 0);
     opacity: 1;
+
+    @media (max-width: 1200px) {
+      left: 80px;
+    }
 
     @media (max-width: 800px) {
       width: 60px;

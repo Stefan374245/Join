@@ -6,11 +6,14 @@
   @include flex(column, flex-start, center);
   position: relative;
   min-height: 100vh;
+  max-width: $breakpoint-lg-xl;
+  margin: 0 auto;
   background-color: #f6f7f8;
   padding: clamp(2.5rem, 5vh, 5rem) clamp(1.5rem, 3vw, 3rem) 2rem;
   gap: clamp(1.5rem, 3vh, 2.5rem);
   overflow-y: auto;
   overflow-x: hidden;
+
 
   @media (max-width: $breakpoint-md) {
     padding: 2.5rem 1.5rem 2rem;
@@ -33,7 +36,7 @@
 
 .main-header {
   @include flex(row, space-between, center);
-  width: 100vw;
+  width: 100%;
   margin-bottom: 20px;
 }
 .signup-div {
