@@ -2,8 +2,15 @@
 
 .help-main {
   @extend .info-page-main;
-    @include hide-scrollbar;
+  @include hide-scrollbar;
+}
 
+.header-container {
+  @extend .info-page-header-container;
+}
+
+.back-arrow {
+  @extend .info-page-back-arrow;
 }
 
 .help-content {

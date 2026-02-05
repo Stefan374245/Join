@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { RouterLink} from '@angular/router';
 
 
@@ -11,5 +11,9 @@ import { RouterLink} from '@angular/router';
   styleUrl: './legal-notice.component.scss'
 })
 export class LegalNoticeComponent {
+  constructor(private location: Location) {}
 
+  goBack(): void {
+    this.location.back();
+  }
 }

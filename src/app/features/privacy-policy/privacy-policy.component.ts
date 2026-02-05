@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 
 @Component({
   selector: 'app-privacy-policy',
@@ -9,6 +9,11 @@ import { CommonModule } from '@angular/common';
   styleUrl: './privacy-policy.component.scss'
 })
 export class PrivacyPolicyComponent {
+  constructor(private location: Location) {}
+
+  goBack(): void {
+    this.location.back();
+  }
 
   scrollTo(elementId: string): void {
     const element = document.getElementById(elementId);

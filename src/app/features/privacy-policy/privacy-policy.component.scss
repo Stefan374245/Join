@@ -6,6 +6,14 @@
   @include hide-scrollbar;
 }
 
+.header-container {
+  @extend .info-page-header-container;
+}
+
+.back-arrow {
+  @extend .info-page-back-arrow;
+}
+
 .privacy-content {
   @extend .info-page-content;
   background: #F6F7F8;

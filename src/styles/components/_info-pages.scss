@@ -106,6 +106,62 @@
   font-weight: 600;
 }
 
+.info-page-header-container {
+  @include flex(row, space-between, center);
+  width: 100%;
+  position: relative;
+  margin-bottom: $spacing-lg;
+
+  @media (max-width: $breakpoint-md) {
+    margin-bottom: $spacing-md;
+  }
+}
+
+.info-page-back-arrow {
+  cursor: pointer;
+  position: relative;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: translateX(-4px);
+  }
+
+  img {
+    position: absolute;
+    top: -10px;
+    left: -12px;
+    width: 100%;
+    height: 100%;
+    transition: opacity 0.2s ease;
+  }
+
+  .arrow-default {
+    opacity: 1;
+  }
+
+  .arrow-hover {
+    opacity: 0;
+  }
+
+  &:hover {
+    .arrow-default {
+      opacity: 0;
+    }
+
+    .arrow-hover {
+      opacity: 1;
+    }
+  }
+
+  @media (max-width: $breakpoint-sm) {
+    width: 24px;
+    height: 24px;
+  }
+}
+
 .info-page-nav {
   background: $background-color;
   border-radius: $border-radius-lg;

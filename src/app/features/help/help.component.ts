@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { RouterLink } from "@angular/router";
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-help',
@@ -8,4 +9,10 @@ import { RouterLink } from "@angular/router";
   styleUrl: './help.component.scss',
   imports: [RouterLink]
 })
-export class HelpComponent {}
+export class HelpComponent {
+  constructor(private location: Location) {}
+
+  goBack(): void {
+    this.location.back();
+  }
+}
