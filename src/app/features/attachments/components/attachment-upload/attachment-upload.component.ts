@@ -1,23 +1,22 @@
 import { Component, EventEmitter, Output, Input, signal, inject, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DragDropDirective } from '../../../../shared/directives';
-import { FileValidationService } from '../../../../core/services/file-validation.service';
-import { ImageCompressionService } from '../../../../core/services/image-compression.service';
+import { FileValidationService } from '../../services/file-validation.service';
+import { ImageCompressionService } from '../../services/image-compression.service';
 import { TaskAttachment } from '../../../../core/models/task.interface';
 import { formatFileSize } from '../../../../shared/utils';
-
 /**
  * Component for uploading and managing task attachments
  * Supports drag & drop and file picker for JPEG/PNG images
  */
 @Component({
-  selector: 'app-task-attachment-upload',
+  selector: 'app-attachment-upload',
   standalone: true,
   imports: [CommonModule, DragDropDirective],
-  templateUrl: './task-attachment-upload.component.html',
-  styleUrl: './task-attachment-upload.component.scss'
+  templateUrl: './attachment-upload.component.html',
+  styleUrl: './attachment-upload.component.scss'
 })
-export class TaskAttachmentUploadComponent {
+export class AttachmentUploadComponent {
   private fileValidation = inject(FileValidationService);
   private imageCompression = inject(ImageCompressionService);
   private hasInitialized = false;
@@ -33,12 +32,32 @@ export class TaskAttachmentUploadComponent {
 
   attachments = signal<TaskAttachment[]>([]);
   errorMessage = signal<string | null>(null);
+  isDragOver = signal<boolean>(false);
+
+  /**
+   * Handle drag over event
+   * @param event - DragEvent
+   */
+  onDragOver(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragOver.set(true);
+  }
+
+  /**
+   * Handle drag leave event
+   * @param event - DragEvent
+   */
+  onDragLeave(event: DragEvent): void {
+    this.isDragOver.set(false);
+  }
 
   /**
    * Handle files dropped via DragDropDirective
    * @param files - Array of dropped files
    */
   async handleFilesDropped(files: File[]): Promise<void> {
+    this.isDragOver.set(false);
     await this.processFiles(files);
   }
 
