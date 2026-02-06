@@ -33,6 +33,9 @@ testem.log
 .DS_Store
 Thumbs.db
 
+DATEIUPLOAD_CHECKLISTE.md
+MIGRATION_PLAN_ATTACHMENTS.md
+
 .environments/
 
 src/environments/environment.ts

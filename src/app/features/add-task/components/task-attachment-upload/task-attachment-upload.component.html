@@ -1,4 +1,4 @@
-<div class="attachment-upload">
+<section class="attachment-upload">
   <div
     class="upload-zone"
     dragDrop
@@ -12,6 +12,7 @@
         viewBox="0 0 24 24"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
       >
         <path
           d="M12 16V4M12 4L8 8M12 4L16 8"
@@ -47,13 +48,14 @@
   </div>
 
   @if (errorMessage()) {
-    <div class="error-message">
+    <aside class="error-message" role="alert" aria-live="polite">
       <svg
         width="16"
         height="16"
         viewBox="0 0 16 16"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
       >
         <path
           d="M8 14C11.3137 14 14 11.3137 14 8C14 4.68629 11.3137 2 8 2C4.68629 2 2 4.68629 2 8C2 11.3137 4.68629 14 8 14Z"
@@ -69,29 +71,30 @@
         <circle cx="8" cy="11" r="0.5" fill="currentColor" />
       </svg>
       {{ errorMessage() }}
-    </div>
+    </aside>
   }
 
   @if (attachments().length > 0) {
-    <div class="attachments-section">
-      <div class="attachments-header">
-        <span class="attachments-count"
-          >{{ attachments().length }} file(s) selected</span
-        >
+    <section class="attachments-section" aria-labelledby="attachments-heading">
+      <header class="attachments-header">
+        <h2 id="attachments-heading" class="attachments-count">
+          {{ attachments().length }} file(s) selected
+        </h2>
         <button
           type="button"
           class="delete-all-btn"
           (click)="removeAllAttachments()"
+          aria-label="Delete all attachments"
         >
           <img src="assets/images/delete.svg" alt="" role="presentation" class="icon-default" />
           <img src="assets/images/delete-blue.svg" alt="" role="presentation" class="icon-hover" />
           Delete All
         </button>
-      </div>
+      </header>
 
-      <div class="attachments-grid">
+      <div class="attachments-grid" role="list">
         @for (attachment of attachments(); track attachment.id) {
-          <div class="attachment-item">
+          <figure class="attachment-item" role="listitem">
             <img
               [src]="getPreviewUrl(attachment)"
               [alt]="attachment.filename"
@@ -103,7 +106,8 @@
               type="button"
               class="remove-btn"
               (click)="removeAttachment(attachment.id)"
-              title="Remove attachment"
+              [attr.aria-label]="'Remove attachment ' + attachment.filename"
+              title="Remove {{ attachment.filename }}"
             >
               <svg
                 width="16"
@@ -111,6 +115,7 @@
                 viewBox="0 0 16 16"
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
               >
                 <path
                   d="M12 4L4 12M4 4L12 12"
@@ -121,17 +126,17 @@
               </svg>
             </button>
 
-            <div class="attachment-info">
+            <figcaption class="attachment-info">
               <span class="attachment-name" [title]="attachment.filename">
                 {{ attachment.filename }}
               </span>
               <span class="attachment-size">
                 {{ formatFileSize(attachment.size) }}
               </span>
-            </div>
-          </div>
+            </figcaption>
+          </figure>
         }
       </div>
-    </div>
+    </section>
   }
-</div>
+</section>

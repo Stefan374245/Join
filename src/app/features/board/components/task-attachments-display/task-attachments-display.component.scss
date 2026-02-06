@@ -5,7 +5,7 @@
 }
 
 .attachments-header {
- @include flex (space-between, center);
+ @include flex (row, flex-end, center);
   margin-bottom: 12px;
 }
 
@@ -168,7 +168,7 @@
 }
 
 .attachment-filename {
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 500;
   color: #2A3647;
   white-space: nowrap;
@@ -177,6 +177,6 @@
 }
 
 .attachment-size {
-  font-size: 12px;
+  font-size: 16px;
   color: #A8A8A8;
 }
