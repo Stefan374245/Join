@@ -7,12 +7,13 @@ import { ToastService } from '../../../core/services/toast.service';
 import { Contact } from '../../../core/models/contact.interface';
 import { ContactDialogComponent } from '../contact-dialog/contact-dialog.component';
 import { ClickOutsideDirective } from '../../../shared/directives/click-outside.directive';
+import { StopPropagationDirective } from '../../../shared/directives';
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
 
 @Component({
   selector: 'app-contact-detail',
   standalone: true,
-  imports: [CommonModule, ContactDialogComponent, ClickOutsideDirective, LoadingSpinnerComponent],
+  imports: [CommonModule, ContactDialogComponent, ClickOutsideDirective, StopPropagationDirective, LoadingSpinnerComponent],
   templateUrl: './contact-detail.component.html',
   styleUrl: './contact-detail.component.scss'
 })
@@ -33,6 +34,7 @@ export class ContactDetailComponent implements OnInit {
   loading = this.contactService.loading;
   isDeleting = signal<boolean>(false);
   isUpdating = signal<boolean>(false);
+  showDeleteConfirm = signal<boolean>(false);
   
   showActionMenu = false;
   showDialog = false;
@@ -91,41 +93,54 @@ export class ContactDetailComponent implements OnInit {
 
  
   /**
-   * Deletes the currently selected contact after user confirmation.
-   * 
-   * - If the user is a guest, shows a toast notification and exits.
-   * - Prompts the user for confirmation before deleting.
-   * - Sets a loading state while the deletion is in progress.
-   * - On successful deletion, shows a success toast and navigates to the contacts list.
-   * - On failure, logs the error and shows an error toast.
-   * - Always resets the loading state and hides the action menu after the operation.
-   * 
-   * @async
-   * @returns {Promise<void>}
+   * Displays the delete confirmation dialog to prevent accidental contact deletion.
+   * Sets the UI state to show confirmation buttons and warning message before proceeding.
    */
-  async deleteContact(): Promise<void> {
+  showDeleteConfirmation(): void {
     if (this.authService.isGuestUser()) {
       this.toastService.showGuestCannotAddContacts();
       this.showActionMenu = false;
       return;
     }
-    
+    this.showActionMenu = false;
+    this.showDeleteConfirm.set(true);
+  }
+
+  /**
+   * Cancels the delete operation and hides the confirmation dialog.
+   * Resets the UI state back to normal view without performing any deletion.
+   */
+  cancelDelete(): void {
+    this.showDeleteConfirm.set(false);
+  }
+
+  /**
+   * Confirms and executes the contact deletion process.
+   * 
+   * This method sets isDeleting state, deletes the contact via service,
+   * shows a success toast notification, and navigates back to contacts list.
+   * The loading spinner will automatically show during the deletion process.
+   * 
+   * @async
+   * @returns {Promise<void>}
+   */
+  async confirmDelete(): Promise<void> {
     const currentContact = this.contact();
     if (!currentContact?.id) return;
 
-    if (confirm(`Delete contact ${currentContact.firstName} ${currentContact.lastName}?`)) {
-      this.isDeleting.set(true);
-      try {
-        await this.contactService.deleteUser(currentContact.id);
-        this.toastService.showSuccess(`Contact ${currentContact.firstName} ${currentContact.lastName} deleted successfully!`);
-        this.router.navigate(['/contacts']);
-      } catch (error) {
-        this.toastService.showError('Failed to delete contact. Please try again.');
-      } finally {
-        this.isDeleting.set(false);
-      }
+    this.isDeleting.set(true);
+    this.showDeleteConfirm.set(false);
+    
+    try {
+      await this.contactService.deleteUser(currentContact.id);
+      this.toastService.showSuccess(`Contact ${currentContact.firstName} ${currentContact.lastName} deleted successfully!`);
+      this.router.navigate(['/contacts']);
+    } catch (error) {
+      console.error('Error deleting contact:', error);
+      this.toastService.showError('Failed to delete contact. Please try again.');
+    } finally {
+      this.isDeleting.set(false);
     }
-    this.showActionMenu = false;
   }
 
   /**

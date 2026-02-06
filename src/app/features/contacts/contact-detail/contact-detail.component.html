@@ -47,7 +47,7 @@
         <img src="assets/images/edit-2.svg" alt="Edit" />
         <span>Edit</span>
       </button>
-      <button class="popup-item" (click)="deleteContact()">
+      <button class="popup-item" (click)="showDeleteConfirmation()">
         <img src="assets/images/delete.svg" alt="Delete" />
         <span>Delete</span>
       </button>
@@ -66,4 +66,19 @@
 
 <div *ngIf="loading()" class="loading-state">
   Loading contact...
+</div>
+
+<!-- Delete Confirmation Modal (Board-Style) -->
+<div
+  class="confirm-dialog-overlay"
+  *ngIf="showDeleteConfirm()"
+  (click)="cancelDelete()">
+  <div class="confirm-dialog" stopPropagation>
+    <h3>Delete permanently?</h3>
+    <p *ngIf="contact()">Delete contact {{ contact()!.firstName }} {{ contact()!.lastName }}?</p>
+    <div class="confirm-buttons">
+      <button class="btn btn-secondary" (click)="cancelDelete()">Cancel</button>
+      <button class="btn btn-danger" (click)="confirmDelete()">Delete</button>
+    </div>
+  </div>
 </div>
