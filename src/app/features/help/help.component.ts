@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { RouterLink } from "@angular/router";
 import { Location } from '@angular/common';
 
 @Component({
@@ -7,7 +6,6 @@ import { Location } from '@angular/common';
   standalone: true,
   templateUrl: './help.component.html',
   styleUrl: './help.component.scss',
-  imports: [RouterLink]
 })
 export class HelpComponent {
   constructor(private location: Location) {}

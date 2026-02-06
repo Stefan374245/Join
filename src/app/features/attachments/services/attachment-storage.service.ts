@@ -1,12 +1,12 @@
 import { Injectable, inject, Injector, runInInjectionContext } from '@angular/core';
 import { Storage, ref, uploadString, getDownloadURL, deleteObject } from '@angular/fire/storage';
 import { Auth } from '@angular/fire/auth';
-import { TaskAttachment } from '../models/task.interface';
-import { LoadingService } from './loading.service';
-import { formatBase64DataUrl } from './attachment-storage/base64-formatter.helper';
-import { downloadBlobToFile } from './attachment-storage/blob-downloader.helper';
-import { downloadWithFallback } from './attachment-storage/download-strategies.helper';
-import { createZipFromAttachments, logZipSummary } from './attachment-storage/zip-creator.helper';
+import { TaskAttachment } from '../../../core/models/task.interface';
+import { LoadingService } from '../../../core/services/loading.service';
+import { formatBase64DataUrl } from '../helpers/base64-formatter.helper';
+import { downloadBlobToFile } from '../helpers/blob-downloader.helper';
+import { downloadWithFallback } from '../helpers/download-strategies.helper';
+import { createZipFromAttachments, logZipSummary } from '../helpers/zip-creator.helper';
 
 /**
  * Service for managing attachment storage operations with Firebase Storage
@@ -86,7 +86,6 @@ export class AttachmentStorageService {
   async downloadSingleAttachment(attachment: TaskAttachment): Promise<void> {
     return await runInInjectionContext(this.injector, async () => {
       this.validateDownloadUrl(attachment);
-      console.log('Downloading attachment:', attachment.filename);
 
       const blob = await downloadWithFallback(
         this.storage,

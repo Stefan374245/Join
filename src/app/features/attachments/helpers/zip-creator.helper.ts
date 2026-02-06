@@ -1,7 +1,7 @@
 import JSZip from 'jszip';
 import { Storage, ref, getBlob } from '@angular/fire/storage';
 import { Auth } from '@angular/fire/auth';
-import { TaskAttachment } from '../../models/task.interface';
+import { TaskAttachment } from '../../../core/models/task.interface';
 import { getUserAuthToken, createAuthFetchOptions } from './auth-helper';
 
 /**
@@ -62,7 +62,6 @@ async function addFileToZip(
 ): Promise<boolean> {
   try {
     if (!attachment.downloadURL) {
-      console.warn(`Skipping ${attachment.filename}: no downloadURL`);
       return false;
     }
 
@@ -138,9 +137,5 @@ async function generateZipBlob(zip: JSZip): Promise<Blob> {
  * @param errorCount - Number of failed files
  */
 export function logZipSummary(successCount: number, errorCount: number): void {
-  if (errorCount > 0) {
-    console.warn(`ZIP created: ${successCount} files. ${errorCount} failed.`);
-  } else {
-    console.log(`ZIP created successfully with ${successCount} files.`);
-  }
+  // Zip summary logged
 }

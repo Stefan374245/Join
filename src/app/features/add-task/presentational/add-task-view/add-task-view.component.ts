@@ -32,14 +32,13 @@ import {
   SubtaskManagementComponent,
   Subtask,
 } from "../../components/subtask-management/subtask-management.component";
-import { TaskAttachmentUploadComponent } from "../../components/task-attachment-upload/task-attachment-upload.component";
+import { AttachmentUploadComponent, ImageViewerComponent } from "../../../attachments";
 import { TaskService } from "../../../../core/services/task.service";
 import { ContactService } from "../../../../core/services/contact.service";
 import { AuthService } from "../../../../core/services/auth.service";
 import { ToastService } from "../../../../core/services/toast.service";
 import { Task, TaskAttachment } from "../../../../core/models/task.interface";
 import { Contact } from "../../../../core/models/contact.interface";
-import { ImageViewerComponent } from "../../../board/components/image-viewer/image-viewer.component";
 import { LoadingSpinnerComponent } from "../../../../shared/components/loading-spinner/loading-spinner.component";
 import { TASK_MESSAGES, TASK_LIMITS } from "../../../../shared/constants";
 @Component({
@@ -53,7 +52,7 @@ import { TASK_MESSAGES, TASK_LIMITS } from "../../../../shared/constants";
     DropdownComponent,
     BadgeListComponent,
     SubtaskManagementComponent,
-    TaskAttachmentUploadComponent,
+    AttachmentUploadComponent,
     ImageViewerComponent,
     LoadingSpinnerComponent,
   ],
@@ -61,8 +60,8 @@ import { TASK_MESSAGES, TASK_LIMITS } from "../../../../shared/constants";
   styleUrl: "./add-task-view.component.scss",
 })
 export class AddTaskViewComponent implements OnInit, AfterViewInit {
-  @ViewChild(TaskAttachmentUploadComponent)
-  uploadComponent?: TaskAttachmentUploadComponent;
+  @ViewChild(AttachmentUploadComponent)
+  uploadComponent?: AttachmentUploadComponent;
 
   isOverlay = input<boolean>(false);
   taskToEdit = input<Task | null>(null);
@@ -170,13 +169,6 @@ export class AddTaskViewComponent implements OnInit, AfterViewInit {
     const dirty = editMode ? this.formDirty() : false;
     const valid = this.isFormValid();
 
-    console.log("🔍 canSubmit() computed:", {
-      editMode,
-      dirty,
-      valid,
-      result: editMode ? dirty : valid,
-    });
-
     if (editMode) {
       return dirty;
     }
@@ -250,10 +242,6 @@ export class AddTaskViewComponent implements OnInit, AfterViewInit {
       this.uploadComponent
     ) {
       this.uploadComponent.initialAttachments = this.attachments();
-      console.log(
-        "✨ Set initial attachments via ViewChild:",
-        this.attachments().length,
-      );
     }
   }
 
@@ -497,18 +485,11 @@ export class AddTaskViewComponent implements OnInit, AfterViewInit {
    * @param attachments - The updated list of task attachments.
    */
   onAttachmentsChange(attachments: TaskAttachment[]): void {
-    console.log("📎 onAttachmentsChange():", {
-      count: attachments.length,
-      editMode: this.isEditMode(),
-      dirtyBefore: this.taskForm.dirty,
-    });
-
     this.attachments.set(attachments);
 
     if (this.isEditMode()) {
       this.taskForm.markAsDirty();
       this.formDirty.set(true);
-      console.log("✅ markAsDirty() called, dirtyAfter:", this.taskForm.dirty);
     }
   }
 

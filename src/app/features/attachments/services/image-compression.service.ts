@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { IMAGE_COMPRESSION } from '../../shared/constants';
+import { IMAGE_COMPRESSION } from '../../../shared/constants';
 
 /**
  * Service for compressing images to meet exam requirements

@@ -132,7 +132,6 @@ export class SubtaskManagementComponent {
     
    
     onAddInputFocus(): void {
-        console.log('Input focused!');
         this.inputFocused.set(true);
     }
     
@@ -145,7 +144,6 @@ export class SubtaskManagementComponent {
      * are processed before the focus state changes.
      */
     onAddInputBlur(): void {
-        console.log('Input blurred!');
         setTimeout(() => {
             this.inputFocused.set(false);
         }, 150);

@@ -132,7 +132,6 @@ export class LoginComponent implements OnInit {
     this.isLoading.set(true);
     try {
       const userCredential = await this.authService.login(this.email, this.password);
-      console.log('Login successful:', userCredential?.user);
       this.showLoginSuccess();
     } catch (error: any) {
       this.handleLoginError(error);
@@ -173,7 +172,6 @@ export class LoginComponent implements OnInit {
     this.isLoading.set(true);
     try {
       const userCredential = await this.authService.guestLogin();
-      console.log('Guest login successful:', userCredential?.user);
       this.showLoginSuccess();
     } catch (error: any) {
       console.error('Guest login error:', error);
@@ -193,7 +191,6 @@ export class LoginComponent implements OnInit {
     this.isLoading.set(true);
     try {
       const userCredential = await this.authService.signInWithGoogle();
-      console.log('✅ Google login successful:', userCredential?.user);
       this.showLoginSuccess();
     } catch (error: any) {
       console.error('❌ Google login error:', error);

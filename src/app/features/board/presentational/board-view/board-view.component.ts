@@ -19,8 +19,6 @@ import { TaskService } from "../../../../core/services/task.service";
 import { ContactService } from "../../../../core/services/contact.service";
 import { ToastService } from "../../../../core/services/toast.service";
 import { Task } from "../../../../core/models/task.interface";
-import { Contact } from "../../../../core/models/contact.interface";
-import { Observable, map } from "rxjs";
 import { TaskDetailComponent } from "../../components/task-detail/task-detail.component";
 import { AddTaskViewComponent } from "../../../add-task/presentational/add-task-view/add-task-view.component";
 import { LoadingSpinnerComponent } from "../../../../shared/components/loading-spinner/loading-spinner.component";
@@ -81,10 +79,6 @@ export class BoardViewComponent implements OnInit, AfterViewInit, OnDestroy {
     effect(() => {
       const columns = this.boardColumns();
       if (columns && columns.length > 0) {
-        console.log(
-          "[effect] boardColumns changed, reconnecting DropLists",
-          columns,
-        );
         this.connectDropLists();
       }
     });
@@ -277,7 +271,6 @@ export class BoardViewComponent implements OnInit, AfterViewInit, OnDestroy {
    * Sets up drag & drop connections between all board columns after ViewChildren are available.
    */
   ngAfterViewInit(): void {
-    console.log("ngAfterViewInit BoardView", this.boardColumns());
     this.connectDropLists();
   }
 
@@ -328,7 +321,6 @@ export class BoardViewComponent implements OnInit, AfterViewInit, OnDestroy {
     if (validStatuses.includes(status as Task["status"])) {
       return status as Task["status"];
     }
-    console.warn("⚠️ Unbekannter Status beim Drop:", status, "aus", dropListId);
     return null;
   }
 
@@ -341,7 +333,7 @@ export class BoardViewComponent implements OnInit, AfterViewInit, OnDestroy {
    * debugging and understanding user interactions that don't result in data changes.
    */
   private logNoUpdate() {
-    console.log("ℹ️ Task dropped in same column - no update needed");
+    // No update needed
   }
 
   /**
@@ -478,7 +470,6 @@ export class BoardViewComponent implements OnInit, AfterViewInit, OnDestroy {
    * @param task - The updated task object that was saved
    */
   onTaskSaved(task: Task): void {
-    console.log("✅ Task saved:", task);
     this.closeEditOverlay();
   }
 
@@ -500,7 +491,6 @@ export class BoardViewComponent implements OnInit, AfterViewInit, OnDestroy {
    * @returns void
    */
   onTaskCreated(task: Task): void {
-    console.log("✅ New task created:", task);
     this.closeAddTaskOverlay();
   }
 
@@ -513,7 +503,6 @@ export class BoardViewComponent implements OnInit, AfterViewInit, OnDestroy {
 
     try {
       await this.taskService.deleteTask(taskId);
-      console.log("✅ Task deleted successfully");
       this.toastService.showTaskDeleted(taskTitle);
       this.closeTaskDetail();
     } catch (error) {

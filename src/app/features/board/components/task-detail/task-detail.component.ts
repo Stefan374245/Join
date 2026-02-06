@@ -5,9 +5,8 @@ import { Task, TaskAttachment } from '../../../../core/models/task.interface';
 import { Contact } from '../../../../core/models/contact.interface';
 import { TaskService } from '../../../../core/services/task.service';
 import { ToastService } from '../../../../core/services/toast.service';
-import { AttachmentStorageService } from '../../../../core/services/attachment-storage.service';
-import { TaskAttachmentsDisplayComponent } from '../task-attachments-display/task-attachments-display.component';
-import { ImageViewerComponent } from '../image-viewer/image-viewer.component';
+import { AttachmentsDisplayComponent, ImageViewerComponent, AttachmentStorageService } from '../../../attachments';
+import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
 
 /**
  * Task detail overlay component for comprehensive task viewing and editing.
@@ -34,7 +33,7 @@ import { ImageViewerComponent } from '../image-viewer/image-viewer.component';
 @Component({
   selector: 'app-task-detail',
   standalone: true,
-  imports: [CommonModule, TaskAttachmentsDisplayComponent, ImageViewerComponent, StopPropagationDirective],
+  imports: [CommonModule, AttachmentsDisplayComponent, ImageViewerComponent, StopPropagationDirective, LoadingSpinnerComponent],
   templateUrl: './task-detail.component.html',
   styleUrl: './task-detail.component.scss'
 })
@@ -53,6 +52,7 @@ export class TaskDetailComponent {
   private lastToggleTime: number = 0;
 
   selectedAttachment = signal<TaskAttachment | null>(null);
+  isDownloading = signal<boolean>(false);
   
   selectedAttachmentIndex = computed<number>(() => {
     const attachment = this.selectedAttachment();
@@ -92,9 +92,6 @@ export class TaskDetailComponent {
         
         currentTask.assignedTo.forEach(userId => {
           const contact = this.getContact(userId);
-          if (!contact) {
-            console.warn(`⚠️ TaskDetail: Contact not found for user ID: ${userId}`);
-          }
         });
       }
     });
@@ -175,7 +172,6 @@ export class TaskDetailComponent {
   async toggleSubtask(subtaskId: string): Promise<void> {
     const now = Date.now();
     if (now - this.lastToggleTime < 300) {
-      console.log('⏸️ Click ignored (debounce)');
       return;
     }
     this.lastToggleTime = now;
@@ -193,11 +189,9 @@ export class TaskDetailComponent {
     }
 
     const newState = !subtask.completed;
-    console.log('🎯 Component: Toggling subtask:', subtaskId, 'Current:', subtask.completed, '→ New:', newState);
 
     try {
       await this.taskService.toggleSubtask(currentTask.id, subtaskId);
-      console.log('✅ Component: Subtask toggled successfully');
     } catch (error) {
       console.error('❌ Component: Error toggling subtask:', error);
       this.toastService.showError('Failed to update subtask');
@@ -299,12 +293,15 @@ export class TaskDetailComponent {
    * @param attachment - The attachment to download
    */
   async onDownloadAttachment(attachment: TaskAttachment): Promise<void> {
+    this.isDownloading.set(true);
     try {
       await this.attachmentStorageService.downloadSingleAttachment(attachment);
       this.toastService.showSuccess('Download started');
     } catch (error) {
       console.error('Error downloading attachment:', error);
       this.toastService.showError('Failed to download attachment');
+    } finally {
+      this.isDownloading.set(false);
     }
   }
 
@@ -327,6 +324,7 @@ export class TaskDetailComponent {
       return;
     }
 
+    this.isDownloading.set(true);
     try {
       const zipName = `${currentTask.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_attachments`;
       await this.attachmentStorageService.downloadAllAsZip(currentTask.attachments, zipName);
@@ -334,6 +332,8 @@ export class TaskDetailComponent {
     } catch (error) {
       console.error('Error downloading all attachments:', error);
       this.toastService.showError('Failed to download attachments');
+    } finally {
+      this.isDownloading.set(false);
     }
   }
 

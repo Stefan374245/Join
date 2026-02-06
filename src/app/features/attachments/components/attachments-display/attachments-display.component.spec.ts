@@ -1,16 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { TaskAttachmentsDisplayComponent } from './task-attachments-display.component';
+import { AttachmentsDisplayComponent } from './attachments-display.component';
 
-describe('TaskAttachmentsDisplayComponent', () => {
-  let component: TaskAttachmentsDisplayComponent;
-  let fixture: ComponentFixture<TaskAttachmentsDisplayComponent>;
+describe('AttachmentsDisplayComponent', () => {
+  let component: AttachmentsDisplayComponent;
+  let fixture: ComponentFixture<AttachmentsDisplayComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [TaskAttachmentsDisplayComponent]
+      imports: [AttachmentsDisplayComponent]
     }).compileComponents();
 
-    fixture = TestBed.createComponent(TaskAttachmentsDisplayComponent);
+    fixture = TestBed.createComponent(AttachmentsDisplayComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

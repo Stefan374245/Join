@@ -120,17 +120,6 @@ export async function updateTaskInFirestore(
 ): Promise<void> {
   const taskDoc = doc(firestore, 'tasks', taskId);
   
-  console.log('🔄 TaskService.updateTask() called:', {
-    taskId,
-    updates: {
-      title: updates.title,
-      category: updates.category,
-      priority: updates.priority,
-      assignedTo: updates.assignedTo,
-      attachmentsCount: updates.attachments?.length || 0
-    }
-  });
-  
   const updateData: Partial<FirestoreTaskDocument> = {
     updatedAt: Timestamp.now()
   };
@@ -161,16 +150,12 @@ export async function updateTaskInFirestore(
 
   if (updates.attachments) {
     updateData.attachments = prepareAttachmentsForFirestore(updates.attachments);
-    console.log('📎 Prepared attachments for Firestore:', updateData.attachments);
   }
-
-  console.log('💾 Sending to Firestore:', updateData);
 
   try {
     await runInInjectionContext(injector, async () => {
       await updateDoc(taskDoc, updateData);
     });
-    console.log('✅ Firestore update successful');
   } catch (error) {
     console.error('❌ Firestore update failed:', error);
     throw error;

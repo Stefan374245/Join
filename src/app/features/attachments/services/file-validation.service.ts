@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { FILE_UPLOAD } from '../../shared/constants';
+import { FILE_UPLOAD } from '../../../shared/constants';
 
 /**
  * Service for validating file uploads with security checks
@@ -38,6 +38,9 @@ export class FileValidationService {
 
   /**
    * Validate file extension
+   * @param filename - Name of the file to validate
+   * @returns Validation result with error message if invalid
+   * @remarks Checks if the file extension is among the allowed extensions (.jpg, .jpeg, .png)
    */
   private validateExtension(filename: string): { valid: boolean; error?: string } {
     const ext = filename.toLowerCase().substring(filename.lastIndexOf('.'));
@@ -50,6 +53,9 @@ export class FileValidationService {
 
   /**
    * Validate MIME type
+   * @param mimeType - MIME type of the file to validate
+   * @returns Validation result with error message if invalid
+   * @remarks Checks if the MIME type is among the allowed types (image/jpeg, image/png)
    */
   private validateMimeType(mimeType: string): { valid: boolean; error?: string } {
     const isValid = this.ALLOWED_TYPES.includes(mimeType as any);
@@ -61,6 +67,9 @@ export class FileValidationService {
 
   /**
    * Validate file size
+   * @param size - Size of the file in bytes
+   * @returns Validation result with error message if invalid
+   * @remarks Checks if the file size does not exceed the maximum allowed size (1MB)
    */
   private validateFileSize(size: number): { valid: boolean; error?: string } {
     return size <= this.MAX_FILE_SIZE
@@ -70,6 +79,9 @@ export class FileValidationService {
 
   /**
    * Validate file using magic bytes (prevents .exe -> .jpg rename attacks)
+   * @param file - File to validate
+   * @returns Promise resolving to validation result with error message if invalid
+   * @remarks Reads the first few bytes of the file and checks against known magic byte signatures for JPEG and PNG formats to ensure the file content matches its extension and MIME type.
    */
   private async validateMagicBytes(file: File): Promise<{ valid: boolean; error?: string }> {
     try {
@@ -87,6 +99,10 @@ export class FileValidationService {
 
   /**
    * Read first N bytes from file
+   * @param file - File to read
+   * @param numBytes - Number of bytes to read
+   * @returns Promise resolving to Uint8Array of the read bytes
+   * @remarks Uses FileReader API to read a slice of the file as an ArrayBuffer, which is then converted to a Uint8Array for magic byte validation.
    */
   private readFileBytes(file: File, numBytes: number): Promise<Uint8Array> {
     return new Promise((resolve, reject) => {
@@ -102,6 +118,9 @@ export class FileValidationService {
 
   /**
    * Check JPEG magic bytes (FF D8 FF)
+   * @param bytes - Uint8Array of the file's initial bytes
+   * @returns True if bytes match JPEG signature, false otherwise
+   * @remarks Validates that the first three bytes of the file match the JPEG magic byte signature (FF D8 FF), which is a common way to verify that a file is indeed a JPEG image.
    */
   private checkJpegMagicBytes(bytes: Uint8Array): boolean {
     return bytes[0] === this.MAGIC_BYTES.jpeg[0] &&
@@ -111,6 +130,7 @@ export class FileValidationService {
 
   /**
    * Check PNG magic bytes (89 50 4E 47)
+   * @param bytes - Uint8Array of the file's initial bytes
    */
   private checkPngMagicBytes(bytes: Uint8Array): boolean {
     return bytes[0] === this.MAGIC_BYTES.png[0] &&

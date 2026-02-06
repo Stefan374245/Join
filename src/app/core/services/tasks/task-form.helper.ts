@@ -21,9 +21,7 @@ export async function uploadAndPrepareAttachments(
     return [];
   }
 
-  console.log('⬆️  Uploading attachments...');
   const downloadURLs = await uploadFn(attachments, taskId);
-  console.log('✅ Upload complete, URLs:', downloadURLs);
 
   return attachments.map((att, index) => ({
     ...att,
@@ -48,12 +46,6 @@ export async function processAttachmentsForUpdate(
   }
 
   const { oldAttachments, newAttachments } = separateAttachments(attachments);
-
-  console.log('📂 Attachments breakdown:', {
-    total: attachments.length,
-    existing: oldAttachments.length,
-    new: newAttachments.length
-  });
 
   if (newAttachments.length === 0) {
     return oldAttachments;

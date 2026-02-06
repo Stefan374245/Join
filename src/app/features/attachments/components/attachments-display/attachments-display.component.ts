@@ -8,13 +8,13 @@ import { formatFileSize } from '../../../../shared/utils';
  * Uses Signal-based pattern for reactive state management
  */
 @Component({
-  selector: 'app-task-attachments-display',
+  selector: 'app-attachments-display',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './task-attachments-display.component.html',
-  styleUrl: './task-attachments-display.component.scss'
+  templateUrl: './attachments-display.component.html',
+  styleUrl: './attachments-display.component.scss'
 })
-export class TaskAttachmentsDisplayComponent {
+export class AttachmentsDisplayComponent {
   attachments = input<TaskAttachment[]>([]);
   isEditMode = input<boolean>(false);
   

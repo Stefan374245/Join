@@ -25,7 +25,6 @@ export async function tryDownloadViaStorageBlob(
     const blob = await getBlob(storageRef);
     return blob;
   } catch (error) {
-    console.warn('Storage getBlob failed:', error);
     return null;
   }
 }
@@ -51,7 +50,6 @@ export async function tryDownloadViaFetch(
     
     return await response.blob();
   } catch (error) {
-    console.warn('Fetch download failed:', error);
     return null;
   }
 }
@@ -125,7 +123,6 @@ export async function downloadWithFallback(
   }
 
   // Strategy 3: Open in new tab (no blob returned)
-  console.warn('All download strategies failed, opening in new tab');
   downloadViaNewTab(downloadURL, filename);
   return null;
 }

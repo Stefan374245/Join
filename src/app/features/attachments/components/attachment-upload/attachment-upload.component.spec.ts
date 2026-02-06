@@ -1,11 +1,11 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { TaskAttachmentUploadComponent } from './task-attachment-upload.component';
-import { FileValidationService } from '../../../../core/services/file-validation.service';
-import { ImageCompressionService } from '../../../../core/services/image-compression.service';
+import { AttachmentUploadComponent } from './attachment-upload.component';
+import { FileValidationService } from '../../services/file-validation.service';
+import { ImageCompressionService } from '../../services/image-compression.service';
 
-describe('TaskAttachmentUploadComponent', () => {
-  let component: TaskAttachmentUploadComponent;
-  let fixture: ComponentFixture<TaskAttachmentUploadComponent>;
+describe('AttachmentUploadComponent', () => {
+  let component: AttachmentUploadComponent;
+  let fixture: ComponentFixture<AttachmentUploadComponent>;
   let fileValidationService: jasmine.SpyObj<FileValidationService>;
   let imageCompressionService: jasmine.SpyObj<ImageCompressionService>;
 
@@ -14,7 +14,7 @@ describe('TaskAttachmentUploadComponent', () => {
     const imageCompressionSpy = jasmine.createSpyObj('ImageCompressionService', ['compressImage']);
 
     await TestBed.configureTestingModule({
-      imports: [TaskAttachmentUploadComponent],
+      imports: [AttachmentUploadComponent],
       providers: [
         { provide: FileValidationService, useValue: fileValidationSpy },
         { provide: ImageCompressionService, useValue: imageCompressionSpy }
@@ -24,7 +24,7 @@ describe('TaskAttachmentUploadComponent', () => {
     fileValidationService = TestBed.inject(FileValidationService) as jasmine.SpyObj<FileValidationService>;
     imageCompressionService = TestBed.inject(ImageCompressionService) as jasmine.SpyObj<ImageCompressionService>;
     
-    fixture = TestBed.createComponent(TaskAttachmentUploadComponent);
+    fixture = TestBed.createComponent(AttachmentUploadComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

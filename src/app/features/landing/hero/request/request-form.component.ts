@@ -151,7 +151,6 @@ export class RequestFormComponent implements OnInit {
   }
 
   openEmailLink() {
-    console.log('🔍 openEmailLink() called');
     this.router.navigate(['/email-form']);
   }
 
@@ -272,8 +271,6 @@ Best regards
         userName: this.stakeholderName || this.stakeholderEmail.split('@')[0],
         timestamp: new Date().toISOString()
       }).toPromise();
-
-      console.log('✅ Request erfolgreich:', response);
 
       this.submitSuccess = true;
 

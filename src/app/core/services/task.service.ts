@@ -10,7 +10,7 @@ import { toSignal } from "@angular/core/rxjs-interop";
 import { Firestore } from "@angular/fire/firestore";
 import { Auth, authState } from "@angular/fire/auth";
 import { Task, Subtask, TaskAttachment } from "../models/task.interface";
-import { AttachmentStorageService } from "./attachment-storage.service";
+import { AttachmentStorageService } from "../../features/attachments";
 import { mapFirestoreToTask } from "./tasks/task-mapper.helper";
 import {
   filterTasksByQuery,
@@ -421,7 +421,7 @@ export class TaskService {
       timestamp: new Date().toISOString(),
     };
     this.http.post(url, body).subscribe({
-      next: () => console.log("✅ Webhook triggered for external task:", task.id),
+      next: () => {},
       error: (err) => console.error("❌ Webhook error:", err),
     });
   }

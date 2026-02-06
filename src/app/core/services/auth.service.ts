@@ -258,7 +258,6 @@ export class AuthService {
         displayName: displayName,
       });
 
-      console.log("✅ Display name updated successfully in Auth");
     } catch (error) {
       console.error("❌ Error updating display name:", error);
       throw error;

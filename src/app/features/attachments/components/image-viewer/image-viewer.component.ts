@@ -1,5 +1,5 @@
-import { 
-  Component, 
+import {
+  Component,
   ChangeDetectionStrategy,
   input,
   output,
@@ -7,41 +7,47 @@ import {
   computed,
   effect,
   inject,
-  HostListener
-} from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { LiveAnnouncer } from '@angular/cdk/a11y';
-import { ClickOutsideDirective, StopPropagationDirective } from '../../../../shared/directives';
-import { LoadingService } from '../../../../core/services/loading.service';
-import { ToastService } from '../../../../core/services/toast.service';
-import { AttachmentStorageService } from '../../../../core/services/attachment-storage.service';
-import { TaskAttachment } from '../../../../core/models/task.interface';
-import { formatFileSize } from '../../../../shared/utils';
+  HostListener,
+} from "@angular/core";
+import { CommonModule } from "@angular/common";
+import { LiveAnnouncer } from "@angular/cdk/a11y";
+import {
+  ClickOutsideDirective,
+  StopPropagationDirective,
+} from "../../../../shared/directives";
+import { ToastService } from "../../../../core/services/toast.service";
+import { AttachmentStorageService } from "../../services/attachment-storage.service";
+import { TaskAttachment } from "../../../../core/models/task.interface";
+import { formatFileSize } from "../../../../shared/utils";
+import { LoadingSpinnerComponent } from "../../../../shared/components/loading-spinner/loading-spinner.component";
 
 /**
  * Modern Angular 19 Signal-based Image Viewer
  * Full-featured viewer with 3D animations, zoom, rotation, touch gestures, and download
  */
 @Component({
-  selector: 'app-image-viewer',
+  selector: "app-image-viewer",
   standalone: true,
-  imports: [CommonModule, ClickOutsideDirective, StopPropagationDirective],
-  templateUrl: './image-viewer.component.html',
-  styleUrl: './image-viewer.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  imports: [
+    CommonModule,
+    ClickOutsideDirective,
+    StopPropagationDirective,
+    LoadingSpinnerComponent,
+  ],
+  templateUrl: "./image-viewer.component.html",
+  styleUrl: "./image-viewer.component.scss",
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ImageViewerComponent {
-  
   images = input.required<TaskAttachment[]>();
   initialIndex = input<number>(0);
   isEditMode = input<boolean>(false);
-  taskTitle = input<string>('Untitled');
+  taskTitle = input<string>("Untitled");
 
   close = output<void>();
   delete = output<TaskAttachment>();
   deleteAll = output<void>();
 
-  private loadingService = inject(LoadingService);
   private toastService = inject(ToastService);
   private attachmentStorageService = inject(AttachmentStorageService);
   private liveAnnouncer = inject(LiveAnnouncer);
@@ -53,49 +59,60 @@ export class ImageViewerComponent {
   currentIndex = signal<number>(0);
   zoomLevel = signal<number>(1);
   rotation = signal<number>(0);
-  panPosition = signal<{x: number, y: number}>({x: 0, y: 0});
+  panPosition = signal<{ x: number; y: number }>({ x: 0, y: 0 });
   isPanning = signal<boolean>(false);
   showActionPopup = signal<boolean>(false);
-  actionPopupPosition = signal<{x: number, y: number}>({x: 0, y: 0});
-  animationDirection = signal<'next' | 'prev' | null>(null);
+  actionPopupPosition = signal<{ x: number; y: number }>({ x: 0, y: 0 });
+  animationDirection = signal<"next" | "prev" | null>(null);
   imageLoadError = signal<boolean>(false);
   imageLoadingStates = signal<Map<number, boolean>>(new Map());
+  isDownloading = signal<boolean>(false);
 
   isMobile = computed(() => this.windowWidthSignal() < 992);
   isFullscreen = computed(() => this.isMobile());
-  
+
   currentImage = computed(() => {
     const images = this.images();
     const index = this.currentIndex();
     return images[index];
   });
-  
+
   hasNext = computed(() => {
     return this.currentIndex() < this.images().length - 1;
   });
-  
+
   hasPrevious = computed(() => {
     return this.currentIndex() > 0;
   });
-  
+
   imageUrls = computed(() => {
-    return this.images().map(att => this.getImageUrl(att));
+    return this.images().map((att) => this.getImageUrl(att));
   });
-  
 
   renderedIndices = computed(() => {
     const curr = this.currentIndex();
     const prev = curr - 1;
     const next = curr + 1;
     const length = this.images().length;
-    
-    return [prev, curr, next].filter(i => i >= 0 && i < length);
+
+    return [prev, curr, next].filter((i) => i >= 0 && i < length);
   });
-  
+
   imageCounter = computed(() => {
     return `${this.currentIndex() + 1} / ${this.images().length}`;
   });
 
+  /**
+   * Format file size for display (using shared utility)
+   * @return Formatted file size string
+   * @remarks Uses shared utility function
+   */
+  formatFileSize = formatFileSize;
+
+  /**
+   * Component constructor
+   * @remarks Sets up reactive effects for initial index and image preloading, and event listeners for window resize and body scroll lock
+   */
   constructor() {
     effect(() => {
       const initial = this.initialIndex();
@@ -108,8 +125,8 @@ export class ImageViewerComponent {
     effect(() => {
       const indices = this.renderedIndices();
       const urls = this.imageUrls();
-      
-      indices.forEach(idx => {
+
+      indices.forEach((idx) => {
         const url = urls[idx];
         if (url) {
           this.preloadImage(url);
@@ -120,50 +137,43 @@ export class ImageViewerComponent {
     this.setupEventListeners();
   }
 
+  /**
+   * Sets up event listeners for window resize and body scroll lock.
+   * @remarks
+   * - Window resize: Updates window width signal on resize to enable responsive behavior.
+   * - Body scroll lock: Locks body scroll when images are present and restores it when the viewer is closed or images are removed.
+   */
   private setupEventListeners(): void {
     const resizeHandler = () => {
       this.windowWidthSignal.set(window.innerWidth);
     };
-    
-    window.addEventListener('resize', resizeHandler);
-    
-    // Cleanup effect
+
+    window.addEventListener("resize", resizeHandler);
+
     effect((onCleanup) => {
       onCleanup(() => {
-        window.removeEventListener('resize', resizeHandler);
+        window.removeEventListener("resize", resizeHandler);
       });
     });
 
     this.setupBodyScrollLock();
   }
 
- 
   /**
-   * Sets up a reactive effect to lock the body scroll when images are present.
-   *
-   * When the images array has one or more items, this method sets the body's
-   * `overflow` style to `'hidden'`, preventing the user from scrolling the page.
-   * When the effect is cleaned up (e.g., when the images array becomes empty or the component is destroyed),
-   * it restores the body's `overflow` style to its default value.
-   *
-   * This is useful for modal or overlay components that should prevent background scrolling
-   * while active.
-   *
-   * @private
+   * Locks body scroll when images are present and restores it when the viewer is closed or images are removed.
+   * @remarks Uses reactive effect to monitor images and update body overflow style accordingly.
    */
   private setupBodyScrollLock(): void {
     effect(() => {
       if (this.images().length > 0) {
-        document.body.style.overflow = 'hidden';
+        document.body.style.overflow = "hidden";
       }
-      
       return () => {
-        document.body.style.overflow = '';
+        document.body.style.overflow = "";
       };
     });
   }
 
-  
   /**
    * Get display URL for attachment
    * @param attachment - Task attachment
@@ -174,11 +184,9 @@ export class ImageViewerComponent {
     if (attachment.downloadURL) {
       return attachment.downloadURL;
     }
-    
-    if (attachment.base64.startsWith('data:')) {
+    if (attachment.base64.startsWith("data:")) {
       return attachment.base64;
     }
-    
     return `data:${attachment.fileType};base64,${attachment.base64}`;
   }
 
@@ -225,13 +233,6 @@ export class ImageViewerComponent {
   }
 
   /**
-   * Format file size for display (using shared utility)
-   * @return Formatted file size string
-   * @remarks Uses shared utility function
-   */
-  formatFileSize = formatFileSize;
-
-  /**
    * Get preview URL for thumbnails
    * @param attachment - Task attachment
    * @returns Preview URL string
@@ -250,11 +251,10 @@ export class ImageViewerComponent {
     const zoom = this.zoomLevel();
     const rotate = this.rotation();
     const pan = this.panPosition();
-    
+
     return `translate(${pan.x}px, ${pan.y}px) rotate(${rotate}deg) scale(${zoom})`;
   }
 
-  
   /**
    * Navigate to next image
    * @remarks Loops to first image if at end
@@ -262,8 +262,8 @@ export class ImageViewerComponent {
   navigateNext(): void {
     const length = this.images().length;
     if (length === 0) return;
-    this.animationDirection.set('next');
-    this.currentIndex.update(i => (i + 1) % length);
+    this.animationDirection.set("next");
+    this.currentIndex.update((i) => (i + 1) % length);
     this.resetImageState();
     this.announceCurrentImage();
     setTimeout(() => this.animationDirection.set(null), 500);
@@ -276,8 +276,8 @@ export class ImageViewerComponent {
   navigatePrev(): void {
     const length = this.images().length;
     if (length === 0) return;
-    this.animationDirection.set('prev');
-    this.currentIndex.update(i => (i - 1 + length) % length);
+    this.animationDirection.set("prev");
+    this.currentIndex.update((i) => (i - 1 + length) % length);
     this.resetImageState();
     this.announceCurrentImage();
     setTimeout(() => this.animationDirection.set(null), 500);
@@ -291,13 +291,13 @@ export class ImageViewerComponent {
   jumpToImage(index: number): void {
     if (index < 0 || index >= this.images().length) return;
     if (index === this.currentIndex()) return;
-    
-    const direction = index > this.currentIndex() ? 'next' : 'prev';
+
+    const direction = index > this.currentIndex() ? "next" : "prev";
     this.animationDirection.set(direction);
     this.currentIndex.set(index);
     this.resetImageState();
     this.announceCurrentImage();
-    
+
     setTimeout(() => this.animationDirection.set(null), 500);
   }
 
@@ -308,7 +308,7 @@ export class ImageViewerComponent {
   private announceCurrentImage(): void {
     const img = this.currentImage();
     const message = `Image ${this.currentIndex() + 1} of ${this.images().length}: ${img.filename}`;
-    this.liveAnnouncer.announce(message, 'polite');
+    this.liveAnnouncer.announce(message, "polite");
   }
 
   /**
@@ -318,17 +318,16 @@ export class ImageViewerComponent {
   private resetImageState(): void {
     this.zoomLevel.set(1);
     this.rotation.set(0);
-    this.panPosition.set({x: 0, y: 0});
+    this.panPosition.set({ x: 0, y: 0 });
     this.imageLoadError.set(false);
   }
-
 
   /**
    * Zoom in
    * @remarks Max zoom level of 4x
    */
   zoomIn(): void {
-    this.zoomLevel.update(z => Math.min(z + 0.25, 4));
+    this.zoomLevel.update((z) => Math.min(z + 0.25, 4));
   }
 
   /**
@@ -336,7 +335,7 @@ export class ImageViewerComponent {
    * @remarks Min zoom level of 0.5x
    */
   zoomOut(): void {
-    this.zoomLevel.update(z => Math.max(z - 0.25, 0.5));
+    this.zoomLevel.update((z) => Math.max(z - 0.25, 0.5));
   }
 
   /**
@@ -344,7 +343,7 @@ export class ImageViewerComponent {
    * @remarks Rotates image by 90 degrees clockwise
    */
   rotate90(): void {
-    this.rotation.update(r => (r + 90) % 360);
+    this.rotation.update((r) => (r + 90) % 360);
   }
 
   /**
@@ -364,42 +363,42 @@ export class ImageViewerComponent {
    * - Escape: Closes the viewer.
    * - ArrowLeft: Navigates to the previous image.
    */
-  @HostListener('window:keydown', ['$event'])
+  @HostListener("window:keydown", ["$event"])
   onKeyDown(event: KeyboardEvent): void {
-    switch(event.key) {
-      case 'Escape':
+    switch (event.key) {
+      case "Escape":
         this.closeViewer();
         break;
-      case 'ArrowLeft':
+      case "ArrowLeft":
         event.preventDefault();
         this.navigatePrev();
         break;
-      case 'ArrowRight':
+      case "ArrowRight":
         event.preventDefault();
         this.navigateNext();
         break;
-      case '+':
-      case '=':
+      case "+":
+      case "=":
         this.zoomIn();
         break;
-      case '-':
+      case "-":
         this.zoomOut();
         break;
-      case 'r':
-      case 'R':
+      case "r":
+      case "R":
         this.rotate90();
         break;
     }
   }
 
-/**
- *  Handles the touch start event for the image viewer component.
- * @returns {void}
- * @param event - The touch event triggered when the user places their finger on the screen.  
- * @remarks
- * - Records the starting touch position for potential panning or swipe navigation.
- */
-  @HostListener('touchstart', ['$event'])
+  /**
+   *  Handles the touch start event for the image viewer component.
+   * @returns {void}
+   * @param event - The touch event triggered when the user places their finger on the screen.
+   * @remarks
+   * - Records the starting touch position for potential panning or swipe navigation.
+   */
+  @HostListener("touchstart", ["$event"])
   onTouchStart(event: TouchEvent): void {
     if (event.touches.length === 1) {
       this.touchStartXSignal.set(event.touches[0].clientX);
@@ -412,27 +411,27 @@ export class ImageViewerComponent {
   /**
    * Handles the touch move event for the image viewer component.
    * @returns {void}
-   * @param event - The touch event triggered when the user moves their finger on the screen. 
+   * @param event - The touch event triggered when the user moves their finger on the screen.
    */
-  @HostListener('touchmove', ['$event'])
+  @HostListener("touchmove", ["$event"])
   onTouchMove(event: TouchEvent): void {
     if (this.isPanning() && event.touches.length === 2) {
       event.preventDefault();
       const touch = event.touches[0];
       const deltaX = touch.clientX - this.touchStartXSignal();
       const deltaY = touch.clientY - this.touchStartYSignal();
-      
-      this.panPosition.update(pos => ({
+
+      this.panPosition.update((pos) => ({
         x: pos.x + deltaX,
-        y: pos.y + deltaY
+        y: pos.y + deltaY,
       }));
-      
+
       this.touchStartXSignal.set(touch.clientX);
       this.touchStartYSignal.set(touch.clientY);
     }
   }
 
-  @HostListener('touchend', ['$event'])
+  @HostListener("touchend", ["$event"])
   /**
    * Handles the touch end event for the image viewer component.
    * @returns {void}
@@ -440,14 +439,14 @@ export class ImageViewerComponent {
    */
   onTouchEnd(event: TouchEvent): void {
     this.isPanning.set(false);
-    
+
     if (event.changedTouches.length === 0) return;
-    
+
     const touchEndX = event.changedTouches[0].clientX;
     const touchEndY = event.changedTouches[0].clientY;
     const deltaX = touchEndX - this.touchStartXSignal();
     const deltaY = touchEndY - this.touchStartYSignal();
-    
+
     if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 50) {
       if (deltaX > 0) {
         this.navigatePrev();
@@ -457,7 +456,6 @@ export class ImageViewerComponent {
     }
   }
 
-  
   /**
    * Toggle action popup for download options
    * @param event - Mouse event
@@ -465,20 +463,20 @@ export class ImageViewerComponent {
    */
   toggleActionPopup(event: MouseEvent): void {
     event.stopPropagation();
-    
+
     if (this.showActionPopup()) {
       this.showActionPopup.set(false);
       return;
     }
-    
+
     const button = event.currentTarget as HTMLElement;
     const rect = button.getBoundingClientRect();
-    
+
     this.actionPopupPosition.set({
       x: rect.left,
-      y: rect.top - 120
+      y: rect.top - 120,
     });
-    
+
     this.showActionPopup.set(true);
   }
 
@@ -488,23 +486,39 @@ export class ImageViewerComponent {
    */
   async onDownloadSingle(): Promise<void> {
     this.showActionPopup.set(false);
-    await this.attachmentStorageService.downloadSingleAttachment(this.currentImage());
+    this.isDownloading.set(true);
+    try {
+      await this.attachmentStorageService.downloadSingleAttachment(
+        this.currentImage(),
+      );
+    } finally {
+      this.isDownloading.set(false);
+    }
   }
 
   /**
    * Download all images as ZIP
+   * @remarks Uses AttachmentStorageService to download all images as a ZIP file, passing the current task title for naming the ZIP file appropriately.
    */
   async onDownloadAll(): Promise<void> {
     this.showActionPopup.set(false);
-    await this.attachmentStorageService.downloadAllAsZip(this.images(), this.taskTitle());
+    this.isDownloading.set(true);
+    try {
+      await this.attachmentStorageService.downloadAllAsZip(
+        this.images(),
+        this.taskTitle(),
+      );
+    } finally {
+      this.isDownloading.set(false);
+    }
   }
 
   /**
    * Handle image load error
+   * @remarks Sets error state and shows toast notification on image load failure
    */
   onImageError(event: Event): void {
     this.imageLoadError.set(true);
-    this.toastService.showError('Failed to load image');
+    this.toastService.showError("Failed to load image");
   }
 }
-

@@ -276,7 +276,6 @@ export class SignupComponent implements OnInit {
     this.isLoading.set(true);
     try {
       const userCredential = await this.authService.signup(signupData);
-      console.log('Signup successful:', userCredential?.user);
       this.showSignupSuccess();
     } catch (error: any) {
       this.handleSignupError(error);

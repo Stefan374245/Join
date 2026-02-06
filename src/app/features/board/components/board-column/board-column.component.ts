@@ -38,7 +38,6 @@ export class BoardColumnComponent implements AfterViewInit {
       const dropList = this.dropList();
       const connected = this.connectedDropLists();
       if (dropList && connected.length > 0) {
-        console.log('[effect] BoardColumnComponent: updating dropList.connectedTo', dropList.id, connected.map(c => c.id));
         dropList.connectedTo = connected;
       }
     });
@@ -79,11 +78,6 @@ export class BoardColumnComponent implements AfterViewInit {
    * @param event - The CDK drag-drop event containing source, destination, and task information
    */
  onTaskDrop(event: CdkDragDrop<Task[]>): void {
-  console.log('Webhook Payload', {
-  taskId: event.item.data.id,
-  oldStatus: this.mapStatus(event.previousContainer.id),
-  newStatus: this.mapStatus(event.container.id),
-});
   this.taskDropped.emit({ event, status: event.container.id });
   const updatedBy = 'system';
   this.taskService.triggerStatusWebhook(

@@ -1,4 +1,6 @@
 <ng-container *ngIf="isVisible() && task() as currentTask">
+  <app-loading-spinner [localLoading]="isDownloading()" />
+  
   <div class="task-overlay" (click)="onOverlayClick($event)">
     <div class="task-card-overlay" stopPropagation>
       <div class="task-header">
@@ -104,7 +106,7 @@
           *ngIf="currentTask.attachments?.length"
         >
           <span class="detail-label">Attachments</span>
-          <app-task-attachments-display 
+          <app-attachments-display 
             [attachments]="currentTask.attachments || []"
             [isEditMode]="false"
             (viewAttachment)="onViewAttachment($event)"
