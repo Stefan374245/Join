@@ -14,28 +14,51 @@
         {{ formatFileSize(currentImage().size) }} •
         {{ imageCounter() }}
       </span>
-      <button class="close-btn" (click)="closeViewer()" title="Close (ESC)">
-        ×
-      </button>
+
+      <div class="top-bar-actions">
+        @if (!isEditMode()) {
+          <button
+            class="download-btn"
+            (click)="toggleActionPopup($event)"
+            title="Download options"
+            aria-label="Download options"
+          >
+            <img src="assets/images/download.svg" alt="Download" />
+            <span class="">Download</span>
+          </button>
+        }
+
+        <button class="close-btn" (click)="closeViewer()" title="Close (ESC)">
+          <img src="assets/images/cancelwhite.svg" alt="Close" />
+        </button>
+      </div>
     </header>
 
     <figure class="image-container">
-      <div class="loading-spinner" *ngIf="isImageLoading(currentIndex())">
-        <div class="spinner"></div>
-      </div>
+      @if (isImageLoading(currentIndex())) {
+        <app-loading-spinner [localLoading]="true" />
+      }
 
       <div
         class="cube-wrapper"
         [class.animating]="animationDirection() !== null"
-        style="position: relative;"
       >
         @for (idx of renderedIndices(); track images()[idx].id) {
           <img
             [src]="imageUrls()[idx]"
             [alt]="images()[idx].filename"
             [class.current]="idx === currentIndex()"
-            [class.animating-out]="
-              idx === currentIndex() && animationDirection() !== null
+            [class.animating-in-next]="
+              idx === currentIndex() && animationDirection() === 'next'
+            "
+            [class.animating-in-prev]="
+              idx === currentIndex() && animationDirection() === 'prev'
+            "
+            [class.animating-out-next]="
+              idx === previousIndex() && animationDirection() === 'next'
+            "
+            [class.animating-out-prev]="
+              idx === previousIndex() && animationDirection() === 'prev'
             "
             [class.loading]="isImageLoading(idx)"
             [style.transform]="
@@ -59,20 +82,6 @@
         }
       </div>
 
-      <button
-        class="nav-btn prev"
-        (click)="navigatePrev()"
-        title="Previous (←)"
-      >
-        ‹
-      </button>
-
-      <button class="nav-btn next" (click)="navigateNext()" title="Next (→)">
-        ›
-      </button>
-    </figure>
-
-    <footer class="bottom-bar">
       @if (images().length > 1) {
         <nav class="thumbnail-bar" aria-label="Image thumbnails">
           @for (img of images(); track img.id; let idx = $index) {
@@ -82,36 +91,44 @@
               (click)="jumpToImage(idx)"
               [title]="img.filename"
             >
+              @if (isThumbnailLoading(img.id)) {
+                <div class="thumbnail-loading-wrapper">
+                  <app-loading-spinner [localLoading]="true" />
+                </div>
+              }
               <img
                 [src]="getPreviewUrl(img)"
                 [alt]="img.filename"
                 title="{{ img.filename }}"
+                [class.loading]="isThumbnailLoading(img.id)"
+                (load)="onThumbnailLoaded(img.id)"
+                (loadstart)="onThumbnailLoadStart(img.id)"
               />
             </button>
           }
         </nav>
       }
+    </figure>
+
+    <footer class="bottom-bar">
+      @if (images().length > 1) {
+        <button
+          class="nav-btn prev"
+          (click)="navigatePrev()"
+          title="Previous (←)"
+        >
+          <img src="assets/images/arrow-left-line.svg" alt="Previous" />
+        </button>
+      }
 
       <nav class="controls" aria-label="Image viewer controls">
-        @if (!isEditMode()) {
-          <button
-            class="download-btn"
-            (click)="toggleActionPopup($event)"
-            title="Download options"
-            aria-label="Download options"
-          >
-            <img src="assets/images/download-blue.svg" alt="Download" />
-            Download
-          </button>
-        }
-
         <div class="zoom-controls">
           <button
             (click)="zoomOut()"
             [disabled]="zoomLevel() <= 0.5"
             title="Zoom Out (-)"
           >
-            −
+           <img src="assets/images/zoom_out.svg" alt="Zoom Out">
           </button>
           <span class="zoom-level">{{ (zoomLevel() * 100).toFixed(0) }}%</span>
           <button
@@ -119,48 +136,36 @@
             [disabled]="zoomLevel() >= 4"
             title="Zoom In (+)"
           >
-            +
+            <img src="assets/images/zoom_in.svg" alt="Zoom In">
           </button>
         </div>
 
         <button class="rotate-btn" (click)="rotate90()" title="Rotate 90° (R)">
           ↻
         </button>
-
-        @if (isEditMode()) {
-          <button
-            class="delete-btn"
-            (click)="delete.emit(currentImage())"
-            title="Delete this image"
-          >
-            🗑️ Delete This
-          </button>
-
-          @if (images().length > 1) {
-            <button
-              class="delete-all-btn"
-              (click)="deleteAll.emit()"
-              title="Delete all attachments"
-            >
-              🗑️ Delete All
-            </button>
-          }
-        }
       </nav>
+
+      @if (images().length > 1) {
+        <button
+          class="nav-btn next"
+          (click)="navigateNext()"
+          title="Next (→)"
+        >
+          <img src="assets/images/arrow-left-line.svg" alt="Next" />
+        </button>
+      }
     </footer>
   </article>
 
   @if (showActionPopup()) {
+    <div class="popup-backdrop" (click)="showActionPopup.set(false)"></div>
     <menu
       class="action-popup"
-      [style.left.px]="actionPopupPosition().x"
+      [style.right.px]="actionPopupPosition().x"
       [style.top.px]="actionPopupPosition().y"
       stopPropagation
-      (clickOutside)="showActionPopup.set(false)"
     >
-      <button (click)="onDownloadSingle()">
-        📥 Download This Image
-      </button>
+      <button (click)="onDownloadSingle()">📥 Download This Image</button>
       <button (click)="onDownloadAll()">
         📦 Download All as ZIP ({{ images().length }})
       </button>

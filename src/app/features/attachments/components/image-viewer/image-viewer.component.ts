@@ -11,10 +11,7 @@ import {
 } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { LiveAnnouncer } from "@angular/cdk/a11y";
-import {
-  ClickOutsideDirective,
-  StopPropagationDirective,
-} from "../../../../shared/directives";
+import { ClickOutsideDirective, StopPropagationDirective} from "../../../../shared/directives";
 import { ToastService } from "../../../../core/services/toast.service";
 import { AttachmentStorageService } from "../../services/attachment-storage.service";
 import { TaskAttachment } from "../../../../core/models/task.interface";
@@ -57,6 +54,7 @@ export class ImageViewerComponent {
   private touchStartYSignal = signal<number>(0);
 
   currentIndex = signal<number>(0);
+  previousIndex = signal<number | null>(null);
   zoomLevel = signal<number>(1);
   rotation = signal<number>(0);
   panPosition = signal<{ x: number; y: number }>({ x: 0, y: 0 });
@@ -66,6 +64,7 @@ export class ImageViewerComponent {
   animationDirection = signal<"next" | "prev" | null>(null);
   imageLoadError = signal<boolean>(false);
   imageLoadingStates = signal<Map<number, boolean>>(new Map());
+  thumbnailLoadingStates = signal<Map<string, boolean>>(new Map());
   isDownloading = signal<boolean>(false);
 
   isMobile = computed(() => this.windowWidthSignal() < 992);
@@ -233,6 +232,37 @@ export class ImageViewerComponent {
   }
 
   /**
+   * Check if thumbnail is loading
+   * @param attachmentId - Attachment ID
+   * @returns Loading state boolean
+   */
+  isThumbnailLoading(attachmentId: string): boolean {
+    return this.thumbnailLoadingStates().get(attachmentId) ?? true;
+  }
+
+  /**
+   * Handle thumbnail load start
+   * @param attachmentId - Attachment ID
+   * @remarks Updates internal thumbnail loading states map
+   */
+  onThumbnailLoadStart(attachmentId: string): void {
+    const states = new Map(this.thumbnailLoadingStates());
+    states.set(attachmentId, true);
+    this.thumbnailLoadingStates.set(states);
+  }
+
+  /**
+   * Handle thumbnail load complete
+   * @param attachmentId - Attachment ID
+   * @remarks Updates internal thumbnail loading states map
+   */
+  onThumbnailLoaded(attachmentId: string): void {
+    const states = new Map(this.thumbnailLoadingStates());
+    states.set(attachmentId, false);
+    this.thumbnailLoadingStates.set(states);
+  }
+
+  /**
    * Get preview URL for thumbnails
    * @param attachment - Task attachment
    * @returns Preview URL string
@@ -262,11 +292,15 @@ export class ImageViewerComponent {
   navigateNext(): void {
     const length = this.images().length;
     if (length === 0) return;
+    this.previousIndex.set(this.currentIndex());
     this.animationDirection.set("next");
     this.currentIndex.update((i) => (i + 1) % length);
     this.resetImageState();
     this.announceCurrentImage();
-    setTimeout(() => this.animationDirection.set(null), 500);
+    setTimeout(() => {
+      this.animationDirection.set(null);
+      this.previousIndex.set(null);
+    }, 500);
   }
 
   /**
@@ -276,11 +310,15 @@ export class ImageViewerComponent {
   navigatePrev(): void {
     const length = this.images().length;
     if (length === 0) return;
+    this.previousIndex.set(this.currentIndex());
     this.animationDirection.set("prev");
     this.currentIndex.update((i) => (i - 1 + length) % length);
     this.resetImageState();
     this.announceCurrentImage();
-    setTimeout(() => this.animationDirection.set(null), 500);
+    setTimeout(() => {
+      this.animationDirection.set(null);
+      this.previousIndex.set(null);
+    }, 500);
   }
 
   /**
@@ -293,12 +331,16 @@ export class ImageViewerComponent {
     if (index === this.currentIndex()) return;
 
     const direction = index > this.currentIndex() ? "next" : "prev";
+    this.previousIndex.set(this.currentIndex());
     this.animationDirection.set(direction);
     this.currentIndex.set(index);
     this.resetImageState();
     this.announceCurrentImage();
 
-    setTimeout(() => this.animationDirection.set(null), 500);
+    setTimeout(() => {
+      this.animationDirection.set(null);
+      this.previousIndex.set(null);
+    }, 500);
   }
 
   /**
@@ -469,12 +511,9 @@ export class ImageViewerComponent {
       return;
     }
 
-    const button = event.currentTarget as HTMLElement;
-    const rect = button.getBoundingClientRect();
-
     this.actionPopupPosition.set({
-      x: rect.left,
-      y: rect.top - 120,
+      x: 80,
+      y: 100,
     });
 
     this.showActionPopup.set(true);
