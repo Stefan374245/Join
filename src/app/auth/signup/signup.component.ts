@@ -34,7 +34,6 @@ export class SignupComponent implements OnInit {
 
   showPassword = false;
   showConfirmPassword = false;
-  showSuccessMessage = false;
   logoAnimationComplete = false;
   passwordFocused = false;
   confirmPasswordFocused = false;
@@ -68,8 +67,8 @@ export class SignupComponent implements OnInit {
            !this.confirmPassword ||
            !this.acceptPrivacy ||
            this.name.trim().length < 2 ||
-           !this.email.includes('@') ||
-           this.password.length < 6 ||
+           !this.isValidEmail(this.email) ||
+           !this.isValidPassword(this.password) ||
            this.password !== this.confirmPassword;
   }
 
@@ -107,10 +106,10 @@ export class SignupComponent implements OnInit {
     /**
      * Handles email input blur event.
      * @returns {void}
-     * @remarks Sets emailError if email is invalid.
+     * @remarks Validates email format when field loses focus.
      */
   onEmailBlur(): void {
-    if (this.email && !this.email.includes('@')) {
+    if (this.email && !this.isValidEmail(this.email)) {
       this.emailError = true;
     }
   }
@@ -129,11 +128,11 @@ export class SignupComponent implements OnInit {
     /**
      * Handles password input blur event.
      * @returns {void}
-     * @remarks Sets passwordError if password is too short.
+     * @remarks Validates password when field loses focus.
      */
   onPasswordBlur(): void {
     this.passwordFocused = false;
-    if (this.password && this.password.length < 6) {
+    if (this.password && !this.isValidPassword(this.password)) {
       this.passwordError = true;
     }
   }
@@ -238,21 +237,42 @@ export class SignupComponent implements OnInit {
   }
 
   /**
+   * Validates email format using regex.
+   * @param email - Email address to validate
+   * @returns {boolean} True if valid email format
+   * @remarks Checks for basic email structure: user@domain.extension
+   */
+  private isValidEmail(email: string): boolean {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  }
+
+  /**
    * Checks if email is valid.
    *  @return {boolean} True if email is valid
-   * @remarks Email must contain '@' character
+   * @remarks Email must match regex pattern
    */
   private isEmailValid(): boolean {
-    return !!this.email && this.email.includes('@');
+    return !!this.email && this.isValidEmail(this.email);
+  }
+
+  /**
+   * Validates password format.
+   * @param password - Password to validate
+   * @returns {boolean} True if valid password format
+   * @remarks Password must be at least 6 characters and contain no spaces
+   */
+  private isValidPassword(password: string): boolean {
+    return password.length >= 6 && !/\s/.test(password);
   }
 
   /**
    * Checks if password is valid.
   * @return {boolean} True if password is valid
-  * @remarks Password must be at least 6 characters
+  * @remarks Password must be at least 6 characters with no spaces
    */
   private isPasswordValid(): boolean {
-    return !!this.password && this.password.length >= 6;
+    return !!this.password && this.isValidPassword(this.password);
   }
 
   /**
@@ -275,9 +295,9 @@ export class SignupComponent implements OnInit {
     const signupData = { name: this.name, email: this.email, password: this.password };
     this.isLoading.set(true);
     try {
-      const userCredential = await this.authService.signup(signupData);
+      await this.authService.signup(signupData);
       this.showSignupSuccess();
-    } catch (error: any) {
+    } catch (error: unknown) {
       this.handleSignupError(error);
     } finally {
       this.isLoading.set(false);
@@ -304,10 +324,11 @@ export class SignupComponent implements OnInit {
      * @returns {void}
      * @remarks Shows toast message for error feedback.
      */
-  private handleSignupError(error: any) {
+  private handleSignupError(error: unknown): void {
     console.error('Signup error:', error);
-    if (error.code === 'auth/email-already-in-use' || error.code === 'auth/invalid-email') this.emailError = true;
-    if (error.code === 'auth/weak-password') this.passwordError = true;
+    const errorCode = (error as any)?.code;
+    if (errorCode === 'auth/email-already-in-use' || errorCode === 'auth/invalid-email') this.emailError = true;
+    if (errorCode === 'auth/weak-password') this.passwordError = true;
     this.toastService.showToast('Signup failed. Please try again.');
   }
 
