@@ -52,8 +52,8 @@
   }
 
   .creator-info {
-    @include flex(row, flex-start, center);
-    gap: 0.5rem;
+    @include flex(row, space-around, center);
+    width: 100%;
 
     .creator-icon {
       width: $spacing-md;
@@ -168,6 +168,16 @@
   }
 }
 
+.attachments-section {
+  @include flex(column, flex-start, stretch);
+
+  .detail-label {
+    font-size: 20px;
+    font-weight: 400;
+    color: $primary-color;
+  }
+}
+
 .subtasks-section {
   @include flex(column, flex-start, stretch);
   gap: 16px;
@@ -199,7 +209,9 @@
     .subtask-checkbox-icon {
       width: 24px;
       height: 24px;
-      transition: transform 0.2s ease, opacity 0.2s ease;
+      transition:
+        transform 0.2s ease,
+        opacity 0.2s ease;
       background-size: contain;
       background-repeat: no-repeat;
       background-position: center;
@@ -281,7 +293,7 @@
 
     .task-category {
       span {
-        font-size: 14px;
+        font-size: 16px;
         padding: 4px 16px;
       }
     }
@@ -301,13 +313,11 @@
     gap: 16px;
 
     .task-title {
-      font-size: 24px;
-      line-height: 1.3;
+      font-size: 36px;
     }
 
     .task-description {
-      font-size: 14px;
-      line-height: 1.5;
+      font-size: 16px;
     }
   }
 
@@ -323,34 +333,20 @@
 
       .creator-badge {
         padding: 4px 12px;
-        font-size: 12px;
-
-        .creator-icon {
-          width: 14px;
-          height: 14px;
-        }
       }
 
       .creator-content {
         margin-left: 0;
-        font-size: 12px;
-      }
-
-      .creator-name {
-        font-size: 14px;
-        width: 100%;
       }
     }
   }
 
   .task-details {
-    gap: 12px;
 
     .detail-row {
       font-size: 16px;
 
       .detail-label {
-        min-width: auto;
         font-size: 16px;
       }
 
@@ -360,7 +356,7 @@
 
       .task-priority {
         span {
-          font-size: 14px;
+          font-size: 16px;
         }
 
         img {
@@ -393,6 +389,14 @@
     }
   }
 
+  .attachments-section {
+    gap: 12px;
+
+    .detail-label {
+      font-size: 16px;
+    }
+  }
+
   .subtasks-section {
     gap: 12px;
 
@@ -410,8 +414,8 @@
       }
 
       .subtask-title {
-        font-size: 14px;
-        line-height: 1.4;
+        font-size: 16px;
+        line-height: 1.2;
       }
     }
   }
@@ -421,7 +425,7 @@
     gap: 8px;
 
     .btn {
-      font-size: 14px;
+      font-size: 16px;
       padding: 8px 12px;
 
       img {
