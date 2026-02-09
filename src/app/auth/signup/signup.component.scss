@@ -96,14 +96,9 @@
 }
 
 .signup-input-div {
-  display: flex;
-  align-items: center;
-  flex-direction: column;
+  @include flex(column, center, center);
+  gap: 2px;
   margin: 20px 0;
-}
-
-.input-div {
-  display: flex;
 }
 
 .signup-input {
@@ -221,16 +216,13 @@
 }
 
 .error-span {
+  @include flex(row, flex-start, center);
+  width: 100%;
   height: auto;
   min-height: 14px;
   font-size: 10px;
   color: red;
   visibility: hidden;
-  width: 375px;
-  text-align: left;
-  padding-left: 40px;
-  margin-top: -8px;
-  margin-bottom: 4px;
 
   &.visible {
     visibility: visible;

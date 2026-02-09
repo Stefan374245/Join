@@ -25,6 +25,7 @@
             class="login-input"
             [class.red-border]="emailError"
             (focus)="onEmailFocus()"
+            (blur)="onEmailBlur()"
             autocomplete="email"
             aria-label="Email address"
             aria-describedby="email-error"
