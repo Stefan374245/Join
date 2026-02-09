@@ -37,6 +37,8 @@ export class AttachmentUploadComponent {
   /**
    * Handle drag over event
    * @param event - DragEvent
+   * @remarks
+   * Prevents default behavior and sets drag over state to true for visual feedback.
    */
   onDragOver(event: DragEvent): void {
     event.preventDefault();
@@ -46,15 +48,19 @@ export class AttachmentUploadComponent {
 
   /**
    * Handle drag leave event
-   * @param event - DragEvent
+   * @param _event - DragEvent
+   * @remarks
+   * Sets drag over state to false to remove visual feedback when dragging leaves the drop area.
    */
-  onDragLeave(event: DragEvent): void {
+  onDragLeave(_event: DragEvent): void {
     this.isDragOver.set(false);
   }
 
   /**
    * Handle files dropped via DragDropDirective
    * @param files - Array of dropped files
+   * @remarks
+   * Resets drag over state and processes the dropped files.
    */
   async handleFilesDropped(files: File[]): Promise<void> {
     this.isDragOver.set(false);
@@ -102,29 +108,18 @@ export class AttachmentUploadComponent {
    */
   private async processFile(file: File): Promise<void> {
     const validation = await this.fileValidation.validateFile(file);
-    
     if (!validation.valid) {
       this.errorMessage.set(validation.error || 'Invalid file');
       return;
     }
-
     try {
       const base64 = await this.imageCompression.compressImage(file);
-      
-      const attachment: TaskAttachment = {
-        id: this.generateId(),
-        filename: file.name,
-        fileType: file.type as 'image/jpeg' | 'image/png',
-        base64,
-        size: file.size,
-        uploadedAt: new Date()
-      };
-
+      const attachment = { id: this.generateId(), filename: file.name, 
+        fileType: file.type as 'image/jpeg' | 'image/png', base64, size: file.size, uploadedAt: new Date() };
       this.attachments.update(current => [...current, attachment]);
       this.attachmentsChange.emit(this.attachments());
-    } catch (error) {
+    } catch {
       this.errorMessage.set('Failed to process image');
-      console.error('Image processing error:', error);
     }
   }
 

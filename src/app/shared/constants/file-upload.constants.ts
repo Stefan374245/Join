@@ -3,7 +3,7 @@
  */
 
 export const FILE_UPLOAD = {
-  MAX_FILE_SIZE: 1024 * 1024, // 1MB in bytes
+  MAX_FILE_SIZE: 1024 * 1024,
   MAX_ATTACHMENTS: 5,
   ALLOWED_TYPES: ['image/jpeg', 'image/png'] as const,
   ALLOWED_EXTENSIONS: ['.jpg', '.jpeg', '.png'] as const,

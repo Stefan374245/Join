@@ -17,7 +17,7 @@
   color: #FFFFFF;
   border: none;
   border-radius: 8px;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 400;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -25,7 +25,6 @@
   img {
     width: 16px;
     height: 16px;
-    filter: brightness(0) invert(1);
   }
 
   &:hover {
@@ -177,6 +176,6 @@
 }
 
 .attachment-size {
-  font-size: 16px;
+  font-size: 14px;
   color: #A8A8A8;
 }

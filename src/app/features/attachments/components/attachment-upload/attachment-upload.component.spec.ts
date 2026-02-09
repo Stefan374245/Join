@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { AttachmentUploadComponent } from './attachment-upload.component';
-import { FileValidationService } from '../../services/file-validation.service';
-import { ImageCompressionService } from '../../services/image-compression.service';
+import { AttachmentUploadComponent } from '../../../attachments/components/attachment-upload/attachment-upload.component';
+import { FileValidationService } from '../../../../features/attachments/services/file-validation.service';
+import { ImageCompressionService } from '../../../../features/attachments/services/image-compression.service';
 
 describe('AttachmentUploadComponent', () => {
   let component: AttachmentUploadComponent;
