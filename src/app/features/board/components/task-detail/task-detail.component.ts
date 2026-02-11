@@ -66,7 +66,9 @@ export class TaskDetailComponent {
     return index >= 0 ? index : 0;
   });
 
-  showImageViewer = computed<boolean>(() => this.selectedAttachment() !== null);
+  showImageViewer = computed<boolean>(() => {
+    return this.selectedAttachment() !== null;
+  });
 
   task = computed<Task | undefined>(() => {
     const id = this.taskId();
