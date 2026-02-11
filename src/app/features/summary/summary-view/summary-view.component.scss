@@ -1,6 +1,4 @@
-@import "../../../../styles/variables";
-@import "../../../../styles/mixins";
-@import "../../../../styles/page-layouts";
+@use "../../../../styles/index" as *;
 
 %card-base {
   background: $white;
@@ -208,7 +206,7 @@ summary {
 }
 
 .todo-card:hover {
-  transform-origin: left center;
+  transform-origin: right center;
 }
 .urgent-card {
   @extend %card-base;

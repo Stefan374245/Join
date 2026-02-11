@@ -1,4 +1,4 @@
-@import '../../../../features/add-task/components/dropdown/dropdown.component.scss';
+@use '../../../../../styles/index' as *;
 
 .email-form {
   min-height: 100vh;

@@ -1,5 +1,4 @@
-@import '../../../styles/variables';
-@import '../../../styles/mixins';
+@use '../../../styles/index' as *;
 
 .sidebar {
   height: 100%;
