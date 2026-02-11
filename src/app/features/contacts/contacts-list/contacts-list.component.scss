@@ -1,10 +1,5 @@
-@import "../../../../styles/_variables.scss";
-@import "../../../../styles/_mixins.scss";
-@import "../../../../styles/_page-layouts.scss";
-@import "../../../../styles/_utilities.scss";
-@import "../../../../styles/components/animations";
-@import "../../../../styles/components/buttons";
-@import "../../board/styles/overlays";
+@use "../../../../styles/index" as *;
+@use "../../board/styles/overlays" as *;
 
 :host {
   display: block;
@@ -91,6 +86,7 @@
   cursor: pointer;
   background-color: $gray-100;
   transition: background 0.15s ease;
+  margin-bottom: 6px;
 
   &::before {
     content: "";

@@ -1,17 +1,16 @@
-@import '../../../styles/components/info-pages';
-@import '../../../styles/scrollbar';
+@use '../../../styles/index' as *;
 
 .privacy-main {
-  @extend .info-page-main;
+  @include info-page-main;
   @include hide-scrollbar;
 }
 
 .header-container {
-  @extend .info-page-header-container;
+  @include info-page-header-container;
 }
 
 .back-arrow {
-  @extend .info-page-back-arrow;
+  @include info-page-back-arrow;
 }
 
 .privacy-content {

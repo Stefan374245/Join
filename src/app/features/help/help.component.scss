@@ -1,16 +1,16 @@
-@import '../../../styles/components/info-pages';
+@use '../../../styles/index' as *;
 
 .help-main {
-  @extend .info-page-main;
+  @include info-page-main;
   @include hide-scrollbar;
 }
 
 .header-container {
-  @extend .info-page-header-container;
+  @include info-page-header-container;
 }
 
 .back-arrow {
-  @extend .info-page-back-arrow;
+  @include info-page-back-arrow;
 }
 
 .help-content {

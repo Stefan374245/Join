@@ -1,7 +1,4 @@
-@import "../../../../styles/variables";
-@import "../../../../styles/mixins";
-@import "../../../../styles/components/animations";
-@import "../../../../styles/components/buttons";
+@use "../../../../styles/index" as *;
 
 .dialog-overlay {
   @include flex(row, center, center);
