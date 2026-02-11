@@ -33,12 +33,32 @@ export class TaskCardComponent {
   contacts = input.required<Contact[]>();
   taskClicked = output<Task>();
 
+  private wasDragging = false;
+
   /**
-   * Handles task card click events and emits the task for detail view navigation.
-   * This method is triggered when users click on the task card to view full task details.
+   * Handles click event - only opens if not dragging
    */
-  onTaskClick(): void {
-    this.taskClicked.emit(this.task());
+  onClick(event: MouseEvent): void {
+    if (!this.wasDragging) {
+      this.taskClicked.emit(this.task());
+    }
+  }
+
+  /**
+   * Handles drag start event
+   */
+  onDragStarted(): void {
+    this.wasDragging = true;
+  }
+
+  /**
+   * Handles drag end event
+   */
+  onDragEnded(): void {
+    // Keep wasDragging true briefly to prevent click event from firing
+    setTimeout(() => {
+      this.wasDragging = false;
+    }, 200);
   }
 
   /**

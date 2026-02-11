@@ -3,8 +3,8 @@
   cdkDrag
   [cdkDragData]="task()"
   [cdkDragStartDelay]="80"
-  [attr.data-task-id]="task().id"
-  (click)="onTaskClick()"
+  [attr.data-task-id] ="task().id"
+  (click)="onClick($event)"
 >
   <div class="drag-placeholder" *cdkDragPlaceholder></div>
 
