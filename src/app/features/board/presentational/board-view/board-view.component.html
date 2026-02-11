@@ -58,17 +58,16 @@
   </ng-container>
 </main>
 
-<div *ngIf="selectedTaskId" (clickOutside)="closeTaskDetail()">
-  <app-task-detail
-    [taskId]="selectedTaskId"
-    [contacts]="contacts()"
-    [isVisible]="showTaskDetail"
-    (close)="closeTaskDetail()"
-    (edit)="onEditTask($event)"
-    (delete)="onDeleteTask($event)"
-  >
-  </app-task-detail>
-</div>
+<app-task-detail
+  *ngIf="selectedTaskId"
+  [taskId]="selectedTaskId"
+  [contacts]="contacts()"
+  [isVisible]="showTaskDetail"
+  (close)="closeTaskDetail()"
+  (edit)="onEditTask($event)"
+  (delete)="onDeleteTask($event)"
+>
+</app-task-detail>
 
 <div *ngIf="showEditOverlay && taskToEdit" (clickOutside)="closeEditOverlay()">
   <app-add-task-view
