@@ -14,7 +14,7 @@
     <li 
       class="attachment-card" 
       *ngFor="let attachment of attachments()"
-      (click)="onAttachmentClick(attachment)"
+      (click)="onAttachmentClick($event, attachment)"
       (mouseenter)="setHoveredAttachment(attachment.id)"
       (mouseleave)="setHoveredAttachment(null)"
       [title]="attachment.filename"

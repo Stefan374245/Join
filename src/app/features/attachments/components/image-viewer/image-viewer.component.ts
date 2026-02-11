@@ -11,7 +11,7 @@ import {
 } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { LiveAnnouncer } from "@angular/cdk/a11y";
-import { ClickOutsideDirective, StopPropagationDirective} from "../../../../shared/directives";
+import { StopPropagationDirective } from "../../../../shared/directives";
 import { ToastService } from "../../../../core/services/toast.service";
 import { AttachmentStorageService } from "../../services/attachment-storage.service";
 import { TaskAttachment } from "../../../../core/models/task.interface";
@@ -27,7 +27,6 @@ import { LoadingSpinnerComponent } from "../../../../shared/components/loading-s
   standalone: true,
   imports: [
     CommonModule,
-    ClickOutsideDirective,
     StopPropagationDirective,
     LoadingSpinnerComponent,
   ],
@@ -36,7 +35,7 @@ import { LoadingSpinnerComponent } from "../../../../shared/components/loading-s
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ImageViewerComponent {
-  images = input.required<TaskAttachment[]>();
+  images = input<TaskAttachment[]>([]);
   initialIndex = input<number>(0);
   isEditMode = input<boolean>(false);
   taskTitle = input<string>("Untitled");
@@ -72,12 +71,15 @@ export class ImageViewerComponent {
 
   currentImage = computed(() => {
     const images = this.images();
+    if (!images || images.length === 0) return null as any;
     const index = this.currentIndex();
     return images[index];
   });
 
   hasNext = computed(() => {
-    return this.currentIndex() < this.images().length - 1;
+    const images = this.images();
+    if (!images || images.length === 0) return false;
+    return this.currentIndex() < images.length - 1;
   });
 
   hasPrevious = computed(() => {
@@ -85,20 +87,26 @@ export class ImageViewerComponent {
   });
 
   imageUrls = computed(() => {
-    return this.images().map((att) => this.getImageUrl(att));
+    const images = this.images();
+    if (!images || images.length === 0) return [];
+    return images.map((att) => this.getImageUrl(att));
   });
 
   renderedIndices = computed(() => {
+    const images = this.images();
+    if (!images || images.length === 0) return [];
     const curr = this.currentIndex();
     const prev = curr - 1;
     const next = curr + 1;
-    const length = this.images().length;
+    const length = images.length;
 
     return [prev, curr, next].filter((i) => i >= 0 && i < length);
   });
 
   imageCounter = computed(() => {
-    return `${this.currentIndex() + 1} / ${this.images().length}`;
+    const images = this.images();
+    if (!images || images.length === 0) return '0 / 0';
+    return `${this.currentIndex() + 1} / ${images.length}`;
   });
 
   /**
@@ -113,15 +121,23 @@ export class ImageViewerComponent {
    * @remarks Sets up reactive effects for initial index and image preloading, and event listeners for window resize and body scroll lock
    */
   constructor() {
+    // Effect for initializing currentIndex - guards ensure safe execution
     effect(() => {
+      const images = this.images();
+      if (!images || images.length === 0) return;
+      
       const initial = this.initialIndex();
-      const length = this.images().length;
+      const length = images.length;
       if (initial >= 0 && initial < length) {
         this.currentIndex.set(initial);
       }
     });
 
+    // Effect for preloading images
     effect(() => {
+      const images = this.images();
+      if (!images || images.length === 0) return;
+      
       const indices = this.renderedIndices();
       const urls = this.imageUrls();
 

@@ -1,7 +1,5 @@
-@import "../../../../../styles/mixins";
-@import "../../../../../styles/variables";
-@import "../../../../../styles/components/buttons";
-@import "../../../../../styles/components/image-viewer-animations";
+@use "../../../../../styles/index" as *;
+@use "../../../../../styles/components/image-viewer-animations" as *;
 
 .image-viewer-wrapper {
   @include flex(column);

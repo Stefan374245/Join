@@ -60,8 +60,13 @@ export class AttachmentsDisplayComponent {
    *
    * @param attachment - The task attachment that was clicked.
    */
-  onAttachmentClick(attachment: TaskAttachment): void {
-    this.viewAttachment.emit(attachment);
+  onAttachmentClick(event: MouseEvent, attachment: TaskAttachment): void {
+    if (!attachment) {
+      console.error('❌ Attachment is undefined!');
+      return;
+    }
+    event.stopPropagation();
+        this.viewAttachment.emit(attachment);
   }
 
  
