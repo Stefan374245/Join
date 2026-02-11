@@ -1,18 +1,14 @@
 // Add spacing between task cards
+@use "../../../../../styles/index" as *;
+@use "../../styles/board-variables" as *;
+@use "../../styles/board-layout" as *;
+@use "../../styles/board-search" as *;
+@use "../../styles/task-cards" as *;
+@use "../../styles/progress-bars" as *;
+@use "../../styles/drag-drop" as *;
+
 app-task-card {
   display: block;
   margin-bottom: 20px;
 }
 
-@import "../../../../../styles/variables";
-@import "../../../../../styles/mixins";
-@import "../../../../../styles/page-layouts";
-@import "../../../../../styles/scrollbar";
-@import "../../../../../styles/components/animations";
-@import "../../../../../styles/components/buttons";
-@import "../../styles/board-variables";
-@import "../../styles/board-layout";
-@import "../../styles/board-search";
-@import "../../styles/task-cards";
-@import "../../styles/progress-bars";
-@import "../../styles/drag-drop";
