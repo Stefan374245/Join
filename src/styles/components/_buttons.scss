@@ -1,5 +1,6 @@
-@import "../variables";
-@import "../mixins";
+@use "sass:color";
+@use "../mixins" as *;
+@use "../variables" as *;
 
 .btn {
   @include flex(row, center, center);
@@ -63,7 +64,7 @@
   color: $white;
 
   &:hover:not(:disabled) {
-    background: darken($error-color, 10%);
+    background: color.scale($error-color, $lightness: -10%);
   }
 }
 
