@@ -1,5 +1,5 @@
-@import '../../../../styles/variables';
-@import '../../../../styles/mixins';
+@use './variables' as *;
+@use './mixins' as *;
 
 .page-wrapper {
   display: flex;

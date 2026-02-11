@@ -11,59 +11,35 @@
     <div class="summary-grid">
       <section class="stats-panel" aria-label="Task statistics overview">
         <div class="stats-row-top">
-          <article
-            class="done-card"
-            aria-labelledby="done-label"
-            (click)="navigateToBoard()"
-          >
-            <div class="card-icon-wrapper">
-              <img
-                class="icon-default"
-                src="assets/images/check.svg"
-                alt=""
-                aria-hidden="true"
-              />
-              <img
-                class="icon-hover"
-                src="assets/images/check-2.svg"
-                alt=""
-                aria-hidden="true"
-              />
-            </div>
-            <div class="card-content">
-              <h4 [attr.aria-label]="taskStats().done + ' tasks done'">
-                {{ taskStats().done }}
-              </h4>
-              <p id="done-label">Done</p>
-            </div>
-          </article>
-
-          <article
-            class="todo-card"
-            aria-labelledby="todo-label"
-            (click)="navigateToBoard()"
-          >
-            <div class="card-icon-wrapper">
-              <img
-                class="icon-default"
-                src="assets/images/edit.svg"
-                alt=""
-                aria-hidden="true"
-              />
-              <img
-                class="icon-hover"
-                src="assets/images/edit-2.svg"
-                alt=""
-                aria-hidden="true"
-              />
-            </div>
-            <div class="card-content">
-              <h4 [attr.aria-label]="taskStats().todo + ' tasks to do'">
-                {{ taskStats().todo }}
-              </h4>
-              <p id="todo-label">To-do</p>
-            </div>
-          </article>
+          <div class="stats-row-top">
+            <article
+              *ngFor="let card of topStatsCards()"
+              [class]="card.class"
+              [attr.aria-labelledby]="card.id + '-label'"
+              (click)="navigateToBoard()"
+            >
+              <div class="card-icon-wrapper">
+                <img
+                  class="icon-default"
+                  [src]="card.iconDefault"
+                  alt=""
+                  aria-hidden="true"
+                />
+                <img
+                  class="icon-hover"
+                  [src]="card.iconHover"
+                  alt=""
+                  aria-hidden="true"
+                />
+              </div>
+              <div class="card-content">
+                <h4 [attr.aria-label]="card.ariaLabel">
+                  {{ card.value }}
+                </h4>
+                <p [id]="card.id + '-label'">{{ card.label }}</p>
+              </div>
+            </article>
+          </div>
         </div>
 
         <div class="stats-row-middle">
@@ -76,14 +52,12 @@
               <div class="urgent-icon-wrapper">
                 <img
                   src="assets/images/urgentwhite.svg"
-                  alt=""
+                  alt=" Urgent tasks icon"
                   aria-hidden="true"
                 />
               </div>
               <div class="urgent-info">
-                <h3
-                  [attr.aria-label]="taskStats().urgent + ' urgent tasks'"
-                >
+                <h3 [attr.aria-label]="taskStats().urgent + ' urgent tasks'">
                   {{ taskStats().urgent }}
                 </h3>
                 <p id="urgent-label">Urgent</p>
@@ -106,11 +80,7 @@
             (click)="navigateToBoard()"
           >
             <div class="email-content">
-              <h4
-                [attr.aria-label]="
-                  emailRequestsTasks() + ' email requests'
-                "
-              >
+              <h4 [attr.aria-label]="emailRequestsTasks() + ' email requests'">
                 {{ emailRequestsTasks() }}
               </h4>
               <p id="email-label">Email<br />requests</p>
@@ -120,49 +90,16 @@
 
         <div class="stats-row-bottom">
           <article
+            *ngFor="let card of bottomStatsCards()"
             class="stat-card"
-            aria-labelledby="total-tasks-label"
+            [attr.aria-labelledby]="card.id + '-label'"
             (click)="navigateToBoard()"
           >
             <div class="stat-content">
-              <h3 [attr.aria-label]="taskStats().total + ' total tasks'">
-                {{ taskStats().total }}
+              <h3 [attr.aria-label]="card.ariaLabel">
+                {{ card.value }}
               </h3>
-              <p id="total-tasks-label">Tasks In<br />Board</p>
-            </div>
-          </article>
-
-          <article
-            class="stat-card"
-            aria-labelledby="progress-tasks-label"
-            (click)="navigateToBoard()"
-          >
-            <div class="stat-content">
-              <h3
-                [attr.aria-label]="
-                  taskStats().inProgress + ' tasks in progress'
-                "
-              >
-                {{ taskStats().inProgress }}
-              </h3>
-              <p id="progress-tasks-label">Tasks In<br />Progress</p>
-            </div>
-          </article>
-
-          <article
-            class="stat-card"
-            aria-labelledby="awaiting-label"
-            (click)="navigateToBoard()"
-          >
-            <div class="stat-content">
-              <h3
-                [attr.aria-label]="
-                  awaitingFeedbackTasks() + ' tasks awaiting feedback'
-                "
-              >
-                {{ awaitingFeedbackTasks() }}
-              </h3>
-              <p id="awaiting-label">Awaiting<br />Feedback</p>
+              <p [id]="card.id + '-label'" [innerHTML]="card.label"></p>
             </div>
           </article>
         </div>
@@ -174,7 +111,7 @@
         aria-label="User greeting"
       >
         <h2 id="greeting">{{ greeting }}</h2>
-        <h3 id="userName">{{ userName() || 'User' }}</h3>
+        <h3 id="userName">{{ userName() || "User" }}</h3>
       </aside>
     </div>
   </summary>

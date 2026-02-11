@@ -5,7 +5,6 @@
 @import "../../../../styles/components/buttons";
 
 .contact-detail-page {
-  min-height: 100vh;
   background-color: $background-color;
   padding-bottom: 100px;
 }
@@ -202,8 +201,6 @@
     }
   }
 }
-
-// ========== Delete Confirmation Modal (Board-Style) ==========
 
 .confirm-dialog-overlay {
   @include flex(row, center, center);

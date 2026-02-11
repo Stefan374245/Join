@@ -36,6 +36,48 @@ export class SummaryViewComponent implements OnInit {
     this.taskService.tasksByStatus().awaitFeedback.length
   );
 
+topStatsCards = computed(() => [
+  {
+    id: 'done',
+    class: 'done-card',
+    value: this.taskStats().done,
+    label: 'Done',
+    ariaLabel: `${this.taskStats().done} tasks done`,
+    iconDefault: 'assets/images/check.svg',
+    iconHover: 'assets/images/check-2.svg'
+  },
+  {
+    id: 'todo',
+    class: 'todo-card',
+    value: this.taskStats().todo,
+    label: 'To-do',
+    ariaLabel: `${this.taskStats().todo} tasks to do`,
+    iconDefault: 'assets/images/edit.svg',
+    iconHover: 'assets/images/edit-2.svg'
+  }
+]);
+
+  bottomStatsCards = computed(() => [
+    {
+      id: 'total-tasks',
+      label: 'Tasks In<br />Board',
+      value: this.taskStats().total,
+      ariaLabel: `${this.taskStats().total} total tasks`
+    },
+    {
+      id: 'progress-tasks',
+      label: 'Tasks In<br />Progress',
+      value: this.taskStats().inProgress,
+      ariaLabel: `${this.taskStats().inProgress} tasks in progress`
+    },
+    {
+      id: 'awaiting',
+      label: 'Awaiting<br />Feedback',
+      value: this.awaitingFeedbackTasks(),
+      ariaLabel: `${this.awaitingFeedbackTasks()} tasks awaiting feedback`
+    }
+  ]);
+
   /**
    * Constructor initializes greeting based on time of day and sets up dependencies.
    * 

@@ -1,3 +1,5 @@
+@use './variables' as *;
+
 @mixin flex($direction: row, $justify: flex-start, $align: stretch) {
   display: flex;
   flex-direction: $direction;

@@ -1,4 +1,4 @@
-@import './variables';
+@use './variables' as *;
 
 @each $name, $color in $user-colors {
   .userColor-#{$name} {
@@ -14,17 +14,7 @@
   color: $white;
   font-weight: bold;
   
-  &.size-sm {
-    width: 32px;
-    height: 32px;
-    font-size: 14px;
-  }
-  
-  &.size-md {
-    width: 48px;
-    height: 48px;
-    font-size: 18px;
-  }
+
   
   &.size-lg {
     width: 64px;

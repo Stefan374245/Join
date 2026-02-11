@@ -9,7 +9,6 @@ export interface Task {
   status: 'triage' | 'todo' | 'in-progress' | 'await-feedback' | 'done';
   subtasks: Subtask[];
   attachments?: TaskAttachment[];
-
   createdAt?: Date;
   updatedAt?: Date;
   source?: 'email' | 'webhook' | 'member';

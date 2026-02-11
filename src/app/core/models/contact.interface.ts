@@ -1,6 +1,6 @@
 export interface Contact {
-  id: string; // Firestore Document ID
-  authUid?: string; // Firebase Auth UID (falls anders als Document ID)
+  id: string;
+  authUid?: string;
   firstName: string;
   lastName: string;
   email: string;

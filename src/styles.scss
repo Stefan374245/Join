@@ -1,18 +1,13 @@
-@import 'styles/variables';
-@import 'styles/mixins';
-@import 'styles/utilities';
-@import 'styles/components/animations';
-@import 'styles/components/image-viewer-animations';
+@use './styles/index' as *;
 
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  scrollbar-width: none; // Firefox (Chrome 121+, not supported in Safari/older Chrome)
-  -ms-overflow-style: none; // IE and Edge
+  -ms-overflow-style: none;
 
   &::-webkit-scrollbar {
-    display: none; // Chrome, Safari, Edge
+    display: none;
   }
 }
 
