@@ -1,5 +1,4 @@
-@import '../../../../../styles/variables';
-@import '../../../../../styles/mixins';
+@use '../../../../../styles/index' as *;
 
 fieldset.form-group {
   border: none;

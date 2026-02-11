@@ -1,5 +1,4 @@
-@import '../../../../../styles/variables';
-@import '../../../../../styles/mixins';
+@use '../../../../../styles/index' as *;
 
 .badge-list {
   @include flex(row, flex-start, stretch);
