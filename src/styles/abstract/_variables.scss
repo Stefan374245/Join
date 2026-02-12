@@ -31,7 +31,6 @@ $shadow-color: #00000040;
 $error-color: #ff0000;
 $link-color: #007CEE;
 
-// Gradient colors
 $gradient-purple: #8933FC;
 $gradient-blue: #29ABE2;
 
@@ -64,9 +63,26 @@ $user-colors: (
 );
 
 $font-family-base: 'Inter', sans-serif;
+
+// Typography Scale
 $font-size-base: 1rem;
 $font-size-lg: 1.25rem;
 $font-size-sm: 16px;
+
+// Heading Sizes (semantic)
+$font-size-h1: 3.8125rem;       // 61px - Page Titles
+$font-size-h1-mobile: 2.9375rem; // 47px - Mobile h1
+$font-size-h2: 2rem;            // 32px - Section Titles
+$font-size-h3: 1.5rem;          // 24px - Subsections
+$font-size-h4: 1.25rem;         // 20px - Small Headers
+$font-size-h5: 1rem;            // 16px - Tiny Headers
+$font-size-h6: 0.875rem;        // 14px - Smallest
+
+// Font Weights
+$font-weight-normal: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
 
 $sidebar-width: 232px;
 $sidebar-width-narrow: 80px;
@@ -92,7 +108,12 @@ $breakpoint-xxl: 1300px;
 $border-radius-sm: 4px;
 $border-radius: 8px;
 $border-radius-lg: 12px;
+$border-radius-card: 1.875rem;  // 30px - Cards
 
+// Shadow System
 $shadow-sm: 0 2px 4px rgba($black, 0.1);
 $shadow: 0 4px 6px rgba($black, 0.1);
 $shadow-lg: 0 10px 15px rgba($black, 0.1);
+$shadow-card: 0 0 4px 0 rgba($black, 0.1);
+$shadow-card-hover: 0 3px 5px rgba($black, 0.4);
+$shadow-elevated: 0 4px 12px rgba($black, 0.15);
