@@ -33,6 +33,7 @@
 }
 
 .subtask-add-button {
+  @include flex(row, center, center);
   position: absolute;
   right: 10px;
   top: 50%;
@@ -42,7 +43,6 @@
   background: none;
   border: none;
   cursor: pointer;
-  @include flex(row, center, center);
   padding: 0;
   transition: transform 0.2s ease;
 
@@ -66,8 +66,7 @@
   right: 10px;
   top: 50%;
   transform: translateY(-50%);
-  display: flex;
-  align-items: center;
+  @include flex(row, unset, center); 
   gap: 4px;
   z-index: 2;
   opacity: 1;
@@ -116,10 +115,8 @@
 }
 
 .subtask-item {
+  @include flex(row, space-between, center);
   position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
   padding: 4px 4px 4px 24px;
   border-radius: 4px;
   background: transparent;
@@ -229,7 +226,7 @@
 
 .subtask-edit-input {
   flex: 1;
-  font-size: 15px;
+  font-size: 16px;
   padding: 8px 40px 8px 8px;
   border: none;
   transition: box-shadow 0.2s ease;
@@ -289,9 +286,7 @@
   }
 
   .remaining-count-content {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    @include flex(row, space-between, center);
     width: 100%;
     margin-right: 12px;
   }
@@ -328,9 +323,7 @@
 }
 
 .dropdown-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  @include flex(unset, space-between, center); 
   padding: 8px 12px;
   transition: all 0.2s ease;
   position: relative;
@@ -372,11 +365,11 @@
   }
 
   .subtask-text {
-    font-size: 14px;
+    font-size: 16px;
   }
 
   .subtask-edit-input {
-    font-size: 14px;
+    font-size: 16px;
   }
 }
 

@@ -1,9 +1,5 @@
 @use '../abstract/variables' as *;
 
-// ============================================
-// HEADINGS - Semantic HTML Tags
-// ============================================
-
 h1 {
   font-size: $font-size-h1;
   font-weight: $font-weight-bold;
@@ -56,43 +52,34 @@ h6 {
   line-height: 1.5;
 }
 
-// ============================================
-// DISPLAY CLASSES - For Large Numbers/Stats
-// ============================================
-// Use these for dashboard stats, counters, large emphasis text
-// that needs to break semantic heading hierarchy
-
 .display-number-xl {
-  font-size: 4rem;          // 64px - Email count (summary)
+  font-size: 4rem;
   font-weight: $font-weight-semibold;
   line-height: 1;
   
   @media (max-width: 640px) {
-    font-size: 3rem;        // 48px - Responsive size
+    font-size: 3rem;
   }
 }
 
 .display-number-lg {
-  font-size: 3rem;          // 48px - Stats cards (summary)
+  font-size: 3rem;
   font-weight: $font-weight-semibold;
   line-height: 1;
 }
 
 .display-number-md {
-  font-size: 2.5rem;        // 40px - Greetings
+  font-size: 2.5rem;
   font-weight: $font-weight-medium;
   line-height: 1.2;
 }
 
 .display-number-sm {
-  font-size: 2rem;          // 32px - Medium stats
+  font-size: 2rem;
   font-weight: $font-weight-medium;
   line-height: 1.2;
 }
 
-// ============================================
-// BODY TEXT
-// ============================================
 
 p {
   font-size: $font-size-base;
@@ -101,9 +88,6 @@ p {
   color: $text-color;
 }
 
-// ============================================
-// LINKS
-// ============================================
 
 a {
   color: $link-color;
@@ -112,6 +96,6 @@ a {
   
   &:hover {
     color: $secondary-color;
-    text-decoration: underline;
+    text-decoration: none;
   }
 }

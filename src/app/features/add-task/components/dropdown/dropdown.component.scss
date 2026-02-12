@@ -167,6 +167,7 @@
   color: #000000;
   min-height: 58px;
   background-color: #ffffff;
+  text-decoration: none;
 
   &:hover:not(.disabled):not(.empty) {
     background-color: $primary-color;

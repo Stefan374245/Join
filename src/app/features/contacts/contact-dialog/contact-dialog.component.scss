@@ -45,12 +45,9 @@
 }
 
 .dialog-left {
+  @include flex(column, center, center); 
   flex: 0 0 40%;
   background: linear-gradient(135deg, #2a3647 0%, #1a2635 100%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
   padding: 50px 30px;
   color: white;
 
@@ -91,12 +88,9 @@
 
 .dialog-right {
   flex: 1;
-  display: flex;
-  flex-direction: column;
+  @include flex(column, center, center);
   overflow-y: auto;
   padding: 50px 40px;
-  align-items: center;
-  justify-content: center;
 
   @media (max-width: $breakpoint-lg) {
     padding: 100px 20px 30px 20px;

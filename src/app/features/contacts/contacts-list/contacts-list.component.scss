@@ -34,13 +34,7 @@
 .add-btn {
   @extend .btn;
   @extend .btn-primary;
-  display: flex;
-  gap: $spacing-xl;
-  align-items: center;
-  justify-content: center;
-  padding: 12px 20px;
-  width: 300px;
-  margin-bottom: $spacing-md;
+  justify-content: space-evenly;
 
   &.disabled {
     cursor: not-allowed;
