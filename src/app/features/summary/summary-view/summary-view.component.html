@@ -32,7 +32,7 @@
                 />
               </div>
               <div class="card-content">
-                <h4 [attr.aria-label]="card.ariaLabel">
+                <h4 class="display-number-lg" [attr.aria-label]="card.ariaLabel">
                   {{ card.value }}
                 </h4>
                 <p [id]="card.id + '-label'">{{ card.label }}</p>
@@ -55,7 +55,7 @@
                 />
               </div>
               <div class="urgent-info">
-                <h3 [attr.aria-label]="taskStats().urgent + ' urgent tasks'">
+                <h3 class="display-number-lg" [attr.aria-label]="taskStats().urgent + ' urgent tasks'">
                   {{ taskStats().urgent }}
                 </h3>
                 <p id="urgent-label">Urgent</p>
@@ -78,7 +78,7 @@
             (click)="navigateToBoard()"
           >
             <div class="email-content">
-              <h4 [attr.aria-label]="emailRequestsTasks() + ' email requests'">
+              <h4 class="display-number-xl" [attr.aria-label]="emailRequestsTasks() + ' email requests'">
                 {{ emailRequestsTasks() }}
               </h4>
               <p id="email-label">Email<br />requests</p>
@@ -94,7 +94,7 @@
             (click)="navigateToBoard()"
           >
             <div class="stat-content">
-              <h3 [attr.aria-label]="card.ariaLabel">
+              <h3 class="display-number-lg" [attr.aria-label]="card.ariaLabel">
                 {{ card.value }}
               </h3>
               <p [id]="card.id + '-label'" [innerHTML]="card.label"></p>
@@ -108,8 +108,8 @@
         *ngIf="!isGuest()"
         aria-label="User greeting"
       >
-        <h2 id="greeting">{{ greeting }}</h2>
-        <h3 id="userName">{{ userName() || "User" }}</h3>
+        <h2 class="display-number-md" id="greeting">{{ greeting }}</h2>
+        <h3 class="display-number-lg" id="userName">{{ userName() || "User" }}</h3>
       </aside>
     </div>
   </summary>

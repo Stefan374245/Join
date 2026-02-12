@@ -1,4 +1,5 @@
 @use "../../../../styles/index" as *;
+@use "sass:map";
 
 $card-types: (
   done: (
@@ -153,9 +154,9 @@ summary {
 @each $type, $props in $card-types {
   .summary__card--#{$type} {
     @extend %card-base;
-    width: map-get($props, width);
-    height: map-get($props, height);
-    padding: map-get($props, padding);
+    width: map.get($props, width);
+    height: map.get($props, height);
+    padding: map.get($props, padding);
     @include flex(column, center, center);
     gap: 0.8125rem;
   }
@@ -191,8 +192,7 @@ summary {
     @include flex(column, center, flex-start);
 
     h4 {
-      font-weight: 600;
-      font-size: 3rem;
+      font-weight: $font-weight-semibold;
       transition: color 0.3s ease-in-out;
     }
   }
@@ -245,8 +245,7 @@ summary {
     @include flex(column, center, flex-start);
 
     h3 {
-      font-weight: 600;
-      font-size: 3rem;
+      font-weight: $font-weight-semibold;
       transition: color 0.3s ease-in-out;
     }
   }
@@ -299,8 +298,7 @@ summary {
     text-align: center;
 
     h4 {
-      font-weight: 600;
-      font-size: 4rem;
+      font-weight: $font-weight-semibold;
       background: linear-gradient(
         180deg,
         $gradient-purple 0%,
@@ -334,8 +332,7 @@ summary {
     gap: $spacing-xs;
 
     h3 {
-      font-weight: 600;
-      font-size: 3rem;
+      font-weight: $font-weight-semibold;
       transition: color 0.3s ease-in-out;
     }
   }
@@ -356,14 +353,12 @@ summary {
   padding-top: 6.25rem;
 
   h2 {
-    font-weight: 500;
-    font-size: 2.5rem;
+    font-weight: $font-weight-medium;
     color: $primary-color;
     cursor: default;
   }
   h3 {
-    font-weight: 700;
-    font-size: 3rem;
+    font-weight: $font-weight-bold;
     color: $secondary-color;
     cursor: default;
   }
@@ -389,9 +384,6 @@ summary {
       }
     }
     .card-content {
-      h4 {
-        font-size: 2.25rem;
-      }
       p {
         font-size: $spacing-md;
       }
@@ -424,10 +416,6 @@ summary {
     padding: 1.5625rem 0;
 
     .email-content {
-      h4 {
-        font-size: 2.5rem;
-      }
-
       p {
         font-size: $spacing-md;
       }
@@ -439,23 +427,9 @@ summary {
     height: 7.25rem;
 
     .stat-content {
-      h3 {
-        font-size: 2rem;
-      }
-
       p {
         font-size: $spacing-md;
       }
-    }
-  }
-
-  .summary__greeting {
-    h2 {
-      font-size: 2rem;
-    }
-
-    h3 {
-      font-size: 2.25rem;
     }
   }
 }
@@ -476,10 +450,6 @@ summary {
         height: $spacing-md;
         width: $spacing-md;
       }
-    }
-
-    .card-content h4 {
-      font-size: 1.75rem;
     }
   }
 
@@ -502,10 +472,6 @@ summary {
       }
     }
 
-    .urgent-info h3 {
-      font-size: 1.5rem;
-    }
-
     .urgent-divider {
       height: 2.5rem;
     }
@@ -516,13 +482,5 @@ summary {
     width: 5.5rem;
     padding: $spacing-md 0;
     gap: $spacing-sm;
-  }
-
-  .summary__card--email .email-content h4 {
-    font-size: 1.75rem;
-  }
-
-  .summary__card--stat .stat-content h3 {
-    font-size: 1.5rem;
   }
 }
