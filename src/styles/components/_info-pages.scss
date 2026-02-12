@@ -1,6 +1,6 @@
-@use '../variables' as *;
-@use '../mixins' as *;
-@use '../page-layouts' as *;
+@use '../abstract/variables' as *;
+@use '../abstract/mixins' as *;
+@use '../abstract/layout-mixins' as *;
 
 @mixin info-page-main {
   @include page-layout-standard;

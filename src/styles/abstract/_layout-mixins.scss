@@ -1,6 +1,6 @@
 @use './variables' as *;
 @use './mixins' as *;
-@use './scrollbar' as *;
+@use './scrollbar-mixins' as *;
 
 @mixin page-layout-standard {
   display: flex;

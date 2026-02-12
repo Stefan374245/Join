@@ -1,5 +1,5 @@
-@use "../index" as *;
-@use "../variables" as *;
+@use "../abstract/variables" as *;
+@use "../abstract/mixins" as *;
 
 // Animation keyframes for image viewer
 @keyframes backdropFadeIn {

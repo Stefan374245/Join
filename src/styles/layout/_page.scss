@@ -1,5 +1,5 @@
-@use './variables' as *;
-@use './mixins' as *;
+@use '../abstract/variables' as *;
+@use '../abstract/mixins' as *;
 
 .page-wrapper {
   display: flex;

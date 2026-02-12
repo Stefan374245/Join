@@ -1,6 +1,6 @@
 @use "sass:color";
-@use "../mixins" as *;
-@use "../variables" as *;
+@use "../abstract/mixins" as *;
+@use "../abstract/variables" as *;
 
 .btn {
   @include flex(row, center, center);
