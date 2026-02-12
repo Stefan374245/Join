@@ -1,5 +1,4 @@
-@import "../../../../../styles/mixins";
-@import "../../../../../styles/variables";
+@use "../../../../../styles/index" as *;
 
 .upload-zone {
   border: 2px dashed #d1d1d1;
