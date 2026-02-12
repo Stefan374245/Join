@@ -39,7 +39,7 @@ export class SummaryViewComponent implements OnInit {
 topStatsCards = computed(() => [
   {
     id: 'done',
-    class: 'done-card',
+    class: 'summary__card--done',
     value: this.taskStats().done,
     label: 'Done',
     ariaLabel: `${this.taskStats().done} tasks done`,
@@ -48,7 +48,7 @@ topStatsCards = computed(() => [
   },
   {
     id: 'todo',
-    class: 'todo-card',
+    class: 'summary__card--todo',
     value: this.taskStats().todo,
     label: 'To-do',
     ariaLabel: `${this.taskStats().todo} tasks to do`,

@@ -21,7 +21,6 @@
     border-radius: $width / 2;
   }
 
-  // scrollbar-width: thin; // Removed for better browser compatibility
   scrollbar-color: $thumb-color $track-color;
 
   -ms-overflow-style: auto;

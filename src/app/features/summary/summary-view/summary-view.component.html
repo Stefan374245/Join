@@ -1,6 +1,6 @@
-<main class="main-summary" [class.guest-mode]="isGuest()">
+<main class="main-summary" [class.is-guest-mode]="isGuest()">
   <summary id="summaryContent">
-    <header class="summary-header">
+    <header class="summary__header">
       <h1>Join 360</h1>
       <div class="header-divider-wrapper">
         <div class="header-divider" aria-hidden="true"></div>
@@ -8,10 +8,9 @@
       </div>
     </header>
 
-    <div class="summary-grid">
-      <section class="stats-panel" aria-label="Task statistics overview">
+    <div class="summary__grid">
+      <section class="summary__stats-panel" aria-label="Task statistics overview">
         <div class="stats-row-top">
-          <div class="stats-row-top">
             <article
               *ngFor="let card of topStatsCards()"
               [class]="card.class"
@@ -39,12 +38,11 @@
                 <p [id]="card.id + '-label'">{{ card.label }}</p>
               </div>
             </article>
-          </div>
         </div>
 
         <div class="stats-row-middle">
           <article
-            class="urgent-card"
+            class="summary__card--urgent"
             aria-labelledby="urgent-label"
             (click)="navigateToBoard()"
           >
@@ -75,7 +73,7 @@
           </article>
 
           <article
-            class="email-card"
+            class="summary__card--email"
             aria-labelledby="email-label"
             (click)="navigateToBoard()"
           >
@@ -91,7 +89,7 @@
         <div class="stats-row-bottom">
           <article
             *ngFor="let card of bottomStatsCards()"
-            class="stat-card"
+            class="summary__card--stat"
             [attr.aria-labelledby]="card.id + '-label'"
             (click)="navigateToBoard()"
           >
@@ -106,7 +104,7 @@
       </section>
 
       <aside
-        class="greeting-card"
+        class="summary__greeting"
         *ngIf="!isGuest()"
         aria-label="User greeting"
       >
