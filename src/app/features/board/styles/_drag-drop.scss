@@ -12,7 +12,6 @@
   transition: border 0.3s ease-in-out;
 }
 
-// Elegante Drop-Animation - Subtil ohne Content-Bewegung
 .task-just-dropped {
   animation: taskDropElegant 1s ease-out;
   position: relative;
@@ -80,9 +79,7 @@
   transition: all 350ms cubic-bezier(0.34, 1.56, 0.64, 1);
   animation: placeholderBreath 2s ease-in-out infinite;
 
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex(row, center, center);
 
   &::before {
     content: "Drop here";

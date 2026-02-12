@@ -4,18 +4,14 @@
 .board-container {
   @include page-layout-board;
   .board-loading {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    @include flex(center, center);
     min-height: 300px;
     width: 100%;
   }
 }
 
 .board-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  @include flex(row, space-between, center);
   width: 100%;
   margin-top: 4rem;
   flex-shrink: 0;
@@ -33,8 +29,7 @@
   }
 
   .board-actions {
-    display: flex;
-    align-items: center;
+    @include flex(row, center, center);
     gap: $spacing-lg;
   }
 }
@@ -296,7 +291,6 @@
     padding-bottom: 120px;
     margin: 0;
     gap: 20px;
-    -webkit-overflow-scrolling: touch;
     scroll-behavior: smooth;
     height: calc(100vh - $header-height - 80px);
     top: $header-height;
@@ -304,9 +298,6 @@
     right: 0;
     overflow-y: auto;
     overflow-x: hidden;
-    
-    scrollbar-width: none;
-    -ms-overflow-style: none;
     
     &::-webkit-scrollbar {
       display: none;
@@ -317,8 +308,7 @@
 
   .board-header {
     position: relative;
-    flex-direction: column;
-    align-items: flex-start;
+    @include flex(column, center, flex-start); 
     padding: 0 0 0 0;
 
     .board-title {
@@ -326,10 +316,6 @@
     }
 
     .board-actions {
-      width: 100%;
-      flex-direction: row;
-      gap: 15px;
-
       .search-wrapper {
         flex: 1;
 
@@ -346,9 +332,7 @@
         height: 40px;
         min-width: 40px;
         padding: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        @include flex(row, center, center);
 
         span {
           display: none;
@@ -388,8 +372,7 @@
     }
 
     .column-content {
-      display: flex;
-      flex-direction: row;
+      @include flex(row, unset, unset);
       gap: 20px;
       overflow-x: auto;
       overflow-y: hidden;
@@ -399,9 +382,7 @@
       margin: 0 -5px;
       padding-left: 5px;
       padding-right: 5px;
-      -webkit-overflow-scrolling: touch;
       overscroll-behavior-x: contain;
-      scrollbar-width: auto;
 
       &::-webkit-scrollbar {
         display: auto;

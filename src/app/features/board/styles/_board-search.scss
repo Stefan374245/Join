@@ -2,8 +2,7 @@
 
 .search-wrapper {
   position: relative;
-  display: flex;
-  align-items: center;
+  @include flex(row, unset, center); 
 
   .search-input {
     width: 250px;
@@ -44,9 +43,7 @@
     border-radius: 50%;
     cursor: pointer;
     transition: background-color 0.2s ease-in-out;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    @include flex(row, center, center);
 
     &:hover {
       background-color: #e7e7e7;
