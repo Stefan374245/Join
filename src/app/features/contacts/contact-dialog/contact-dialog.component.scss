@@ -292,7 +292,7 @@ fieldset.form-group {
   gap: 15px;
   margin-top: 10px;
 
-  .btn-cancel {
+  .dialog-cancel-btn {
     @media (max-width: $breakpoint-lg) {
       display: none;
     }

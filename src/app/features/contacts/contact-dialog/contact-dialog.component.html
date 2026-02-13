@@ -78,7 +78,7 @@
             <button
               *ngIf="mode === 'edit'"
               type="button"
-              class="btn btn-secondary"
+              class="btn btn-secondary btn-icon"
               (click)="onDelete()"
               aria-label="Delete contact">
               Delete
@@ -88,7 +88,7 @@
             <button
               *ngIf="mode === 'add'"
               type="button"
-              class="btn btn-secondary btn-cancel"
+              class="btn btn-secondary btn-icon dialog-cancel-btn"
               (click)="onClose()"
               aria-label="Cancel">
               Cancel
@@ -97,7 +97,7 @@
 
             <button
               type="submit"
-              class="btn btn-primary"
+              class="btn btn-primary btn-icon"
               [disabled]="!isFormValid || isSubmitting()"
               [attr.aria-busy]="isSubmitting()">
               {{ submitButtonText }}

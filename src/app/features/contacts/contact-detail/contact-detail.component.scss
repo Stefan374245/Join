@@ -218,8 +218,4 @@
   @include flex(row, space-between, center);
   margin-top: $spacing-lg * 1.33;
   gap: $spacing-sm * 2;
-
-  button {
-    padding: $spacing-sm * 2.4 $spacing-lg * 1.6;
-  }
 }
