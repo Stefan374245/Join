@@ -1,0 +1,54 @@
+<fieldset class="form-group">
+  <div class="input-wrapper">
+    <label 
+      [attr.id]="id() + '-label'"
+      [for]="id()" 
+      [class.visually-hidden]="!labelVisible()"
+      [class.form-label]="labelVisible()"
+    >
+      {{ label() }}
+      @if (required() && labelVisible()) {
+        <span class="required" aria-label="required">*</span>
+      }
+    </label>
+    
+    <input
+      [type]="type()"
+      [id]="id()"
+      [formControl]="control()"
+      placeholder="Input field"
+      [placeholder]="placeholder()"
+      title="Input field"
+      [ngClass]="inputClasses()"
+      [attr.aria-labelledby]="id() + '-label'"
+      [attr.aria-label]="label() || placeholder() || 'Input field'"
+      [attr.aria-invalid]="hasError()"
+      [attr.aria-required]="required()"
+      [attr.aria-describedby]="ariaDescribedby()"
+      [attr.readonly]="readonly() ? true : null"
+      [attr.title]="label() || placeholder() || 'Input field'"
+      (blur)="onInputBlur()"
+    />
+    
+    @if (icon()) {
+      <img 
+        [src]="icon()" 
+        alt="" 
+        aria-hidden="true" 
+        class="input-icon" 
+      />
+    }
+  </div>
+  
+  <div class="error-container">
+    @if (hasError() && displayErrorMessage()) {
+      <output 
+        [id]="id() + '-error'" 
+        class="error-message" 
+        role="alert"
+      >
+        {{ displayErrorMessage() }}
+      </output>
+    }
+  </div>
+</fieldset>
