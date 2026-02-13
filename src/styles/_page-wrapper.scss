@@ -1,0 +1,64 @@
+@use './variables' as *;
+@use './mixins' as *;
+
+.page-wrapper {
+  @include flex(column, unset, unset);
+  height: 100%;
+  width: 100%;
+  padding: $spacing-xl;
+  box-sizing: border-box;
+
+  @media (max-width: $breakpoint-lg) {
+    padding: $spacing-lg;
+  }
+
+  @media (max-width: $breakpoint-md) {
+    padding: $spacing-md;
+  }
+}
+
+.page-header {
+  @include flex(unset, space-between, center);
+  margin-bottom: $spacing-xl;
+  flex-shrink: 0;
+
+  h1 {
+    @include page-title;
+    margin: 0;
+  }
+}
+
+.page-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-height: 0;
+
+  &.hide-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+}
+
+.page-wrapper--board {
+  .page-content {
+    padding: 0;
+  }
+}
+
+.page-wrapper--contacts {
+  padding: 0;
+  
+  .page-content {
+    overflow: hidden;
+  }
+}
+
+.page-wrapper--centered {
+  justify-content: center;
+  align-items: center;
+}
