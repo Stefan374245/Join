@@ -15,96 +15,87 @@
         <h1 class="account-header">Sign up</h1>
       </div>
 
-      <div class="signup-input-div" (keydown.enter)="!isSignupButtonDisabled() && signup()" preventDefault="keydown.enter">
-        <div class="input-div">
-          <input
-            type="text"
-            id="nameInput"
-            name="name"
-            [(ngModel)]="name"
-            placeholder="Name"
-            class="signup-input"
-            [class.red-border]="nameError"
-            (focus)="onNameFocus()"
-            (blur)="onNameBlur()"
-            autocomplete="name"
-          />
-          <img src="assets/images/person.svg" alt="Name" class="input-img" />
-        </div>
-        <span class="error-span" [class.visible]="nameError"
-          >Please enter your name</span
-        >
+      <form [formGroup]="signupForm" class="signup-input-div" (ngSubmit)="signup()" (keydown.enter)="!isSignupButtonDisabled() && signup(); $event.preventDefault()" novalidate>
+        <app-form-input
+          id="nameInput"
+          label="Name"
+          [control]="$any(signupForm.get('name'))"
+          type="text"
+          placeholder="Name"
+          icon="assets/images/person.svg"
+          [required]="true"
+        />
 
-        <div class="input-div">
-          <input
-            type="email"
-            id="emailInput"
-            name="email"
-            [(ngModel)]="email"
-            placeholder="Email"
-            class="signup-input"
-            [class.red-border]="emailError"
-            (focus)="onEmailFocus()"
-            (blur)="onEmailBlur()"
-            autocomplete="email"
-          />
-          <img src="assets/images/mail.svg" alt="Email" class="input-img" />
-        </div>
-        <span class="error-span" [class.visible]="emailError"
-          >Please enter a valid email address</span
-        >
+        <app-form-input
+          id="emailInput"
+          label="Email"
+          [control]="$any(signupForm.get('email'))"
+          type="email"
+          placeholder="Email"
+          icon="assets/images/mail.svg"
+          [required]="true"
+        />
 
-        <div class="input-div">
-          <input
-            [type]="showPassword ? 'text' : 'password'"
+        <div class="password-field-wrapper">
+          <app-form-input
             id="passwordInput"
-            name="password"
-            [(ngModel)]="password"
+            label="Password"
+            [control]="$any(signupForm.get('password'))"
+            [type]="showPassword ? 'text' : 'password'"
             placeholder="Password"
-            class="signup-input"
-            [class.red-border]="passwordError"
+            [required]="true"
+          />
+          <button 
+            type="button" 
+            (click)="togglePasswordVisibility(); $event.stopPropagation()" 
             (focus)="onPasswordFocus()"
             (blur)="onPasswordBlur()"
-            autocomplete="new-password"
-          />
-          <img
-            id="passwordImg"
-            [src]="getPasswordIcon()"
-            alt="Toggle password visibility"
-            class="input-img clickable"
-            (click)="togglePasswordVisibility()"
-            [class.active]="passwordFocused || password"
-          />
+            class="password-toggle-btn"
+            [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'"
+            title="Toggle password visibility"
+          >
+            <img 
+              [src]="getPasswordIcon()" 
+              alt="" 
+              aria-hidden="true" 
+              class="password-icon"
+              [class.active]="passwordFocused || signupForm.get('password')?.value"
+            />
+          </button>
         </div>
-        <span class="error-span" [class.visible]="passwordError"
-          >Password must be at least 6 characters with no spaces</span
-        >
 
-        <div class="input-div">
-          <input
-            [type]="showConfirmPassword ? 'text' : 'password'"
+        <div class="password-field-wrapper">
+          <app-form-input
             id="confirmPasswordInput"
-            name="confirmPassword"
-            [(ngModel)]="confirmPassword"
+            label="Confirm Password"
+            [control]="$any(signupForm.get('confirmPassword'))"
+            [type]="showConfirmPassword ? 'text' : 'password'"
             placeholder="Confirm Password"
-            class="signup-input"
-            [class.red-border]="confirmPasswordError"
+            [required]="true"
+          />
+          <div class="error-container">
+            @if (signupForm.hasError('passwordMismatch') && signupForm.get('confirmPassword')?.touched) {
+              <output class="form-level-error" role="alert">Passwords do not match</output>
+            }
+          </div>
+          <button 
+            type="button" 
+            (click)="toggleConfirmPasswordVisibility(); $event.stopPropagation()" 
             (focus)="onConfirmPasswordFocus()"
             (blur)="onConfirmPasswordBlur()"
-            autocomplete="new-password"
-          />
-          <img
-            id="confirmPasswordImg"
-            [src]="getConfirmPasswordIcon()"
-            alt="Toggle confirm password visibility"
-            class="input-img clickable"
-            (click)="toggleConfirmPasswordVisibility()"
-            [class.active]="confirmPasswordFocused || confirmPassword"
-          />
+            class="password-toggle-btn"
+            [attr.aria-label]="showConfirmPassword ? 'Hide password' : 'Show password'"
+            title="Toggle password visibility"
+          >
+            <img 
+              [src]="getConfirmPasswordIcon()" 
+              alt="" 
+              aria-hidden="true"
+              class="password-icon"
+              [class.active]="confirmPasswordFocused || signupForm.get('confirmPassword')?.value"
+            />
+          </button>
         </div>
-        <span class="error-span" [class.visible]="confirmPasswordError"
-          >Passwords do not match</span
-        >
 
         <div class="checkbox-div">
           <div class="custom-checkbox" (click)="togglePrivacy()">
@@ -112,16 +103,14 @@
               type="checkbox"
               id="privacyCheckbox"
               name="acceptPrivacy"
-              [(ngModel)]="acceptPrivacy"
+              [checked]="acceptPrivacy"
               class="privacy-checkbox"
               tabindex="0"
+              (keydown.space)="$event.preventDefault(); togglePrivacy()"
+              (keydown.enter)="$event.preventDefault(); togglePrivacy()"
             />
             <img
-              [src]="
-                acceptPrivacy
-                  ? 'assets/images/checkboxtrueblack.svg'
-                  : 'assets/images/checkboxfalseblack.svg'
-              "
+              [src]="acceptPrivacy ? 'assets/images/checkboxtrueblack.svg' : 'assets/images/checkboxfalseblack.svg'"
               alt="checkbox"
               class="checkbox-icon"
             />
@@ -133,10 +122,12 @@
             >
           </label>
         </div>
-        <span class="error-span" [class.visible]="privacyError"
-          >You must accept the Privacy Policy</span
-        >
-      </div>
+        <div class="error-container">
+          @if (privacyError) {
+            <output class="error-span" role="alert">You must accept the Privacy Policy</output>
+          }
+        </div>
+      </form>
 
       <div class="signup-button-div">
         <div class="button-row">

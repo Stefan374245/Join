@@ -14,73 +14,44 @@
       </header>
       <div class="seperator"></div>
 
-      <form class="login-input-div" (keydown.enter)="!isLoginButtonDisabled() && login()" preventDefault="keydown.enter">
-        <div class="input-div">
-          <input
-            type="email"
-            id="emailInput"
-            name="email"
-            [(ngModel)]="email"
-            placeholder="Email"
-            class="login-input"
-            [class.red-border]="emailError"
-            (focus)="onEmailFocus()"
-            (blur)="onEmailBlur()"
-            autocomplete="email"
-            aria-label="Email address"
-            aria-describedby="email-error"
-          />
-          <img
-            src="assets/images/mail.svg"
-            alt=""
-            aria-hidden="true"
-            class="input-img"
-          />
-        </div>
-        <span
-          id="email-error"
-          class="error-span"
-          [class.visible]="emailError"
-          role="alert"
-          >Please enter a valid email address</span
-        >
+      <form class="login-input-div" [formGroup]="loginForm" (ngSubmit)="login()" (keydown.enter)="!isLoginButtonDisabled() && login(); $event.preventDefault()" novalidate>
+        <app-form-input
+          id="emailInput"
+          label="Email address"
+          [control]="$any(loginForm.get('email'))"
+          type="email"
+          placeholder="Email"
+          icon="assets/images/mail.svg"
+          [required]="true"
+        />
 
-        <div class="input-div">
-          <input
-            [type]="showPassword ? 'text' : 'password'"
+        <div class="password-field-wrapper">
+          <app-form-input
             id="passwordInput"
-            name="password"
-            [(ngModel)]="password"
+            label="Password"
+            [control]="$any(loginForm.get('password'))"
+            [type]="showPassword ? 'text' : 'password'"
             placeholder="Password"
-            class="login-input"
-            [class.red-border]="passwordError"
+            [required]="true"
+          />
+          <button
+            type="button"
+            (click)="togglePasswordVisibility(); $event.stopPropagation()"
             (focus)="onPasswordFocus()"
             (blur)="onPasswordBlur()"
-            autocomplete="current-password"
-            aria-label="Password"
-            aria-describedby="password-error"
-          />
-          <img
-            id="passwordImg"
-            [src]="getPasswordIcon()"
-            alt=""
-            class="input-img clickable"
-            (click)="togglePasswordVisibility()"
-            [class.active]="passwordFocused || password"
-            role="button"
+            class="password-toggle-btn"
             [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'"
-            tabindex="0"
-            (keydown.enter)="togglePasswordVisibility()"
-            (keydown.space)="togglePasswordVisibility()"
-          />
+            title="Toggle password visibility"
+          >
+            <img
+              [src]="getPasswordIcon()"
+              alt=""
+              aria-hidden="true"
+              class="password-icon"
+              [class.active]="passwordFocused || loginForm.get('password')?.value"
+            />
+          </button>
         </div>
-        <span
-          id="password-error"
-          class="error-span"
-          [class.visible]="passwordError"
-          role="alert"
-          >Check your email and password. Please try again.</span
-        >
       </form>
 
       <nav class="login-button-div">
@@ -141,14 +112,6 @@
           </svg>
           <span>Sign in with Google</span>
         </button>
-
-        <span
-          class="error-span text-center"
-          [class.visible]="loginFailError"
-          role="alert"
-        >
-          Email and/or Password incorrect. Please try again.
-        </span>
       </nav>
 
 

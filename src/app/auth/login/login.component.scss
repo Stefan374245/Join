@@ -2,7 +2,6 @@
 
 .main-div {
   @include flex(column, flex-start, center);
-  position: relative;
   min-height: 100vh;
   max-width: $breakpoint-lg-xl;
   margin: 0 auto;
@@ -21,14 +20,6 @@
   width: 150px;
   height: 3px;
   color: $accent-color;
-}
-
-.main-content {
-  width: 100%;
-  max-width: 39.375rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
 }
 
 .main-header {
@@ -126,78 +117,56 @@
   }
 }
 
-.input-div {
-  @include flex(row, center, center);
+.login-input-div {
+  @include flex(column, center, center);
+  gap: 6px;
   width: 23.4375rem;
   padding-left: 25px;
-}
 
-.login-input {
-  border: solid 1px #d1d1d1;
-  border-radius: 10px;
-  height: 46px;
-  border-width: 1px;
-  font-size: 20px;
-  padding: 16px;
-  outline: none;
-  cursor: pointer;
-
-  &::placeholder {
-    color: #d1d1d1;
-  }
-
-  &:focus {
-    border-color: #29abe2;
-  }
-
-  &.red-border {
-    border-color: red;
+  @media (max-width: $breakpoint-md) {
+    width: 100%;
+    padding-left: 0;
   }
 }
 
-.input-img {
+.password-field-wrapper {
   position: relative;
-  right: 45px;
-  margin: 0px;
-  padding: 0px;
-  cursor: pointer;
-  transition: all 0.2s ease-in-out;
-  opacity: 0.5;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
 
-  &.clickable {
+  .password-toggle-btn {
+    position: absolute;
+    right: 15px;
+    top: 13px;
+    background: none;
+    border: none;
+    padding: 0;
     cursor: pointer;
+    z-index: 2;
+    @include flex(unset, center, center);
+    width: 20px;
+    height: 20px;
 
-    &:hover {
+    .password-icon {
+      width: 20px;
+      height: 20px;
+      opacity: 0.5;
+      transition: all 0.2s ease-in-out;
+
+      &.active {
+        opacity: 0.8;
+      }
+    }
+
+    &:hover .password-icon {
       opacity: 1;
       transform: scale(1.1);
     }
-
-    &.active {
-      opacity: 0.8;
-    }
   }
 
-  &:not(.clickable) {
-    cursor: default;
-  }
-}
-
-.error-span {
-  @include flex(row, flex-start, center);
-  padding: 0 52px;
-  width: 100%;
-  height: auto;
-  min-height: 14px;
-  font-size: 12px;
-  color: red;
-  visibility: hidden;
-
-  &.visible {
-    visibility: visible;
-  }
-
-  &.text-center {
-    text-align: center;
+  app-form-input {
+    width: 100%;
   }
 }
 
@@ -276,29 +245,6 @@
   width: 110px;
   text-decoration: none;
   text-align: center;
-}
-
-.login-success {
-  position: absolute;
-  left: 50%;
-  top: 100%;
-  transform: translate(-50%, -150%);
-  color: white;
-  font-size: 16px;
-  font-weight: bold;
-  background-color: #2a3647;
-  border-radius: 10px;
-  padding: 20px 20px;
-  text-align: center;
-  z-index: 2;
-
-  &.display-none {
-    display: none;
-  }
-}
-
-.animation {
-  transition: all 0.5s ease-in-out;
 }
 
 @media (max-width: $breakpoint-md) {
