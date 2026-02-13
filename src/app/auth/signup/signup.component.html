@@ -1,6 +1,8 @@
 <app-toast />
 <main class="main-div" [class.show]="logoAnimationComplete">
-  <img class="logo" src="assets/images/joinlogodark.svg" alt="Join Logo" />  <app-loading-spinner [localLoading]="isLoading()" />
+  <div class="signup-logo-div">
+      <img class="logo" src="assets/images/joinlogodark.svg" alt="Join Logo" />  <app-loading-spinner [localLoading]="isLoading()" />
+  </div>
 
   <div class="main-content">
     <div class="signup-div">
@@ -121,11 +123,6 @@
               >Privacy Policy</a
             >
           </label>
-        </div>
-        <div class="error-container">
-          @if (privacyError) {
-            <output class="error-span" role="alert">You must accept the Privacy Policy</output>
-          }
         </div>
       </form>
 

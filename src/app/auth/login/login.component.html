@@ -1,11 +1,13 @@
 <main class="main-div">
+  <div class="signup-logo-div">
  <img class="logo" src="assets/images/joinlogodark.svg" alt="Join Logo" />
-  <app-loading-spinner [localLoading]="isLoading()" />
-
   <aside class="signup-div">
     <span class="signup-span">Not a Join User?</span>
     <a routerLink="/signup" class="signup-link" aria-label="Sign up for a new account">Sign up</a>
   </aside>
+  </div>
+  <app-loading-spinner [localLoading]="isLoading()" />
+
 
   <article class="main-content">
     <section class="login-div">

@@ -6,7 +6,7 @@
   max-width: $breakpoint-lg-xl;
   margin: 0 auto;
   background-color: #f6f7f8;
-  padding: clamp(2.5rem, 5vh, 5rem) clamp(1.5rem, 3vw, 3rem) 2rem;
+  padding: clamp(4.5rem, 5vh, 5rem) clamp(1.5rem, 3vw, 3rem) 2rem;
   gap: clamp(1.5rem, 3vh, 2.5rem);
   overflow-y: auto;
   overflow-x: hidden;
@@ -27,10 +27,14 @@
   width: 100%;
   margin-bottom: 20px;
 }
+
+.signup-logo-div{
+  @include flex(row, space-between, center);
+  width: 100%;
+  max-width: $breakpoint-lg-xl;
+}
+
 .signup-div {
-  position: absolute;
-  top: clamp(2rem, 5vh, 5rem);
-  right: clamp(1rem, 3vw, 5rem);
   @include flex(row, center, center);
   width: auto;
   gap: 35px;
@@ -70,8 +74,7 @@
 }
 
 .logo {
-  position: static;
-  height: clamp(4rem, 8vw, 6.25rem);
+  height: 120px;
   width: auto;
   align-self: flex-start;
   flex-shrink: 0;
@@ -82,10 +85,7 @@
 }
 
 .login-div {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-evenly;
-  align-items: center;
+  @include flex(column, space-evenly, center);
   width: fit-content;
   background-color: white;
   border-radius: 30px;
@@ -172,10 +172,7 @@
 
 .login-button-div {
   width: 100%;
-  display: flex;
-  justify-content: space-evenly;
-  flex-direction: column;
-  align-items: center;
+  @include flex(column, space-evenly, center);
   gap: 10px;
   position: relative;
 }
@@ -189,9 +186,7 @@
 }
 
 .divider {
-  display: flex;
-  align-items: center;
-  text-align: center;
+  @include flex(unset, center, center);
   width: 100%;
   margin: 20px 0;
   color: #a8a8a8;
@@ -245,6 +240,13 @@
   width: 110px;
   text-decoration: none;
   text-align: center;
+  color: $white;
+  background-color: $primary-color;
+
+  &:hover {
+    color: $white;
+    background-color: $primary-dark;
+  }
 }
 
 @media (max-width: $breakpoint-md) {
