@@ -23,67 +23,65 @@
       </div>
     }
 
-    <form class="request-form" (ngSubmit)="onSubmit()">
+    <form class="request-form" [formGroup]="requestForm" (ngSubmit)="onSubmit()" novalidate>
       <div class="form-group">
-        <label for="requestType">Request Type *</label>
+        <label for="requestType" class="form-label">Request Type <span class="required">*</span></label>
         <app-dropdown
           id="requestType"
           [items]="requestTypeItems"
-          [selectedIds]="[requestType]"
+          [selectedIds]="[getControl('requestType').value]"
           placeholder="Select request type"
           [searchable]="false"
           [multiple]="false"
           [showClearButton]="false"
           (selectionChange)="onRequestTypeChange($event)"
+          (closed)="onRequestTypeBlur()"
         ></app-dropdown>
+
+        @if (requestTypeHasError()) {
+          <span class="field-error-message" role="alert">Request type is required</span>
+        }
       </div>
 
-      <div class="form-group">
-        <label for="requestTitle">Title *</label>
-        <input
-          type="text"
-          id="requestTitle"
-          [(ngModel)]="requestTitle"
-          name="requestTitle"
-          placeholder="Brief description of your request"
-          required
-        />
-      </div>
+      <app-form-input
+        id="requestTitle"
+        label="Title"
+        [control]="getControl('requestTitle')"
+        type="text"
+        placeholder="Brief description of your request"
+        [required]="true"
+        [labelVisible]="true"
+      />
 
-      <div class="form-group">
-        <label for="requestDescription">Description *</label>
-        <textarea
-          id="requestDescription"
-          [(ngModel)]="requestDescription"
-          name="requestDescription"
-          rows="6"
-          placeholder="Please provide detailed information about your request..."
-          required
-        ></textarea>
-      </div>
+      <app-form-field
+        id="requestDescription"
+        label="Description"
+        type="textarea"
+        [control]="getControl('requestDescription')"
+        [rows]="6"
+        placeholder="Please provide detailed information about your request..."
+        [required]="true"
+        errorMessage="Description is required, min 10 characters"
+      />
 
-      <div class="form-group">
-        <label for="stakeholderName">Your Name</label>
-        <input
-          type="text"
-          id="stakeholderName"
-          [(ngModel)]="stakeholderName"
-          name="stakeholderName"
-          placeholder="John Doe"
-        />
-      </div>
+      <app-form-input
+        id="stakeholderName"
+        label="Your Name"
+        [control]="getControl('stakeholderName')"
+        type="text"
+        placeholder="John Doe"
+        [labelVisible]="true"
+      />
 
-      <div class="form-group">
-        <label for="stakeholderEmail">Your Email *</label>
-        <input
-          type="email"
-          id="stakeholderEmail"
-          [(ngModel)]="stakeholderEmail"
-          name="stakeholderEmail"
-          placeholder="john@example.com"
-          required
-        />
-      </div>
+      <app-form-input
+        id="stakeholderEmail"
+        label="Your Email"
+        [control]="getControl('stakeholderEmail')"
+        type="email"
+        placeholder="john@example.com"
+        [required]="true"
+        [labelVisible]="true"
+      />
 
       @if (submitError) {
         <div class="error-message">{{ submitError }}</div>

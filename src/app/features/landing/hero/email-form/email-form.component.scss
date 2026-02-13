@@ -38,14 +38,12 @@
     }
 
     .title-section {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      @include flex(row, space-between, center);
       margin-bottom: 2rem;
 
       h1 {
         font-size: 2rem;
-        color: #2a3647;
+        color: $primary-color;
       }
 
       .back-link-mobile {
@@ -59,7 +57,7 @@
 
     .limit-banner {
       background-color: #ffebee;
-      color: #c62828;
+      color: $error-color;
       padding: 1rem;
       border-radius: 8px;
       margin-bottom: 2rem;
@@ -72,15 +70,22 @@
       padding: 2rem;
       border-radius: 12px;
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
 
       .form-group {
         margin-bottom: 1.5rem;
 
-        label {
+        .form-label {
           display: block;
           font-weight: 500;
           margin-bottom: 0.5rem;
-          color: #2a3647;
+          color: $primary-color;
+
+          .required {
+            color: $error-color;
+          }
         }
 
         input,
@@ -92,10 +97,11 @@
           border-radius: 8px;
           font-size: 1rem;
           transition: border-color 0.3s;
+          resize: none!important;
 
           &:focus {
             outline: none;
-            border-color: #29abe2;
+            border-color: $secondary-color;
           }
         }
 
@@ -103,11 +109,44 @@
           resize: vertical;
           font-family: inherit;
         }
+
+        .field-error-message {
+          display: block;
+          font-size: 12px;
+          color: $error-color;
+          margin-top: 4px;
+        }
+      }
+
+      app-form-field {
+        width: 100%;
+      }
+
+      app-form-input {
+        width: 100%;
+
+        ::ng-deep {
+          .form-label {
+            color: $primary-color;
+          }
+
+          .form-input {
+            height: auto;
+            min-height: 46px;
+            padding: 0.75rem;
+            border-radius: 8px;
+            font-size: 1rem;
+          }
+
+          .error-message {
+            margin-left: 0;
+          }
+        }
       }
 
       .error-message {
         background-color: #ffebee;
-        color: #c62828;
+        color: $error-color;
         padding: 0.75rem;
         border-radius: 8px;
         margin-bottom: 1rem;
@@ -132,11 +171,11 @@
         transition: all 0.3s;
 
         &.btn-primary {
-          background-color: #29abe2;
+          background-color: $secondary-color;
           color: white;
 
           &:hover:not(:disabled) {
-            background-color: #1d8ec2;
+            background-color: $accent-color;
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(41, 171, 226, 0.3);
           }
