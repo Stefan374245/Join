@@ -105,7 +105,7 @@
           class="attachments-section"
           *ngIf="currentTask.attachments?.length"
         >
-          <span class="detail-label">Attachments</span>
+          <span class="detail-label">Uploaded files</span>
           <app-attachments-display 
             [attachments]="currentTask.attachments || []"
             [isEditMode]="false"
@@ -173,8 +173,7 @@
   </div>
 </div>
 
-<!-- Image Viewer -->
-<!-- DEBUG: showImageViewer={{showImageViewer()}} hasTask={{!!task()}} hasAttachments={{!!task()?.attachments}} attachmentsLength={{task()?.attachments?.length}} -->
+
 @if (showImageViewer() && task()?.attachments && task()!.attachments!.length > 0) {
   <app-image-viewer
     [images]="task()!.attachments!"

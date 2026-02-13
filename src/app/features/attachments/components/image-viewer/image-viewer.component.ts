@@ -121,7 +121,6 @@ export class ImageViewerComponent {
    * @remarks Sets up reactive effects for initial index and image preloading, and event listeners for window resize and body scroll lock
    */
   constructor() {
-    // Effect for initializing currentIndex - guards ensure safe execution
     effect(() => {
       const images = this.images();
       if (!images || images.length === 0) return;
@@ -133,7 +132,6 @@ export class ImageViewerComponent {
       }
     });
 
-    // Effect for preloading images
     effect(() => {
       const images = this.images();
       if (!images || images.length === 0) return;
