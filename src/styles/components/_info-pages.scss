@@ -13,7 +13,7 @@
 
 .info-page-content {
   @include flex(column, flex-start, flex-start);
-  gap: $spacing-xl;
+  gap: 1rem;
   width: 100%;
   max-width: 900px;
   margin: 0;
@@ -36,7 +36,6 @@
     padding-left: $spacing-lg;
     margin: 0;
     @include flex(column, flex-start, flex-start);
-    gap: $spacing-sm;
 
     li {
       line-height: 1.6;
@@ -55,7 +54,7 @@
 
 .info-page-section {
   @include flex(column, flex-start, flex-start);
-  gap: $spacing-md;
+  gap: 0.5rem;
   width: 100%;
   scroll-margin-top: 120px;
 
@@ -177,8 +176,7 @@
     list-style: none;
     padding: 0;
     margin: 0;
-    @include flex(column, flex-start, flex-start);
-    gap: $spacing-sm;
+    @include flex(column, flex-start, flex-start);;
 
     li a {
       color: $link-color;

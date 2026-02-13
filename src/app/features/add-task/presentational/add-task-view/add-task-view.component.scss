@@ -25,6 +25,7 @@
 }
 
 .task-edit-card {
+  @include flex(column, flex-start, stretch);
   position: relative;
   width: 1116px;
   max-width: 95%;
@@ -35,7 +36,6 @@
   padding: 48px 40px;
   animation: slideInFromRight 0.3s ease-out;
   overflow: auto;
-  @include flex(column, flex-start, stretch);
   gap: 24px;
 
   @include hide-scrollbar;
@@ -50,11 +50,11 @@
     cursor: pointer;
     padding: 8px;
     border-radius: 50%;
-    
+
     &:hover {
       transform: scale(1.1);
     }
-    
+
     img {
       width: 32px;
       height: 32px;
@@ -131,8 +131,7 @@
 .form-column {
   width: 50%;
   @include flex(column, flex-start, stretch);
-  gap: 8px;
-  
+
   @media (max-width: $breakpoint-md) {
     width: 100%;
   }
@@ -155,7 +154,7 @@
   align-self: stretch;
   border: none;
   margin: 0;
-  
+
   @media (max-width: $breakpoint-md) {
     display: none;
   }
@@ -170,14 +169,14 @@
   gap: 5px;
 
   &.required::after {
-    content: '';
-    color: #ff3d00;
+    content: "";
+    color: $error-color;
     margin-left: 4px;
   }
 }
 
 .required-indicator {
-  color: #ff3d00;
+  color: $error-color;
   font-weight: bold;
 }
 
@@ -205,60 +204,11 @@
 .form-actions {
   @include flex(row, flex-end, center);
   gap: 16px;
-  margin-top: 24px;
   width: 100%;
-  
+
   @media (max-width: $breakpoint-md) {
     flex-direction: row;
     gap: 12px;
-  }
-}
-
-.btn {
-  @include flex(row, center, center);
-  gap: 8px;
-  padding: 18px 10px;
-  border: none;
-  border-radius: 10px;
-  font-size: 21px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.125s ease-in-out;
-  font-family: 'Inter', sans-serif;
-  min-width: 110px;
-  
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-  
-  &:hover:not(:disabled) {
-    transform: scale(1.05);
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.15);
-  }
-  
-  img, svg {
-    width: 16px;
-    height: 16px;
-  }
-}
-
-.btn-secondary {
-  background-color: transparent;
-  color: #2a3647;
-  border: 1px solid #2a3647;
-  
-  &:hover:not(:disabled) {
-    background-color: #f0f0f0;
-  }
-}
-
-.btn-primary {
-  background-color: #2a3647;
-  color: white;
-  
-  &:hover:not(:disabled) {
-    background-color: #29abe2;
   }
 }
 
@@ -273,20 +223,14 @@
     flex-direction: column;
     gap: 24px;
   }
-  
+
   .form-column {
     width: 100%;
   }
-  
+
   .form-actions {
     flex-direction: row;
     gap: 12px;
-  }
-  
-  .btn {
-    font-size: 18px;
-    padding: 14px 8px;
-    min-width: 90px;
   }
 }
 
@@ -294,13 +238,32 @@
   .section-label {
     font-size: 18px;
   }
-  
-  .btn {
-    font-size: 16px;
-    padding: 12px 8px;
-  }
-  
+
   .add-task-header .page-title {
     font-size: 28px;
+  }
+}
+
+@media (max-width: 420px) {
+  .task-edit-overlay {
+    padding: 10px;
+  }
+  .task-edit-card {
+    padding: 20px 10px !important;
+    .close-btn {
+      top: 24px;
+      right: 16px;
+    }
+  }
+}
+
+@media (max-width: 360px) {
+  .button-group {
+    gap: 6px;
+  }
+  .button-group-item {
+    min-width: auto;
+    font-size: 16px;
+    padding: 0 !important;
   }
 }

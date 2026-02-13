@@ -16,8 +16,8 @@
   line-height: 1;
 
   img {
-    width: 20px;
-    height: 20px;
+    width: 32px;
+    height: 32px;
     transition: filter 0.2s, transform 0.2s;
   }
 
@@ -87,7 +87,8 @@
   color: $primary-color;
   font-weight: 400;
   transition: color 0.2s ease;
-
+  cursor: pointer;
+  
   img {
     width: 24px;
     height: 24px;
@@ -117,7 +118,7 @@
 .btn-text {
   background: none;
   color: $primary-color;
-  padding: $border-radius $spacing-md;
+  padding: 8px $spacing-md;
   font-weight: 400;
 
   &:hover:not(:disabled) {
@@ -231,6 +232,7 @@
 .button-group {
   display: flex;
   gap: 16px;
+  margin: 0!important;
   @media (max-width: $breakpoint-lg) {
     justify-content: center;
   }
@@ -240,11 +242,11 @@
   position: relative;
   width: fit-content;
   font-size: 12px;
-  color: #2a3647;
+  color: $primary-color;
   margin-top: 24px;
 
   span {
-    color: #ff3d00;
+    color: $error-color;
   }
 }
 
