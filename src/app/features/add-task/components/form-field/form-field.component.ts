@@ -3,7 +3,7 @@ import {
     ChangeDetectionStrategy, 
     input, 
     computed,
-    effect
+    signal
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormControl, ValidationErrors } from '@angular/forms';
@@ -33,12 +33,15 @@ export class FormFieldComponent {
     max = input<string | number>('');
     maxLength = input<number>(1000);
     spellcheck = input<boolean>(false);
+
+    private updateTrigger = signal(0);
     
     /**
      * Determines if field has validation errors
      * @returns True if control is touched and invalid
      */
     hasError = computed(() => {
+        this.updateTrigger();
         const ctrl = this.control();
         return ctrl.touched && ctrl.invalid;
     });
@@ -48,6 +51,7 @@ export class FormFieldComponent {
      * @returns Validation errors or null
      */
     validationErrors = computed((): ValidationErrors | null => {
+        this.updateTrigger();
         const ctrl = this.control();
         if (ctrl.touched && ctrl.errors) {
             return ctrl.errors;
@@ -112,4 +116,10 @@ export class FormFieldComponent {
             'error': this.hasError()
         };
     });
+
+    onFieldBlur(): void {
+        const ctrl = this.control();
+        ctrl.markAsTouched();
+        this.updateTrigger.set(Date.now());
+    }
 }

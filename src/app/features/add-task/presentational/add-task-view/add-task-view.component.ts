@@ -373,6 +373,18 @@ export class AddTaskViewComponent implements OnInit, AfterViewInit {
     this.updateFormValidity();
   }
 
+  onCategoryBlur(): void {
+    const categoryControl = this.taskForm.get("category");
+    categoryControl?.markAsTouched();
+    categoryControl?.updateValueAndValidity({ emitEvent: false });
+    this.updateFormValidity();
+  }
+
+  categoryHasError(): boolean {
+    const categoryControl = this.taskForm?.get("category");
+    return !!categoryControl && categoryControl.touched && categoryControl.invalid;
+  }
+
   /**
    * Removes a contact ID from the list of selected contact IDs.
    *

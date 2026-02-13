@@ -42,9 +42,9 @@
 
   .close-btn {
     position: absolute;
-    top: 24px;
+    top: 48px;
     right: 24px;
-    z-index: 260;
+    z-index: 20;
     background: none;
     border: none;
     cursor: pointer;
@@ -52,12 +52,12 @@
     border-radius: 50%;
     
     &:hover {
-      background: rgba(0, 0, 0, 0.1);
+      transform: scale(1.1);
     }
     
     img {
-      width: 20px;
-      height: 20px;
+      width: 32px;
+      height: 32px;
     }
   }
 
@@ -167,6 +167,7 @@
   font-size: 20px;
   font-weight: 400;
   color: #2a3647;
+  gap: 5px;
 
   &.required::after {
     content: '';
@@ -187,6 +188,18 @@
   color: #2a3647;
   margin-top: 16px;
   margin-bottom: 8px;
+}
+
+.field-error-message {
+  display: block;
+  margin-top: 0;
+  font-size: 12px;
+  color: $error-color;
+}
+
+.field-feedback {
+  min-height: 20px;
+  margin-top: 4px;
 }
 
 .form-actions {

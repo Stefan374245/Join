@@ -1,5 +1,5 @@
 <fieldset class="form-group">
-  <label [for]="id()" class="form-label">
+  <label [attr.id]="id() + '-label'" [for]="id()" class="form-label">
     {{ label() }}
     @if (required()) {
       <span class="required" aria-label="required">*</span>
@@ -10,10 +10,16 @@
     <textarea
       [id]="id()"
       [formControl]="control()"
+      placeholder="Input field"
       [placeholder]="placeholder()"
       [rows]="rows()"
       [maxlength]="maxLength()"
       [ngClass]="inputClasses()"
+      (blur)="onFieldBlur()"
+      [attr.aria-labelledby]="id() + '-label'"
+      [attr.aria-label]="label() || placeholder() || 'Input field'"
+      [attr.title]="label() || placeholder() || 'Input field'"
+      
       [attr.aria-invalid]="hasError()"
       [attr.aria-required]="required()"
       [attr.aria-describedby]="ariaDescribedby()"
@@ -27,9 +33,14 @@
         type="date"
         [id]="id()"
         [formControl]="control()"
+        title="Date field"
         [min]="min()"
         [max]="max()"
         [ngClass]="inputClasses()"
+        (blur)="onFieldBlur()"
+        [attr.aria-labelledby]="id() + '-label'"
+        [attr.aria-label]="label() || 'Date field'"
+        [attr.title]="label() || 'Date field'"
         [attr.aria-invalid]="hasError()"
         [attr.aria-required]="required()"
         [attr.aria-describedby]="ariaDescribedby()"
@@ -42,11 +53,17 @@
       [type]="type()"
       [id]="id()"
       [formControl]="control()"
+      placeholder="Input field"
       [placeholder]="placeholder()"
+      title="Input field"
       [min]="type() === 'number' ? min() : undefined"
       [max]="type() === 'number' ? max() : undefined"
       [maxlength]="maxLength()"
       [ngClass]="inputClasses()"
+      (blur)="onFieldBlur()"
+      [attr.aria-labelledby]="id() + '-label'"
+      [attr.aria-label]="label() || placeholder() || 'Input field'"
+      [attr.title]="label() || placeholder() || 'Input field'"
       [attr.aria-invalid]="hasError()"
       [attr.aria-required]="required()"
       [attr.aria-describedby]="ariaDescribedby()"
@@ -54,23 +71,24 @@
     />
   }
   
-  @if (hasError() && displayErrorMessage()) {
-    <span 
-      [id]="id() + '-error'" 
-      class="error-message" 
-      role="alert"
-      aria-live="polite"
-    >
-      {{ displayErrorMessage() }}
-    </span>
-  }
-  
-  @if (hint() && !hasError()) {
-    <span 
-      [id]="id() + '-hint'" 
-      class="form-hint"
-    >
-      {{ hint() }}
-    </span>
-  }
+  <div class="feedback-container" aria-live="polite">
+    @if (hasError() && displayErrorMessage()) {
+      <span 
+        [id]="id() + '-error'" 
+        class="error-message" 
+        role="alert"
+      >
+        {{ displayErrorMessage() }}
+      </span>
+    }
+    
+    @if (hint() && !hasError()) {
+      <span 
+        [id]="id() + '-hint'" 
+        class="form-hint"
+      >
+        {{ hint() }}
+      </span>
+    }
+  </div>
 </fieldset>

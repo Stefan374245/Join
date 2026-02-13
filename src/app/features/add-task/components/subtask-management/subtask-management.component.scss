@@ -58,6 +58,12 @@
   .add-icon {
     width: 24px;
     height: 24px;
+    opacity: 0.45;
+    transition: opacity 0.2s ease;
+  }
+
+  &:hover:not(:disabled) .add-icon {
+    opacity: 1;
   }
 }
 
@@ -105,13 +111,13 @@
 .subtasks-list {
   margin-top: 0.25rem;
   list-style: none;
-  border: 1px solid #d1d1d1;
+  border: 1px solid $gray-300;
   border-radius: 10px;
   overflow-y: auto;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
   padding: 0;
   max-height: 200px;
-  background: white;
+  background: $white;
 }
 
 .subtask-item {
@@ -129,7 +135,7 @@
     top: 50%;
     transform: translateY(-50%);
     font-size: 24px;
-    color: black;
+    color: $primary-color;
     transition: color 0.2s ease;
   }
 
@@ -146,7 +152,7 @@
 
   &:hover {
     .subtask-text {
-      color: black;
+      color: $primary-color;
     }
     &::before {
       color: $accent-color;
@@ -262,7 +268,7 @@
 .subtask-edit-divider {
   width: 1px;
   height: 18px;
-  background: #e0e0e0;
+  background: $white;
   margin: 0 4px;
 }
 
@@ -282,7 +288,7 @@
     content: "•";
     position: absolute;
     left: 8px;
-    color: black;
+    color: $primary-color;
   }
 
   .remaining-count-content {
@@ -308,7 +314,7 @@
   top: 100%;
   left: 0;
   right: 0;
-  background: white;
+  background: $white;
   border-radius: 4px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   z-index: 1000;

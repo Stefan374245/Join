@@ -96,7 +96,16 @@
               [searchable]="false"
               [multiple]="false"
               (selectionChange)="onCategorySelection($event)"
+              (closed)="onCategoryBlur()"
             />
+
+            <div class="field-feedback" aria-live="polite">
+              @if (categoryHasError()) {
+                <span class="field-error-message" role="alert">
+                  Category is required
+                </span>
+              }
+            </div>
           </div>
         </section>
 

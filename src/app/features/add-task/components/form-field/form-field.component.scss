@@ -1,17 +1,13 @@
 @use '../../../../../styles/index' as *;
 
 fieldset.form-group {
+    @include flex(column, unset, unset);
     border: none;
     padding: 0;
-    margin: 0 0 8px 0;
-    display: flex;
-    flex-direction: column;
-    position: relative;
 }
 
 .form-label {
-    display: flex;
-    align-items: center;
+    @include flex(row, unset, unset);
     margin-bottom: 8px;
     font-size: 20px;
     font-weight: 400;
@@ -30,14 +26,14 @@ fieldset.form-group {
     width: 100%;
     height: 48px;
     padding: 0 16px;
-    border: 1px solid #d1d1d1;
+    border: 0.5px solid $gray-300;
     border-radius: 10px;
     font-size: 20px;
-    color: #2a3647;
+    color: $primary-color;
     font-family: inherit;
     transition: border-color 0.2s;
     box-sizing: border-box;
-    background-color: #ffffff;
+    background-color:$white;
 
     &:focus {
         outline: none;
@@ -45,11 +41,11 @@ fieldset.form-group {
     }
 
     &::placeholder {
-        color: #a8a8a8;
+        color: $gray-400;
     }
 
     &.error {
-        border-color: #ff3d00;
+        border-color: $error-color;
     }
 
     &:disabled {
@@ -60,12 +56,12 @@ fieldset.form-group {
 }
 
 .form-textarea {
+    @include hide-scrollbar;
     resize: none;
     min-height: 119px;
     height: auto;
     padding-top: 16px;
     padding-bottom: 16px;
-    @include hide-scrollbar;
 
     &:focus {
         @include custom-scrollbar(
@@ -78,8 +74,8 @@ fieldset.form-group {
 
 .error-message {
     font-size: 12px;
-    color: #ff3d00;
-    margin-top: 4px;
+    color: $error-color;
+    margin-top: 0;
     display: block;
     line-height: 1.4;
     animation: slideDownFade 0.2s ease-out;
@@ -98,20 +94,29 @@ fieldset.form-group {
 
 .form-hint {
     font-size: 12px;
-    color: #6c757d;
-    margin-top: 4px;
+    color: rgba($primary-color, 0.6);
+    margin-top: 0;
     display: block;
     line-height: 1.4;
 }
 
+.feedback-container {
+    min-height: 22px;
+    margin-top: 4px;
+}
+
 .input-wrapper {
     position: relative;
-    display: flex;
-    align-items: center;
+    @include flex(row, unset, center);
 
     input[type="date"] {
         position: relative;
         padding-right: 50px;
+        color: $primary-color;
+
+        &::-webkit-datetime-edit {
+            color: $primary-color;
+        }
 
         &::-webkit-calendar-picker-indicator {
             position: absolute;
@@ -163,15 +168,14 @@ input[type="number"] {
 
 .form-input:focus-visible,
 .form-textarea:focus-visible {
-    outline: 2px solid $accent-color;
-    outline-offset: 2px;
+    outline: 0.5px solid $accent-color;
     border-color: $accent-color;
 }
 
 @media (prefers-contrast: high) {
     .form-input,
     .form-textarea {
-        border-width: 2px;
+        border-width: 1px;
     }
 
     .error-message {
