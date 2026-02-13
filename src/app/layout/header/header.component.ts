@@ -19,8 +19,14 @@ export class HeaderComponent {
   showUserMenu = false;
 
   user = this.authService.currentUserSignal;
+  isAuthenticated = this.authService.isAuthenticated;
   userDisplayName = this.authService.userDisplayName;
   userEmail = this.authService.userEmail;
+
+  shouldShowHelpIcon(): boolean {
+    const isLegalInfoPage = this.router.url.startsWith('/privacy-policy') || this.router.url.startsWith('/legal-notice');
+    return this.isAuthenticated() || !isLegalInfoPage;
+  }
 
   /**
    * Computed signal for user's initials.

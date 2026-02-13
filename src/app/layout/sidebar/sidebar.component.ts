@@ -1,6 +1,14 @@
-import { Component } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { AuthService } from '../../core/services/auth.service';
+
+interface SidebarNavLink {
+  path: string;
+  label: string;
+  iconGray: string;
+  iconWhite?: string;
+}
 
 @Component({
   selector: 'app-sidebar',
@@ -10,7 +18,11 @@ import { CommonModule } from '@angular/common';
   styleUrl: './sidebar.component.scss'
 })
 export class SidebarComponent {
-  navLinks = [
+  private authService = inject(AuthService);
+
+  isAuthenticated = this.authService.isAuthenticated;
+
+  navLinks: SidebarNavLink[] = [
     {
       path: '/summary',
       label: 'Summary',
@@ -41,5 +53,18 @@ export class SidebarComponent {
     { path: '/privacy-policy', label: 'Privacy Policy' },
     { path: '/legal-notice', label: 'Legal Notice' }
   ];
+
+  guestLinks: SidebarNavLink[] = [
+    {
+      path: '/login',
+      label: 'Log in',
+      iconGray: 'assets/images/logingray.svg'
+    }
+  ];
+  
+
+  displayedNavLinks = computed(() => {
+    return this.isAuthenticated() ? this.navLinks : this.guestLinks;
+  });
 }
 

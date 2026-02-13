@@ -1,11 +1,11 @@
-<aside class="sidebar">
+<aside class="sidebar" [class.guest-sidebar]="!isAuthenticated()">
   <div class="sidebar-logo">
     <img src="assets/images/joinlogowhite.svg" alt="Join Logo" />
   </div>
 
   <nav class="sidebar-nav">
     <a
-      *ngFor="let link of navLinks"
+      *ngFor="let link of displayedNavLinks()"
       [routerLink]="link.path"
       routerLinkActive="active"
       class="nav-link">
@@ -14,11 +14,13 @@
         [alt]="link.label" 
         class="icon-gray"
         title="icons" />
+      @if (link.iconWhite) {
       <img 
         [src]="link.iconWhite" 
         [alt]="link.label" 
         class="icon-white"
         title="icons" />
+      }
       <span>{{ link.label }}</span>
     </a>
   </nav>

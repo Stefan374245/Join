@@ -1,4 +1,4 @@
-@use '../../../styles/index' as *;
+@use "../../../styles/index" as *;
 
 .sidebar {
   height: 100%;
@@ -11,8 +11,7 @@
 
 .sidebar-logo {
   @include flex(row, center, center);
-  padding: $spacing-xl 0;
-  margin-top: $spacing-md;
+  padding-top: 64px;
 
   img {
     width: 80px;
@@ -28,13 +27,12 @@
 .sidebar-nav {
   @include flex(column, flex-start, stretch);
   flex: 1;
-  padding: 3rem 0;
+  padding-top: 114px;
 }
 
 .nav-link {
   @include flex(row, flex-start, center);
-  padding: $spacing-sm $spacing-lg;
-  padding-left: 45px;
+  padding: 12px 56px;
   text-decoration: none;
   color: $font-color;
   font-size: $font-size-base;
@@ -43,22 +41,23 @@
   white-space: nowrap;
   gap: $spacing-sm;
   margin-bottom: 15px;
+  text-align: left;
 
   .icon-gray {
     display: block;
-    width: 24px;
-    height: 24px;
+    width: 30px;
+    height: 30px;
   }
 
   .icon-white {
     display: none;
-    width: 24px;
-    height: 24px;
+    width: 30px;
+    height: 30px;
   }
 
   &:hover {
-    background-color: #2A3D59;
-    color: $white;
+    color: $secondary-color;
+    background-color: rgba($accent-color, 0.1);
   }
 
   &.active {
@@ -82,21 +81,22 @@
 
 .sidebar-legal {
   @include flex(column, center, center);
-  padding: $spacing-lg 0;
+  padding-bottom: 64px;
   gap: $spacing-md;
-  border-top: 1px solid rgba($white, 0.1);
 }
 
 .legal-link {
-  color: #A8A8A8;
-  font-size: 12px;
+  color: #a8a8a8;
+  font-size: 16px;
   text-decoration: none;
   transition: all 0.2s ease;
   white-space: nowrap;
+  padding: 12px 56px;
+  border-radius: 16px;
 
   &:hover {
     color: $secondary-color;
-    font-weight: bold;
+    background-color: rgba($accent-color, 0.1);
   }
 }
 
@@ -109,7 +109,7 @@
     }
 
     .nav-link {
-      padding-left: $spacing-md;
+      padding-left: 40px;
       justify-content: center;
 
       span {
@@ -123,7 +123,6 @@
     }
 
     .sidebar-legal {
-      flex-direction: row;
       gap: $spacing-sm;
 
       .legal-link {
@@ -173,6 +172,21 @@
 
     .sidebar-legal {
       display: none;
+    }
+  }
+
+  .sidebar.guest-sidebar {
+    .sidebar-legal {
+      @include flex(row, center, center);
+      gap: $spacing-md;
+      border-top: none;
+      padding: 0 $spacing-md;
+
+      .legal-link {
+        font-size: 16px;
+        writing-mode: initial;
+        text-orientation: initial;
+      }
     }
   }
 }

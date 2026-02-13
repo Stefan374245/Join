@@ -20,10 +20,18 @@
 
 .index-nav {
   @extend .info-page-nav;
+
+  a:hover {
+    cursor: pointer;
+  }
 }
 
 .privacy-section {
   @extend .info-page-section;
+
+  a:hover {
+    cursor: pointer;
+  }
 }
 
 .privacy-footer {

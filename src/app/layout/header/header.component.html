@@ -6,7 +6,7 @@
     </div>
 
     <section class="header-right">
-      <a routerLink="/help" class="help-icon" title="Help">
+      <a routerLink="/help" class="help-icon" title="Help" *ngIf="shouldShowHelpIcon()">
         <img src="assets/images/help20x20.svg" alt="Help" />
       </a>
 

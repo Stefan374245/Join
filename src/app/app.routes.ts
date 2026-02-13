@@ -80,13 +80,11 @@ export const routes: Routes = [
   },
   {
     path: 'legal-notice',
-    component: LegalNoticeComponent,
-    canActivate: [authGuard]
+    component: LegalNoticeComponent
   },
   {
     path: 'privacy-policy',
-    component: PrivacyPolicyComponent,
-    canActivate: [authGuard]
+    component: PrivacyPolicyComponent
   },
   { path: '**', redirectTo: '/logo-animation' }
 ];
