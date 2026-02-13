@@ -1,58 +1,63 @@
 <app-loading-spinner [localLoading]="isDeleting() || isUpdating()" />
 
-<div class="contact-detail-page" *ngIf="contact() && !loading()">
-  <div class="detail-header">
+<article class="contact-detail" *ngIf="contact() && !loading()">
+  <header class="contact-detail__header">
     <h1>Contacts</h1>
-    <button class="back-btn" (click)="goBack()">
-      <img src="assets/images/arrow-left-line.svg" alt="Back" />
+    <button class="contact-detail__back-btn" (click)="goBack()" aria-label="Go back">
+      <img src="assets/images/arrow-left-line.svg" alt="" aria-hidden="true" />
     </button>
-  </div>
-  <div class="detail-subheader">
-    <p>Better with a team</p>
-  </div>
-  <div class="separator"></div>
+  </header>
+  
+  <p class="contact-detail__subheader">Better with a team</p>
+  
+  <hr class="contact-detail__separator" aria-hidden="true" />
 
-  <div class="contact-info">
-    <div class="contact-avatar">
-      <span class="avatar-large" [style.background-color]="contact()!.color">
-        {{ contact()!.initials }}
-      </span>
-    </div>
+  <section class="contact-detail__info" aria-label="Contact profile">
+    <figure class="contact-detail__avatar" [style.background-color]="contact()!.color">
+      {{ contact()!.initials }}
+    </figure>
 
-    <div class="contact-name">
+    <hgroup class="contact-detail__name">
       <h2>{{ contact()!.firstName }} {{ contact()!.lastName }}</h2>
-    </div>
-  </div>
-  <div class="contact-details">
-    <h3>Contact Information</h3>
+    </hgroup>
+  </section>
+  
+  <section class="contact-detail__details" aria-labelledby="contact-info-heading">
+    <h3 id="contact-info-heading">Contact Information</h3>
 
-    <div class="detail-item">
-      <strong>Email</strong>
-      <a [href]="'mailto:' + contact()!.email" class="contact-email">{{ contact()!.email }}</a>
-    </div>
+    <dl class="contact-detail__item">
+      <dt class="contact-detail__item-label">Email</dt>
+      <dd>
+        <a [href]="'mailto:' + contact()!.email" class="contact-detail__email">{{ contact()!.email }}</a>
+      </dd>
+    </dl>
 
-    <div class="detail-item">
-      <strong>Phone</strong>
-      <span>{{ contact()!.phone || '-' }}</span>
-    </div>
-  </div>
+    <dl class="contact-detail__item">
+      <dt class="contact-detail__item-label">Phone</dt>
+      <dd class="contact-detail__item-value">{{ contact()!.phone || '-' }}</dd>
+    </dl>
+  </section>
 
-  <div class="mobile-action-menu" (clickOutside)="closeActionMenu()">
-    <button class="fab-button" (click)="toggleActionMenu()">
-      <img src="assets/images/more_vert.svg" alt="More" />
+  <nav class="fab-menu" aria-label="Contact actions" (clickOutside)="closeActionMenu()">
+    <button class="fab-menu__button" (click)="toggleActionMenu()" aria-label="More actions" aria-expanded="showActionMenu" aria-haspopup="menu">
+      <img src="assets/images/more_vert.svg" alt="" aria-hidden="true" />
     </button>
 
-    <div class="action-popup" *ngIf="showActionMenu">
-      <button class="popup-item" (click)="editContact()">
-        <img src="assets/images/edit-2.svg" alt="Edit" />
-        <span>Edit</span>
-      </button>
-      <button class="popup-item" (click)="showDeleteConfirmation()">
-        <img src="assets/images/delete.svg" alt="Delete" />
-        <span>Delete</span>
-      </button>
-    </div>
-  </div>
+    <menu class="fab-menu__popup" *ngIf="showActionMenu" role="menu">
+      <li role="none">
+        <button class="fab-menu__item" (click)="editContact()" role="menuitem">
+          <img src="assets/images/edit-2.svg" alt="" aria-hidden="true" />
+          <span>Edit</span>
+        </button>
+      </li>
+      <li role="none">
+        <button class="fab-menu__item" (click)="showDeleteConfirmation()" role="menuitem">
+          <img src="assets/images/delete.svg" alt="" aria-hidden="true" />
+          <span>Delete</span>
+        </button>
+      </li>
+    </menu>
+  </nav>
 
   <app-contact-dialog
     *ngIf="showDialog"
@@ -62,23 +67,25 @@
     (save)="saveContact($event)"
     (delete)="handleDelete($event)">
   </app-contact-dialog>
-</div>
+</article>
 
-<div *ngIf="loading()" class="loading-state">
+<aside *ngIf="loading()" class="loading-state" role="status" aria-live="polite">
   Loading contact...
-</div>
+</aside>
 
-<!-- Delete Confirmation Modal (Board-Style) -->
 <div
-  class="confirm-dialog-overlay"
+  class="confirm-dialog__overlay"
   *ngIf="showDeleteConfirm()"
-  (click)="cancelDelete()">
+  (click)="cancelDelete()"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="dialog-title">
   <div class="confirm-dialog" stopPropagation>
-    <h3>Delete permanently?</h3>
-    <p *ngIf="contact()">Delete contact {{ contact()!.firstName }} {{ contact()!.lastName }}?</p>
-    <div class="confirm-buttons">
+    <h3 id="dialog-title" class="confirm-dialog__title">Delete permanently?</h3>
+    <p class="confirm-dialog__text" *ngIf="contact()">Delete contact {{ contact()!.firstName }} {{ contact()!.lastName }}?</p>
+    <footer class="confirm-dialog__actions">
       <button class="btn btn-secondary" (click)="cancelDelete()">Cancel</button>
       <button class="btn btn-danger" (click)="confirmDelete()">Delete</button>
-    </div>
+    </footer>
   </div>
 </div>

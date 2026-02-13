@@ -1,17 +1,19 @@
+
 import { Component, inject, Output, EventEmitter, Input, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormControl } from '@angular/forms';
 import { StopPropagationDirective } from '../../../shared/directives';
 import { ContactService } from '../../../core/services/contact.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { Contact } from '../../../core/models/contact.interface';
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
+import { FormInputComponent } from '../../../shared/components/form-input/form-input.component';
 
 @Component({
   selector: 'app-contact-dialog',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, LoadingSpinnerComponent, StopPropagationDirective],
+  imports: [CommonModule, ReactiveFormsModule, LoadingSpinnerComponent, StopPropagationDirective, FormInputComponent],
   templateUrl: './contact-dialog.component.html',
   styleUrl: './contact-dialog.component.scss'
 })
@@ -33,6 +35,8 @@ export class ContactDialogComponent implements OnInit {
 
   /**
    * Component initialization - sets up form and populates in edit mode
+   * @return void
+   * @remarks Initializes reactive form and populates with existing contact data if in edit mode
    */
   ngOnInit(): void {
     this.initForm();
@@ -43,6 +47,8 @@ export class ContactDialogComponent implements OnInit {
 
   /**
    * Initializes reactive form with validation rules
+   * @return void
+   * @remarks Sets up form controls with appropriate validators for contact fields
    */
   initForm(): void {
     this.contactForm = this.fb.group({
@@ -55,6 +61,8 @@ export class ContactDialogComponent implements OnInit {
 
   /**
    * Populates form with existing contact data in edit mode
+   * @return void
+   * @remarks Uses patchValue to fill form controls with contact's current information for editing
    */
   populateForm(): void {
     if (this.contact) {
@@ -77,7 +85,7 @@ export class ContactDialogComponent implements OnInit {
 
   /**
    * Returns dialog title based on mode
-   * @returns Dialog title string
+   * @returns Title string
    */
   get title(): string {
     return this.mode === 'add' ? 'Add contact' : 'Edit contact';

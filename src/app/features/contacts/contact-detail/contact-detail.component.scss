@@ -1,23 +1,22 @@
 @use "../../../../styles/index" as *;
 
-.contact-detail-page {
+.contact-detail {
   background-color: $background-color;
   padding-bottom: 100px;
 }
 
-.detail-header {
+.contact-detail__header {
   @include flex(row, space-between, center);
   gap: $spacing-lg;
   padding: $spacing-lg $spacing-xl 0 $spacing-xl;
 
   h1 {
     @include page-title;
-
     margin: 0;
   }
 }
 
-.back-btn {
+.contact-detail__back-btn {
   @include flex(row, center, center);
   background: none;
   border: none;
@@ -35,35 +34,24 @@
   }
 }
 
-.detail-subheader {
+.contact-detail__subheader {
   padding: 0 $spacing-xl;
-
-  p {
-    margin: 0;
-    font-size: 18px;
-    color: $gray-600;
-  }
 }
 
-.separator {
+.contact-detail__separator {
   width: 90px;
   height: 3px;
   background: $accent-color;
   margin: 12px 32px;
 }
 
-.contact-info {
+.contact-detail__info {
   padding: $spacing-xl;
   margin: $spacing-lg 0;
   text-align: center;
 }
 
-.contact-avatar {
-  @include flex(row, center, center);
-  margin-bottom: $spacing-lg;
-}
-
-.avatar-large {
+.contact-detail__avatar {
   @include flex(row, center, center);
   width: 120px;
   height: 120px;
@@ -73,9 +61,11 @@
   font-size: 48px;
   border: solid 3px $white;
   box-shadow: 0 4px 12px rgba($black, 0.15);
+  margin: 0 auto $spacing-lg;
 }
 
-.contact-name {
+.contact-detail__name {
+
   h2 {
     font-size: 36px;
     font-weight: 500;
@@ -84,7 +74,7 @@
   }
 }
 
-.contact-details {
+.contact-detail__details {
   padding: $spacing-xl;
   margin: $spacing-lg 0;
 
@@ -95,35 +85,37 @@
   }
 }
 
-.detail-item {
+.contact-detail__item {
   @include flex(column, center, unset);
   gap: $spacing-sm;
-  margin-bottom: $spacing-lg;
+  margin: 0 0 $spacing-lg 0;
+  padding: 0;
 
-  strong {
+  dt {
     font-weight: 600;
     color: $gray-700;
   }
 
-  span {
+  dd {
+    margin: 0;
     font-size: 18px;
   }
 }
 
-.contact-email {
+.contact-detail__email {
   color: $accent-color;
   text-decoration: none;
   font-size: 18px;
 }
 
-.mobile-action-menu {
+.fab-menu {
   position: fixed;
   bottom: 100px;
   right: 24px;
   z-index: 100;
 }
 
-.fab-button {
+.fab-menu__button {
   @include flex(row, center, center);
   width: 56px;
   height: 56px;
@@ -146,7 +138,7 @@
   }
 }
 
-.action-popup {
+.fab-menu__popup {
   position: absolute;
   bottom: 64px;
   right: 32px;
@@ -156,69 +148,78 @@
   min-width: 180px;
   overflow: hidden;
   animation: slideUpFade 0.2s ease;
+  margin: 0;
+  padding: 0;
+  list-style: none;
 
-  .popup-item {
-    @include flex(row, flex-start, center);
-    gap: 12px;
-    padding: 16px 20px;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-    border: none;
-    background: none;
-    width: 100%;
-
-    &:hover {
-      background-color: $gray-100;
-    }
-
-    &:not(:last-child) {
-      border-bottom: 1px solid $gray-200;
-    }
-
-    img {
-      width: 20px;
-      height: 20px;
-    }
+  li {
+    list-style: none;
+    margin: 0;
+    padding: 0;
   }
 }
 
-.confirm-dialog-overlay {
+.fab-menu__item {
+  @include flex(row, flex-start, center);
+  gap: 12px;
+  padding: 16px 20px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  border: none;
+  background: none;
+  width: 100%;
+
+  &:hover {
+    background-color: $gray-100;
+  }
+
+  &:not(:last-child) {
+    border-bottom: 1px solid $gray-200;
+  }
+
+  img {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.confirm-dialog__overlay {
   @include flex(row, center, center);
   position: fixed;
   inset: 0;
   background-color: rgba($black, 0.3);
   animation: slideInFromRight 0.2s ease-out;
   z-index: 1001;
+}
 
-  .confirm-dialog {
-    background-color: $white;
-    padding: $spacing-lg * 1.33 $spacing-xl * 1.5;
-    border-radius: $border-radius-lg;
-    box-shadow: $shadow-lg;
-    text-align: center;
-    max-width: 400px;
+.confirm-dialog {
+  background-color: $white;
+  padding: $spacing-lg * 1.33 $spacing-xl * 1.5;
+  border-radius: $border-radius-lg;
+  box-shadow: $shadow-lg;
+  text-align: center;
+  max-width: 400px;
+}
 
-    h3 {
-      font-size: 24px;
-      font-weight: 600;
-      color: $primary-color;
-      margin: 0 0 $spacing-lg 0;
-    }
+.confirm-dialog__title {
+  font-size: 24px;
+  font-weight: 600;
+  color: $primary-color;
+  margin: 0 0 $spacing-lg 0;
+}
 
-    p {
-      font-size: 16px;
-      color: $gray-700;
-      margin: 0 0 $spacing-lg * 1.6 0;
-    }
+.confirm-dialog__text {
+  font-size: 16px;
+  color: $gray-700;
+  margin: 0 0 $spacing-lg * 1.6 0;
+}
 
-    .confirm-buttons {
-      @include flex(row, space-between, center);
-      margin-top: $spacing-lg * 1.33;
-      gap: $spacing-sm * 2;
+.confirm-dialog__actions {
+  @include flex(row, space-between, center);
+  margin-top: $spacing-lg * 1.33;
+  gap: $spacing-sm * 2;
 
-      button {
-        padding: $spacing-sm * 2.4 $spacing-lg * 1.6;
-      }
-    }
+  button {
+    padding: $spacing-sm * 2.4 $spacing-lg * 1.6;
   }
 }

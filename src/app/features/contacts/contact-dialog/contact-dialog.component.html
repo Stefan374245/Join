@@ -1,150 +1,124 @@
-<div class="dialog-overlay" (click)="onClose()">
-  <!-- Loading Spinner -->
+<div class="dialog-overlay" (click)="onClose()" role="dialog" aria-modal="true" aria-labelledby="dialog-title">
   <app-loading-spinner [localLoading]="isSubmitting()" />
 
-  <div class="dialog-container" stopPropagation>
-    <button class="close-btn" (click)="onClose()" type="button">
-      <img src="assets/images/closeWhite.svg" alt="Close" />
+  <article class="dialog-container" stopPropagation>
+    <button class="close-btn" (click)="onClose()" type="button" aria-label="Close dialog">
+      <img src="assets/images/closeWhite.svg" alt="" aria-hidden="true" />
     </button>
 
-    <div class="dialog-left">
-      <div class="branding">
+    <aside class="dialog-left">
+      <header class="branding">
         <img src="assets/images/joinlogowhite.svg" alt="Join Logo" class="logo" />
-        <h1>{{ title }}</h1>
+        <h1 id="dialog-title">{{ title }}</h1>
         <p>Tasks are better with a team!</p>
-        <div class="divider"></div>
-      </div>
-    </div>
+        <hr class="divider" aria-hidden="true" />
+      </header>
+    </aside>
 
-    <div class="dialog-right">
+    <section class="dialog-right">
       <div class="form-container">
-        <div class="avatar-section-desktop">
-          <div class="avatar" [style.background-color]="avatarColor">
+        <figure class="avatar-section-desktop">
+          <div class="avatar" [style.background-color]="avatarColor" [attr.aria-label]="avatarInitials ? 'Avatar with initials ' + avatarInitials : 'Default avatar'">
             <img
               *ngIf="!avatarInitials"
               src="assets/images/personwhite.svg"
-              alt="Person"
+              alt=""
+              aria-hidden="true"
               class="avatar-icon" />
-            <span *ngIf="avatarInitials" class="avatar-initials">{{ avatarInitials }}</span>
+            <span *ngIf="avatarInitials" class="avatar-initials" aria-hidden="true">{{ avatarInitials }}</span>
           </div>
-        </div>
+        </figure>
 
-        <form [formGroup]="contactForm" (ngSubmit)="onSubmit()" class="contact-form">
-          <div class="form-group">
-            <div class="input-wrapper">
-              <input
-                type="text"
-                id="firstName"
-                formControlName="firstName"
-                placeholder="First Name"
-                class="form-input"
-                [class.error]="contactForm.get('firstName')?.touched && contactForm.get('firstName')?.invalid"
-              />
-              <img src="assets/images/person.svg" alt="Person" class="input-icon" />
-            </div>
-            <span class="error-message" *ngIf="contactForm.get('firstName')?.touched">
-              {{ getFieldError('firstName') }}
-            </span>
-          </div>
+        <form [formGroup]="contactForm" (ngSubmit)="onSubmit()" class="contact-form" novalidate>
+          <app-form-input
+            id="firstName"
+            label="First Name"
+            [control]="$any(contactForm.get('firstName'))"
+            type="text"
+            placeholder="First Name"
+            icon="assets/images/person.svg"
+            [required]="true"
+          />
 
-          <div class="form-group">
-            <div class="input-wrapper">
-              <input
-                type="text"
-                id="lastName"
-                formControlName="lastName"
-                placeholder="Last Name"
-                class="form-input"
-                [class.error]="contactForm.get('lastName')?.touched && contactForm.get('lastName')?.invalid"
-              />
-              <img src="assets/images/person.svg" alt="Person" class="input-icon" />
-            </div>
-            <span class="error-message" *ngIf="contactForm.get('lastName')?.touched">
-              {{ getFieldError('lastName') }}
-            </span>
-          </div>
+          <app-form-input
+            id="lastName"
+            label="Last Name"
+            [control]="$any(contactForm.get('lastName'))"
+            type="text"
+            placeholder="Last Name"
+            icon="assets/images/person.svg"
+            [required]="true"
+          />
 
-          <div class="form-group">
-            <div class="input-wrapper">
-              <input
-                type="email"
-                id="email"
-                formControlName="email"
-                placeholder="Email"
-                class="form-input"
-                [class.error]="contactForm.get('email')?.touched && contactForm.get('email')?.invalid"
-                [readonly]="mode === 'edit'"
-              />
-              <img src="assets/images/mail.svg" alt="Email" class="input-icon" />
-            </div>
-            <span class="error-message" *ngIf="contactForm.get('email')?.touched">
-              {{ getFieldError('email') }}
-            </span>
-          </div>
+          <app-form-input
+            id="email"
+            label="Email"
+            [control]="$any(contactForm.get('email'))"
+            type="email"
+            placeholder="Email"
+            icon="assets/images/mail.svg"
+            [required]="true"
+            [readonly]="mode === 'edit'"
+          />
 
-          <div class="form-group">
-            <div class="input-wrapper">
-              <input
-                type="tel"
-                id="phone"
-                formControlName="phone"
-                placeholder="Phone (optional)"
-                class="form-input"
-                [class.error]="contactForm.get('phone')?.touched && contactForm.get('phone')?.invalid"
-              />
-              <img src="assets/images/call.svg" alt="Phone" class="input-icon" />
-            </div>
-            <span class="error-message" *ngIf="contactForm.get('phone')?.touched">
-              {{ getFieldError('phone') }}
-            </span>
-          </div>
+          <app-form-input
+            id="phone"
+            label="Phone (optional)"
+            [control]="$any(contactForm.get('phone'))"
+            type="tel"
+            placeholder="Phone (optional)"
+            icon="assets/images/call.svg"
+          />
 
-          <div class="error-message general-error" *ngIf="errorMessage">
+          <output class="error-message general-error" *ngIf="errorMessage" role="alert" aria-live="assertive">
             {{ errorMessage }}
-          </div>
+          </output>
 
-          <div class="button-group">
+          <footer class="button-group">
             <button
               *ngIf="mode === 'edit'"
               type="button"
               class="btn btn-secondary"
-              (click)="onDelete()">
+              (click)="onDelete()"
+              aria-label="Delete contact">
               Delete
-              <img src="assets/images/canceldarkblue.svg" alt="Delete" class="btn-icon" />
+              <img src="assets/images/canceldarkblue.svg" alt="" aria-hidden="true" class="btn-icon" />
             </button>
 
             <button
               *ngIf="mode === 'add'"
               type="button"
               class="btn btn-secondary btn-cancel"
-              (click)="onClose()">
+              (click)="onClose()"
+              aria-label="Cancel">
               Cancel
-              <img src="assets/images/canceldarkblue.svg" alt="Cancel" class="btn-icon" />
+              <img src="assets/images/canceldarkblue.svg" alt="" aria-hidden="true" class="btn-icon" />
             </button>
 
             <button
               type="submit"
               class="btn btn-primary"
-              [disabled]="!isFormValid || isSubmitting()">
+              [disabled]="!isFormValid || isSubmitting()"
+              [attr.aria-busy]="isSubmitting()">
               {{ submitButtonText }}
-              <img src="assets/images/check.svg" alt="Submit" class="btn-icon" />
+              <img src="assets/images/check.svg" alt="" aria-hidden="true" class="btn-icon" />
             </button>
-          </div>
+          </footer>
         </form>
       </div>
-    </div>
+    </section>
 
-    <!-- Avatar Mobile -->
-    <div class="avatar-section-mobile">
-      <div class="avatar" [style.background-color]="avatarColor">
+    <figure class="avatar-section-mobile">
+      <div class="avatar" [style.background-color]="avatarColor" [attr.aria-label]="avatarInitials ? 'Avatar with initials ' + avatarInitials : 'Default avatar'">
         <img
           *ngIf="!avatarInitials"
           src="assets/images/personwhite.svg"
-          alt="Person"
+          alt=""
+          aria-hidden="true"
           class="avatar-icon" />
-        <span *ngIf="avatarInitials" class="avatar-initials">{{ avatarInitials }}</span>
+        <span *ngIf="avatarInitials" class="avatar-initials" aria-hidden="true">{{ avatarInitials }}</span>
       </div>
-    </div>
-  </div>
+    </figure>
+  </article>
 </div>
 
