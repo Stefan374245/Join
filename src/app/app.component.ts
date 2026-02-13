@@ -11,7 +11,7 @@ import { ToastComponent } from './shared/components/toast/toast.component';
   styleUrl: './app.component.scss',
 })
 export class AppComponent {
-  title(_title: any) {
+  title(_title: string) {
     throw new Error('Method not implemented.');
   }
   showMainLayout = false;

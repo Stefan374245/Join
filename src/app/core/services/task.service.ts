@@ -11,7 +11,6 @@ import { Firestore } from "@angular/fire/firestore";
 import { Auth, authState } from "@angular/fire/auth";
 import { Task, Subtask, TaskAttachment } from "../models/task.interface";
 import { AttachmentStorageService } from "../../features/attachments";
-import { mapFirestoreToTask } from "./tasks/task-mapper.helper";
 import {
   filterTasksByQuery,
   groupTasksByStatus,
