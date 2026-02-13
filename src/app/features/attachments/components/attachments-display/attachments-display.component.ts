@@ -1,4 +1,4 @@
-import { Component, input, output, signal } from '@angular/core';
+import { Component, input, output, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TaskAttachment } from '../../../../core/models/task.interface';
 import { formatFileSize } from '../../../../shared/utils';
@@ -15,8 +15,19 @@ import { formatFileSize } from '../../../../shared/utils';
   styleUrl: './attachments-display.component.scss'
 })
 export class AttachmentsDisplayComponent {
+  readonly maxVisible = 3;
   attachments = input<TaskAttachment[]>([]);
   isEditMode = input<boolean>(false);
+
+  visibleAttachments = computed<TaskAttachment[]>(() => {
+    return this.attachments().slice(0, this.maxVisible);
+  });
+
+  hiddenCount = computed<number>(() => {
+    return Math.max(0, this.attachments().length - this.maxVisible);
+  });
+
+  hasHidden = computed<boolean>(() => this.hiddenCount() > 0);
   
   viewAttachment = output<TaskAttachment>();
   deleteAttachment = output<TaskAttachment>();
@@ -58,15 +69,21 @@ export class AttachmentsDisplayComponent {
    * Handles the click event on a task attachment.
    * Emits the selected attachment using the `viewAttachment` event emitter.
    *
-   * @param attachment - The task attachment that was clicked.
+   * If the last visible tile has a +X marker, clicking it opens the first hidden image.
    */
-  onAttachmentClick(event: MouseEvent, attachment: TaskAttachment): void {
+  onAttachmentClick(event: MouseEvent, attachment: TaskAttachment, visibleIndex: number): void {
     if (!attachment) {
       console.error('❌ Attachment is undefined!');
       return;
     }
+
+    const shouldOpenFirstHidden = this.hasHidden() && visibleIndex === this.maxVisible - 1;
+    const attachmentToOpen = shouldOpenFirstHidden
+      ? this.attachments()[this.maxVisible] ?? attachment
+      : attachment;
+
     event.stopPropagation();
-        this.viewAttachment.emit(attachment);
+    this.viewAttachment.emit(attachmentToOpen);
   }
 
  

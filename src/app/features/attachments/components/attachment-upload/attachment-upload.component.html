@@ -1,15 +1,20 @@
 <section class="attachment-upload">
   <p class="upload-hint">Allowed file types are JPEG and PNG</p>
-  <div class="upload-zone" dragDrop (filesDropped)="handleFilesDropped($event)">
+  <p class="upload-limit-hint" [class.limit-alert]="isLimitHintFlashing()">
+    Max {{ maxFilesPerUpload }} at once · {{ attachments().length }}/{{ maxFilesTotal }} selected
+  </p>
+
+  <div class="upload-zone" [class.disabled]="isAtLimit()" dragDrop (filesDropped)="handleFilesDropped($event)">
     <div class="upload-content">
       <p class="upload-text">
         Drag a file or 
-        <label class="file-picker-label">
+        <label class="file-picker-label" [class.disabled]="isAtLimit()">
           browse files <img src="assets/images/addDark.svg" alt="" role="presentation" class="addfile" />
           <input
             type="file"
             accept="image/jpeg,image/png,.jpg,.jpeg,.png"
             multiple
+            [disabled]="isAtLimit()"
             (change)="onFileSelected($event)"
             class="file-input"
           />

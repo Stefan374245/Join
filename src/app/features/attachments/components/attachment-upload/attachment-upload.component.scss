@@ -10,6 +10,13 @@
   color: #a8a8a8;
   cursor: pointer;
 
+  &.disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+    border-color: #d1d1d1;
+    background-color: #f3f3f3;
+  }
+
   &.drag-over {
     border-color:$accent-color;
     background-color: #e8f4fa;
@@ -41,6 +48,11 @@
     input[type="file"] {
       display: none;
     }
+
+    &.disabled {
+      pointer-events: none;
+      opacity: 0.7;
+    }
   }
 }
 
@@ -66,6 +78,31 @@
   margin-bottom: 8px;
   font-size: 16px;
   color: #a8a8a8;
+}
+
+.upload-limit-hint {
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: #6c757d;
+
+  &.limit-alert {
+    animation: limitHintFlash 2s ease-in-out 1;
+  }
+}
+
+@keyframes limitHintFlash {
+  0% {
+    color: #6c757d;
+  }
+  35% {
+    color: $error-color;
+  }
+  70% {
+    color: #6c757d;
+  }
+  100% {
+    color: $error-color;
+  }
 }
 
 .error-message {

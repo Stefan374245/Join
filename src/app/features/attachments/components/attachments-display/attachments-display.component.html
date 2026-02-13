@@ -13,8 +13,8 @@
   <ul class="attachments-grid">
     <li 
       class="attachment-card" 
-      *ngFor="let attachment of attachments()"
-      (click)="onAttachmentClick($event, attachment)"
+      *ngFor="let attachment of visibleAttachments(); let i = index"
+      (click)="onAttachmentClick($event, attachment, i)"
       (mouseenter)="setHoveredAttachment(attachment.id)"
       (mouseleave)="setHoveredAttachment(null)"
       [title]="attachment.filename"
@@ -33,6 +33,10 @@
           (load)="onImageLoaded(attachment.id)"
           (loadstart)="onImageLoadStart(attachment.id)"
         />
+
+        <div class="more-overlay" *ngIf="hasHidden() && i === maxVisible - 1">
+          +{{ hiddenCount() }}
+        </div>
         
         <button 
           *ngIf="isEditMode() && hoveredAttachment() === attachment.id"

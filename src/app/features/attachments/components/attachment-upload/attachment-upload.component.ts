@@ -1,10 +1,12 @@
-import { Component, EventEmitter, Output, Input, signal, inject, effect } from '@angular/core';
+import { Component, EventEmitter, Output, Input, signal, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DragDropDirective } from '../../../../shared/directives';
 import { FileValidationService } from '../../services/file-validation.service';
 import { ImageCompressionService } from '../../services/image-compression.service';
 import { TaskAttachment } from '../../../../core/models/task.interface';
 import { formatFileSize } from '../../../../shared/utils';
+import { FILE_UPLOAD } from '../../../../shared/constants';
+import { ToastService } from '../../../../core/services/toast.service';
 /**
  * Component for uploading and managing task attachments
  * Supports drag & drop and file picker for JPEG/PNG images
@@ -19,11 +21,19 @@ import { formatFileSize } from '../../../../shared/utils';
 export class AttachmentUploadComponent {
   private fileValidation = inject(FileValidationService);
   private imageCompression = inject(ImageCompressionService);
+  private toastService = inject(ToastService);
   private hasInitialized = false;
+  private limitHintFlashTimeout: ReturnType<typeof setTimeout> | null = null;
+  readonly maxFilesPerUpload = FILE_UPLOAD.MAX_FILES_PER_UPLOAD;
+  readonly maxFilesTotal = FILE_UPLOAD.MAX_FILES_TOTAL;
 
   @Input() set initialAttachments(attachments: TaskAttachment[] | undefined) {
     if (!this.hasInitialized && attachments && attachments.length > 0) {
-      this.attachments.set([...attachments]);
+      const limitedAttachments = attachments.slice(0, this.maxFilesTotal);
+      this.attachments.set([...limitedAttachments]);
+      if (attachments.length > this.maxFilesTotal) {
+        this.errorMessage.set(`Only ${this.maxFilesTotal} images are allowed in total.`);
+      }
       this.hasInitialized = true;
     }
   }
@@ -33,6 +43,9 @@ export class AttachmentUploadComponent {
   attachments = signal<TaskAttachment[]>([]);
   errorMessage = signal<string | null>(null);
   isDragOver = signal<boolean>(false);
+  isLimitHintFlashing = signal<boolean>(false);
+  isAtLimit = computed(() => this.attachments().length >= this.maxFilesTotal);
+  remainingSlots = computed(() => Math.max(0, this.maxFilesTotal - this.attachments().length));
 
   /**
    * Handle drag over event
@@ -43,6 +56,9 @@ export class AttachmentUploadComponent {
   onDragOver(event: DragEvent): void {
     event.preventDefault();
     event.stopPropagation();
+    if (this.isAtLimit()) {
+      return;
+    }
     this.isDragOver.set(true);
   }
 
@@ -64,6 +80,10 @@ export class AttachmentUploadComponent {
    */
   async handleFilesDropped(files: File[]): Promise<void> {
     this.isDragOver.set(false);
+    if (this.isAtLimit()) {
+      this.notifyLimitAndFlash(`Limit total ${this.maxFilesTotal}. Remove one image to add more.`);
+      return;
+    }
     await this.processFiles(files);
   }
 
@@ -92,9 +112,40 @@ export class AttachmentUploadComponent {
   private async processFiles(files: File[]): Promise<void> {
     this.errorMessage.set(null);
 
-    for (const file of files) {
+    if (!this.canStart(files)) return;
+
+    const filesToProcess = this.applyLimits(files);
+    for (const file of filesToProcess) {
       await this.processFile(file);
     }
+  }
+
+  private canStart(files: File[]): boolean {
+    if (files.length === 0) return false;
+    if (!this.isAtLimit()) return true;
+
+    this.notifyLimitAndFlash(`Limit total ${this.maxFilesTotal}. Remove one image to add more.`);
+    return false;
+  }
+
+  private applyLimits(files: File[]): File[] {
+    const withinPerUploadLimit = this.limitPerUpload(files);
+    return this.limitBySlots(withinPerUploadLimit);
+  }
+
+  private limitPerUpload(files: File[]): File[] {
+    if (files.length <= this.maxFilesPerUpload) return files;
+
+    this.notifyLimitAndFlash(`You can upload max ${this.maxFilesPerUpload} images at once. Limit total ${this.maxFilesTotal}.`);
+    return files.slice(0, this.maxFilesPerUpload);
+  }
+
+  private limitBySlots(files: File[]): File[] {
+    const availableSlots = this.remainingSlots();
+    if (files.length <= availableSlots) return files;
+
+    this.notifyLimitAndFlash(`Limit total ${this.maxFilesTotal}. Only ${availableSlots} slot(s) left.`);
+    return files.slice(0, availableSlots);
   }
 
   /**
@@ -156,6 +207,20 @@ export class AttachmentUploadComponent {
    */
   private generateId(): string {
     return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  }
+
+  private notifyLimitAndFlash(message: string): void {
+    this.toastService.showError(message, 3500);
+
+    if (this.isLimitHintFlashing()) {
+      return;
+    }
+
+    this.isLimitHintFlashing.set(true);
+    this.limitHintFlashTimeout = setTimeout(() => {
+      this.isLimitHintFlashing.set(false);
+      this.limitHintFlashTimeout = null;
+    }, 2000);
   }
 
   /**
