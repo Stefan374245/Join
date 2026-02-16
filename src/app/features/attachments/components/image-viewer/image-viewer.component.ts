@@ -1,14 +1,4 @@
-import {
-  Component,
-  ChangeDetectionStrategy,
-  input,
-  output,
-  signal,
-  computed,
-  effect,
-  inject,
-  HostListener,
-} from "@angular/core";
+import { Component, ChangeDetectionStrategy, input, output, signal, computed, effect, inject, HostListener,} from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { LiveAnnouncer } from "@angular/cdk/a11y";
 import { StopPropagationDirective } from "../../../../shared/directives";
@@ -17,6 +7,10 @@ import { AttachmentStorageService } from "../../services/attachment-storage.serv
 import { TaskAttachment } from "../../../../core/models/task.interface";
 import { formatFileSize } from "../../../../shared/utils";
 import { LoadingSpinnerComponent } from "../../../../shared/components/loading-spinner/loading-spinner.component";
+import * as LoadingHelper from './image-viewer-loading.helper';
+import * as NavigationHelper from './image-viewer-navigation.helper';
+import * as GesturesHelper from './image-viewer-gestures.helper';
+import * as TransformHelper from './image-viewer-transform.helper';
 
 /**
  * Modern Angular 19 Signal-based Image Viewer
@@ -89,7 +83,7 @@ export class ImageViewerComponent {
   imageUrls = computed(() => {
     const images = this.images();
     if (!images || images.length === 0) return [];
-    return images.map((att) => this.getImageUrl(att));
+    return images.map((att) => TransformHelper.getAttachmentImageUrl(att));
   });
 
   renderedIndices = computed(() => {
@@ -109,11 +103,6 @@ export class ImageViewerComponent {
     return `${this.currentIndex() + 1} / ${images.length}`;
   });
 
-  /**
-   * Format file size for display (using shared utility)
-   * @return Formatted file size string
-   * @remarks Uses shared utility function
-   */
   formatFileSize = formatFileSize;
 
   /**
@@ -124,7 +113,6 @@ export class ImageViewerComponent {
     effect(() => {
       const images = this.images();
       if (!images || images.length === 0) return;
-      
       const initial = this.initialIndex();
       const length = images.length;
       if (initial >= 0 && initial < length) {
@@ -135,432 +123,229 @@ export class ImageViewerComponent {
     effect(() => {
       const images = this.images();
       if (!images || images.length === 0) return;
-      
       const indices = this.renderedIndices();
       const urls = this.imageUrls();
-
       indices.forEach((idx) => {
         const url = urls[idx];
-        if (url) {
-          this.preloadImage(url);
-        }
+        if (url) LoadingHelper.preloadImage(url);
       });
     });
 
-    this.setupEventListeners();
-  }
-
-  /**
-   * Sets up event listeners for window resize and body scroll lock.
-   * @remarks
-   * - Window resize: Updates window width signal on resize to enable responsive behavior.
-   * - Body scroll lock: Locks body scroll when images are present and restores it when the viewer is closed or images are removed.
-   */
-  private setupEventListeners(): void {
-    const resizeHandler = () => {
-      this.windowWidthSignal.set(window.innerWidth);
-    };
-
+    const resizeHandler = () => this.windowWidthSignal.set(window.innerWidth);
     window.addEventListener("resize", resizeHandler);
-
     effect((onCleanup) => {
-      onCleanup(() => {
-        window.removeEventListener("resize", resizeHandler);
-      });
+      onCleanup(() => window.removeEventListener("resize", resizeHandler));
     });
 
-    this.setupBodyScrollLock();
-  }
-
-  /**
-   * Locks body scroll when images are present and restores it when the viewer is closed or images are removed.
-   * @remarks Uses reactive effect to monitor images and update body overflow style accordingly.
-   */
-  private setupBodyScrollLock(): void {
     effect(() => {
       if (this.images().length > 0) {
         document.body.style.overflow = "hidden";
       }
-      return () => {
-        document.body.style.overflow = "";
-      };
+      return () => { document.body.style.overflow = ""; };
     });
   }
 
-  /**
-   * Get display URL for attachment
-   * @param attachment - Task attachment
-   * @returns Display URL string
-   * @remarks Uses downloadURL if available, otherwise constructs data URL from base64
-   */
   private getImageUrl(attachment: TaskAttachment): string {
-    if (attachment.downloadURL) {
-      return attachment.downloadURL;
-    }
-    if (attachment.base64.startsWith("data:")) {
-      return attachment.base64;
-    }
-    return `data:${attachment.fileType};base64,${attachment.base64}`;
+    return TransformHelper.getAttachmentImageUrl(attachment);
   }
 
-  /**
-   * Check if image is loading
-   * @param index - Image index
-   * @returns True if image is loading, otherwise false
-   * @remarks Uses internal loading states map
-   */
   isImageLoading(index: number): boolean {
-    return this.imageLoadingStates().get(index) ?? true;
+    return LoadingHelper.isImageLoading(this.imageLoadingStates(), index);
   }
 
-  /**
-   * Handle image load start
-   * @param index - Image index
-   * @remarks Updates internal loading states map
-   */
   onImageLoadStart(index: number): void {
-    const states = new Map(this.imageLoadingStates());
-    states.set(index, true);
-    this.imageLoadingStates.set(states);
+    const newStates = LoadingHelper.updateImageLoadingState(this.imageLoadingStates(), index, true);
+    this.imageLoadingStates.set(newStates);
   }
 
-  /**
-   * Handle image load complete
-   * @param index - Image index
-   * @remarks Updates internal loading states map
-   */
   onImageLoaded(index: number): void {
-    const states = new Map(this.imageLoadingStates());
-    states.set(index, false);
-    this.imageLoadingStates.set(states);
+    const newStates = LoadingHelper.updateImageLoadingState(this.imageLoadingStates(), index, false);
+    this.imageLoadingStates.set(newStates);
   }
 
-  /**
-   * Preload image for smooth transitions
-   * @param url - Image URL
-   * @remarks Creates new Image object to trigger browser preload
-   */
-  private preloadImage(url: string): void {
-    const img = new Image();
-    img.src = url;
-  }
-
-  /**
-   * Check if thumbnail is loading
-   * @param attachmentId - Attachment ID
-   * @returns Loading state boolean
-   */
   isThumbnailLoading(attachmentId: string): boolean {
-    return this.thumbnailLoadingStates().get(attachmentId) ?? true;
+    return LoadingHelper.isThumbnailLoading(this.thumbnailLoadingStates(), attachmentId);
   }
 
-  /**
-   * Handle thumbnail load start
-   * @param attachmentId - Attachment ID
-   * @remarks Updates internal thumbnail loading states map
-   */
   onThumbnailLoadStart(attachmentId: string): void {
-    const states = new Map(this.thumbnailLoadingStates());
-    states.set(attachmentId, true);
-    this.thumbnailLoadingStates.set(states);
+    const newStates = LoadingHelper.updateThumbnailLoadingState(this.thumbnailLoadingStates(), attachmentId, true);
+    this.thumbnailLoadingStates.set(newStates);
   }
 
-  /**
-   * Handle thumbnail load complete
-   * @param attachmentId - Attachment ID
-   * @remarks Updates internal thumbnail loading states map
-   */
   onThumbnailLoaded(attachmentId: string): void {
-    const states = new Map(this.thumbnailLoadingStates());
-    states.set(attachmentId, false);
-    this.thumbnailLoadingStates.set(states);
+    const newStates = LoadingHelper.updateThumbnailLoadingState(this.thumbnailLoadingStates(), attachmentId, false);
+    this.thumbnailLoadingStates.set(newStates);
   }
 
-  /**
-   * Get preview URL for thumbnails
-   * @param attachment - Task attachment
-   * @returns Preview URL string
-   * @remarks Uses getImageUrl method
-   */
   getPreviewUrl(attachment: TaskAttachment): string {
     return this.getImageUrl(attachment);
   }
 
-  /**
-   * Get transform for current image (zoom, rotation, pan)
-   * @returns CSS transform string
-   * @remarks Combines zoom, rotation, and pan into single transform string
-   */
   getImageTransform(): string {
-    const zoom = this.zoomLevel();
-    const rotate = this.rotation();
-    const pan = this.panPosition();
-
-    return `translate(${pan.x}px, ${pan.y}px) rotate(${rotate}deg) scale(${zoom})`;
+    return TransformHelper.getImageTransform({
+      zoom: this.zoomLevel(),
+      rotation: this.rotation(),
+      pan: this.panPosition()
+    });
   }
 
-  /**
-   * Navigate to next image
-   * @remarks Loops to first image if at end
-   */
   navigateNext(): void {
-    const length = this.images().length;
-    if (length === 0) return;
-    this.previousIndex.set(this.currentIndex());
-    this.animationDirection.set("next");
-    this.currentIndex.update((i) => (i + 1) % length);
-    this.resetImageState();
-    this.announceCurrentImage();
-    setTimeout(() => {
-      this.animationDirection.set(null);
-      this.previousIndex.set(null);
-    }, 500);
+    const navState = NavigationHelper.navigateToNext(
+      this.currentIndex(),
+      this.images().length,
+      () => this.resetImageState(),
+      () => this.announceCurrentImage()
+    );
+    this.previousIndex.set(navState.previousIndex);
+    this.animationDirection.set(navState.animationDirection);
+    this.currentIndex.set(navState.currentIndex);
+    NavigationHelper.clearAnimationState(
+      (dir) => this.animationDirection.set(dir),
+      (idx) => this.previousIndex.set(idx)
+    );
   }
 
-  /**
-   * Navigate to previous image
-   * @remarks Loops to last image if at start
-   */
   navigatePrev(): void {
-    const length = this.images().length;
-    if (length === 0) return;
-    this.previousIndex.set(this.currentIndex());
-    this.animationDirection.set("prev");
-    this.currentIndex.update((i) => (i - 1 + length) % length);
-    this.resetImageState();
-    this.announceCurrentImage();
-    setTimeout(() => {
-      this.animationDirection.set(null);
-      this.previousIndex.set(null);
-    }, 500);
+    const navState = NavigationHelper.navigateToPrevious(
+      this.currentIndex(),
+      this.images().length,
+      () => this.resetImageState(),
+      () => this.announceCurrentImage()
+    );
+    this.previousIndex.set(navState.previousIndex);
+    this.animationDirection.set(navState.animationDirection);
+    this.currentIndex.set(navState.currentIndex);
+    NavigationHelper.clearAnimationState(
+      (dir) => this.animationDirection.set(dir),
+      (idx) => this.previousIndex.set(idx)
+    );
   }
 
-  /**
-   * Jump to specific image by index
-   * @param index - Image index to jump to
-   * @remarks Updates current index and resets image state
-   */
   jumpToImage(index: number): void {
-    if (index < 0 || index >= this.images().length) return;
-    if (index === this.currentIndex()) return;
-
-    const direction = index > this.currentIndex() ? "next" : "prev";
-    this.previousIndex.set(this.currentIndex());
-    this.animationDirection.set(direction);
-    this.currentIndex.set(index);
-    this.resetImageState();
-    this.announceCurrentImage();
-
-    setTimeout(() => {
-      this.animationDirection.set(null);
-      this.previousIndex.set(null);
-    }, 500);
+    const navState = NavigationHelper.jumpToSpecificImage(
+      this.currentIndex(),
+      index,
+      this.images().length,
+      () => this.resetImageState(),
+      () => this.announceCurrentImage()
+    );
+    if (!navState) return;
+    this.previousIndex.set(navState.previousIndex);
+    this.animationDirection.set(navState.animationDirection);
+    this.currentIndex.set(navState.currentIndex);
+    NavigationHelper.clearAnimationState(
+      (dir) => this.animationDirection.set(dir),
+      (idx) => this.previousIndex.set(idx)
+    );
   }
 
-  /**
-   * Announce current image to screen readers
-   *  @remarks Uses LiveAnnouncer to announce image position and filename
-   */
   private announceCurrentImage(): void {
     const img = this.currentImage();
     const message = `Image ${this.currentIndex() + 1} of ${this.images().length}: ${img.filename}`;
     this.liveAnnouncer.announce(message, "polite");
   }
 
-  /**
-   * Reset image state (zoom, rotation, pan)
-   * @remarks Resets zoom level, rotation, pan position, and load error state
-   */
   private resetImageState(): void {
-    this.zoomLevel.set(1);
-    this.rotation.set(0);
-    this.panPosition.set({ x: 0, y: 0 });
+    const initialState = TransformHelper.createInitialTransformState();
+    this.zoomLevel.set(initialState.zoom);
+    this.rotation.set(initialState.rotation);
+    this.panPosition.set(initialState.pan);
     this.imageLoadError.set(false);
   }
 
-  /**
-   * Zoom in
-   * @remarks Max zoom level of 4x
-   */
   zoomIn(): void {
-    this.zoomLevel.update((z) => Math.min(z + 0.25, 4));
+    this.zoomLevel.update((z) => TransformHelper.calculateZoomIn(z));
   }
 
-  /**
-   * Zoom out
-   * @remarks Min zoom level of 0.5x
-   */
   zoomOut(): void {
-    this.zoomLevel.update((z) => Math.max(z - 0.25, 0.5));
+    this.zoomLevel.update((z) => TransformHelper.calculateZoomOut(z));
   }
 
-  /**
-   * Rotate image 90 degrees clockwise
-   * @remarks Rotates image by 90 degrees clockwise
-   */
   rotate90(): void {
-    this.rotation.update((r) => (r + 90) % 360);
+    this.rotation.update((r) => TransformHelper.calculateRotation90(r));
   }
 
-  /**
-   * Close viewer and emit close event
-   * @remarks Resets image state before emitting close event
-   */
   closeViewer(): void {
     this.resetImageState();
     this.close.emit();
   }
 
-  /**
-   * Handle keydown events for viewer controls
-   * @returns {void}
-   * @param event - The keyboard event triggered when a key is pressed.
-   * @remarks
-   * - Escape: Closes the viewer.
-   * - ArrowLeft: Navigates to the previous image.
-   */
   @HostListener("window:keydown", ["$event"])
   onKeyDown(event: KeyboardEvent): void {
     switch (event.key) {
-      case "Escape":
-        this.closeViewer();
-        break;
-      case "ArrowLeft":
-        event.preventDefault();
-        this.navigatePrev();
-        break;
-      case "ArrowRight":
-        event.preventDefault();
-        this.navigateNext();
-        break;
+      case "Escape": this.closeViewer(); break;
+      case "ArrowLeft": event.preventDefault(); this.navigatePrev(); break;
+      case "ArrowRight": event.preventDefault(); this.navigateNext(); break;
       case "+":
-      case "=":
-        this.zoomIn();
-        break;
-      case "-":
-        this.zoomOut();
-        break;
+      case "=": this.zoomIn(); break;
+      case "-": this.zoomOut(); break;
       case "r":
-      case "R":
-        this.rotate90();
-        break;
+      case "R": this.rotate90(); break;
     }
   }
 
-  /**
-   *  Handles the touch start event for the image viewer component.
-   * @returns {void}
-   * @param event - The touch event triggered when the user places their finger on the screen.
-   * @remarks
-   * - Records the starting touch position for potential panning or swipe navigation.
-   */
   @HostListener("touchstart", ["$event"])
   onTouchStart(event: TouchEvent): void {
-    if (event.touches.length === 1) {
-      this.touchStartXSignal.set(event.touches[0].clientX);
-      this.touchStartYSignal.set(event.touches[0].clientY);
-    } else if (event.touches.length === 2 && this.zoomLevel() > 1) {
-      this.isPanning.set(true);
-    }
+    const result = GesturesHelper.handleTouchStart(event, this.zoomLevel());
+    if (!result) return;
+    this.touchStartXSignal.set(result.touchState.startX);
+    this.touchStartYSignal.set(result.touchState.startY);
+    this.isPanning.set(result.isPanning);
   }
 
-  /**
-   * Handles the touch move event for the image viewer component.
-   * @returns {void}
-   * @param event - The touch event triggered when the user moves their finger on the screen.
-   */
   @HostListener("touchmove", ["$event"])
   onTouchMove(event: TouchEvent): void {
-    if (this.isPanning() && event.touches.length === 2) {
-      event.preventDefault();
-      const touch = event.touches[0];
-      const deltaX = touch.clientX - this.touchStartXSignal();
-      const deltaY = touch.clientY - this.touchStartYSignal();
-
-      this.panPosition.update((pos) => ({
-        x: pos.x + deltaX,
-        y: pos.y + deltaY,
-      }));
-
-      this.touchStartXSignal.set(touch.clientX);
-      this.touchStartYSignal.set(touch.clientY);
-    }
+    const result = GesturesHelper.handleTouchMove(
+      event,
+      this.isPanning(),
+      this.touchStartXSignal(),
+      this.touchStartYSignal(),
+      this.panPosition()
+    );
+    if (!result) return;
+    if (result.shouldPreventDefault) event.preventDefault();
+    this.panPosition.set(result.newPan);
+    this.touchStartXSignal.set(result.newTouchState.startX);
+    this.touchStartYSignal.set(result.newTouchState.startY);
   }
 
   @HostListener("touchend", ["$event"])
-  /**
-   * Handles the touch end event for the image viewer component.
-   * @returns {void}
-   * @param event - The touch event triggered when the user lifts their finger.
-   */
   onTouchEnd(event: TouchEvent): void {
     this.isPanning.set(false);
-
-    if (event.changedTouches.length === 0) return;
-
-    const touchEndX = event.changedTouches[0].clientX;
-    const touchEndY = event.changedTouches[0].clientY;
-    const deltaX = touchEndX - this.touchStartXSignal();
-    const deltaY = touchEndY - this.touchStartYSignal();
-
-    if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 50) {
-      if (deltaX > 0) {
-        this.navigatePrev();
-      } else {
-        this.navigateNext();
-      }
-    }
+    const swipeDirection = GesturesHelper.handleTouchEnd(
+      event,
+      this.touchStartXSignal(),
+      this.touchStartYSignal()
+    );
+    if (swipeDirection === 'prev') this.navigatePrev();
+    else if (swipeDirection === 'next') this.navigateNext();
   }
 
-  /**
-   * Toggle action popup for download options
-   * @param event - Mouse event
-   * @remarks Positions popup near button and toggles visibility
-   */
   toggleActionPopup(event: MouseEvent): void {
     event.stopPropagation();
-
     if (this.showActionPopup()) {
       this.showActionPopup.set(false);
       return;
     }
-
-    this.actionPopupPosition.set({
-      x: 80,
-      y: 100,
-    });
-
+    this.actionPopupPosition.set({ x: 80, y: 100 });
     this.showActionPopup.set(true);
   }
 
-  /**
-   * Download single image
-   * @remarks Uses AttachmentStorageService to download current image
-   */
   async onDownloadSingle(): Promise<void> {
     this.showActionPopup.set(false);
     this.isDownloading.set(true);
     try {
-      await this.attachmentStorageService.downloadSingleAttachment(
-        this.currentImage(),
-      );
+      await this.attachmentStorageService.downloadSingleAttachment(this.currentImage());
     } finally {
       this.isDownloading.set(false);
     }
   }
 
-  /**
-   * Download all images as ZIP
-   * @remarks Uses AttachmentStorageService to download all images as a ZIP file, passing the current task title for naming the ZIP file appropriately.
-   */
   async onDownloadAll(): Promise<void> {
     this.showActionPopup.set(false);
     this.isDownloading.set(true);
     try {
-      await this.attachmentStorageService.downloadAllAsZip(
-        this.images(),
-        this.taskTitle(),
-      );
+      await this.attachmentStorageService.downloadAllAsZip(this.images(), this.taskTitle());
     } finally {
       this.isDownloading.set(false);
     }
