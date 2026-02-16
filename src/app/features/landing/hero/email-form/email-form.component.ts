@@ -195,16 +195,30 @@ export class EmailFormComponent implements OnInit {
     this.requestForm.markAsUntouched();
   }
 
+  /**
+   * Handles changes to the request type dropdown.
+   * @param ids - The selected request type IDs from the dropdown
+   * @remarks Updates the requestType form control based on the selected dropdown value.
+   */
   onRequestTypeChange(ids: string[]) {
     const allowedTypes: Array<'feature' | 'bug' | 'question'> = ['feature', 'bug', 'question'];
     const selectedType = allowedTypes.includes(ids[0] as any) ? (ids[0] as 'feature' | 'bug' | 'question') : 'feature';
     this.requestForm.patchValue({ requestType: selectedType });
   }
 
+  /**
+   * Handles blur event for the request type dropdown.
+   * @returns {void}
+   * @remarks Marks the requestType form control as touched.
+   */
   onRequestTypeBlur(): void {
     this.getControl('requestType').markAsTouched();
   }
 
+  /**
+   * Checks if the request type form control has an error.
+   * @returns {boolean} True if the control is touched and invalid, otherwise false.
+   */
   requestTypeHasError(): boolean {
     const control = this.getControl('requestType');
     return control.touched && control.invalid;
