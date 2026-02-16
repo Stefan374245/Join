@@ -107,7 +107,7 @@ fieldset.form-group {
 
 .input-wrapper {
     position: relative;
-    @include flex(row, unset, center);
+    @include flex(column, center, flex-start);
 
     input[type="date"] {
         position: relative;

@@ -40,7 +40,7 @@
 
 .input-wrapper {
   position: relative;
-  @include flex(row, unset, center);
+  @include flex(column, unset, flex-start);
   width: 100%;
 }
 
