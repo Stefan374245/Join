@@ -7,6 +7,9 @@ export interface Contact {
   phone?: string;
   color: string;
   initials: string;
+  avatarUrl?: string | null;
+  avatarPath?: string | null;
+  avatarUpdatedAt?: Date;
   createdAt?: Date;
   updatedAt?: Date;
 }
