@@ -358,8 +358,6 @@
     img {
       width: 18px;
       height: 18px;
-      filter: brightness(0) saturate(100%) invert(48%) sepia(83%) saturate(748%)
-        hue-rotate(164deg) brightness(96%) contrast(101%);
       transition: filter 0.2s ease;
     }
 
