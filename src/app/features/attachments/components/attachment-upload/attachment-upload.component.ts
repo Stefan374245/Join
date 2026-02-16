@@ -44,11 +44,8 @@ export class AttachmentUploadComponent {
   isLimitHintFlashing = signal<boolean>(false);
   isAtLimit = computed(() => this.attachments().length >= this.maxFilesTotal);
   remainingSlots = computed(() => Math.max(0, this.maxFilesTotal - this.attachments().length));
-  
   totalSize = computed(() => calculateTotalAttachmentsSize(this.attachments()));
-  
   totalSizeFormatted = computed(() => formatFileSize(this.totalSize()));
-  
   isOverSizeLimit = computed(() => this.totalSize() > this.maxTotalSize);
 
   /**
@@ -124,6 +121,14 @@ export class AttachmentUploadComponent {
     }
   }
 
+  /**
+   * Checks if the upload process can start based on the provided files and current attachment limits.
+   * @param files - Array of files to be uploaded
+   * @returns {boolean} Returns `true` if the upload can proceed; otherwise, returns `false` and shows appropriate error messages.
+    * @remarks
+    * Validates that there are files to upload and that adding them would not exceed the total attachment limit.
+    * If the limits are exceeded, it shows error messages and prevents the upload from starting.
+   */
   private canStart(files: File[]): boolean {
     if (files.length === 0) return false;
     if (!this.isAtLimit()) return true;
@@ -132,11 +137,23 @@ export class AttachmentUploadComponent {
     return false;
   }
 
+  /**
+   * Applies upload limits to the provided files.
+   * @param files - Array of files to be uploaded
+   * @returns {File[]} Array of files after applying limits
+   * @remarks Applies per-upload and total slot limits to the provided files.
+   */
   private applyLimits(files: File[]): File[] {
     const withinPerUploadLimit = this.limitPerUpload(files);
     return this.limitBySlots(withinPerUploadLimit);
   }
 
+  /**
+   * Limits the number of files per upload.
+   * @param files - Array of files to be uploaded
+   * @returns {File[]} Array of files after applying per-upload limit
+   * @remarks Ensures that the number of files does not exceed the maximum allowed per upload.
+   */
   private limitPerUpload(files: File[]): File[] {
     if (files.length <= this.maxFilesPerUpload) return files;
 
@@ -144,6 +161,12 @@ export class AttachmentUploadComponent {
     return files.slice(0, this.maxFilesPerUpload);
   }
 
+  /**
+   * Limits the number of files based on available slots.
+   * @param files - Array of files to be uploaded
+   * @returns {File[]} Array of files after applying slot limits
+   * @remarks Ensures that the number of files does not exceed the available slots.
+   */
   private limitBySlots(files: File[]): File[] {
     const availableSlots = this.remainingSlots();
     if (files.length <= availableSlots) return files;
@@ -157,10 +180,6 @@ export class AttachmentUploadComponent {
    * @param file - File to process
    * @remarks
    * Validates the file using FileValidationService.
-   * If valid, compresses the image using ImageCompressionService.
-   * Creates a TaskAttachment object and adds it to the attachments list.
-   * Emits the updated attachments list via attachmentsChange event emitter.
-   * Validates 1MB total size limit for all attachments.
    */
   private async processFile(file: File): Promise<void> {
     try {
@@ -174,7 +193,6 @@ export class AttachmentUploadComponent {
         uploadedAt: new Date() 
       };
       
-      // Check if adding this attachment would exceed 1MB total limit
       const newTotalSize = this.totalSize() + calculateBase64Size(attachment.base64);
       if (newTotalSize > this.maxTotalSize) {
         const exceededBy = formatFileSize(newTotalSize - this.maxTotalSize);
@@ -226,6 +244,12 @@ export class AttachmentUploadComponent {
     return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
   }
 
+  /**
+   * Notify user about limit issues and flash the limit hint
+   * @param message - The message to display in the toast notification
+   * @returns {void}
+   * @remarks Shows an error toast with the provided message and triggers a flash effect on the limit hint. If the flash effect is already active, it does not reset the timer to allow for continuous flashing if multiple limit issues occur in quick succession.
+   */
   private notifyLimitAndFlash(message: string): void {
     this.toastService.showError(message, 3500);
 
@@ -243,7 +267,8 @@ export class AttachmentUploadComponent {
   /**
    * Get data URL for preview
    * @param attachment - Task attachment
-   * @returns Preview URL string
+   * @returns {string} Data URL for image preview
+   * @remarks Returns the download URL if available; otherwise, constructs a data URL from the base64 string for previewing the image.
    */
   getPreviewUrl(attachment: TaskAttachment): string {
     if (attachment.downloadURL) {
