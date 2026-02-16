@@ -13,11 +13,22 @@ import { LoadingService } from '../../../core/services/loading.service';
   imports: [CommonModule],
   template: `
     @if (isLoading()) {
-      <div class="global-loading-overlay">
-        <div class="loading-spinner">
-          <img src="assets/images/loading.svg" alt="Loading..." />
+      @if (inline()) {
+        <div class="inline-loading-spinner" [style.width.px]="size()" [style.height.px]="size()">
+          <img
+            src="assets/images/loading.svg"
+            alt="Loading..."
+            [style.width.px]="size()"
+            [style.height.px]="size()"
+          />
         </div>
-      </div>
+      } @else {
+        <div class="global-loading-overlay">
+          <div class="loading-spinner">
+            <img src="assets/images/loading.svg" alt="Loading..." />
+          </div>
+        </div>
+      }
     }
   `,
   styleUrls: ['./loading-spinner.component.scss']
@@ -25,6 +36,8 @@ import { LoadingService } from '../../../core/services/loading.service';
 export class LoadingSpinnerComponent {
   loadingService = inject(LoadingService);
   localLoading = input<boolean | undefined>(undefined);
+  inline = input<boolean>(false);
+  size = input<number>(64);
   
   isLoading = computed(() => {
     const local = this.localLoading();

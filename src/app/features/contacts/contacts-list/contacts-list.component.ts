@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, HostListener } from "@angular/core";
+import { Component, OnInit, inject, HostListener, effect, signal } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { Router, RouterLink, RouterLinkActive } from "@angular/router";
 import { StopPropagationDirective } from '../../../shared/directives';
@@ -6,7 +6,9 @@ import { ContactService } from "../../../core/services/contact.service";
 import { AuthService } from "../../../core/services/auth.service";
 import { ToastService } from "../../../core/services/toast.service";
 import { Contact } from "../../../core/models/contact.interface";
+import { ContactSaveRequest } from '../../../core/models/contact-save-request.interface';
 import { ContactDialogComponent } from "../contact-dialog/contact-dialog.component";
+import { LoadingSpinnerComponent } from "../../../shared/components/loading-spinner/loading-spinner.component";
 
 /**
  * Contacts list view with search, selection and CRUD operations using ContactService signals
@@ -14,7 +16,7 @@ import { ContactDialogComponent } from "../contact-dialog/contact-dialog.compone
 @Component({
   selector: "app-contacts-list",
   standalone: true,
-  imports: [CommonModule, RouterLink, ContactDialogComponent, StopPropagationDirective],
+  imports: [CommonModule, RouterLink, ContactDialogComponent, StopPropagationDirective, LoadingSpinnerComponent],
   templateUrl: "./contacts-list.component.html",
   styleUrl: "./contacts-list.component.scss",
 })
@@ -29,6 +31,7 @@ export class ContactsListComponent implements OnInit {
   loading = this.contactService.loading;
 
   selected: Contact | null = null;
+  private selectedEmail: string | null = null;
   showRight = true;
   isMobile = false;
 
@@ -38,6 +41,21 @@ export class ContactsListComponent implements OnInit {
 
   showDeleteConfirm = false;
   contactToDelete: Contact | null = null;
+  isSavingContact = signal<boolean>(false);
+  private avatarLoaded = signal<Record<string, boolean>>({});
+  detailAvatarLoaded = signal<boolean>(false);
+
+  constructor() {
+    effect(() => {
+      const contacts = this.contactService.contacts();
+      if (!this.selectedEmail) {
+        this.selected = null;
+        return;
+      }
+
+      this.selected = contacts.find((contact) => contact.email === this.selectedEmail) || null;
+    });
+  }
 
   /**
    * Determines if the selected contact is the current user's own profile
@@ -75,7 +93,9 @@ export class ContactsListComponent implements OnInit {
         event.preventDefault();
       }
     }
+    this.selectedEmail = contact.email;
     this.selected = contact;
+    this.detailAvatarLoaded.set(!contact.avatarUrl);
     localStorage.setItem("selectedContactEmail", contact.email);
     localStorage.setItem("lastEditedContact", contact.email);
   }
@@ -129,16 +149,21 @@ export class ContactsListComponent implements OnInit {
    * @remarks Handles both adding new contacts and updating existing ones.
    * Emits success or error toasts based on operation outcome.
    */
-  async saveContact(contact: Contact): Promise<void> {
+  async saveContact(request: ContactSaveRequest): Promise<void> {
+    const { contact, avatar, removeAvatar } = request;
+
+    this.isSavingContact.set(true);
     try {
       if (this.dialogMode === "add") {
-        await this.addContactLogic(contact);
+        await this.addContactLogic(contact, avatar);
       } else if (contact.id) {
-        await this.updateContactLogic(contact);
+        await this.updateContactLogic(contact, avatar, removeAvatar);
       }
       this.afterContactSave(contact);
     } catch (error) {
       this.handleContactSaveError(error);
+    } finally {
+      this.isSavingContact.set(false);
     }
   }
 
@@ -151,10 +176,10 @@ export class ContactsListComponent implements OnInit {
    * @remarks Generates contact ID from email, saves via ContactService,
    * and shows success toast on completion.
    */
-  private async addContactLogic(contact: Contact): Promise<void> {
+  private async addContactLogic(contact: Contact, avatar?: ContactSaveRequest['avatar']): Promise<void> {
     const contactId = contact.email.replace(/[.@]/g, "_");
     const newContact: Contact = { ...contact, id: contactId };
-    await this.contactService.saveContact(newContact);
+    await this.contactService.saveContactWithAvatar(newContact, avatar);
     this.toastService.showSuccess(
       `Contact ${contact.firstName} ${contact.lastName} added successfully!`,
     );
@@ -170,13 +195,14 @@ export class ContactsListComponent implements OnInit {
    * updates auth display name if own profile,
    * and shows success toast on completion.
    */
-  private async updateContactLogic(contact: Contact): Promise<void> {
+  private async updateContactLogic(
+    contact: Contact,
+    avatar?: ContactSaveRequest['avatar'],
+    removeAvatar?: boolean,
+  ): Promise<void> {
     const isOwnProfile = this.authService.currentUser?.email === contact.email;
-    await this.contactService.updateUser(contact.id!, {
-      firstName: contact.firstName,
-      lastName: contact.lastName,
-      phone: contact.phone,
-    });
+    await this.contactService.updateUserWithAvatar(contact, avatar, !!removeAvatar);
+
     if (isOwnProfile) {
       const displayName = `${contact.firstName} ${contact.lastName}`;
       await this.authService.updateDisplayName(displayName);
@@ -195,7 +221,9 @@ export class ContactsListComponent implements OnInit {
    */
   private afterContactSave(contact: Contact): void {
     this.closeDialog();
-    this.selected = contact;
+    this.selectedEmail = contact.email;
+    this.selected = this.contactService.findContactByEmail(contact.email) || contact;
+    this.detailAvatarLoaded.set(!this.selected?.avatarUrl);
     localStorage.setItem("selectedContactEmail", contact.email);
   }
 
@@ -315,6 +343,8 @@ export class ContactsListComponent implements OnInit {
    */
   clearSelection(): void {
     this.selected = null;
+    this.selectedEmail = null;
+    this.detailAvatarLoaded.set(false);
     localStorage.removeItem("selectedContactEmail");
   }
 
@@ -331,7 +361,24 @@ export class ContactsListComponent implements OnInit {
       localStorage.getItem("selectedContactEmail");
     if (!last) return;
     const contact = this.contactService.findContactByEmail(last);
-    if (contact) this.selected = contact;
+    if (contact) {
+      this.selectedEmail = contact.email;
+      this.selected = contact;
+      this.detailAvatarLoaded.set(!contact.avatarUrl);
+    }
+  }
+
+  isDetailAvatarLoading(contact: Contact | null): boolean {
+    if (!contact?.avatarUrl) return false;
+    return !this.detailAvatarLoaded();
+  }
+
+  onDetailAvatarLoad(): void {
+    this.detailAvatarLoaded.set(true);
+  }
+
+  onDetailAvatarError(): void {
+    this.detailAvatarLoaded.set(true);
   }
 
   /**
@@ -344,5 +391,24 @@ export class ContactsListComponent implements OnInit {
     const w = window.innerWidth;
     this.showRight = w >= 900;
     this.isMobile = w < 900;
+  }
+
+  avatarLoadKey(contact: Contact): string {
+    return `${contact.id}:${contact.avatarUrl || ''}`;
+  }
+
+  isAvatarLoading(contact: Contact): boolean {
+    if (!contact.avatarUrl) return false;
+    const key = this.avatarLoadKey(contact);
+    return !this.avatarLoaded()[key];
+  }
+
+  onAvatarLoad(contact: Contact): void {
+    const key = this.avatarLoadKey(contact);
+    this.avatarLoaded.update((state) => ({ ...state, [key]: true }));
+  }
+
+  onAvatarError(contact: Contact): void {
+    this.onAvatarLoad(contact);
   }
 }

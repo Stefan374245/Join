@@ -1,11 +1,9 @@
 import { Component, EventEmitter, Output, Input, signal, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DragDropDirective } from '../../../../shared/directives';
-import { FileValidationService } from '../../services/file-validation.service';
-import { ImageCompressionService } from '../../services/image-compression.service';
+import { ImageUploadFlowService } from '../../services/image-upload-flow.service';
 import { TaskAttachment } from '../../../../core/models/task.interface';
-import { formatFileSize } from '../../../../shared/utils';
-import { FILE_UPLOAD } from '../../../../shared/constants';
+import { formatFileSize, calculateTotalAttachmentsSize, calculateBase64Size, FILE_UPLOAD } from '../../../../shared/constants';
 import { ToastService } from '../../../../core/services/toast.service';
 /**
  * Component for uploading and managing task attachments
@@ -19,13 +17,13 @@ import { ToastService } from '../../../../core/services/toast.service';
   styleUrl: './attachment-upload.component.scss'
 })
 export class AttachmentUploadComponent {
-  private fileValidation = inject(FileValidationService);
-  private imageCompression = inject(ImageCompressionService);
+  private imgFlow = inject(ImageUploadFlowService);
   private toastService = inject(ToastService);
   private hasInitialized = false;
   private limitHintFlashTimeout: ReturnType<typeof setTimeout> | null = null;
   readonly maxFilesPerUpload = FILE_UPLOAD.MAX_FILES_PER_UPLOAD;
   readonly maxFilesTotal = FILE_UPLOAD.MAX_FILES_TOTAL;
+  readonly maxTotalSize = FILE_UPLOAD.MAX_TOTAL_ATTACHMENTS_SIZE;
 
   @Input() set initialAttachments(attachments: TaskAttachment[] | undefined) {
     if (!this.hasInitialized && attachments && attachments.length > 0) {
@@ -46,6 +44,12 @@ export class AttachmentUploadComponent {
   isLimitHintFlashing = signal<boolean>(false);
   isAtLimit = computed(() => this.attachments().length >= this.maxFilesTotal);
   remainingSlots = computed(() => Math.max(0, this.maxFilesTotal - this.attachments().length));
+  
+  totalSize = computed(() => calculateTotalAttachmentsSize(this.attachments()));
+  
+  totalSizeFormatted = computed(() => formatFileSize(this.totalSize()));
+  
+  isOverSizeLimit = computed(() => this.totalSize() > this.maxTotalSize);
 
   /**
    * Handle drag over event
@@ -156,21 +160,34 @@ export class AttachmentUploadComponent {
    * If valid, compresses the image using ImageCompressionService.
    * Creates a TaskAttachment object and adds it to the attachments list.
    * Emits the updated attachments list via attachmentsChange event emitter.
+   * Validates 1MB total size limit for all attachments.
    */
   private async processFile(file: File): Promise<void> {
-    const validation = await this.fileValidation.validateFile(file);
-    if (!validation.valid) {
-      this.errorMessage.set(validation.error || 'Invalid file');
-      return;
-    }
     try {
-      const base64 = await this.imageCompression.compressImage(file);
-      const attachment = { id: this.generateId(), filename: file.name, 
-        fileType: file.type as 'image/jpeg' | 'image/png', base64, size: file.size, uploadedAt: new Date() };
+      const img = await this.imgFlow.proc(file);
+      const attachment = { 
+        id: this.generateId(), 
+        filename: file.name, 
+        fileType: img.fileType, 
+        base64: img.base64, 
+        size: file.size, 
+        uploadedAt: new Date() 
+      };
+      
+      // Check if adding this attachment would exceed 1MB total limit
+      const newTotalSize = this.totalSize() + calculateBase64Size(attachment.base64);
+      if (newTotalSize > this.maxTotalSize) {
+        const exceededBy = formatFileSize(newTotalSize - this.maxTotalSize);
+        this.errorMessage.set(`Cannot add image: Would exceed 1MB total limit by ${exceededBy}`);
+        this.toastService.showError(`Upload limit: 1MB total for all images. This would exceed by ${exceededBy}`);
+        return;
+      }
+      
       this.attachments.update(current => [...current, attachment]);
       this.attachmentsChange.emit(this.attachments());
-    } catch {
-      this.errorMessage.set('Failed to process image');
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Failed to process image';
+      this.errorMessage.set(message);
     }
   }
 

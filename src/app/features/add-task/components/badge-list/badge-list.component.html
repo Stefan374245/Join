@@ -15,10 +15,18 @@
         [attr.aria-label]="item.ariaLabel || item.label"
         role="listitem"
       >
-        @if (item.icon) {
+        @if (hasAvatar(item)) {
+          <img
+            [src]="item.avatarUrl!"
+            [alt]="item.label"
+            title="{{ item.label }}"
+            class="badge-avatar"
+          />
+        } @else if (item.icon) {
           <img
             [src]="item.icon"
             [alt]="item.iconAlt || ''"
+            title="{{ item.label }}"
             class="badge-icon"
             role="presentation"
           />
@@ -30,6 +38,7 @@
           <img
             [src]="removeIcon()"
             alt="Remove"
+            title="Remove"
             class="badge-remove"
             (click)="remove(item.id)"
             role="button"

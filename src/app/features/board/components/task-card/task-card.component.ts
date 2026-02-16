@@ -1,8 +1,9 @@
-import { Component, input, output, ViewEncapsulation } from '@angular/core';
+import { Component, input, output, ViewEncapsulation, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { Task } from '../../../../core/models/task.interface';
 import { Contact } from '../../../../core/models/contact.interface';
+import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
 
 /**
  * Task card component representing individual tasks in the Kanban board columns.
@@ -23,7 +24,7 @@ import { Contact } from '../../../../core/models/contact.interface';
 @Component({
   selector: 'app-task-card',
   standalone: true,
-  imports: [CommonModule, DragDropModule],
+  imports: [CommonModule, DragDropModule, LoadingSpinnerComponent],
   templateUrl: './task-card.component.html',
   styleUrl: './task-card.component.scss',
   encapsulation: ViewEncapsulation.None,
@@ -34,6 +35,7 @@ export class TaskCardComponent {
   taskClicked = output<Task>();
 
   private wasDragging = false;
+  private avatarLoaded = signal<Record<string, boolean>>({});
 
   /**
    * Handles click event - only opens if not dragging
@@ -140,7 +142,7 @@ export class TaskCardComponent {
    * @returns Hex color code for the contact's avatar, or default blue if contact not found
    */
   getContactColor(userId: string): string {
-    const contact = this.contacts().find((c) => c.id === userId);
+    const contact = this.ct(userId);
     return contact?.color || '#29abe2';
   }
 
@@ -152,8 +154,40 @@ export class TaskCardComponent {
    * @returns Two-letter initials for the contact, or "??" if contact not found
    */
   getContactInitials(userId: string): string {
-    const contact = this.contacts().find((c) => c.id === userId);
+    const contact = this.ct(userId);
     return contact?.initials || '??';
+  }
+
+  getContactAvatar(userId: string): string | null {
+    return this.ct(userId)?.avatarUrl || null;
+  }
+
+  isAvatarLoading(userId: string): boolean {
+    const url = this.getContactAvatar(userId);
+    if (!url) return false;
+
+    const key = this.avatarLoadKey(userId, url);
+    return !this.avatarLoaded()[key];
+  }
+
+  onAvatarLoad(userId: string): void {
+    const url = this.getContactAvatar(userId);
+    if (!url) return;
+
+    const key = this.avatarLoadKey(userId, url);
+    this.avatarLoaded.update((state) => ({ ...state, [key]: true }));
+  }
+
+  onAvatarError(userId: string): void {
+    this.onAvatarLoad(userId);
+  }
+
+  private avatarLoadKey(userId: string, url: string): string {
+    return `${this.task().id}:${userId}:${url}`;
+  }
+
+  private ct(userId: string): Contact | undefined {
+    return this.contacts().find((contact) => contact.id === userId);
   }
 
   /**

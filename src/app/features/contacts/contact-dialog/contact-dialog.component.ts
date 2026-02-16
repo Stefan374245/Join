@@ -1,36 +1,43 @@
 
 import { Component, inject, Output, EventEmitter, Input, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormControl } from '@angular/forms';
-import { StopPropagationDirective } from '../../../shared/directives';
-import { ContactService } from '../../../core/services/contact.service';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { StopPropagationDirective, DragDropDirective } from '../../../shared/directives';
 import { AuthService } from '../../../core/services/auth.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { Contact } from '../../../core/models/contact.interface';
+import { ContactSaveRequest } from '../../../core/models/contact-save-request.interface';
+import { ContactAvatarUpload } from '../../../core/models/contact-avatar-upload.interface';
+import { generateColorFromEmail } from '../../../core/services/auth/color-generator.helper';
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
 import { FormInputComponent } from '../../../shared/components/form-input/form-input.component';
+import { ImageUploadFlowService } from '../../attachments/services/image-upload-flow.service';
 
 @Component({
   selector: 'app-contact-dialog',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, LoadingSpinnerComponent, StopPropagationDirective, FormInputComponent],
+  imports: [CommonModule, ReactiveFormsModule, LoadingSpinnerComponent, StopPropagationDirective, DragDropDirective, FormInputComponent],
   templateUrl: './contact-dialog.component.html',
   styleUrl: './contact-dialog.component.scss'
 })
 export class ContactDialogComponent implements OnInit {
   @Input() mode: 'add' | 'edit' = 'add';
   @Input() contact: Contact | null = null;
+  @Input() isSaving = false;
   @Output() close = new EventEmitter<void>();
-  @Output() save = new EventEmitter<Contact>();
+  @Output() save = new EventEmitter<ContactSaveRequest>();
   @Output() delete = new EventEmitter<string>();
 
   private fb = inject(FormBuilder);
-  private contactService = inject(ContactService);
   private authService = inject(AuthService);
   private toastService = inject(ToastService);
+  private imgFlow = inject(ImageUploadFlowService);
 
   contactForm!: FormGroup;
   isSubmitting = signal<boolean>(false);
+  avatarPreviewUrl = signal<string | null>(null);
+  avatarUpload = signal<ContactAvatarUpload | null>(null);
+  removeAvatar = signal<boolean>(false);
   errorMessage = '';
 
   /**
@@ -42,6 +49,10 @@ export class ContactDialogComponent implements OnInit {
     this.initForm();
     if (this.mode === 'edit' && this.contact) {
       this.populateForm();
+    }
+
+    if (this.contact?.avatarUrl) {
+      this.avatarPreviewUrl.set(this.contact.avatarUrl);
     }
   }
 
@@ -99,11 +110,17 @@ export class ContactDialogComponent implements OnInit {
     return this.mode === 'add' ? 'Create contact' : 'Save';
   }
 
+  get isBusy(): boolean {
+    return this.isSubmitting() || this.isSaving;
+  }
+
   /**
    * Generates avatar initials from first and last name
    * @returns Two-letter initials string
    */
   get avatarInitials(): string {
+    if (this.avatarPreviewUrl()) return '';
+
     const firstName = this.contactForm.get('firstName')?.value || '';
     const lastName = this.contactForm.get('lastName')?.value || '';
 
@@ -132,6 +149,53 @@ export class ContactDialogComponent implements OnInit {
     this.close.emit();
   }
 
+  async onDrop(files: File[]): Promise<void> {
+    await this.procAvatar(files[0]);
+  }
+
+  async onPick(event: Event): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    await this.procAvatar(file);
+    input.value = '';
+  }
+
+  clearAvatar(): void {
+    this.avatarUpload.set(null);
+    this.avatarPreviewUrl.set(null);
+    this.removeAvatar.set(true);
+  }
+
+  onRemoveAvatarClick(event: MouseEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.clearAvatar();
+  }
+
+  private async procAvatar(file?: File): Promise<void> {
+    if (!file) return;
+
+    try {
+      const img = await this.imgFlow.proc(file);
+      this.setAvatar(img.base64, img.fileType);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Failed to process image';
+      this.avatarErr(message);
+    }
+  }
+
+  private avatarErr(message?: string): void {
+    const error = message || 'Invalid image file';
+    this.errorMessage = error;
+    this.toastService.showError(error);
+  }
+
+  private setAvatar(base64: string, fileType: ContactAvatarUpload['fileType']): void {
+    this.avatarUpload.set({ base64, fileType });
+    this.avatarPreviewUrl.set(`data:${fileType};base64,${base64}`);
+    this.removeAvatar.set(false);
+  }
+
   /**
    * Emits delete event with contact email
    */
@@ -145,72 +209,60 @@ export class ContactDialogComponent implements OnInit {
    * Handles form submission for add/edit operations
    */
   async onSubmit(): Promise<void> {
-    if (!this.isFormValid || this.isSubmitting()) return;
-
-    if (this.authService.isGuestUser()) {
-      this.toastService.showGuestCannotAddContacts();
-      return;
-    }
+    if (!this.isFormValid || this.isBusy) return;
+    if (this.authService.isGuestUser()) return this.toastService.showGuestCannotAddContacts();
 
     this.isSubmitting.set(true);
     this.errorMessage = '';
 
     try {
-      const formValue = this.contactForm.value;
-      const fullName = `${formValue.firstName} ${formValue.lastName}`;
-      const initials = this.avatarInitials;
-
-      if (this.mode === 'add') {
-        const email = formValue.email;
-        const color = this.generateColorFromEmail(email);
-        const id = email.replace(/[.@]/g, '_');
-
-        const newContact: Contact = {
-          id: id,
-          firstName: formValue.firstName,
-          lastName: formValue.lastName,
-          email: formValue.email,
-          phone: formValue.phone || '',
-          color: color,
-          initials: initials
-        };
-
-        this.save.emit(newContact);
-      } else if (this.mode === 'edit' && this.contact) {
-        const updatedContact: Contact = {
-          ...this.contact,
-          firstName: formValue.firstName,
-          lastName: formValue.lastName,
-          email: formValue.email,
-          phone: formValue.phone || '',
-          initials: initials
-        };
-
-        this.save.emit(updatedContact);
-      }
+      this.emitReq(this.mkContact());
     } catch (error: any) {
-      console.error('Error saving contact:', error);
       this.errorMessage = error.message || 'Failed to save contact';
+      console.error('Error saving contact:', error);
     } finally {
       this.isSubmitting.set(false);
     }
   }
 
-  /**
-   * Generates consistent color from email address
-   * @param email - Email address
-   * @returns Hexadecimal color code
-   */
-  private generateColorFromEmail(email: string): string {
-    const colors = [
-      '#FF7A00', '#FF5EB3', '#6E52FF', '#9327FF', '#00BEE8',
-      '#1FD7C1', '#FF745E', '#FFA35E', '#FC71FF', '#FFC701',
-      '#0038FF', '#C3FF2B', '#FFE62B', '#FF4646', '#FFBB2B'
-    ];
+  private mkContact(): Contact {
+    return this.mode === 'add' ? this.mkNew() : this.mkEdit();
+  }
 
-    const hash = email.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    const colorIndex = hash % colors.length;
-    return colors[colorIndex];
+  private mkNew(): Contact {
+    const form = this.contactForm.value;
+    const id = String(form.email).replace(/[.@]/g, '_');
+
+    return {
+      id,
+      firstName: form.firstName,
+      lastName: form.lastName,
+      email: form.email,
+      phone: form.phone || '',
+      color: generateColorFromEmail(form.email),
+      initials: this.avatarInitials,
+    };
+  }
+
+  private mkEdit(): Contact {
+    const form = this.contactForm.value;
+
+    return {
+      ...(this.contact as Contact),
+      firstName: form.firstName,
+      lastName: form.lastName,
+      email: form.email,
+      phone: form.phone || '',
+      initials: this.avatarInitials,
+    };
+  }
+
+  private emitReq(contact: Contact): void {
+    this.save.emit({
+      contact,
+      avatar: this.avatarUpload() || undefined,
+      removeAvatar: this.removeAvatar(),
+    });
   }
 
   /**

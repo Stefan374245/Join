@@ -77,6 +77,13 @@
         z-index: 10;
       }
 
+      .assignee-photo {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
+      }
+
       &.more {
         background: $primary-color;
         font-size: 12px;

@@ -3,6 +3,9 @@
   <p class="upload-limit-hint" [class.limit-alert]="isLimitHintFlashing()">
     Max {{ maxFilesPerUpload }} at once · {{ attachments().length }}/{{ maxFilesTotal }} selected
   </p>
+  <p class="upload-size-hint" [class.size-alert]="isOverSizeLimit()">
+    Total size: {{ totalSizeFormatted() }} / 1.0 MB
+  </p>
 
   <div class="upload-zone" [class.disabled]="isAtLimit()" dragDrop (filesDropped)="handleFilesDropped($event)">
     <div class="upload-content">

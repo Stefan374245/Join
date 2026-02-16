@@ -90,6 +90,18 @@
   }
 }
 
+.upload-size-hint {
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: #6c757d;
+  font-weight: 500;
+
+  &.size-alert {
+    color: $error-color;
+    font-weight: 600;
+  }
+}
+
 @keyframes limitHintFlash {
   0% {
     color: #6c757d;

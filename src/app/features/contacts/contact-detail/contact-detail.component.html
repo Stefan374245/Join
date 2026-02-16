@@ -14,7 +14,17 @@
 
   <section class="contact-detail__info" aria-label="Contact profile">
     <figure class="contact-detail__avatar" [style.background-color]="contact()!.color">
-      {{ contact()!.initials }}
+      <span class="avatar-loader" *ngIf="isAvatarLoading(contact())">
+        <app-loading-spinner [localLoading]="true" [inline]="true" [size]="28" />
+      </span>
+      <img
+        *ngIf="contact()!.avatarUrl"
+        [src]="contact()!.avatarUrl!"
+        alt="{{ contact()!.firstName }} {{ contact()!.lastName }}"
+        (load)="onAvatarLoad(contact()!)"
+        (error)="onAvatarError(contact()!)"
+        class="contact-detail__avatar-image" />
+      <span *ngIf="!contact()!.avatarUrl">{{ contact()!.initials }}</span>
     </figure>
 
     <hgroup class="contact-detail__name">
@@ -63,6 +73,7 @@
     *ngIf="showDialog"
     [mode]="dialogMode"
     [contact]="contact()"
+    [isSaving]="isUpdating()"
     (close)="closeDialog()"
     (save)="saveContact($event)"
     (delete)="handleDelete($event)">

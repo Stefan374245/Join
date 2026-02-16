@@ -64,7 +64,19 @@
         role="listitem"
         [attr.aria-label]="getContactInitials(userId)"
       >
-        {{ getContactInitials(userId) }}
+        <span class="assignee-avatar-loading" *ngIf="isAvatarLoading(userId)">
+          <app-loading-spinner [localLoading]="true" [inline]="true" [size]="14" />
+        </span>
+        <img
+          *ngIf="getContactAvatar(userId)"
+          [src]="getContactAvatar(userId)!"
+          alt=""
+          aria-hidden="true"
+          class="assignee-photo"
+          (load)="onAvatarLoad(userId)"
+          (error)="onAvatarError(userId)"
+        />
+        <span *ngIf="!getContactAvatar(userId)">{{ getContactInitials(userId) }}</span>
       </div>
       <div
         class="assignee-avatar more"

@@ -79,7 +79,19 @@
                   class="assignee-avatar"
                   [style.background-color]="getContactColor(userId)"
                 >
-                  {{ getContactInitials(userId) }}
+                  <span class="assignee-avatar-loading" *ngIf="isAvatarLoading(currentTask.id, userId)">
+                    <app-loading-spinner [localLoading]="true" [inline]="true" [size]="18" />
+                  </span>
+                  <img
+                    *ngIf="getContactAvatar(userId)"
+                    [src]="getContactAvatar(userId)!"
+                    alt=""
+                    aria-hidden="true"
+                    class="assignee-photo"
+                    (load)="onAvatarLoad(currentTask.id, userId)"
+                    (error)="onAvatarError(currentTask.id, userId)"
+                  />
+                  <span *ngIf="!getContactAvatar(userId)">{{ getContactInitials(userId) }}</span>
                 </div>
                 <span class="assignee-name">{{
                   getContactFullName(userId)

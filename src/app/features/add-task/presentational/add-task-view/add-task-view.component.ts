@@ -140,6 +140,7 @@ export class AddTaskViewComponent implements OnInit, AfterViewInit {
       label: `${c.firstName} ${c.lastName}`,
       value: c.id,
       color: c.color,
+      avatarUrl: c.avatarUrl,
     }));
   });
 
@@ -158,6 +159,7 @@ export class AddTaskViewComponent implements OnInit, AfterViewInit {
         id: c.id,
         label: c.label,
         color: (c as any).color || "#29ABE2",
+        avatarUrl: (c as any).avatarUrl || null,
         removable: true,
       }));
   });

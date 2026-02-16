@@ -5,6 +5,7 @@ import { ContactService } from '../../../core/services/contact.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { Contact } from '../../../core/models/contact.interface';
+import { ContactSaveRequest } from '../../../core/models/contact-save-request.interface';
 import { ContactDialogComponent } from '../contact-dialog/contact-dialog.component';
 import { ClickOutsideDirective } from '../../../shared/directives/click-outside.directive';
 import { StopPropagationDirective } from '../../../shared/directives';
@@ -39,6 +40,7 @@ export class ContactDetailComponent implements OnInit {
   showActionMenu = false;
   showDialog = false;
   dialogMode: 'add' | 'edit' = 'edit';
+  private avatarLoaded = signal<Record<string, boolean>>({});
 
   /**
    * Component initialization - gets email from route
@@ -159,16 +161,17 @@ export class ContactDetailComponent implements OnInit {
    * @param updatedContact - Contact with updated data
    * @async @returns {Promise<void>}
    */
-  async saveContact(updatedContact: Contact): Promise<void> {
+  async saveContact(request: ContactSaveRequest): Promise<void> {
+    const updatedContact = request.contact;
     if (!updatedContact.id) return;
 
     this.isUpdating.set(true);
     try {
-      await this.contactService.updateUser(updatedContact.id, {
-        firstName: updatedContact.firstName,
-        lastName: updatedContact.lastName,
-        phone: updatedContact.phone
-      });
+      await this.contactService.updateUserWithAvatar(
+        updatedContact,
+        request.avatar,
+        !!request.removeAvatar,
+      );
       this.showDialog = false;
       this.toastService.showSuccess(`Contact ${updatedContact.firstName} ${updatedContact.lastName} updated successfully!`);
     } catch (error) {
@@ -184,5 +187,24 @@ export class ContactDetailComponent implements OnInit {
    */
   handleDelete(_email: string) {
     this.router.navigate(['/contacts']);
+  }
+
+  avatarLoadKey(contact: Contact): string {
+    return `${contact.id}:${contact.avatarUrl || ''}`;
+  }
+
+  isAvatarLoading(contact: Contact | null): boolean {
+    if (!contact?.avatarUrl) return false;
+    const key = this.avatarLoadKey(contact);
+    return !this.avatarLoaded()[key];
+  }
+
+  onAvatarLoad(contact: Contact): void {
+    const key = this.avatarLoadKey(contact);
+    this.avatarLoaded.update((state) => ({ ...state, [key]: true }));
+  }
+
+  onAvatarError(contact: Contact): void {
+    this.onAvatarLoad(contact);
   }
 }

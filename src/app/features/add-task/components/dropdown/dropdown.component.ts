@@ -16,6 +16,8 @@ export interface DropdownItem {
   id: string;
   label: string;
   icon?: string;
+  avatarUrl?: string | null;
+  color?: string;
   disabled?: boolean;
   [key: string]: any;
 }
@@ -305,6 +307,14 @@ export class DropdownComponent {
    */
   hasColor(item: DropdownItem): boolean {
     return !!item["color"];
+  }
+
+  hasAvatarImage(item: DropdownItem): boolean {
+    return typeof item["avatarUrl"] === "string" && item["avatarUrl"].trim().length > 0;
+  }
+
+  getAvatarUrl(item: DropdownItem): string {
+    return item["avatarUrl"] || "";
   }
 
   /**

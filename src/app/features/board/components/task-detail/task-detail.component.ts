@@ -53,6 +53,7 @@ export class TaskDetailComponent {
 
   selectedAttachment = signal<TaskAttachment | null>(null);
   isDownloading = signal<boolean>(false);
+  private avatarLoaded = signal<Record<string, boolean>>({});
   
   selectedAttachmentIndex = computed<number>(() => {
     const attachment = this.selectedAttachment();
@@ -225,6 +226,35 @@ export class TaskDetailComponent {
   getContactInitials(userId: string): string {
     const contact = this.getContact(userId);
     return contact?.initials || '??';
+  }
+
+  getContactAvatar(userId: string): string | null {
+    const contact = this.getContact(userId);
+    return contact?.avatarUrl || null;
+  }
+
+  isAvatarLoading(taskId: string, userId: string): boolean {
+    const url = this.getContactAvatar(userId);
+    if (!url) return false;
+
+    const key = this.avatarLoadKey(taskId, userId, url);
+    return !this.avatarLoaded()[key];
+  }
+
+  onAvatarLoad(taskId: string, userId: string): void {
+    const url = this.getContactAvatar(userId);
+    if (!url) return;
+
+    const key = this.avatarLoadKey(taskId, userId, url);
+    this.avatarLoaded.update((state) => ({ ...state, [key]: true }));
+  }
+
+  onAvatarError(taskId: string, userId: string): void {
+    this.onAvatarLoad(taskId, userId);
+  }
+
+  private avatarLoadKey(taskId: string, userId: string, url: string): string {
+    return `${taskId}:${userId}:${url}`;
   }
 
   /**

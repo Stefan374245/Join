@@ -105,10 +105,18 @@
           (click)="selectItem(item)"
           (mouseenter)="focusedIndex.set($index)"
         >
-          <span *ngIf="hasColor(item)" class="avatar" [style.background-color]="getColor(item)">
+          <span *ngIf="hasAvatarImage(item)" class="item-icon-wrapper">
+            <img
+              [src]="getAvatarUrl(item)"
+              [alt]="item.label"
+              class="item-icon"
+              title="avatar"
+            />
+          </span>
+          <span *ngIf="!hasAvatarImage(item) && hasColor(item)" class="avatar" [style.background-color]="getColor(item)">
             {{ getInitials(item.label) }}
           </span>
-          <span *ngIf="!hasColor(item) && item.icon" class="item-icon-wrapper">
+          <span *ngIf="!hasAvatarImage(item) && !hasColor(item) && item.icon" class="item-icon-wrapper">
             <img
               [src]="item.icon"
               [alt]="item.label"

@@ -5,6 +5,7 @@ export interface BadgeItem {
   id: string;
   label: string;
   color?: string;
+  avatarUrl?: string | null;
   textColor?: string;
   icon?: string;
   iconAlt?: string;
@@ -78,4 +79,8 @@ export class BadgeListComponent {
    * @returns Two-letter initials in uppercase
    */
   getInitials = getInitials;
+
+  hasAvatar(item: BadgeItem): boolean {
+    return typeof item.avatarUrl === 'string' && item.avatarUrl.trim().length > 0;
+  }
 }

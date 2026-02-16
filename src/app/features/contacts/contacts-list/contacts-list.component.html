@@ -1,4 +1,4 @@
-<main class="contacts-main">
+<section class="contacts-main">
   <div class="content-left">
     <div 
       class="add-btn" 
@@ -24,7 +24,21 @@
                 [class.singleUserChosen]="selected?.email === user.email"
                 [routerLink]="isMobile ? ['/contacts', user.email] : null"
                 (click)="select(user, $event)">
-                <span class="userInitials" [ngStyle]="{'background-color': user.color}">{{ user.initials }}</span>
+                <span class="userInitials" [ngStyle]="{'background-color': user.color}">
+                  <span class="avatar-loader" *ngIf="isAvatarLoading(user)">
+                    <app-loading-spinner [localLoading]="true" [inline]="true" [size]="16" />
+                  </span>
+                  <img
+                    *ngIf="user.avatarUrl"
+                    [src]="user.avatarUrl"
+                    alt="{{ user.firstName }} {{ user.lastName }}"
+                    class="userAvatar"
+                    [class.avatar-pending]="isAvatarLoading(user)"
+                    (load)="onAvatarLoad(user)"
+                    (error)="onAvatarError(user)"
+                  />
+                  <span *ngIf="!user.avatarUrl">{{ user.initials }}</span>
+                </span>
                 <div class="userDetails">
                   <span class="userName">{{ user.firstName }} {{ user.lastName }}</span>
                   <a class="emailText" [href]="'mailto:' + user.email" stopPropagation>{{ user.email }}</a>
@@ -58,7 +72,20 @@
 
     <section class="contact-details" *ngIf="selected; else emptyState">
       <div class="contactDetailsPerson">
-        <span class="userInitialsBig" [ngStyle]="{'background-color': selected.color}">{{ selected.initials }}</span>
+        <span class="userInitialsBig" [ngStyle]="{'background-color': selected.color}">
+          <span class="avatar-loader avatar-loader-big" *ngIf="isDetailAvatarLoading(selected)">
+            <app-loading-spinner [localLoading]="true" [inline]="true" [size]="28" />
+          </span>
+          <img
+            *ngIf="selected.avatarUrl"
+            [src]="selected.avatarUrl"
+            alt="{{ selected.firstName }} {{ selected.lastName }}"
+            class="userAvatarBig"
+            (load)="onDetailAvatarLoad()"
+            (error)="onDetailAvatarError()"
+          />
+          <span *ngIf="!selected.avatarUrl">{{ selected.initials }}</span>
+        </span>
         <section>
           <p id="contactDetailsName">{{ selected.firstName }} {{ selected.lastName }}</p>
           <div id="basicManipulate">
@@ -91,12 +118,13 @@
       </div>
     </ng-template>
   </div>
-</main>
+</section>
 
 <app-contact-dialog
   *ngIf="showDialog"
   [mode]="dialogMode"
   [contact]="dialogContact"
+  [isSaving]="isSavingContact()"
   (close)="closeDialog()"
   (save)="saveContact($event)"
   (delete)="showDeleteConfirmation(dialogContact!)">

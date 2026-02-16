@@ -28,6 +28,19 @@
   }
 }
 
+.inline-loading-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none;
+
+  img {
+    animation: spin 1s linear infinite;
+    display: block;
+    filter: none;
+  }
+}
+
 @keyframes spin {
   100% { transform: rotate(360deg); }
 }
