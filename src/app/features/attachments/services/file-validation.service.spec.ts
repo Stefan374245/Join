@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { FileValidationService } from './file-validation.service';
+import { FILE_UPLOAD } from '../../../shared/constants';
 
 describe('FileValidationService', () => {
   let service: FileValidationService;
@@ -90,8 +91,8 @@ describe('FileValidationService', () => {
   });
 
   describe('File Size Validation', () => {
-    it('should accept files under 1MB', async () => {
-      const smallContent = new Array(500 * 1024).fill('a').join('');
+    it('should accept files under configured limit', async () => {
+      const smallContent = new Array(Math.floor(FILE_UPLOAD.MAX_FILE_SIZE / 2)).fill('a').join('');
       const file = new File([smallContent], 'test.jpg', { type: 'image/jpeg' });
       spyOn<any>(service, 'validateMagicBytes').and.returnValue(Promise.resolve({ valid: true }));
       
@@ -100,8 +101,8 @@ describe('FileValidationService', () => {
       expect(result.valid).toBe(true);
     });
 
-    it('should reject files over 1MB', async () => {
-      const largeContent = new Array(2 * 1024 * 1024).fill('a').join('');
+    it('should reject files over configured limit', async () => {
+      const largeContent = new Array(FILE_UPLOAD.MAX_FILE_SIZE + 1).fill('a').join('');
       const file = new File([largeContent], 'large.jpg', { type: 'image/jpeg' });
       
       const result = await service.validateFile(file);
@@ -110,8 +111,8 @@ describe('FileValidationService', () => {
       expect(result.error).toContain('File too large');
     });
 
-    it('should accept exactly 1MB file', async () => {
-      const exactContent = new Array(1024 * 1024).fill('a').join('');
+    it('should accept exactly configured limit', async () => {
+      const exactContent = new Array(FILE_UPLOAD.MAX_FILE_SIZE).fill('a').join('');
       const file = new File([exactContent], 'exact.jpg', { type: 'image/jpeg' });
       spyOn<any>(service, 'validateMagicBytes').and.returnValue(Promise.resolve({ valid: true }));
       

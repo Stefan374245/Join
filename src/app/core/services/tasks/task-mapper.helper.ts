@@ -132,11 +132,11 @@ function mapSingleAttachment(att: FirestoreAttachment): TaskAttachment {
   return {
     id: att.id || generateAttachmentId(),
     filename: att.filename || 'unknown',
-    fileType: att.fileType || att.type || 'application/octet-stream',
-    base64: att.base64 || '',
+    fileType: att.fileType || 'application/octet-stream',
+    base64: att.base64, // Required: compressed base64 from Firestore
     size: att.size || 0,
     uploadedAt: convertToDate(att.uploadedAt),
-    downloadURL: att.downloadURL || att.url || ''
+    downloadURL: att.downloadURL // Optional for backward compatibility
   };
 }
 

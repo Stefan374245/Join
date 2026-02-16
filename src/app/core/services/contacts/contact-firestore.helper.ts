@@ -45,6 +45,9 @@ function buildContactDocument(contact: Contact): any {
     phone: contact.phone || '',
     color: contact.color,
     initials: contact.initials,
+    avatarUrl: contact.avatarUrl || null,
+    avatarPath: contact.avatarPath || null,
+    avatarUpdatedAt: contact.avatarUpdatedAt ? convertToTimestamp(contact.avatarUpdatedAt) : null,
     createdAt: contact.createdAt ? convertToTimestamp(contact.createdAt) : Timestamp.now(),
     updatedAt: Timestamp.now(),
   };
@@ -108,6 +111,8 @@ function copySafeContactProperties(updateData: any, data: Partial<Contact>): voi
   if (data.phone !== undefined) updateData.phone = data.phone;
   if (data.color !== undefined) updateData.color = data.color;
   if (data.initials !== undefined) updateData.initials = data.initials;
+  if (data.avatarUrl !== undefined) updateData.avatarUrl = data.avatarUrl;
+  if (data.avatarPath !== undefined) updateData.avatarPath = data.avatarPath;
 }
 
 /**
@@ -130,6 +135,10 @@ function convertDatesToTimestamps(updateData: any, data: Partial<Contact>): void
   if (data.createdAt) {
     updateData.createdAt = convertToTimestamp(data.createdAt);
   }
+
+  if (data.avatarUpdatedAt) {
+    updateData.avatarUpdatedAt = convertToTimestamp(data.avatarUpdatedAt);
+  }
 }
 
 /**
@@ -142,6 +151,7 @@ function convertDatesToTimestamps(updateData: any, data: Partial<Contact>): void
  * @param mapperFn - Function to map Firestore data to Contact
  * @param sorterFn - Function to sort contacts
  * @returns Unsubscribe function
+ * @remarks Initializes a real-time listener on the 'users' collection in Firestore. Updates the provided signals for contacts, loading state, and errors based on snapshot updates or errors. Returns a function to unsubscribe from the listener when it's no longer needed. Handles initialization errors gracefully by setting error and loading states accordingly.
  */
 export function setupContactsListener(
   firestore: Firestore,
@@ -166,6 +176,8 @@ export function setupContactsListener(
 /**
  * Creates real-time listener for contacts collection
  * Listens to Firestore changes and updates signals automatically
+ * @returns Unsubscribe function to stop listening
+ * @remarks Uses onSnapshot to listen for real-time updates and updates contacts, loading, and error signals accordingly. Handles errors gracefully and ensures proper cleanup with unsubscribe function.
  */
 function createContactsSnapshot(
   usersCol: any,
@@ -175,17 +187,14 @@ function createContactsSnapshot(
   mapperFn: (docId: string, data: any) => Contact,
   sorterFn: (contacts: Contact[]) => Contact[]
 ): () => void {
-  // onSnapshot = Firebase Real-Time Listener
-  // Wird AUTOMATISCH aufgerufen bei jeder Änderung in der 'users' Collection
+
   return onSnapshot(
     usersCol,
     
-    // SUCCESS: Wird aufgerufen wenn Daten ankommen
     (snapshot: QuerySnapshot<DocumentData>) => {
       handleContactsSnapshot(snapshot, contactsSignal, loadingSignal, errorSignal, mapperFn, sorterFn);
     },
     
-    // ERROR: Wird aufgerufen bei Fehlern
     (error: Error) => {
       handleSnapshotError(error, errorSignal, loadingSignal, contactsSignal);
     }
@@ -194,6 +203,14 @@ function createContactsSnapshot(
 
 /**
  * Handles successful snapshot update
+ * Updates contacts signal with mapped and sorted contacts, sets loading to false, and clears any previous errors
+ * @param snapshot - Firestore query snapshot
+ * @param contactsSignal - Writable signal for contacts
+ * @param loadingSignal - Writable signal for loading state
+ * @param errorSignal - Writable signal for errors
+ * @param mapperFn - Function to map Firestore data to Contact
+ * @param sorterFn - Function to sort contacts
+ * @remarks Maps Firestore documents to Contact objects using the provided mapper function, sorts them with the sorter function, and updates the contacts signal. Also manages loading and error states appropriately.
  */
 function handleContactsSnapshot(
   snapshot: QuerySnapshot<DocumentData>,

@@ -3,7 +3,8 @@ import { FILE_UPLOAD } from '../../../shared/constants';
 
 /**
  * Service for validating file uploads with security checks
- * Supports only JPEG and PNG image formats as per exam requirements
+ * Supports only JPEG and PNG image formats.
+ * Size validation applies to source files before compression.
  */
 @Injectable({
   providedIn: 'root'
@@ -69,12 +70,13 @@ export class FileValidationService {
    * Validate file size
    * @param size - Size of the file in bytes
    * @returns Validation result with error message if invalid
-   * @remarks Checks if the file size does not exceed the maximum allowed size (1MB)
+   * @remarks Checks if the file size does not exceed the configured source-file limit
    */
   private validateFileSize(size: number): { valid: boolean; error?: string } {
+    const maxMb = Math.round(this.MAX_FILE_SIZE / (1024 * 1024));
     return size <= this.MAX_FILE_SIZE
       ? { valid: true }
-      : { valid: false, error: `File too large. Maximum size: 1MB` };
+      : { valid: false, error: `File too large. Maximum size: ${maxMb}MB` };
   }
 
   /**

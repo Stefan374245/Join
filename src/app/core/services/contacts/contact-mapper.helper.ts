@@ -45,6 +45,23 @@ export function buildFullName(firstName: string, lastName: string): string {
   return `${firstName} ${lastName}`.trim();
 }
 
+function resolveContactNames(data: any): { firstName: string; lastName: string } {
+  const firstName = data['firstName'] || '';
+  const lastName = data['lastName'] || '';
+  if (firstName || lastName || !data['displayName']) return { firstName, lastName };
+  return extractNameParts(data['displayName']);
+}
+
+function mapContactMeta(data: any): Partial<Contact> {
+  return {
+    avatarUrl: data['avatarUrl'] || null,
+    avatarPath: data['avatarPath'] || null,
+    avatarUpdatedAt: data['avatarUpdatedAt'] ? convertToDate(data['avatarUpdatedAt']) : undefined,
+    createdAt: data['createdAt'] ? convertToDate(data['createdAt']) : undefined,
+    updatedAt: data['updatedAt'] ? convertToDate(data['updatedAt']) : undefined,
+  };
+}
+
 /**
  * Maps Firestore document to Contact object
  * @param docId - Document ID
@@ -58,19 +75,8 @@ export function mapFirestoreToContact(
   colorGenerator: (email: string) => string
 ): Contact {
   const email = data['email'] || '';
-  let firstName = data['firstName'] || '';
-  let lastName = data['lastName'] || '';
-
-  if (!firstName && !lastName && data['displayName']) {
-    const nameParts = extractNameParts(data['displayName']);
-    firstName = nameParts.firstName;
-    lastName = nameParts.lastName;
-  }
-
+  const { firstName, lastName } = resolveContactNames(data);
   const fullName = buildFullName(firstName, lastName);
-  const initials = data['initials'] || generateContactInitials(fullName, email);
-  const color = data['color'] || colorGenerator(email);
-
   return {
     id: docId,
     authUid: docId,
@@ -78,10 +84,9 @@ export function mapFirestoreToContact(
     lastName,
     email,
     phone: data['phone'] || '',
-    color,
-    initials,
-    createdAt: data['createdAt'] ? convertToDate(data['createdAt']) : undefined,
-    updatedAt: data['updatedAt'] ? convertToDate(data['updatedAt']) : undefined
+    color: data['color'] || colorGenerator(email),
+    initials: data['initials'] || generateContactInitials(fullName, email),
+    ...mapContactMeta(data),
   } as Contact;
 }
 
