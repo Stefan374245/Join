@@ -12,6 +12,21 @@ import { sortTasksByCreatedDate } from './task-filter.helper';
  */
 
 /**
+ * Removes undefined values from object (Firestore doesn't accept undefined)
+ * @param obj - Object to clean
+ * @returns Object without undefined values
+ */
+function removeUndefinedValues<T extends Record<string, any>>(obj: T): T {
+  const cleaned = { ...obj };
+  Object.keys(cleaned).forEach(key => {
+    if (cleaned[key] === undefined) {
+      delete cleaned[key];
+    }
+  });
+  return cleaned;
+}
+
+/**
  * Prepares subtasks for Firestore storage
  * @param subtasks - Array of subtasks
  * @returns Firestore-compatible subtask objects
@@ -22,8 +37,8 @@ export function prepareSubtasksForFirestore(subtasks: Subtask[]): FirestoreSubta
   }
 
   return subtasks.map(st => ({
-    id: st.id,
-    title: st.title,
+    id: st.id || `st-${Date.now()}`,
+    title: st.title || '',
     completed: st.completed === true
   }));
 }
@@ -38,14 +53,22 @@ export function prepareAttachmentsForFirestore(attachments: TaskAttachment[]): F
     return [];
   }
 
-  return attachments.map(att => ({
-    id: att.id,
-    filename: att.filename,
-    fileType: att.fileType,
-    size: att.size,
-    uploadedAt: att.uploadedAt ? convertToTimestamp(att.uploadedAt) : Timestamp.now(),
-    downloadURL: att.downloadURL || undefined
-  }));
+  return attachments.map(att => {
+    const firestoreAtt: FirestoreAttachment = {
+      id: att.id,
+      filename: att.filename,
+      fileType: att.fileType,
+      base64: att.base64,
+      size: att.size,
+      uploadedAt: att.uploadedAt ? convertToTimestamp(att.uploadedAt) : Timestamp.now()
+    };
+    
+    if (att.downloadURL) {
+      firestoreAtt.downloadURL = att.downloadURL;
+    }
+    
+    return firestoreAtt;
+  });
 }
 
 /**
@@ -54,16 +77,16 @@ export function prepareAttachmentsForFirestore(attachments: TaskAttachment[]): F
  * @param currentUserId - Current user ID
  * @returns Firestore task data object
  */
-export function buildTaskDataForFirestore(task: Task, currentUserId: string): Partial<FirestoreTaskDocument> {
-  const taskData: Partial<FirestoreTaskDocument> = {
-    title: task.title,
-    description: task.description,
-    category: task.category,
+export function buildTaskDataForFirestore(task: Task, currentUserId: string): Record<string, any> {
+  const taskData: Record<string, any> = {
+    title: task.title || '',
+    description: task.description || '',
+    category: task.category || '',
     assignedTo: task.assignedTo || [],
     dueDate: convertToTimestamp(task.dueDate),
-    priority: task.priority,
-    status: task.status,
-    subtasks: prepareSubtasksForFirestore(task.subtasks),
+    priority: task.priority || 'medium',
+    status: task.status || 'triage',
+    subtasks: prepareSubtasksForFirestore(task.subtasks || []),
     attachments: prepareAttachmentsForFirestore(task.attachments || []),
     createdAt: task.createdAt ? convertToTimestamp(task.createdAt) : Timestamp.now(),
     updatedAt: Timestamp.now(),
@@ -74,13 +97,13 @@ export function buildTaskDataForFirestore(task: Task, currentUserId: string): Pa
   };
 
   if (task.creatorName) {
-    taskData.creatorName = task.creatorName;
+    taskData['creatorName'] = task.creatorName;
   }
   if (task.creatorEmail) {
-    taskData.creatorEmail = task.creatorEmail;
+    taskData['creatorEmail'] = task.creatorEmail;
   }
 
-  return taskData;
+  return removeUndefinedValues(taskData);
 }
 
 /**
@@ -100,9 +123,34 @@ export async function addTaskToFirestore(
   const currentUserId = auth.currentUser?.uid || 'anonymous';
   const taskData = buildTaskDataForFirestore(task, currentUserId);
   
-  await runInInjectionContext(injector, async () => {
-    await setDoc(taskDoc, taskData);
-  });
+  const documentSize = estimateDocumentSize(taskData);
+  const maxSize = 1024 * 1024;
+  
+  if (documentSize > maxSize) {
+    const sizeMB = (documentSize / (1024 * 1024)).toFixed(2);
+    throw new Error(`Document too large: ${sizeMB}MB exceeds Firestore limit of 1MB. Please reduce attachments.`);
+  }
+  
+  try {
+    await runInInjectionContext(injector, async () => {
+      await setDoc(taskDoc, taskData);
+    });
+  } catch (error) {
+    console.error('❌ Failed to create task in Firestore:', error);
+    if (error instanceof Error) {
+      throw new Error(`Failed to create task: ${error.message}`);
+    }
+    throw new Error('Failed to create task: Unknown error');
+  }
+}
+
+/**
+ * Estimates document size in bytes
+ * @param data - Document data
+ * @returns Estimated size in bytes
+ */
+function estimateDocumentSize(data: any): number {
+  return new Blob([JSON.stringify(data)]).size;
 }
 
 /**
@@ -152,9 +200,11 @@ export async function updateTaskInFirestore(
     updateData.attachments = prepareAttachmentsForFirestore(updates.attachments);
   }
 
+  const cleanedUpdateData = removeUndefinedValues(updateData);
+
   try {
     await runInInjectionContext(injector, async () => {
-      await updateDoc(taskDoc, updateData);
+      await updateDoc(taskDoc, cleanedUpdateData);
     });
   } catch (error) {
     console.error('❌ Firestore update failed:', error);
