@@ -110,19 +110,16 @@ export async function downloadWithFallback(
   downloadURL: string,
   filename: string
 ): Promise<Blob | null> {
-  // Strategy 1: Firebase Storage getBlob
   const blobViaStorage = await tryDownloadViaStorageBlob(storage, downloadURL);
   if (blobViaStorage) {
     return blobViaStorage;
   }
 
-  // Strategy 2: Fetch with authentication
   const blobViaFetch = await tryDownloadViaFetch(auth, downloadURL);
   if (blobViaFetch) {
     return blobViaFetch;
   }
 
-  // Strategy 3: Open in new tab (no blob returned)
   downloadViaNewTab(downloadURL, filename);
   return null;
 }

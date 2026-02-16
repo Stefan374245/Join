@@ -331,9 +331,7 @@ export class TaskService {
     const taskId = generateTaskId();
 
     const attachmentsWithURLs = await uploadAndPrepareAttachments(
-      additionalData.attachments,
-      taskId,
-      this.attachmentStorage.uploadAttachments.bind(this.attachmentStorage),
+      additionalData.attachments
     );
 
     const newTask = buildTaskFromFormData(
@@ -371,9 +369,7 @@ export class TaskService {
     }
 
     const finalAttachments = await processAttachmentsForUpdate(
-      additionalData.attachments,
-      taskId,
-      this.attachmentStorage.uploadAttachments.bind(this.attachmentStorage),
+      additionalData.attachments
     );
 
     const updates = buildTaskUpdatesFromFormData(

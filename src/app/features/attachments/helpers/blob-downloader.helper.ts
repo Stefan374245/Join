@@ -3,6 +3,29 @@
  */
 
 /**
+ * Converts base64 string to Blob
+ * @param base64 - Base64 string (with or without data URL prefix)
+ * @param fileType - MIME type of the file
+ * @returns Blob object
+ */
+export function base64ToBlob(base64: string, fileType: string): Blob {
+  // Remove data URL prefix if present
+  const cleanBase64 = base64.includes(',') ? base64.split(',')[1] : base64;
+  
+  // Decode base64 to binary string
+  const byteString = atob(cleanBase64);
+  
+  // Create byte array
+  const byteArray = new Uint8Array(byteString.length);
+  for (let i = 0; i < byteString.length; i++) {
+    byteArray[i] = byteString.charCodeAt(i);
+  }
+  
+  // Create and return blob
+  return new Blob([byteArray], { type: fileType });
+}
+
+/**
  * Downloads blob as file to user's device
  * @param blob - Blob data to download
  * @param filename - Target filename for download

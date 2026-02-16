@@ -1,10 +1,12 @@
-import { Injectable, inject, signal, computed, Injector, runInInjectionContext, effect } from '@angular/core';
+import { Injectable, inject, signal, computed, Injector, effect } from '@angular/core';
 import { Firestore, collection, getDocs, doc, setDoc, deleteDoc, Timestamp } from '@angular/fire/firestore';
 import { Auth, authState } from '@angular/fire/auth';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Contact } from '../models/contact.interface';
+import { ContactAvatarUpload } from '../models/contact-avatar-upload.interface';
+import { AttachmentStorageService } from '../../features/attachments/services/attachment-storage.service';
 import { generateColorFromEmail } from './auth/color-generator.helper';
-import { fetchContactsFromFirestore, saveContactToFirestore, updateContactInFirestore, setupContactsListener } from './contacts/contact-firestore.helper';
+import { saveContactToFirestore, updateContactInFirestore, setupContactsListener } from './contacts/contact-firestore.helper';
 import { mapFirestoreToContact, sortContactsByName, buildFullName } from './contacts/contact-mapper.helper';
 import { groupContactsByInitial } from './contacts/contact-grouping.helper';
 
@@ -18,6 +20,7 @@ import { groupContactsByInitial } from './contacts/contact-grouping.helper';
 export class ContactService {
   private firestore = inject(Firestore);
   private auth = inject(Auth);
+  private attachmentStorage = inject(AttachmentStorageService);
   private injector = inject(Injector);
   private contactsSignal = signal<Contact[]>([]);
   private loadingSignal = signal<boolean>(false);
@@ -84,9 +87,7 @@ export class ContactService {
    */
   findContactByIdOrAuthUid(idOrAuthUid: string): Contact | undefined {
     const contacts = this.contacts();
-    // First try exact ID match
     let contact = contacts.find(c => c.id === idOrAuthUid);
-    // If not found, try authUid match
     if (!contact) {
       contact = contacts.find(c => c.authUid === idOrAuthUid);
     }
@@ -141,12 +142,19 @@ export class ContactService {
       phone: contact.phone || '',
       color: contact.color,
       initials: contact.initials,
+      avatarUrl: contact.avatarUrl || null,
+      avatarPath: contact.avatarPath || null,
+      avatarUpdatedAt: contact.avatarUpdatedAt ? Timestamp.fromDate(contact.avatarUpdatedAt) : null,
       createdAt: Timestamp.now(),
       updatedAt: Timestamp.now()
     };
 
     await setDoc(userDoc, contactData);
-    // Real-time listener will update automatically
+  }
+
+  async saveContactWithAvatar(contact: Contact, avatar?: ContactAvatarUpload): Promise<void> {
+    const avatarData = avatar ? await this.upAvatar(contact.id, avatar) : {};
+    await this.saveContact({ ...contact, ...avatarData });
   }
 
   /**
@@ -166,7 +174,6 @@ export class ContactService {
       createdAt: Timestamp.now(),
       updatedAt: Timestamp.now()
     });
-    // Real-time listener will update automatically
   }
 
   /**
@@ -177,7 +184,15 @@ export class ContactService {
    */
   async updateUser(userId: string, data: Partial<Contact>): Promise<void> {
     await updateContactInFirestore(this.firestore, userId, this.buildUpdateData(data));
-    // Real-time listener will update automatically
+  }
+
+  async updateUserWithAvatar(
+    contact: Contact,
+    avatar?: ContactAvatarUpload,
+    removeAvatar = false,
+  ): Promise<void> {
+    const avatarData = await this.avatarPatch(contact, avatar, removeAvatar);
+    await this.updateUser(contact.id, { ...this.editData(contact), ...avatarData });
   }
 
   /**
@@ -198,6 +213,47 @@ export class ContactService {
     return updateData;
   }
 
+  private editData(contact: Contact): Partial<Contact> {
+    return {
+      firstName: contact.firstName,
+      lastName: contact.lastName,
+      phone: contact.phone,
+    };
+  }
+
+  private async avatarPatch(
+    contact: Contact,
+    avatar?: ContactAvatarUpload,
+    removeAvatar = false,
+  ): Promise<Partial<Contact>> {
+    if (removeAvatar) return await this.clearAvatarData(contact.avatarPath);
+    if (!avatar) return {};
+    await this.delAvatar(contact.avatarPath);
+    return await this.upAvatar(contact.id, avatar);
+  }
+
+  private async clearAvatarData(avatarPath?: string | null): Promise<Partial<Contact>> {
+    await this.delAvatar(avatarPath);
+    return { avatarUrl: null, avatarPath: null, avatarUpdatedAt: new Date() };
+  }
+
+  private async upAvatar(
+    contactId: string,
+    avatar: ContactAvatarUpload,
+  ): Promise<Partial<Contact>> {
+    const avatarPath = this.avatarPath(contactId, avatar.fileType);
+    const avatarUrl = await this.attachmentStorage.putBase64(avatarPath, avatar.base64, avatar.fileType);
+    return { avatarUrl, avatarPath, avatarUpdatedAt: new Date() };
+  }
+
+  private avatarPath(contactId: string, fileType: ContactAvatarUpload['fileType']): string {
+    return `users/${contactId}/avatar.${fileType === 'image/png' ? 'png' : 'jpg'}`;
+  }
+
+  private async delAvatar(avatarPath?: string | null): Promise<void> {
+    await this.attachmentStorage.delByPath(avatarPath);
+  }
+
   /**
    * Deletes user from Firestore and removes from all tasks
    * @param userId - The ID of the user to delete
@@ -205,10 +261,11 @@ export class ContactService {
    */
   async deleteUser(userId: string): Promise<void> {
     const userDoc = doc(this.firestore, 'users', userId);
+    const contact = this.findContactById(userId);
     
+    await this.delAvatar(contact?.avatarPath);
     await this.removeUserFromAllTasks(userId);
     await deleteDoc(userDoc);
-    // Real-time listener will update automatically
   }
 
   /**

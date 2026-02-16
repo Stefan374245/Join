@@ -11,19 +11,36 @@ import { IMAGE_COMPRESSION } from '../../../shared/constants';
 export class ImageCompressionService {
   private readonly MAX_DIMENSION = IMAGE_COMPRESSION.MAX_DIMENSION;
   private readonly COMPRESSION_QUALITY = IMAGE_COMPRESSION.QUALITY;
+  private readonly MAX_OUTPUT_SIZE = IMAGE_COMPRESSION.MAX_OUTPUT_SIZE;
 
   /**
    * Compress image to base64 string
    * @param file - Image file to compress
    * @returns Promise resolving to base64 string
    */
-  async compressImage(file: File): Promise<string> {
+  async compressImage(file: File, maxOutputSize = this.MAX_OUTPUT_SIZE): Promise<string> {
     const img = await this.loadImage(file);
     const canvas = this.createCanvas(img);
     const ctx = this.getContext(canvas);
     
     this.drawImage(ctx, img, canvas.width, canvas.height);
-    return this.canvasToBase64(canvas, file.type);
+    const base64 = this.canvasToBase64(canvas, file.type);
+    this.checkSize(base64, maxOutputSize);
+    return base64;
+  }
+
+  private checkSize(base64: string, maxBytes: number): void {
+    if (this.bytes(base64) <= maxBytes) return;
+    throw new Error(`Compressed image too large. Maximum size: ${this.mb(maxBytes)}MB`);
+  }
+
+  private bytes(base64: string): number {
+    const padding = base64.endsWith('==') ? 2 : base64.endsWith('=') ? 1 : 0;
+    return Math.floor((base64.length * 3) / 4) - padding;
+  }
+
+  private mb(bytes: number): number {
+    return Math.round((bytes / (1024 * 1024)) * 10) / 10;
   }
 
   /**
@@ -88,6 +105,6 @@ export class ImageCompressionService {
   private canvasToBase64(canvas: HTMLCanvasElement, mimeType: string): string {
     const format = mimeType === 'image/png' ? 'image/png' : 'image/jpeg';
     const base64 = canvas.toDataURL(format, this.COMPRESSION_QUALITY);
-    return base64.split(',')[1]; // Remove data:image/jpeg;base64, prefix
+    return base64.split(',')[1];
   }
 }
