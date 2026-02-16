@@ -1,8 +1,4 @@
 /**
- * Helper functions for Base64 data formatting
- */
-
-/**
  * Formats base64 string to data URL format
  * @param base64 - Base64 string with or without prefix
  * @param fileType - MIME type of the file
