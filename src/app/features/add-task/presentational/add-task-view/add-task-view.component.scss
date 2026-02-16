@@ -257,6 +257,17 @@
   }
 }
 
+@media (max-width: 390px) {
+  .form-actions {
+    flex-direction: column !important;
+    gap: 12px;
+    
+    .btn {
+      width: 100%;
+    }
+  }
+}
+
 @media (max-width: 360px) {
   .button-group {
     gap: 6px;
