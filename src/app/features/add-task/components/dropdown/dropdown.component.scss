@@ -116,6 +116,14 @@
   border-bottom: 1px solid #d1d1d1;
 }
 
+.loading-wrapper {
+  padding: 12px;
+  @include flex(row, center, center);
+  background-color: #ffffff;
+  border-bottom: 1px solid #d1d1d1;
+  min-height: 60px;
+}
+
 .search-input {
   width: 100%;
   height: 40px;

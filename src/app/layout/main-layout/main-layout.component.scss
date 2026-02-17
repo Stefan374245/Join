@@ -62,8 +62,9 @@
   }
 
   @media (max-width: $breakpoint-lg) {
-    scrollbar-width: none;
     -ms-overflow-style: none;
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
 
     &::-webkit-scrollbar {
       display: none;

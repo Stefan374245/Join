@@ -24,7 +24,8 @@
   margin: $spacing-md;
   animation: slideInFromRight 0.2s ease-out;
   overflow: auto;
-  scrollbar-width: none;
+  /* stylelint-disable-next-line property-no-unknown */
+  scrollbar-width: none; /* Firefox support with webkit fallback below */
 
   @media (max-width: 500px) {
     width: calc(100% - 32px);

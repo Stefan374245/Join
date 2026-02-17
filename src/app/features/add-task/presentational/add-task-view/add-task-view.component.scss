@@ -221,7 +221,7 @@
 @media (max-width: $breakpoint-md) {
   .add-task-form {
     flex-direction: column;
-    gap: 24px;
+    gap: 0!important;
   }
 
   .form-column {
