@@ -333,7 +333,6 @@ export class BoardViewComponent implements OnInit, AfterViewInit, OnDestroy {
    * debugging and understanding user interactions that don't result in data changes.
    */
   private logNoUpdate() {
-    // No update needed
   }
 
   /**

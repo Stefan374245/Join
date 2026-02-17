@@ -1,10 +1,14 @@
 @use "../../../../../styles/index" as *;
 
 .request-form {
+  @include flex(column, flex-start, center);
   position: relative;
-  width: 100%;
   min-height: 100vh;
+  max-width: $breakpoint-lg-xl;
+  margin: 0 auto;
+  background-color: #f6f7f8;
   padding: clamp(1.5rem, 3vw, 2.5rem);
+  padding-bottom: 0;
 }
 
 .header {
@@ -14,8 +18,13 @@
   margin: 0;
 
   .logo {
-    width: clamp(2.5rem, 4vw, 3.5rem);
-    height: auto;
+    height: 120px;
+    width: auto;
+  }
+  @media (max-width: $breakpoint-md) {
+    .logo {
+      height: 80px;
+    }
   }
 }
 
@@ -25,9 +34,8 @@
   @media (min-width: $breakpoint-md) {
     @include flex(row, space-between, center);
     width: 100%;
-    max-width: 1200px;
     margin: 0 auto 2rem;
-    padding: 0 $spacing-md;
+    padding: 3rem 2rem;
   }
 
   .back-link-desktop {
@@ -53,7 +61,7 @@
       font-weight: 500;
 
       &.limit-reached {
-        color: #FF4646;
+        color: #ff4646;
         font-weight: 600;
       }
     }
@@ -62,10 +70,10 @@
 
 .content {
   @include flex(column, flex-start, center);
+  flex: 1;
   width: 100%;
-  max-width: 1000px;
   margin: 0 auto;
-  padding: clamp(2rem, 4vw, 3.5rem) $spacing-md;
+  padding: clamp(2rem, 4vw, 3.5rem) $spacing-md 0;
   gap: 1rem;
 
   .title-section {
@@ -125,7 +133,7 @@
     font-weight: 500;
 
     &.limit-reached {
-      color: #FF4646;
+      color: $error-color;
       font-weight: 600;
     }
   }
@@ -134,12 +142,12 @@
 .limit-banner {
   width: 100%;
   padding: 1rem 1.5rem;
-  background-color: rgba(255, 70, 70, 0.08);
+  background-color: rgba($error-color, 0.08);
   border-radius: 4px;
   font-family: "Open Sans", sans-serif;
   font-size: 1rem;
   font-weight: 500;
-  color: #FF4646;
+  color: $error-color;
   text-align: center;
 }
 
@@ -180,7 +188,7 @@
 
     .email-info {
       margin-top: $spacing-md;
-      
+
       p {
         font-family: "Open Sans", sans-serif;
         font-size: clamp(1rem, 1.8vw, 1.1875rem);
@@ -354,7 +362,6 @@
   }
 }
 
-// ANIMATIONS
 @keyframes slideDown {
   from {
     opacity: 0;
@@ -388,7 +395,6 @@
   }
 }
 
-// Responsive
 @media (max-width: 768px) {
   .action-section {
     .dropdown-menu {

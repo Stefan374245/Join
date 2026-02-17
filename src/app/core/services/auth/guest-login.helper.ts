@@ -34,14 +34,12 @@ export function isEmailInUseError(error: any): boolean {
  * Logs guest account creation
  */
 export function logGuestCreation(): void {
-  // Guest creation logged
 }
 
 /**
  * Logs successful guest creation
  */
 export function logGuestSuccess(): void {
-  // Guest success logged
 }
 
 /**

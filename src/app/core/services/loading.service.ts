@@ -1,10 +1,5 @@
 import { Injectable, signal, computed } from '@angular/core';
 
-/**
- * Global loading service using Signal-based pattern
- * Manages loading state across the application with support for multiple concurrent operations
- * Now includes image loading state management for reusable image loading tracking
- */
 @Injectable({
   providedIn: 'root'
 })
@@ -50,10 +45,6 @@ export class LoadingService {
   reset(): void {
     this.loadingCountSignal.set(0);
   }
-
-  // ============================================
-  // IMAGE LOADING STATE MANAGEMENT
-  // ============================================
 
   /**
    * Mark an image as loading

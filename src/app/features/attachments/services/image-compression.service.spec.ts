@@ -84,7 +84,6 @@ describe('ImageCompressionService', () => {
       const result = await service.compressImage(file);
       
       expect(result).toBeTruthy();
-      // Result should be compressed and smaller
       expect(result.length).toBeLessThan(canvas.toDataURL('image/jpeg', 0.7).length);
     });
 
@@ -144,7 +143,6 @@ describe('ImageCompressionService', () => {
       canvas.height = 800;
       const ctx = canvas.getContext('2d')!;
       
-      // Fill with gradient for better compression testing
       const gradient = ctx.createLinearGradient(0, 0, 800, 800);
       gradient.addColorStop(0, 'red');
       gradient.addColorStop(1, 'blue');
@@ -160,7 +158,6 @@ describe('ImageCompressionService', () => {
       const result = await service.compressImage(file);
       
       expect(result).toBeTruthy();
-      // Compressed base64 should be smaller than original
       const originalBase64 = await new Promise<string>((resolve) => {
         const reader = new FileReader();
         reader.onload = () => resolve((reader.result as string).split(',')[1]);
@@ -185,7 +182,6 @@ describe('ImageCompressionService', () => {
       
       const result = await service.compressImage(file);
       
-      // Should not contain data:image prefix
       expect(result.startsWith('data:')).toBe(false);
       expect(result.startsWith('/9j')).toBe(true); // JPEG base64 typically starts with /9j
     });

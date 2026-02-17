@@ -39,7 +39,6 @@ export class BadgeListComponent {
   
   remainingCount = computed(() => {
     const max = this.maxVisible();
-    // Calculate overflow count when limit is set
     return max ? Math.max(0, this.items().length - max) : 0;
   });
 
@@ -50,7 +49,6 @@ export class BadgeListComponent {
    * @param itemId - ID of item to remove
    */
   remove(itemId: string): void {
-    // Emit item ID to parent component for removal handling
     this.itemRemove.emit(itemId);
   }
   

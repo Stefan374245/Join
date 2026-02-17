@@ -14,7 +14,6 @@ describe('BoardColumnComponent', () => {
     fixture = TestBed.createComponent(BoardColumnComponent);
     component = fixture.componentInstance;
     
-    // Mock required inputs
     component.columnId = 'test';
     component.title = 'Test Column';
     component.tasks = [];

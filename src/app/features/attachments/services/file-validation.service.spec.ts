@@ -144,7 +144,6 @@ describe('FileValidationService', () => {
     });
 
     it('should reject renamed .exe file as .jpg', async () => {
-      // MZ header (exe file)
       const exeBytes = new Uint8Array([0x4D, 0x5A, 0x90, 0x00]);
       const blob = new Blob([exeBytes], { type: 'image/jpeg' });
       const file = new File([blob], 'malware.jpg', { type: 'image/jpeg' });

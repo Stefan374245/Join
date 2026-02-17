@@ -10,7 +10,6 @@ export const authGuard: CanActivateFn = (route, state) => {
   const authService = inject(AuthService);
   const router = inject(Router);
 
-  // ✅ Direct Signal Access - kein Observable nötig!
   if (authService.isAuthenticated()) {
     return true;
   } else {
@@ -27,7 +26,6 @@ export const guestGuard: CanActivateFn = (route, state) => {
   const authService = inject(AuthService);
   const router = inject(Router);
 
-  // ✅ Direct Signal Access - kein Observable nötig!
   if (!authService.isAuthenticated()) {
     return true;
   } else {

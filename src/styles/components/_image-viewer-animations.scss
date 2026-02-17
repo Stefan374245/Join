@@ -1,7 +1,6 @@
 @use "../abstract/variables" as *;
 @use "../abstract/mixins" as *;
 
-// Animation keyframes for image viewer
 @keyframes backdropFadeIn {
   from {
     opacity: 0;

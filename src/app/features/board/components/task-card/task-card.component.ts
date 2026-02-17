@@ -1,4 +1,4 @@
-import { Component, input, output, ViewEncapsulation, signal } from '@angular/core';
+import { Component, input, output, ViewEncapsulation, ChangeDetectionStrategy, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { Task } from '../../../../core/models/task.interface';
@@ -28,6 +28,7 @@ import { LoadingSpinnerComponent } from '../../../../shared/components/loading-s
   templateUrl: './task-card.component.html',
   styleUrl: './task-card.component.scss',
   encapsulation: ViewEncapsulation.None,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TaskCardComponent {
   task = input.required<Task>();
@@ -57,7 +58,6 @@ export class TaskCardComponent {
    * Handles drag end event
    */
   onDragEnded(): void {
-    // Keep wasDragging true briefly to prevent click event from firing
     setTimeout(() => {
       this.wasDragging = false;
     }, 200);
@@ -204,5 +204,15 @@ export class TaskCardComponent {
       high: 'assets/images/urgent.svg',
     };
     return iconMap[priority] || iconMap['medium'];
+  }
+
+  /**
+   * TrackBy function for assignedTo list to prevent unnecessary re-renders
+   * @param index - Array index
+   * @param userId - User ID
+   * @returns User ID for tracking
+   */
+  trackByUserId(index: number, userId: string): string {
+    return userId;
   }
 }

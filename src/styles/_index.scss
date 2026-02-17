@@ -1,20 +1,15 @@
-// Abstract (keine CSS-Ausgabe)
 @forward './abstract/variables';
 @forward './abstract/mixins';
 @forward './abstract/scrollbar-mixins';
 @forward './abstract/layout-mixins';
 
-// Base
 @forward './base/typography';
 
-// Layout
 @forward './layout/page';
 
-// Components
 @forward './components/buttons';
 @forward './components/animations';
 @forward './components/info-pages';
 @forward './components/image-viewer-animations';
 
-// Utilities
 @forward './utilities/utilities';

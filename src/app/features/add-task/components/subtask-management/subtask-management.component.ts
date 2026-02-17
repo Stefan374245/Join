@@ -78,12 +78,9 @@ export class SubtaskManagementComponent {
    
     /**
      * Handles the addition of a new subtask.
-     *
-     * - Retrieves and trims the input value from the subtask input control.
-     * - If the input is empty, the method returns early.
-     * - Checks if the maximum number of subtasks (5) has been reached; if so, displays a toast notification and returns.
-     * - Emits the new subtask input to the parent component for further handling.
-     * - Resets the subtask input control and refocuses the input field.
+     * @param subtask - The title of the new subtask to be added.
+     * @return {void}
+     * @remarks This method first checks if the input for the new subtask is valid (not empty). If the input is valid, it then checks if the maximum number of subtasks has been reached. If the user can add more subtasks, it emits the `addSubtask` event with the new subtask title, resets the input control, and sets focus back to the input field. If the maximum number of subtasks has been reached, it shows a toast notification to inform the user.
      */
     onAddSubtask(): void {
         const input = this.subtaskInputControl().value?.trim();
@@ -97,7 +94,6 @@ export class SubtaskManagementComponent {
             return;
         }
 
-        // Always emit to parent - parent decides TaskService vs local handling
         this.addSubtask.emit(input);
         this.subtaskInputControl().reset();
         this.focusAddInput();
@@ -106,10 +102,8 @@ export class SubtaskManagementComponent {
   
     /**
      * Sets focus to the add input element after the current call stack is cleared.
-     * Uses `setTimeout` with a delay of 0 to ensure the DOM is updated before focusing.
-     * Checks if `addInput` is defined before attempting to focus.
-     *
-     * @private
+        * @return {void}
+        * @remarks This method uses `setTimeout` with a delay of 0 to ensure that the focus is set to the add input element after any pending operations in the current call stack have been completed. This is particularly useful when adding a new subtask, as it allows the UI to update before attempting to focus the input field, ensuring a smoother user experience.
      */
     private focusAddInput(): void {
         setTimeout(() => {
@@ -122,6 +116,8 @@ export class SubtaskManagementComponent {
     /**
      * Handles Enter key press in add input field
      * @param event - Keyboard event
+     * @return {void}
+     * @remarks This method listens for the 'Enter' key press event on the add input field. When the 'Enter' key is pressed, it prevents the default behavior (which would typically submit a form) and calls the `onAddSubtask` method to add the new subtask. This allows users to quickly add subtasks by simply typing the title and pressing 'Enter', enhancing the usability of the subtask management interface.
      */
     onAddInputKeydown(event: KeyboardEvent): void {
         if (event.key === 'Enter') {
@@ -138,10 +134,8 @@ export class SubtaskManagementComponent {
 
     /**
      * Handles the blur event on the input field.
-     * Logs a message to the console and, after a short delay,
-     * sets the `inputFocused` state to false.
-     * The delay ensures that any related events (such as click)
-     * are processed before the focus state changes.
+     * @return {void}
+     * @remarks This method is called when the input field loses focus. It uses `setTimeout` to delay the execution of setting the `inputFocused` signal to `false`, allowing any related click events (such as clicking on a dropdown or action button) to be processed before the input is marked as unfocused. This helps prevent issues where the input might lose focus prematurely when interacting with other UI elements related to the subtask management.
      */
     onAddInputBlur(): void {
         setTimeout(() => {
@@ -152,10 +146,8 @@ export class SubtaskManagementComponent {
     
     /**
      * Clears the value of the subtask input control and resets its state.
-     * If the input element reference (`addInput`) exists, it sets focus back to the input field.
-     *
-     * @remarks
-     * This method is typically used to clear user input and prepare the input field for new data entry.
+     * @return {void}
+     * @remarks This method resets the subtask input control to an empty state and then sets focus back to the input field. This is typically used after a subtask has been successfully added, allowing the user to quickly add another subtask without having to manually clear the input field or click on it again.
      */
     onClearInput(): void {
         this.subtaskInputControl().reset();
@@ -167,6 +159,8 @@ export class SubtaskManagementComponent {
     /**
      * Initiates subtask editing mode
      * @param subtask - Subtask to edit
+     * @return {void}
+     * @remarks This method is called when the user clicks the edit icon for a subtask. It emits the `editSubtask` event with the subtask to be edited, which allows parent components or services to handle the editing logic. After emitting the event, it sets focus to the edit input field to allow the user to immediately start editing the subtask title.
      */
     onEdit(subtask: Subtask): void {
         this.editSubtask.emit(subtask);
@@ -180,10 +174,8 @@ export class SubtaskManagementComponent {
    
     /**
      * Emits an event to notify that a subtask update action has been triggered.
-     *
-     * This method should be called when the user initiates an update operation
-     * for a subtask. It emits the `updateSubtask` event to inform parent components
-     * or services that the update process should proceed.
+     * @return {void}
+     * @remarks This method is typically called when the user finishes editing a subtask and wants to save the changes. It emits the `updateSubtask` event, which can be handled by parent components or services to perform the actual update logic, such as saving the changes to a database or updating the UI accordingly.
      */
     onUpdate(): void {
         this.updateSubtask.emit();
@@ -192,7 +184,8 @@ export class SubtaskManagementComponent {
 
     /**
      * Emits an event to notify that the subtask edit operation has been cancelled.
-     * Typically used to revert the UI to its previous state or close an edit form.
+     * @return {void}
+     * @remarks This method is typically called when the user cancels editing a subtask. It emits the `cancelEditSubtask` event, which can be handled by parent components or services to revert the UI to its previous state or close the edit form.
      */
     onCancelEdit(): void {
         this.cancelEditSubtask.emit();
@@ -200,7 +193,9 @@ export class SubtaskManagementComponent {
 
     /**
      * Handles input blur during editing with focus check
-     * @param event - Focus event
+     *@param event - Focus event triggered when the edit input field loses focus
+     * @return {void}
+     * @remarks This method is called when the edit input field loses focus. It checks the related target of the blur event to determine if the focus is moving to an element that should keep the edit mode active (such as action icons). If the focus is moving to an unrelated element, it emits the `cancelEditSubtask` event to exit the edit mode. This ensures that users can interact with related UI elements without unintentionally cancelling their edits.
      */
     onInputBlur(event: FocusEvent): void {
         const relatedTarget = event.relatedTarget as HTMLElement;
@@ -214,6 +209,8 @@ export class SubtaskManagementComponent {
     /**
      * Deletes specified subtask - emits to parent for TaskService handling
      * @param id - Subtask ID to delete
+     * @return {void}
+     * @remarks This method is called when the user clicks the delete icon for a subtask. It emits the `deleteSubtask` event with the ID of the subtask to be deleted, allowing parent components or services to handle the deletion logic, such as removing the subtask from a database or updating the UI accordingly.
      */
     onDelete(id: string): void {
         this.deleteSubtask.emit(id);
@@ -222,9 +219,8 @@ export class SubtaskManagementComponent {
   
     /**
      * Toggles the open state of the dropdown menu.
-     * 
-     * This method updates the `isDropdownOpen` state by inverting its current value.
-     * Typically used to show or hide a dropdown in the UI.
+     * @return {void}
+     * @remarks This method updates the `isDropdownOpen` signal to toggle the visibility of the dropdown menu. When called, it inverts the current state of `isDropdownOpen`, allowing the dropdown to open if it was closed, or close if it was open. This is typically used in response to user interactions, such as clicking on a dropdown toggle button.
      */
     toggleDropdown(): void {
         this.isDropdownOpen.update(open => !open);
@@ -232,6 +228,8 @@ export class SubtaskManagementComponent {
 
     /**
      * Closes subtask overflow dropdown
+     *  @return {void}
+     * @remarks This method sets the `isDropdownOpen` signal to `false`, which closes the dropdown menu. It is typically called when the user clicks outside of the dropdown or performs an action that should close the dropdown, ensuring that the UI behaves as expected and does not leave the dropdown open unintentionally.
      */
     closeDropdown(): void {
         this.isDropdownOpen.set(false);

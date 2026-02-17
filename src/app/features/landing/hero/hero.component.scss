@@ -9,7 +9,6 @@
   padding: $spacing-md;
   overflow: auto;
 
-  // Container für max-width Begrenzung
   &::before {
     content: '';
     position: absolute;

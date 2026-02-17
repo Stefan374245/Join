@@ -10,7 +10,6 @@ import { FooterAuthComponent } from '../../shared/components/footer-auth/footer-
 import { LoadingSpinnerComponent } from '../../shared/components/loading-spinner/loading-spinner.component';
 import { FormInputComponent } from '../../shared/components/form-input/form-input.component';
 
-// Constants
 const POPUP_CHECK_INTERVAL_MS = 500;
 const POPUP_MAX_CHECKS = 10;
 const LOGIN_TIMEOUT_MS = 20000;

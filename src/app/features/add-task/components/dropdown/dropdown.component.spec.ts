@@ -14,7 +14,6 @@ describe('DropdownComponent', () => {
     fixture = TestBed.createComponent(DropdownComponent);
     component = fixture.componentInstance;
     
-    // Setup test data
     testItems = [
       { id: '1', label: 'Option 1' },
       { id: '2', label: 'Option 2' },
@@ -22,10 +21,6 @@ describe('DropdownComponent', () => {
       { id: '4', label: 'Another Option' }
     ];
   });
-
-  // ============================================
-  // CREATION & INITIALIZATION
-  // ============================================
 
   it('should create', () => {
     expect(component).toBeTruthy();
@@ -39,10 +34,6 @@ describe('DropdownComponent', () => {
     const trigger = fixture.nativeElement.querySelector('.dropdown-trigger');
     expect(trigger).toBeTruthy();
   });
-
-  // ============================================
-  // DROPDOWN STATE
-  // ============================================
 
   it('should be closed by default', () => {
     fixture.componentRef.setInput('id', 'test');
@@ -106,10 +97,6 @@ describe('DropdownComponent', () => {
     expect(emitted).toBe(true);
   });
 
-  // ============================================
-  // SINGLE SELECT MODE
-  // ============================================
-
   it('should select item in single-select mode', () => {
     fixture.componentRef.setInput('id', 'test');
     fixture.componentRef.setInput('items', testItems);
@@ -147,10 +134,6 @@ describe('DropdownComponent', () => {
     component.selectItem(testItems[1]);
     expect(selectedIds).toEqual(['2']);
   });
-
-  // ============================================
-  // MULTI SELECT MODE
-  // ============================================
 
   it('should allow multiple selections in multi-select mode', () => {
     fixture.componentRef.setInput('id', 'test');
@@ -193,10 +176,6 @@ describe('DropdownComponent', () => {
     expect(component.isOpen()).toBe(true);
   });
 
-  // ============================================
-  // DISABLED STATE
-  // ============================================
-
   it('should not select disabled items', () => {
     fixture.componentRef.setInput('id', 'test');
     fixture.componentRef.setInput('items', testItems);
@@ -218,10 +197,6 @@ describe('DropdownComponent', () => {
     component.toggleDropdown();
     expect(component.isOpen()).toBe(false);
   });
-
-  // ============================================
-  // SEARCH FUNCTIONALITY
-  // ============================================
 
   it('should filter items based on search query', () => {
     fixture.componentRef.setInput('id', 'test');
@@ -251,10 +226,6 @@ describe('DropdownComponent', () => {
     expect(component.filteredItems().length).toBe(testItems.length);
   });
 
-  // ============================================
-  // DISPLAY TEXT
-  // ============================================
-
   it('should show placeholder when nothing is selected', () => {
     fixture.componentRef.setInput('id', 'test');
     fixture.componentRef.setInput('items', testItems);
@@ -282,10 +253,6 @@ describe('DropdownComponent', () => {
     expect(component.displayText()).toBe('2 selected');
   });
 
-  // ============================================
-  // CLEAR SELECTION
-  // ============================================
-
   it('should clear all selections', () => {
     fixture.componentRef.setInput('id', 'test');
     fixture.componentRef.setInput('items', testItems);
@@ -298,10 +265,6 @@ describe('DropdownComponent', () => {
     component.clearSelection();
     expect(selectedIds).toEqual([]);
   });
-
-  // ============================================
-  // KEYBOARD NAVIGATION
-  // ============================================
 
   it('should open dropdown on ArrowDown key', () => {
     fixture.componentRef.setInput('id', 'test');
@@ -364,10 +327,6 @@ describe('DropdownComponent', () => {
     component.onKeyDown(event);
     expect(component.isOpen()).toBe(false);
   });
-
-  // ============================================
-  // ACCESSIBILITY
-  // ============================================
 
   it('should have correct aria-expanded attribute', () => {
     fixture.componentRef.setInput('id', 'test');
