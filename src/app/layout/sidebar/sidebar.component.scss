@@ -186,7 +186,13 @@
         font-size: 16px;
         writing-mode: initial;
         text-orientation: initial;
+        padding: 0 20px;
+      }
+
+      @media (max-width: 500px) {
+        flex-direction: column;
       }
     }
   }
 }
+

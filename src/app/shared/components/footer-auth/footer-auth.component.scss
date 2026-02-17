@@ -1,18 +1,16 @@
 @use "../../../../styles/index" as *;
 
 .footer-auth {
-  position: absolute;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  left: 0;
-  right: 0;
-  bottom: 40px;
+  @include flex(row, center, center);
   gap: 50px;
+  margin-top: auto;
+  padding-top: 2rem;
+  padding-bottom: 20px;
+  width: 100%;
 
   @media (max-width: $breakpoint-md) {
-    bottom: 40px;
     gap: 20px;
+    padding-bottom: 20px;
   }
 }
 
