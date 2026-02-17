@@ -107,6 +107,9 @@ export class AttachmentUploadComponent {
   /**
    * Process multiple files
    * @param files - Array of files to process
+   * @returns {void}
+    * @remarks
+    * This method orchestrates the processing of multiple files by first checking if the upload can start based on the current limits and then applying those limits to the provided files. It iterates over each file and processes it individually, ensuring that all necessary validations and transformations are applied before adding them to the attachments list.
    * @remarks
    * Iterates over each file and processes it individually.
    */
@@ -178,31 +181,17 @@ export class AttachmentUploadComponent {
   /**
    * Process single file with validation and compression
    * @param file - File to process
-   * @remarks
-   * Validates the file using FileValidationService.
+   * @return {void}
+   * @remarks This method handles the processing of a single file by first attempting to compress it using the `ImageUploadFlowService`. If the compression is successful, it creates a `TaskAttachment` object and validates its size against the total attachments size limit. If the attachment is valid, it is added to the attachments list. If any errors occur during processing, an appropriate error message is set to inform the user. This method ensures that only valid and appropriately sized attachments are added to the task.
    */
   private async processFile(file: File): Promise<void> {
     try {
       const img = await this.imgFlow.proc(file);
-      const attachment = { 
-        id: this.generateId(), 
-        filename: file.name, 
-        fileType: img.fileType, 
-        base64: img.base64, 
-        size: file.size, 
-        uploadedAt: new Date() 
-      };
+      const attachment = this.createAttachment(file, img);
       
-      const newTotalSize = this.totalSize() + calculateBase64Size(attachment.base64);
-      if (newTotalSize > this.maxTotalSize) {
-        const exceededBy = formatFileSize(newTotalSize - this.maxTotalSize);
-        this.errorMessage.set(`Cannot add image: Would exceed 1MB total limit by ${exceededBy}`);
-        this.toastService.showError(`Upload limit: 1MB total for all images. This would exceed by ${exceededBy}`);
-        return;
-      }
+      if (!this.validateSize(attachment)) return;
       
-      this.attachments.update(current => [...current, attachment]);
-      this.attachmentsChange.emit(this.attachments());
+      this.addAttachment(attachment);
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : 'Failed to process image';
       this.errorMessage.set(message);
@@ -210,12 +199,55 @@ export class AttachmentUploadComponent {
   }
 
   /**
+   * Download file as blob (primary strategy)
+   * @param file - File to download
+   * @param img - Compressed image data
+   * @returns {Promise<string>} Download URL of the uploaded file
+   * @remarks This method attempts to upload the compressed image data to Firebase Storage and retrieve a download URL. It uses the `AttachmentStorageService` to handle the upload and download URL retrieval. If the upload is successful, it returns the download URL, which can be used for downloading the file or displaying it in the UI. If any errors occur during this process, they are propagated to be handled by the calling method.
+   */
+  private createAttachment(file: File, img: { fileType: string; base64: string }): TaskAttachment {
+    return {
+      id: this.generateId(),
+      filename: file.name,
+      fileType: img.fileType,
+      base64: img.base64,
+      size: file.size,
+      uploadedAt: new Date()
+    };
+  }
+
+  /**
+   * Validates the size of a task attachment against the total allowed size.
+   * @param attachment - The task attachment to validate.
+   * @returns {boolean} True if the attachment size is within the allowed limit, false otherwise.
+   * @remarks This method calculates the new total size if the attachment were to be added. If the new total size exceeds the maximum allowed size, it sets an error message and shows a toast notification. This ensures that the total size of all attachments does not exceed the defined limit.
+   */
+  private validateSize(attachment: TaskAttachment): boolean {
+    const newTotalSize = this.totalSize() + calculateBase64Size(attachment.base64);
+    if (newTotalSize <= this.maxTotalSize) return true;
+
+    const exceededBy = formatFileSize(newTotalSize - this.maxTotalSize);
+    this.errorMessage.set(`Cannot add image: Would exceed 1MB total limit by ${exceededBy}`);
+    this.toastService.showError(`Upload limit: 1MB total for all images. This would exceed by ${exceededBy}`);
+    return false;
+  }
+
+  /**
+   * Check if compressed image exceeds size limit and throw error if it does
+   * @param attachment - The task attachment to validate
+   * @return {boolean} - Returns `true` if the attachment size is within the allowed limit, otherwise returns `false` and sets an error message.
+   * @remarks This method calculates the new total size if the attachment were to be added. If the new total size exceeds the maximum allowed size, it sets an error message and shows a toast notification. This ensures that the total size of all attachments does not exceed the defined limit.
+   */
+  private addAttachment(attachment: TaskAttachment): void {
+    this.attachments.update(current => [...current, attachment]);
+    this.attachmentsChange.emit(this.attachments());
+  }
+
+  /**
    * Removes an attachment from the attachments list by its unique identifier.
-   *
    * @param id - The unique identifier of the attachment to be removed.
-   * @remarks
-   * This method updates the attachments list by filtering out the attachment with the specified `id`.
-   * After updating the list, it emits the updated attachments through the `attachmentsChange` event emitter.
+   * @return {void}
+   * @remarks This method updates the attachments signal by filtering out the attachment with the specified ID. After updating the attachments list, it emits the updated list through the `attachmentsChange` event emitter to notify parent components of the change.
    */
   removeAttachment(id: string): void {
     this.attachments.update(current => 
@@ -226,10 +258,8 @@ export class AttachmentUploadComponent {
 
   /**
    * Removes all attachments from the current list.
-   * 
-   * This method clears the attachments by setting the attachments array to an empty array.
-   * It also emits an empty array via the `attachmentsChange` event to notify any listeners
-   * that all attachments have been removed.
+   * @return {void}
+   * @remarks This method clears the attachments list by setting it to an empty array and emits the change through the `attachmentsChange` event emitter. This allows parent components to react to the removal of all attachments, such as updating the UI or resetting related states.
    */
   removeAllAttachments(): void {
     this.attachments.set([]);
@@ -238,7 +268,8 @@ export class AttachmentUploadComponent {
 
   /**
    * Generate unique ID for attachment
-   * @return Unique ID string
+   * @return {string} Unique ID string
+   * @remarks This method generates a unique identifier by combining the current timestamp with a random string. This ensures that each attachment has a distinct ID, which is crucial for managing attachments, especially when adding or removing them from the list. The generated ID is used to track attachments and perform operations like deletion without conflicts.
    */
   private generateId(): string {
     return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
@@ -274,13 +305,16 @@ export class AttachmentUploadComponent {
     if (attachment.downloadURL) {
       return attachment.downloadURL;
     }
+    if (!attachment.base64) {
+      return '';
+    }
     return `data:${attachment.fileType};base64,${attachment.base64}`;
   }
 
   /**
    * Format file size for display (using shared utility)
    * @param bytes - File size in bytes
-   * @returns Formatted file size string
+   * @returns {string} Formatted file size string
    */
   formatFileSize = formatFileSize;
 }

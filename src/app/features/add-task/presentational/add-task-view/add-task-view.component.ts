@@ -357,6 +357,10 @@ export class AddTaskViewComponent implements OnInit, AfterViewInit {
   onRemoveBadge(idToRemove: string): void {
     const updated = this.selectedContactIds().filter((id) => id !== idToRemove);
     this.selectedContactIds.set(updated);
+    
+    if (this.isEditMode()) {
+      this.formDirty.set(true);
+    }
   }
 
   onAddSubtask(title: string): void {
@@ -366,6 +370,10 @@ export class AddTaskViewComponent implements OnInit, AfterViewInit {
     }
     const newSubtask = createSubtask(title);
     this.subtasks.update((tasks) => [...tasks, newSubtask]);
+    
+    if (this.isEditMode()) {
+      this.formDirty.set(true);
+    }
   }
 
   /**
@@ -390,6 +398,10 @@ export class AddTaskViewComponent implements OnInit, AfterViewInit {
     this.subtasks.update((tasks) => updateSubtaskTitle(tasks, id, newTitle));
     this.editingSubtaskId.set(null);
     this.subtaskEditInput.set("");
+    
+    if (this.isEditMode()) {
+      this.formDirty.set(true);
+    }
   }
 
   /**
@@ -410,6 +422,10 @@ export class AddTaskViewComponent implements OnInit, AfterViewInit {
    */
   onDeleteSubtask(id: string): void {
     this.subtasks.update((tasks) => removeSubtask(tasks, id));
+    
+    if (this.isEditMode()) {
+      this.formDirty.set(true);
+    }
   }
 
   /**
@@ -448,6 +464,7 @@ export class AddTaskViewComponent implements OnInit, AfterViewInit {
     this.attachments.set([]);
     this.editingSubtaskId.set(null);
     this.subtaskEditInput.set("");
+    this.uploadComponent?.removeAllAttachments();
 
     this.updateFormValidity();
   }
@@ -628,6 +645,7 @@ export class AddTaskViewComponent implements OnInit, AfterViewInit {
     this.attachments.update((atts) =>
       atts.filter((a) => a.id !== attachment.id),
     );
+    this.uploadComponent?.removeAttachment(attachment.id);
     this.toastService.showSuccess("Attachment removed");
 
     if (this.selectedAttachment()?.id === attachment.id) {
@@ -644,6 +662,7 @@ export class AddTaskViewComponent implements OnInit, AfterViewInit {
    */
   onDeleteAllAttachments(): void {
     this.attachments.set([]);
+    this.uploadComponent?.removeAllAttachments();
     this.selectedAttachment.set(null);
     this.toastService.showSuccess("All attachments removed");
   }

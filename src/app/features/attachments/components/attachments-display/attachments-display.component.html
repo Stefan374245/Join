@@ -13,7 +13,7 @@
   <ul class="attachments-grid">
     <li 
       class="attachment-card" 
-      *ngFor="let attachment of visibleAttachments(); let i = index"
+      *ngFor="let attachment of visibleAttachments(); let i = index; trackBy: trackByAttachmentId"
       (click)="onAttachmentClick($event, attachment, i)"
       (mouseenter)="setHoveredAttachment(attachment.id)"
       (mouseleave)="setHoveredAttachment(null)"
