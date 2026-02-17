@@ -1,11 +1,6 @@
 import { Injectable } from '@angular/core';
 import { FILE_UPLOAD } from '../../../shared/constants';
 
-/**
- * Service for validating file uploads with security checks
- * Supports only JPEG and PNG image formats.
- * Size validation applies to source files before compression.
- */
 @Injectable({
   providedIn: 'root'
 })
@@ -133,6 +128,8 @@ export class FileValidationService {
   /**
    * Check PNG magic bytes (89 50 4E 47)
    * @param bytes - Uint8Array of the file's initial bytes
+   * @return True if bytes match PNG signature, false otherwise
+   * @remarks Validates that the first four bytes of the file match the PNG magic byte signature (89 50 4E 47), which is a common way to verify that a file is indeed a PNG image.
    */
   private checkPngMagicBytes(bytes: Uint8Array): boolean {
     return bytes[0] === this.MAGIC_BYTES.png[0] &&

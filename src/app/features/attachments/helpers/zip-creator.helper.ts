@@ -52,6 +52,10 @@ async function addFileToZip(
   attachment: TaskAttachment
 ): Promise<boolean> {
   try {
+    if (!attachment.base64) {
+      console.warn(`Skipping ${attachment.filename}: base64 data is missing`);
+      return false;
+    }
     const blob = base64ToBlob(attachment.base64, attachment.fileType);
     zip.file(attachment.filename, blob);
     return true;
@@ -61,6 +65,12 @@ async function addFileToZip(
   }
 }
 
+/**
+ * Generates ZIP file blob from JSZip instance
+ * @param zip - JSZip instance with added files
+ * @returns Promise with generated ZIP blob
+ * @remarks Uses JSZip's generateAsync method to create a Blob object representing the ZIP file. This blob can then be downloaded by the user. The function handles the asynchronous nature of ZIP generation and ensures that the resulting blob is properly created before returning it.
+ */
 async function generateZipBlob(zip: JSZip): Promise<Blob> {
   return await zip.generateAsync({ type: 'blob' });
 }
@@ -69,6 +79,7 @@ async function generateZipBlob(zip: JSZip): Promise<Blob> {
  * Logs ZIP creation summary
  * @param successCount - Number of successful files
  * @param errorCount - Number of failed files
+ * @remarks Logs a summary of the ZIP creation process, including the number of successful and failed file additions. This helps in debugging and provides feedback on the ZIP creation outcome.
  */
 export function logZipSummary(successCount: number, errorCount: number): void {
   console.log(`ZIP created: ${successCount} successful, ${errorCount} failed`);

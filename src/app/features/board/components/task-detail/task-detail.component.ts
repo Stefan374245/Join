@@ -526,5 +526,25 @@ export class TaskDetailComponent {
     }
     return 'Unknown';
   }
+
+  /**
+   * TrackBy function for assignedTo list to prevent unnecessary re-renders
+   * @param index - Array index
+   * @param userId - User ID
+   * @returns User ID for tracking
+   */
+  trackByUserId(index: number, userId: string): string {
+    return userId;
+  }
+
+  /**
+   * TrackBy function for subtasks list to prevent unnecessary re-renders
+   * @param index - Array index
+   * @param subtask - Subtask object
+   * @returns Subtask ID for tracking
+   */
+  trackBySubtaskId(index: number, subtask: { id: string }): string {
+    return subtask.id;
+  }
 }
 

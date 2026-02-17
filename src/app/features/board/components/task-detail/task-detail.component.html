@@ -73,7 +73,7 @@
             <div class="assignee-list">
               <div
                 class="assignee-item"
-                *ngFor="let userId of currentTask.assignedTo.slice(0, 3)"
+                *ngFor="let userId of currentTask.assignedTo.slice(0, 3); trackBy: trackByUserId"
               >
                 <div
                   class="assignee-avatar"
@@ -135,7 +135,7 @@
           <div class="subtask-list">
             <div
               class="subtask-checkbox-container"
-              *ngFor="let subtask of currentTask.subtasks; let i = index"
+              *ngFor="let subtask of currentTask.subtasks; trackBy: trackBySubtaskId"
               (click)="toggleSubtask(subtask.id)"
             >
               <div

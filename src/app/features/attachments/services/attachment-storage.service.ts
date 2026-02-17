@@ -16,6 +16,13 @@ export class AttachmentStorageService {
   private injector = inject(Injector);
   private loadingService = inject(LoadingService);
 
+  /**
+   * Uploads base64 data to Firebase Storage
+   * @param filePath - Storage path for the file
+   * @param base64 - Base64 encoded data
+   * @param fileType - MIME type of the file
+   * @returns Promise resolving to download URL
+   */
   async putBase64(filePath: string, base64: string, fileType: string): Promise<string> {
     return await runInInjectionContext(this.injector, async () => {
       const storageRef = ref(this.storage, filePath);
@@ -25,6 +32,12 @@ export class AttachmentStorageService {
     });
   }
 
+  /**
+   * Deletes file from Firebase Storage by path
+   * @param filePath - Storage path of the file to delete
+   * @returns Promise that resolves when deletion is complete
+   * @remarks Silently fails if file doesn't exist or path is null/undefined
+   */
   async delByPath(filePath?: string | null): Promise<void> {
     if (!filePath) return;
     try {
@@ -36,9 +49,19 @@ export class AttachmentStorageService {
     }
   }
 
+  /**
+   * Downloads single attachment to user's device
+   * @param attachment - Task attachment to download
+   * @returns Promise that resolves when download starts
+   * @remarks Converts base64 to blob and triggers browser download
+   * @throws Error if base64 data is missing
+   */
   async downloadSingleAttachment(attachment: TaskAttachment): Promise<void> {
+    if (!attachment.base64) {
+      throw new Error('Cannot download attachment: base64 data is missing');
+    }
     return await runInInjectionContext(this.injector, async () => {
-      const blob = base64ToBlob(attachment.base64, attachment.fileType);
+      const blob = base64ToBlob(attachment.base64!, attachment.fileType);
       downloadBlobToFile(blob, attachment.filename);
     });
   }

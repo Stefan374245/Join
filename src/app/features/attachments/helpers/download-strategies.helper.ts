@@ -2,9 +2,6 @@ import { Storage, ref, getBlob } from '@angular/fire/storage';
 import { Auth } from '@angular/fire/auth';
 import { getUserAuthToken, createAuthFetchOptions } from './auth-helper';
 
-/**
- * Download strategy result interface
- */
 export interface DownloadResult {
   blob: Blob;
   success: boolean;
@@ -82,6 +79,7 @@ function createNewTabLink(url: string, filename: string): HTMLAnchorElement {
 /**
  * Triggers new tab download
  * @param link - Anchor element
+ * @remarks Opens the download URL in a new browser tab. This is a fallback strategy for downloading files when other methods fail, but it relies on the browser's handling of the download URL and may not work in all cases (e.g., if the URL requires authentication or if pop-ups are blocked).
  */
 function triggerNewTabDownload(link: HTMLAnchorElement): void {
   document.body.appendChild(link);
@@ -91,6 +89,7 @@ function triggerNewTabDownload(link: HTMLAnchorElement): void {
 /**
  * Removes link from DOM
  * @param link - Anchor element to remove
+ *  @remarks Cleans up the DOM by removing the anchor element after triggering the download. This helps prevent cluttering the DOM with unused elements and ensures that the download process is as seamless as possible for the user.
  */
 function removeLink(link: HTMLAnchorElement): void {
   document.body.removeChild(link);

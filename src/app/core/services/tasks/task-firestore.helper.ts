@@ -58,10 +58,13 @@ export function prepareAttachmentsForFirestore(attachments: TaskAttachment[]): F
       id: att.id,
       filename: att.filename,
       fileType: att.fileType,
-      base64: att.base64,
       size: att.size,
       uploadedAt: att.uploadedAt ? convertToTimestamp(att.uploadedAt) : Timestamp.now()
     };
+    
+    if (att.base64) {
+      firestoreAtt.base64 = att.base64;
+    }
     
     if (att.downloadURL) {
       firestoreAtt.downloadURL = att.downloadURL;
@@ -247,12 +250,28 @@ export function setupTasksListener(
       
       return onSnapshot(tasksCol,
         (snapshot) => {
-          const tasks = snapshot.docs.map((doc) => {
-            const data = { id: doc.id, ...doc.data() } as unknown as FirestoreTaskDocument;
-            return mapFirestoreToTask(data);
+          const currentTasks = [...tasksSignal()];
+          
+          snapshot.docChanges().forEach((change) => {
+            const data = { id: change.doc.id, ...change.doc.data() } as unknown as FirestoreTaskDocument;
+            const task = mapFirestoreToTask(data);
+            
+            if (change.type === 'added') {
+              currentTasks.push(task);
+            } else if (change.type === 'modified') {
+              const index = currentTasks.findIndex(t => t.id === task.id);
+              if (index !== -1) {
+                currentTasks[index] = task;
+              }
+            } else if (change.type === 'removed') {
+              const index = currentTasks.findIndex(t => t.id === task.id);
+              if (index !== -1) {
+                currentTasks.splice(index, 1);
+              }
+            }
           });
 
-          const sortedTasks = sortTasksByCreatedDate(tasks);
+          const sortedTasks = sortTasksByCreatedDate(currentTasks);
 
           tasksSignal.set(sortedTasks);
           loadingSignal.set(false);

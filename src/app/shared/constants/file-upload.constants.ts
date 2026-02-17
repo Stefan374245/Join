@@ -36,10 +36,12 @@ export function formatFileSize(bytes: number): string {
 
 /**
  * Calculate actual size of base64 string in bytes
- * @param base64 - Base64 string (without data URL prefix)
- * @returns Size in bytes
+ * @param base64 - Base64 string (without data URL prefix), can be undefined/null
+ * @returns Size in bytes, returns 0 if base64 is undefined/null/empty
  */
-export function calculateBase64Size(base64: string): number {
+export function calculateBase64Size(base64?: string | null): number {
+  if (!base64) return 0;
+  
   const cleanBase64 = base64.includes(',') ? base64.split(',')[1] : base64;
   const padding = cleanBase64.endsWith('==') ? 2 : cleanBase64.endsWith('=') ? 1 : 0;
   
@@ -48,9 +50,10 @@ export function calculateBase64Size(base64: string): number {
 
 /**
  * Calculate total size of all attachments in bytes
- * @param attachments - Array of attachments with base64 data
+ * @param attachments - Array of attachments with base64 data (base64 can be undefined)
  * @returns Total size in bytes
+ * @remarks Safely handles attachments with undefined/null base64 values
  */
-export function calculateTotalAttachmentsSize(attachments: { base64: string }[]): number {
+export function calculateTotalAttachmentsSize(attachments: { base64?: string | null }[]): number {
   return attachments.reduce((total, att) => total + calculateBase64Size(att.base64), 0);
 }

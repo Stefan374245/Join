@@ -30,7 +30,7 @@
     </div>
 
     <app-task-card
-      *ngFor="let task of tasks()"
+      *ngFor="let task of tasks(); trackBy: trackByTaskId"
       [task]="task"
       [contacts]="contacts()"
       (taskClicked)="onTaskClick($event)"

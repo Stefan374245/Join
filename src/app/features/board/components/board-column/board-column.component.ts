@@ -1,4 +1,4 @@
-import { Component, input, output, ViewEncapsulation, viewChild, AfterViewInit, effect } from '@angular/core';
+import { Component, input, output, ViewEncapsulation, ChangeDetectionStrategy, viewChild, AfterViewInit, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DragDropModule, CdkDragDrop, CdkDropList } from '@angular/cdk/drag-drop';
 import { Task } from '../../../../core/models/task.interface';
@@ -30,6 +30,7 @@ import { TaskService } from '../../../../core/services/task.service';
   templateUrl: './board-column.component.html',
   styleUrl: './board-column.component.scss',
   encapsulation: ViewEncapsulation.None,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BoardColumnComponent implements AfterViewInit {
 
@@ -126,5 +127,15 @@ private mapStatus(columnId: string): string {
    */
   onAddButtonHover(event: MouseEvent, isHover: boolean): void {
     this.addButtonHover.emit({ event, isHover });
+  }
+
+  /**
+   * TrackBy function for tasks list to prevent unnecessary re-renders
+   * @param index - Array index
+   * @param task - Task object
+   * @returns Task ID for tracking
+   */
+  trackByTaskId(index: number, task: Task): string {
+    return task.id;
   }
 }

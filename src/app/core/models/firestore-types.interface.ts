@@ -59,15 +59,12 @@ export interface FirestoreAttachment {
   id: string;
   filename: string;
   fileType: string;
-  base64: string; // Required: compressed 800x800px base64 string stored in Firestore
+  base64?: string;
   size: number;
   uploadedAt: Timestamp;
-  downloadURL?: string; // Optional: for backward compatibility
+  downloadURL?: string;
 }
 
-/**
- * Form data interfaces for task creation/update
- */
 
 /**
  * Task form data from Angular FormGroup
@@ -107,7 +104,7 @@ export interface FormAttachment {
   id: string;
   filename: string;
   fileType: string;
-  base64: string; // Compressed 800x800px base64 string
+  base64: string;
   size: number;
   uploadedAt: Date;
 }

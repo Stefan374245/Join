@@ -28,8 +28,8 @@ export interface TaskAttachment {
   id: string;
   filename: string;
   fileType: string;
-  base64: string; // Required: compressed 800x800px base64 string
+  base64?: string;
   size: number;
   uploadedAt: Date;
-  downloadURL?: string; // Optional: for backward compatibility
+  downloadURL?: string;
 }

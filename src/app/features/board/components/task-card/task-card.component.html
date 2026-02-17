@@ -59,7 +59,7 @@
     >
       <div
         class="assignee-avatar"
-        *ngFor="let userId of task().assignedTo.slice(0, 3)"
+        *ngFor="let userId of task().assignedTo.slice(0, 3); trackBy: trackByUserId"
         [style.background-color]="getContactColor(userId)"
         role="listitem"
         [attr.aria-label]="getContactInitials(userId)"

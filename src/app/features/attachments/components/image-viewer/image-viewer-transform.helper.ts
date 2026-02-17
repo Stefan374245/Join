@@ -24,6 +24,9 @@ export function getAttachmentImageUrl(attachment: TaskAttachment): string {
   if (attachment.downloadURL) {
     return attachment.downloadURL;
   }
+  if (!attachment.base64) {
+    return '';
+  }
   if (attachment.base64.startsWith('data:')) {
     return attachment.base64;
   }

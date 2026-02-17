@@ -11,6 +11,7 @@ import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
 import { ClickOutsideDirective, StopPropagationDirective } from "../../../../shared/directives";
 import { getInitials } from '../../../../shared/utils';
+import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
 
 export interface DropdownItem {
   id: string;
@@ -25,7 +26,7 @@ export interface DropdownItem {
 @Component({
   selector: "app-dropdown",
   standalone: true,
-  imports: [CommonModule, FormsModule, ClickOutsideDirective, StopPropagationDirective],
+  imports: [CommonModule, FormsModule, ClickOutsideDirective, StopPropagationDirective, LoadingSpinnerComponent],
   templateUrl: "./dropdown.component.html",
   styleUrl: "./dropdown.component.scss",
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -51,6 +52,9 @@ export class DropdownComponent {
   isOpen = signal<boolean>(false);
   searchQuery = signal<string>("");
   focusedIndex = signal<number>(-1);
+  loadingImages = signal<Set<string>>(new Set());
+
+  isLoadingImages = computed(() => this.loadingImages().size > 0);
 
 
   /**
@@ -119,6 +123,22 @@ export class DropdownComponent {
       this.filteredItems();
       this.focusedIndex.set(-1);
     });
+
+    effect(() => {
+      if (this.isOpen()) {
+        this.initializeImageLoading();
+      }
+    });
+  }
+
+  /**
+   * Initializes image loading tracking for items with avatars
+   * @remarks Called when dropdown opens to track avatar image loading
+   */
+  private initializeImageLoading(): void {
+    const itemsWithAvatars = this.filteredItems().filter(item => this.hasAvatarImage(item));
+    const loadingSet = new Set(itemsWithAvatars.map(item => item.id));
+    this.loadingImages.set(loadingSet);
   }
 
   /**
@@ -154,8 +174,7 @@ export class DropdownComponent {
   closeDropdown(): void {
     this.isOpen.set(false);
     this.searchQuery.set("");
-    this.focusedIndex.set(-1);
-    this.closed.emit();
+    this.focusedIndex.set(-1);    this.loadingImages.set(new Set());    this.closed.emit();
   }
 
   /**
@@ -325,5 +344,27 @@ export class DropdownComponent {
    */
   getColor(item: DropdownItem): string {
     return item["color"] || "#29ABE2";
+  }
+
+  /**
+   * Tracks when an image starts loading
+   * @param itemId - ID of the item whose image is loading
+   * @remarks Adds item ID to loading set
+   */
+  onImageLoadStart(itemId: string): void {
+    const current = new Set(this.loadingImages());
+    current.add(itemId);
+    this.loadingImages.set(current);
+  }
+
+  /**
+   * Tracks when an image finishes loading
+   * @param itemId - ID of the item whose image finished loading
+   * @remarks Removes item ID from loading set
+   */
+  onImageLoadEnd(itemId: string): void {
+    const current = new Set(this.loadingImages());
+    current.delete(itemId);
+    this.loadingImages.set(current);
   }
 }

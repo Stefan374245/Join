@@ -92,6 +92,11 @@
           </svg>
         </li>
       }
+      @if (isLoadingImages()) {
+        <li class="loading-wrapper" role="presentation">
+          <app-loading-spinner [inline]="true" [localLoading]="true" [size]="32" />
+        </li>
+      }
       @for (item of filteredItems(); track trackByItemId($index, item)) {
         <li
           class="dropdown-item"
@@ -111,6 +116,9 @@
               [alt]="item.label"
               class="item-icon"
               title="avatar"
+              (load)="onImageLoadEnd(item.id)"
+              (error)="onImageLoadEnd(item.id)"
+              [attr.data-loading]="item.id"
             />
           </span>
           <span *ngIf="!hasAvatarImage(item) && hasColor(item)" class="avatar" [style.background-color]="getColor(item)">
@@ -145,7 +153,7 @@
           </span>
         </li>
       } @empty {
-        <li class="dropdown-item empty">No results found</li>
+        <li class="dropdown-item empty" role="option" aria-disabled="true">No results found</li>
       }
     </ul>
   }
