@@ -7,23 +7,26 @@
     Total size: {{ totalSizeFormatted() }} / 1.0 MB
   </p>
 
+  <input
+    id="file-upload-input"
+    type="file"
+    accept="image/jpeg,image/png,.jpg,.jpeg,.png"
+    multiple
+    [disabled]="isAtLimit()"
+    (change)="onFileSelected($event)"
+    class="file-input"
+    tabindex="0"
+    aria-label="Upload images (JPEG or PNG, max 10 files, 1MB total)"
+  />
+
   <div class="upload-zone" [class.disabled]="isAtLimit()" dragDrop (filesDropped)="handleFilesDropped($event)">
     <div class="upload-content">
       <p class="upload-text">
         Drag a file or 
-        <label class="file-picker-label" [class.disabled]="isAtLimit()">
+        <label for="file-upload-input" class="file-picker-label" [class.disabled]="isAtLimit()">
           browse files <img src="assets/images/addDark.svg" alt="" role="presentation" class="addfile" />
-          <input
-            type="file"
-            accept="image/jpeg,image/png,.jpg,.jpeg,.png"
-            multiple
-            [disabled]="isAtLimit()"
-            (change)="onFileSelected($event)"
-            class="file-input"
-          />
         </label>
       </p>
-
     </div>
   </div>
 
@@ -89,7 +92,7 @@
                 {{ attachment.filename }}
               </span>
               <span class="attachment-size">
-                {{ formatFileSize(attachment.size) }}
+                {{ formatFileSize(getAttachmentSize(attachment)) }}
               </span>
             </figcaption>
           </figure>

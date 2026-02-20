@@ -211,7 +211,7 @@ export class AttachmentUploadComponent {
       filename: file.name,
       fileType: img.fileType,
       base64: img.base64,
-      size: file.size,
+      size: calculateBase64Size(img.base64),
       uploadedAt: new Date()
     };
   }
@@ -317,4 +317,14 @@ export class AttachmentUploadComponent {
    * @returns {string} Formatted file size string
    */
   formatFileSize = formatFileSize;
+
+  /**
+   * Gets the correct file size for an attachment, always calculated from base64
+   * @param attachment - The task attachment
+   * @returns {number} - The actual size in bytes based on the compressed base64 data
+   * @remarks This method ensures that the displayed size is always correct by calculating it from the base64 string.
+   */
+  getAttachmentSize(attachment: TaskAttachment): number {
+    return calculateBase64Size(attachment.base64);
+  }
 }

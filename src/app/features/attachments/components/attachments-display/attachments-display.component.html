@@ -73,7 +73,7 @@
           {{ attachment.filename }}
         </span>
         <span class="attachment-size">
-          {{ formatFileSize(attachment.size) }}
+          {{ formatFileSize(getAttachmentSize(attachment)) }}
         </span>
       </figcaption>
     </li>

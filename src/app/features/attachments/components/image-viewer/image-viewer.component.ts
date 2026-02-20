@@ -6,6 +6,7 @@ import { ToastService } from "../../../../core/services/toast.service";
 import { AttachmentStorageService } from "../../services/attachment-storage.service";
 import { TaskAttachment } from "../../../../core/models/task.interface";
 import { formatFileSize } from "../../../../shared/utils";
+import { calculateBase64Size } from "../../../../shared/constants";
 import { LoadingSpinnerComponent } from "../../../../shared/components/loading-spinner/loading-spinner.component";
 import * as LoadingHelper from './image-viewer-loading.helper';
 import * as NavigationHelper from './image-viewer-navigation.helper';
@@ -104,6 +105,16 @@ export class ImageViewerComponent {
   });
 
   formatFileSize = formatFileSize;
+
+  /**
+   * Gets the correct file size for an attachment, always calculated from base64
+   * @param attachment - The task attachment
+   * @returns {number} - The actual size in bytes based on the compressed base64 data
+   * @remarks This method ensures that the displayed size is always correct by calculating it from the base64 string.
+   */
+  getAttachmentSize(attachment: TaskAttachment): number {
+    return calculateBase64Size(attachment.base64);
+  }
 
   /**
    * Component constructor

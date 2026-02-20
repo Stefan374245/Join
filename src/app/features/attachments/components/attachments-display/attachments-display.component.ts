@@ -2,6 +2,7 @@ import { Component, input, output, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TaskAttachment } from '../../../../core/models/task.interface';
 import { formatFileSize } from '../../../../shared/utils';
+import { calculateBase64Size } from '../../../../shared/constants';
 
 @Component({
   selector: 'app-attachments-display',
@@ -62,6 +63,17 @@ export class AttachmentsDisplayComponent {
    * @remarks This function takes a file size in bytes and converts it into a more human-readable format. It checks the size against thresholds for kilobytes (KB) and megabytes (MB) and formats the number accordingly, rounding to two decimal places for KB and MB. If the size is less than 1 KB, it returns the size in bytes with a "B" suffix.
     */
   formatFileSize = formatFileSize;
+
+  /**
+   * Gets the correct file size for an attachment, always calculated from base64
+   * @param attachment - The task attachment
+   * @returns {number} - The actual size in bytes based on the compressed base64 data
+   * @remarks This method ensures that the displayed size is always correct by calculating it from the base64 string.
+   * This is important because older attachments may have been saved with the original file size before compression.
+   */
+  getAttachmentSize(attachment: TaskAttachment): number {
+    return calculateBase64Size(attachment.base64);
+  }
 
   /**
    * Handles the click event for viewing an attachment.

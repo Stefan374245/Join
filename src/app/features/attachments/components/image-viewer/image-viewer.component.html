@@ -10,7 +10,7 @@
     <header class="top-bar">
       <span class="image-info">
         {{ currentImage().filename }} •
-        {{ formatFileSize(currentImage().size) }} •
+        {{ formatFileSize(getAttachmentSize(currentImage())) }} •
         {{ imageCounter() }}
       </span>
 
